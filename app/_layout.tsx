@@ -1,9 +1,15 @@
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import {
   Roboto_400Regular,
   Roboto_500Medium,
   Roboto_600SemiBold,
   useFonts,
 } from "@expo-google-fonts/roboto";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -11,7 +17,25 @@ import React, { useEffect } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
+const CustomLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: "#F7F7F7",
+  },
+};
+const CustomDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: "#1C1C1E",
+  },
+};
+
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
   const isAuthenticated = false;
   const hasComletedOnboarding = true;
 
@@ -33,8 +57,8 @@ export default function RootLayout() {
   }
 
   return (
-    <React.Fragment>
-      <StatusBar style="dark" translucent />
+    <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
+      <StatusBar style="auto" />
       <Stack>
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" />
@@ -48,6 +72,6 @@ export default function RootLayout() {
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         </Stack.Protected>
       </Stack>
-    </React.Fragment>
+    </ThemeProvider>
   );
 }

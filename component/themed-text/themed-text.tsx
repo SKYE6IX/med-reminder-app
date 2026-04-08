@@ -4,7 +4,7 @@ import { StyleSheet, Text, type TextProps } from "react-native";
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: "default" | "title" | "subtitle";
+  type?: "default" | "title" | "subtitle" | "label";
 };
 
 export function ThemedText({
@@ -18,19 +18,7 @@ export function ThemedText({
     { light: lightColor, dark: darkColor },
     "textPrimary",
   );
-  return (
-    <Text
-      style={[
-        { color },
-        type === "default" ? styles.default : undefined,
-        type === "title" ? styles.title : undefined,
-        type === "subtitle" ? styles.subtitle : undefined,
-        style,
-      ]}
-      {...rest}
-      testID="themed-text"
-    />
-  );
+  return <Text style={[{ color }, styles[type], style]} {...rest} />;
 }
 
 const styles = StyleSheet.create({
@@ -46,5 +34,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     textAlign: "center",
+  },
+  label: {
+    fontFamily: "Roboto_500Medium",
+    fontSize: 16,
+    lineHeight: 19.2,
   },
 });

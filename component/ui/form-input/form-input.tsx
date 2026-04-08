@@ -1,41 +1,148 @@
-import React, { type Ref, useState } from "react";
-import { StyleSheet, TextInput, type TextInputProps } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import React, { useState, type RefObject } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  type TextInputProps,
+} from "react-native";
+
+import CloseIcon from "@/component/icons/close-icon";
+import ExclamationCircleIcon from "@/component/icons/exclamation-circle-icon";
+import EyeIcon from "@/component/icons/eye-icon";
+import StrokeEyeIcon from "@/component/icons/stroke-eye-icon";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { inputProps } from "./inputProps";
 
 type FormInputProps = TextInputProps & {
-  customRef?: Ref<TextInput>;
+  inputRef?: RefObject<TextInput | null>;
   label: string;
   type?: "text" | "email" | "password";
+  hasError: boolean;
   onValueChange: (value: string) => void;
 };
 
 export default function FormInput({
+  type = "text",
   label,
-  customRef,
+  inputRef,
   onValueChange,
+  hasError,
   ...rest
 }: FormInputProps) {
   const [inputValue, onInputValueChange] = useState("");
+  const [hidePassword, setHidePassword] = useState(false);
+
+  const isPassword = type === "password";
 
   const handleOnTextChange = (text: string) => {
     onInputValueChange(text);
     onValueChange(text);
   };
 
+  const clearInputValue = () => {
+    onInputValueChange("");
+    onValueChange("");
+  };
+
+  const handleShowPassword = () => {
+    setHidePassword(!hidePassword);
+  };
+
+  const inputBgColor = useThemeColor({}, "backgroundSecondary");
+  const inputBorderColor = useThemeColor({}, "borderColor");
+  const color = useThemeColor({}, "textPrimary");
+
   return (
-    <SafeAreaProvider>
-      <SafeAreaView>
-        <ThemedText>{label}</ThemedText>
+    <View style={styles.container}>
+      <ThemedText type="label">{label}</ThemedText>
+      <View style={styles.inputWrapper}>
         <TextInput
-          ref={customRef}
+          ref={inputRef}
           onChangeText={handleOnTextChange}
           value={inputValue}
+          style={[
+            {
+              backgroundColor: inputBgColor,
+              borderColor: inputBorderColor,
+              color,
+            },
+            styles.input,
+            inputRef?.current?.isFocused() ? styles.inputFocus : undefined,
+            hasError ? styles.error : undefined,
+          ]}
+          placeholderTextColor="#9E9E9E"
+          secureTextEntry={type === "password" && !hidePassword}
+          clearTextOnFocus={false}
+          testID="form-test-input"
+          {...inputProps[type]}
+          {...rest}
         />
-      </SafeAreaView>
-    </SafeAreaProvider>
+        <View style={styles.iconWrapper}>
+          {hasError ? (
+            <ExclamationCircleIcon />
+          ) : (
+            <>
+              {!isPassword && inputValue && (
+                <Pressable onPress={clearInputValue} role="button">
+                  <CloseIcon size={25} color={color} />
+                </Pressable>
+              )}
+
+              {isPassword && (
+                <>
+                  {hidePassword ? (
+                    <Pressable onPress={handleShowPassword}>
+                      <StrokeEyeIcon size={25} color={color} />
+                    </Pressable>
+                  ) : (
+                    <Pressable onPress={handleShowPassword}>
+                      <EyeIcon width={25} height={18} color={color} />
+                    </Pressable>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </View>
+      </View>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    gap: 8,
+    minHeight: 75,
+  },
+  inputWrapper: {
+    height: 48,
+    width: "100%",
+    position: "relative",
+  },
+  input: {
+    height: "100%",
+    borderWidth: 1,
+    borderRadius: 12,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    paddingLeft: 16,
+    paddingRight: 41,
+    lineHeight: 16.8,
+  },
+  inputFocus: {
+    borderColor: "#353535",
+  },
+  iconWrapper: {
+    position: "absolute",
+    right: 16,
+    height: 48,
+    justifyContent: "center",
+  },
+  error: {
+    borderColor: "#DC0000",
+  },
+});

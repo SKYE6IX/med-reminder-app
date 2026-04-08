@@ -1,33 +1,47 @@
-const primaryBlue = "#1256DB";
-const accentsBlue = "#1E6EF4";
+const blue = "#1256DB";
+const blueAccent = "#1E6EF4";
+const white = "#FFF";
 
 export const Colors = {
   light: {
     textPrimary: "#353535",
+    textMuted: "#9E9E9E",
 
-    backgroundPrimary: "#fff",
+    backgroundPrimary: "#F7F7F7",
+    backgroundSecondary: white,
 
-    buttonPrimaryBg: primaryBlue,
+    borderColor: "#E6E6E6",
 
-    tint: primaryBlue,
+    buttonPrimaryBg: blue,
+    buttonOutlineBg: white,
+    backButtonColor: "#000000",
+
+    tint: blue,
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
-    tabIconSelected: primaryBlue,
+    tabIconSelected: blue,
   },
   dark: {
     textPrimary: "#ECEDEE",
+    textMuted: "#ECEDEE",
 
-    backgroundPrimary: "#0F0F0F",
+    backgroundPrimary: "#1C1C1E",
+    backgroundSecondary: "#2C2C2E",
 
-    buttonPrimaryBg: accentsBlue,
+    borderColor: "#3A3A3C",
 
-    tint: accentsBlue,
+    buttonPrimaryBg: blueAccent,
+    buttonOutlineBg: "#2C2C2E",
+    backButtonColor: white,
+
+    tint: blue,
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
-    tabIconSelected: accentsBlue,
+    tabIconSelected: blue,
   },
 };
 
+// const accentsBlue = "#1E6EF4";
 // border: 1.5px solid rgba(20, 94, 241, 0.50);
 // background: rgba(20, 94, 241, 0.02);
 
@@ -65,8 +79,9 @@ export const Colors = {
 //  textInverse: "#ffffff",
 //  textDisabled: "#C0C0C0",
 
+// foreground = text/icon on button
 // buttonPrimaryBg: primaryColor,
-//   buttonPrimaryFg: "#ffffff",       // foreground = text/icon on button
+//   buttonPrimaryFg: "#ffffff",
 //   buttonSecondaryBg: "#F0F0F0",
 //   buttonSecondaryFg: "#1A1A1A",
 //   buttonOutlineBorder: primaryColor,

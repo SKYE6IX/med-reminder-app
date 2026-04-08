@@ -1,16 +1,16 @@
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 
-import { useColorScheme } from "@/hooks/use-color-scheme";
-
 import { OnboardingView } from "@/component/onboadring-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function WelcomeScreen() {
   const scheme = useColorScheme();
 
   const appNameColor = scheme === "dark" ? "#1E6EF4" : "#1256DB";
+
   const source =
     scheme === "dark"
       ? require("@/assets/icons/app-logo-dark.png")
@@ -26,7 +26,9 @@ export default function WelcomeScreen() {
         </ThemedText>
       </View>
       <View style={styles.textContainer}>
-        <ThemedText type="title">Легко принимайте свои таблетки</ThemedText>
+        <ThemedText type="title">
+          Контролируйте прием Ваших лекарств просто
+        </ThemedText>
         <ThemedText type="subtitle">
           Все ваши таблетки в одном месте.
         </ThemedText>
@@ -38,7 +40,7 @@ export default function WelcomeScreen() {
           label="Войти в аккаунт"
           href="/sign-in"
           variant="outline"
-          textVaraint="outlineText"
+          textVaraint="mutedText"
         />
       </View>
     </OnboardingView>

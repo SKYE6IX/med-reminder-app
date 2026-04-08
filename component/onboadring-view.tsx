@@ -1,10 +1,7 @@
-import { StyleSheet, type ViewProps } from "react-native";
+import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 
-import {
-  SafeAreaProvider,
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 
@@ -19,25 +16,26 @@ export function OnboardingView({
   darkColor,
   ...rest
 }: OnboardingVievProps) {
+  const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView
-        style={[
-          {
-            paddingBottom: insets.bottom,
-            backgroundColor,
-          },
-          styles.container,
-          style,
-        ]}
-        {...rest}
-      />
-    </SafeAreaProvider>
+    <View
+      style={[
+        {
+          backgroundColor,
+          paddingTop: Platform.OS === "ios" ? headerHeight : 0,
+          paddingBottom: insets.bottom + 20,
+        },
+        styles.container,
+        style,
+      ]}
+      {...rest}
+    />
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     width: "100%",

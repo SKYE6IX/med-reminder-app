@@ -5,7 +5,7 @@ type Props = {
   size?: number;
 };
 
-export default function GearIcon({ color = "#353535", size = 20 }: Props) {
+export default function CloseIcon({ color = "#353535", size = 20 }: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path

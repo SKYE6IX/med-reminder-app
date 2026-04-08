@@ -1,27 +1,51 @@
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { StyleSheet } from "react-native";
 
-export const linkButtonStyles = StyleSheet.create({
-  base: {
-    width: "100%",
-    height: 48,
-    borderRadius: 16,
-  },
-  text: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 16,
-    color: "#FFF",
-    lineHeight: 19.2,
-  },
-  primary: {},
-  secondary: {},
-  outline: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#E6E6E6",
-  },
-  outlineText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 16,
-    color: "#9E9E9E",
-  },
-});
+export function useLinkButtonStyles() {
+  const primaryBg = useThemeColor({}, "buttonPrimaryBg");
+  const outlineBg = useThemeColor({}, "buttonOutlineBg");
+  const borderColor = useThemeColor({}, "borderColor");
+  const textPrimary = useThemeColor({}, "textPrimary");
+  const textMuted = useThemeColor({}, "textMuted");
+
+  return StyleSheet.create({
+    base: {
+      width: "100%",
+      height: 48,
+      borderRadius: 16,
+      flexDirection: "row",
+      gap: 10,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    text: {
+      fontFamily: "Roboto_400Regular",
+      fontSize: 16,
+      lineHeight: 19.2,
+    },
+    filled: {
+      backgroundColor: primaryBg,
+    },
+    outline: {
+      backgroundColor: outlineBg,
+      borderWidth: 1,
+      borderColor,
+    },
+    disabled: {},
+    danger: {},
+    regularText: {
+      color: "#FFF",
+    },
+    accentText: {
+      color: textPrimary,
+    },
+    mutedText: {
+      color: textMuted,
+    },
+    logo: {
+      width: 24,
+      height: 24,
+      aspectRatio: 1 / 1,
+    },
+  });
+}

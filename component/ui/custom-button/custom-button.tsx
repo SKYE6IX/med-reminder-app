@@ -1,22 +1,33 @@
-import { linkButtonStyles } from "@/component/shared-styles/link-button-styles";
-import { Pressable, Text, type PressableProps } from "react-native";
+import { useLinkButtonStyles } from "@/component/shared-styles/link-button-styles";
+import { Image } from "expo-image";
+import { Pressable, type PressableProps, Text } from "react-native";
 
 type CustomButtonProps = PressableProps & {
   label: string;
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "filled" | "outline" | "disabled" | "danger";
+  textVaraint?: "regularText" | "accentText" | "mutedText";
+  logoSrc?: any;
 };
 
 export default function CustomButton({
   label,
-  variant = "primary",
+  variant = "filled",
+  textVaraint = "regularText",
   onPress,
+  logoSrc,
 }: CustomButtonProps) {
+  const buttonStyles = useLinkButtonStyles();
+
   return (
     <Pressable
+      role="button"
       onPress={onPress}
-      style={() => [linkButtonStyles.base, linkButtonStyles[variant]]}
+      style={[buttonStyles.base, buttonStyles[variant]]}
     >
-      <Text>{label}</Text>
+      {logoSrc && <Image source={logoSrc} style={buttonStyles.logo} />}
+      <Text style={[buttonStyles.text, buttonStyles[textVaraint]]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
