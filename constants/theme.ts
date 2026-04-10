@@ -20,6 +20,11 @@ export const Colors = {
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
     tabIconSelected: blue,
+
+    loaderDefault: "#1256DB",
+    loaderPillLeft: "#1256DB",
+    loaderPillRight: "#B8CCF4",
+    loaderBg: "#FFFFFFB2",
   },
 
   dark: {
@@ -39,6 +44,11 @@ export const Colors = {
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
     tabIconSelected: blue,
+
+    loaderDefault: "#3B82F6",
+    loaderPillLeft: "#2563EB",
+    loaderPillRight: "#60A5FA",
+    loaderBg: "#1F2937E5",
   },
 };
 

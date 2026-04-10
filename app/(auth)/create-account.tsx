@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
@@ -28,6 +29,8 @@ export default function CreateAccountScreen() {
     <View
       style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}
     >
+      <Loader visible={false} />
+
       <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
 
       <View style={styles.inputsWrapper}>
