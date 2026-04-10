@@ -10,6 +10,7 @@ type CustomButtonProps = PressableProps & {
 };
 
 export default function CustomButton({
+  style,
   label,
   variant = "filled",
   textVaraint = "regularText",
@@ -22,7 +23,7 @@ export default function CustomButton({
     <Pressable
       role="button"
       onPress={onPress}
-      style={[buttonStyles.base, buttonStyles[variant]]}
+      style={[buttonStyles.base, buttonStyles[variant], style]}
     >
       {logoSrc && <Image source={logoSrc} style={buttonStyles.logo} />}
       <Text style={[buttonStyles.text, buttonStyles[textVaraint]]}>

@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 
 export default function AuthLayout() {
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
+
   return (
     <Stack
       screenOptions={{

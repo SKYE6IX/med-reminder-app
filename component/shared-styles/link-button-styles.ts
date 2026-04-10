@@ -45,7 +45,7 @@ export function useLinkButtonStyles() {
     logo: {
       width: 24,
       height: 24,
-      aspectRatio: 1 / 1,
+      objectFit: "contain",
     },
   });
 }

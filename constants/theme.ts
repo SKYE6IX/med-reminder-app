@@ -1,13 +1,13 @@
 const blue = "#1256DB";
 const blueAccent = "#1E6EF4";
-const white = "#FFF";
+const white = "#F7F7F7";
 
 export const Colors = {
   light: {
     textPrimary: "#353535",
     textMuted: "#9E9E9E",
 
-    backgroundPrimary: "#F7F7F7",
+    backgroundPrimary: white,
     backgroundSecondary: white,
 
     borderColor: "#E6E6E6",
@@ -21,6 +21,7 @@ export const Colors = {
     tabIconDefault: "#6B6B6B",
     tabIconSelected: blue,
   },
+
   dark: {
     textPrimary: "#ECEDEE",
     textMuted: "#ECEDEE",

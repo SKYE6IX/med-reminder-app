@@ -7,14 +7,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function CreateAccountScreen() {
   const insets = useSafeAreaInsets();
   const textInputRef = useRef<TextInput>(null);
   const emaiInputRef = useRef<TextInput>(null);
+  const scheme = useColorScheme();
 
-  const appleLogoSource = require("@/assets/icons/apple-logo.png");
+  const appleLogoSource =
+    scheme === "dark"
+      ? require("@/assets/icons/apple-logo-light.png")
+      : require("@/assets/icons/apple-logo.png");
+
   const googleLogoSource = require("@/assets/icons/google-logo.png");
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");

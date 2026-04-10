@@ -1,4 +1,6 @@
+import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { getValidAccessToken } from "@/utils/tokenUtils";
 import {
   Roboto_400Regular,
   Roboto_500Medium,
@@ -13,7 +15,7 @@ import {
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,11 +35,24 @@ const CustomDarkTheme = {
 };
 
 export default function RootLayout() {
+  const { isAuthenticated, hasCompleteOnboarding } = useAuthStore();
+  const [isTokenLoading, setIsTokenLoading] = useState(true);
+
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const isAuthenticated = false;
-  const hasComletedOnboarding = true;
+  const checkIsAccesTokenValid = async () => {
+    await getValidAccessToken()
+      .then((res) => {
+        useAuthStore.getState().setIsAuthenticated(res !== null);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setIsTokenLoading(false);
+      });
+  };
 
   // Only load the app after the fonts are loaded.
   const [loaded, error] = useFonts({
@@ -46,11 +61,13 @@ export default function RootLayout() {
     Roboto_600SemiBold,
   });
 
+  // Check for if font state and the state of if the token completed loaded.
   useEffect(() => {
-    if (loaded || error) {
+    checkIsAccesTokenValid();
+    if (loaded || error || !isTokenLoading) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, isTokenLoading]);
 
   if (!loaded && !error) {
     return null;
@@ -64,12 +81,12 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
         </Stack.Protected>
 
-        <Stack.Protected guard={!isAuthenticated && hasComletedOnboarding}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Protected guard={!hasCompleteOnboarding}>
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         </Stack.Protected>
 
-        <Stack.Protected guard={!hasComletedOnboarding}>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

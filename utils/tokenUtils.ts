@@ -1,0 +1,53 @@
+import type { AuthResponse } from "@/types/auth-response";
+import * as SecureStore from "expo-secure-store";
+import { jwtDecode } from "jwt-decode";
+import { authApi } from "./authApi";
+
+interface JwtPayload {
+  subject: string;
+  expire: number;
+  iat: number;
+}
+
+export const isTokenExpired = (token: string) => {
+  try {
+    const decoded = jwtDecode<JwtPayload>(token);
+    const currentTime = Date.now() / 1000;
+
+    // We added a 60 second buffer to refresh before it actually expires
+    return decoded.expire < currentTime + 60;
+  } catch {
+    return true;
+  }
+};
+
+export const saveTokens = async (accessToken: string, refreshToken: string) => {
+  await SecureStore.setItemAsync("accessToken", accessToken);
+  await SecureStore.setItemAsync("refreshToken", refreshToken);
+};
+
+export const clearTokens = async () => {
+  await SecureStore.deleteItemAsync("accessToken");
+  await SecureStore.deleteItemAsync("refreshToken");
+};
+
+export const getValidAccessToken = async (): Promise<string | null> => {
+  const accessToken = await SecureStore.getItemAsync("accessToken");
+  const refreshToken = await SecureStore.getItemAsync("refreshToken");
+
+  if (!accessToken || !refreshToken) return null;
+
+  if (!isTokenExpired(accessToken)) return accessToken;
+
+  try {
+    const { data } = await authApi.post<AuthResponse>("/refresh", {
+      refreshToken,
+    });
+
+    saveTokens(data.accessToken, data.refreshToken);
+
+    return data.accessToken;
+  } catch {
+    return null;
+  }
+};
