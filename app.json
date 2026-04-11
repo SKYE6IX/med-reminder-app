@@ -9,10 +9,11 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.medreminderapp",
+      "bundleIdentifier": "com.medreminderapp.MedRemindR",
       "icon": {
         "dark": "./assets/icons/ios-dark.png",
-        "light": "./assets/icons/ios-light.png"
+        "light": "./assets/icons/ios-light.png",
+        "tinted": "./assets/icons/ios-light.png"
       }
     },
     "android": {
@@ -22,7 +23,10 @@
         "backgroundColor": "#F7F7F7"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.medreminderapp"
+      "package": "com.medreminderapp.MedRemindR"
+    },
+    "web": {
+      "output": "static"
     },
     "plugins": [
       "expo-router",
