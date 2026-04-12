@@ -1,7 +1,7 @@
 import FormHeader from "@/component/ui/form-header";
 import FormInput from "@/component/ui/form-input/form-input";
 import { Link } from "expo-router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,7 +11,22 @@ import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
+type CreateAccountFormState = {
+  email: string;
+  name: string;
+  password: string;
+};
+
+// TRACKING:
+// Each form with is name and need to be saved into the right value
+
 export default function CreateAccountScreen() {
+  const [formState, setFormState] = useState<CreateAccountFormState>({
+    email: "",
+    name: "",
+    password: "",
+  });
+
   const insets = useSafeAreaInsets();
   const textInputRef = useRef<TextInput>(null);
   const emaiInputRef = useRef<TextInput>(null);
@@ -21,10 +36,23 @@ export default function CreateAccountScreen() {
     scheme === "dark"
       ? require("@/assets/icons/apple-logo-light.png")
       : require("@/assets/icons/apple-logo.png");
-
   const googleLogoSource = require("@/assets/icons/google-logo.png");
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
+
+  // Handle when each text input value changes
+  const handleOnValueChanges = ({
+    name,
+    value,
+  }: {
+    name: string;
+    value: string;
+  }) => {
+    setFormState((prvState) => ({ ...prvState, [name]: value }));
+  };
+
+  console.log("Here is the value for the form state -> ", formState);
+
   return (
     <View
       style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}
@@ -36,7 +64,8 @@ export default function CreateAccountScreen() {
       <View style={styles.inputsWrapper}>
         <FormInput
           label="Имя"
-          onValueChange={() => {}}
+          name="name"
+          onValueChange={handleOnValueChanges}
           inputRef={textInputRef}
           type="text"
           placeholder="Введите Ваше имя"
@@ -44,7 +73,8 @@ export default function CreateAccountScreen() {
         />
         <FormInput
           label="Почта"
-          onValueChange={() => {}}
+          name="email"
+          onValueChange={handleOnValueChanges}
           inputRef={emaiInputRef}
           type="email"
           placeholder="Введите адрес Вашей почты"
@@ -52,7 +82,8 @@ export default function CreateAccountScreen() {
         />
         <FormInput
           label="Пароль"
-          onValueChange={() => {}}
+          name="password"
+          onValueChange={handleOnValueChanges}
           type="password"
           placeholder="Придумайте пароль"
           hasError={false}

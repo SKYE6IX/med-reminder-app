@@ -31,6 +31,7 @@ export default function SignInScreen() {
       <View style={styles.inputsWrapper}>
         <FormInput
           label="Почта"
+          name="email"
           onValueChange={() => {}}
           inputRef={emaiInputRef}
           type="email"
@@ -39,6 +40,7 @@ export default function SignInScreen() {
         />
         <FormInput
           label="Пароль"
+          name="password"
           onValueChange={() => {}}
           type="password"
           placeholder="Придумайте пароль"

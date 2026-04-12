@@ -6,6 +6,7 @@ describe("FormInput component", () => {
     render(
       <FormInput
         label="Test Label"
+        name="test-input"
         hasError={false}
         onValueChange={() => {}}
       />,
@@ -19,6 +20,7 @@ describe("FormInput component", () => {
     render(
       <FormInput
         label="Test Label"
+        name="test-input"
         hasError={false}
         onValueChange={() => {}}
         placeholder="Test placeholder"
@@ -36,6 +38,7 @@ describe("FormInput component", () => {
       <FormInput
         label="Test Label"
         hasError={false}
+        name="test-input"
         onValueChange={() => {}}
         placeholder="Test placeholder"
       />,

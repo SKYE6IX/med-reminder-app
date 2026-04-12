@@ -18,10 +18,11 @@ import { inputProps } from "./inputProps";
 
 type FormInputProps = TextInputProps & {
   inputRef?: RefObject<TextInput | null>;
+  name: string;
   label: string;
   type?: "text" | "email" | "password";
   hasError: boolean;
-  onValueChange: (value: string) => void;
+  onValueChange: ({ name, value }: { name: string; value: string }) => void;
 };
 
 export default function FormInput({
@@ -30,6 +31,7 @@ export default function FormInput({
   inputRef,
   onValueChange,
   hasError,
+  name,
   ...rest
 }: FormInputProps) {
   const [inputValue, onInputValueChange] = useState("");
@@ -39,12 +41,12 @@ export default function FormInput({
 
   const handleOnTextChange = (text: string) => {
     onInputValueChange(text);
-    onValueChange(text);
+    onValueChange({ name, value: text });
   };
 
   const clearInputValue = () => {
     onInputValueChange("");
-    onValueChange("");
+    onValueChange({ name, value: "" });
   };
 
   const handleShowPassword = () => {
@@ -54,7 +56,6 @@ export default function FormInput({
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const color = useThemeColor({}, "textPrimary");
-
   return (
     <View style={styles.container}>
       <ThemedText type="label">{label}</ThemedText>
