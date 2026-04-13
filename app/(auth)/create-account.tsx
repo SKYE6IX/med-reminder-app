@@ -1,5 +1,6 @@
 import FormHeader from "@/component/ui/form-header";
 import FormInput from "@/component/ui/form-input/form-input";
+import { authApi } from "@/utils/authApi";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
@@ -8,24 +9,37 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
+import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
+import { validateCreateAccountInputs } from "@/utils/validator";
 
-type CreateAccountFormState = {
+import { AuthResponse } from "@/types/auth-response";
+
+type FormState = {
   email: string;
   name: string;
   password: string;
 };
-
-// TRACKING:
-// Each form with is name and need to be saved into the right value
+type CreateAccountState = {
+  formState: FormState;
+  errorsSet: Set<string>;
+  isLoading: boolean;
+};
 
 export default function CreateAccountScreen() {
-  const [formState, setFormState] = useState<CreateAccountFormState>({
-    email: "",
-    name: "",
-    password: "",
-  });
+  const { setIsAuthenticated } = useAuthStore();
+  const [createAccountState, setCreateAccountState] =
+    useState<CreateAccountState>({
+      formState: {
+        email: "",
+        name: "",
+        password: "",
+      },
+      errorsSet: new Set(),
+      isLoading: false,
+    });
 
   const insets = useSafeAreaInsets();
   const textInputRef = useRef<TextInput>(null);
@@ -48,16 +62,69 @@ export default function CreateAccountScreen() {
     name: string;
     value: string;
   }) => {
-    setFormState((prvState) => ({ ...prvState, [name]: value }));
+    setCreateAccountState((prvState) => {
+      const updatedErrors = new Set(prvState.errorsSet);
+      updatedErrors.delete(name);
+      return {
+        ...prvState,
+        formState: {
+          ...prvState.formState,
+          [name]: value,
+        },
+        errorsSet: updatedErrors,
+      };
+    });
   };
 
-  console.log("Here is the value for the form state -> ", formState);
+  // Handle the submission of form
+  const handleSubmitForm = async () => {
+    // Check all field are filled correctly.
+    const validatedInputs = validateCreateAccountInputs(
+      createAccountState.formState,
+    );
+    if (validatedInputs.error) {
+      validatedInputs.error.issues.forEach((issue) => {
+        setCreateAccountState((prvState) => {
+          return {
+            ...prvState,
+            errorsSet: new Set(prvState.errorsSet).add(
+              issue.path[0].toString(),
+            ),
+          };
+        });
+        return;
+      });
+    }
+
+    // If all passed above, we continue.
+    setCreateAccountState((prvState) => ({ ...prvState, isLoading: true }));
+    await authApi
+      .post<AuthResponse>("/register", {
+        ...validatedInputs.data,
+      })
+      .then(async ({ data }) => {
+        saveTokens(data.accessToken, data.refreshToken);
+        const validToken = await getValidAccessToken();
+        setIsAuthenticated(validToken !== null);
+        setCreateAccountState((prvState) => ({
+          ...prvState,
+          isLoading: false,
+        }));
+      })
+      .catch((err) => {
+        console.error("Error occur while register -> ", err);
+        setCreateAccountState((prvState) => ({
+          ...prvState,
+          isLoading: false,
+        }));
+      });
+  };
 
   return (
     <View
       style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}
     >
-      <Loader visible={false} />
+      <Loader visible={createAccountState.isLoading} />
 
       <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
 
@@ -69,7 +136,7 @@ export default function CreateAccountScreen() {
           inputRef={textInputRef}
           type="text"
           placeholder="Введите Ваше имя"
-          hasError={false}
+          hasError={createAccountState.errorsSet.has("name")}
         />
         <FormInput
           label="Почта"
@@ -78,7 +145,7 @@ export default function CreateAccountScreen() {
           inputRef={emaiInputRef}
           type="email"
           placeholder="Введите адрес Вашей почты"
-          hasError={false}
+          hasError={createAccountState.errorsSet.has("email")}
         />
         <FormInput
           label="Пароль"
@@ -86,12 +153,12 @@ export default function CreateAccountScreen() {
           onValueChange={handleOnValueChanges}
           type="password"
           placeholder="Придумайте пароль"
-          hasError={false}
+          hasError={createAccountState.errorsSet.has("password")}
         />
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Создать аккаунт" />
+        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} />
         <ThemedText style={styles.termsText}>
           Создавая аккаунт, Вы принимаете
           <Link href="/" style={{ color: linkColor }}>

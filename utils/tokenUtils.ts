@@ -4,8 +4,8 @@ import { jwtDecode } from "jwt-decode";
 import { authApi } from "./authApi";
 
 interface JwtPayload {
-  subject: string;
-  expire: number;
+  sub: string;
+  exp: number;
   iat: number;
 }
 
@@ -15,7 +15,7 @@ export const isTokenExpired = (token: string) => {
     const currentTime = Date.now() / 1000;
 
     // We added a 60 second buffer to refresh before it actually expires
-    return decoded.expire < currentTime + 60;
+    return decoded.exp < currentTime + 60;
   } catch {
     return true;
   }

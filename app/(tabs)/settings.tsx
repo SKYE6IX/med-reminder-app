@@ -1,5 +1,13 @@
-import { Text } from "react-native";
+import { useAuthStore } from "@/hooks/use-auth-store";
+import { clearTokens } from "@/utils/tokenUtils";
+import { Button } from "react-native";
 
 export default function Settings() {
-  return <Text>Setting</Text>;
+  const { setIsAuthenticated } = useAuthStore();
+  const logoutUser = () => {
+    clearTokens();
+    setIsAuthenticated(false);
+  };
+
+  return <Button title="Logout" onPress={logoutUser} />;
 }

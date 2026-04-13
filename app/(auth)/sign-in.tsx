@@ -1,16 +1,43 @@
 import FormHeader from "@/component/ui/form-header";
 import FormInput from "@/component/ui/form-input/form-input";
 import { Link } from "expo-router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
+import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { AuthResponse } from "@/types/auth-response";
+import { authApi } from "@/utils/authApi";
+import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
+import { validateSignInInputs } from "@/utils/validator";
+
+type FormState = {
+  email: string;
+  password: string;
+};
+
+type SignInState = {
+  formState: FormState;
+  errorsSet: Set<string>;
+  isLoading: boolean;
+};
 
 export default function SignInScreen() {
+  const { setIsAuthenticated } = useAuthStore();
+  const [signInState, setSignInState] = useState<SignInState>({
+    formState: {
+      email: "",
+      password: "",
+    },
+    errorsSet: new Set(),
+    isLoading: false,
+  });
+
   const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const emaiInputRef = useRef<TextInput>(null);
@@ -23,33 +50,99 @@ export default function SignInScreen() {
   const googleLogoSource = require("@/assets/icons/google-logo.png");
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
+
+  // Handle when each text input value changes
+  const handleOnValueChanges = ({
+    name,
+    value,
+  }: {
+    name: string;
+    value: string;
+  }) => {
+    setSignInState((prvState) => {
+      const updatedErrors = new Set(prvState.errorsSet);
+      updatedErrors.delete(name);
+      return {
+        ...prvState,
+        formState: {
+          ...prvState.formState,
+          [name]: value,
+        },
+        errorsSet: updatedErrors,
+      };
+    });
+  };
+
+  // Handle the submission of form
+  const handleSubmitForm = async () => {
+    // Check all field are filled correctly.
+    const validatedInputs = validateSignInInputs(signInState.formState);
+    if (validatedInputs.error) {
+      validatedInputs.error.issues.forEach((issue) => {
+        setSignInState((prvState) => {
+          return {
+            ...prvState,
+            errorsSet: new Set(prvState.errorsSet).add(
+              issue.path[0].toString(),
+            ),
+          };
+        });
+        return;
+      });
+    }
+
+    setSignInState((prvState) => ({ ...prvState, isLoading: true }));
+    await authApi
+      .post<AuthResponse>("/login", {
+        ...validatedInputs.data,
+      })
+      .then(async ({ data }) => {
+        saveTokens(data.accessToken, data.refreshToken);
+        const validToken = await getValidAccessToken();
+        setIsAuthenticated(validToken !== null);
+        setSignInState((prvState) => ({
+          ...prvState,
+          isLoading: false,
+        }));
+      })
+      .catch((err) => {
+        console.error("Error occur while register -> ", err);
+        setSignInState((prvState) => ({
+          ...prvState,
+          isLoading: false,
+        }));
+      });
+  };
+
   return (
     <View
       style={[{ paddingBottom: Math.max(insets.bottom, 30) }, styles.container]}
     >
+      <Loader visible={signInState.isLoading} />
+
       <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
       <View style={styles.inputsWrapper}>
         <FormInput
           label="Почта"
           name="email"
-          onValueChange={() => {}}
+          onValueChange={handleOnValueChanges}
           inputRef={emaiInputRef}
           type="email"
           placeholder="Введите адрес Вашей почты"
-          hasError={false}
+          hasError={signInState.errorsSet.has("name")}
         />
         <FormInput
           label="Пароль"
           name="password"
-          onValueChange={() => {}}
+          onValueChange={handleOnValueChanges}
           type="password"
           placeholder="Придумайте пароль"
-          hasError={false}
+          hasError={signInState.errorsSet.has("password")}
         />
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Войти" />
+        <CustomButton label="Войти" onPress={handleSubmitForm} />
         <ThemedText style={styles.resetPasswordText}>
           Забыли пароль?
           <Link href="/forget-password" style={{ color: linkColor }}>

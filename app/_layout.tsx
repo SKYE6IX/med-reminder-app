@@ -69,7 +69,7 @@ export default function RootLayout() {
     }
   }, [loaded, error, isTokenLoading]);
 
-  if (!loaded && !error) {
+  if (!loaded && !error && isTokenLoading) {
     return null;
   }
 
