@@ -17,7 +17,5 @@ export const inputProps = {
     autoCapitalize: "none" as const,
     autoCorrect: false,
     returnKeyType: "done" as const,
-    textContentType: "newPassword" as const,
-    autoComplete: "new-password" as const,
   },
 };

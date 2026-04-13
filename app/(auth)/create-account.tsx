@@ -9,9 +9,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
 import { validateCreateAccountInputs } from "@/utils/validator";
 
@@ -154,6 +154,8 @@ export default function CreateAccountScreen() {
           type="password"
           placeholder="Придумайте пароль"
           hasError={createAccountState.errorsSet.has("password")}
+          textContentType="newPassword"
+          autoComplete="new-password"
         />
       </View>
 

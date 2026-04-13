@@ -1,5 +1,6 @@
-import { useAuthStore } from "@/hooks/use-auth-store";
+import FeedbackAlert from "@/component/ui/feedback-alert";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { getValidAccessToken } from "@/utils/tokenUtils";
 import {
   Roboto_400Regular,
@@ -76,6 +77,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
       <StatusBar style="auto" />
+      <FeedbackAlert />
       <Stack>
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" />

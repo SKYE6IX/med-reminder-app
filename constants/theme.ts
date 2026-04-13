@@ -25,6 +25,14 @@ export const Colors = {
     loaderPillLeft: "#1256DB",
     loaderPillRight: "#B8CCF4",
     loaderBg: "#FFFFFFB2",
+
+    feedbackSuccess: "#009E00",
+    feedbackSuccessBg: "#E6F5E6",
+    feedbackSuccessText: "#0D3616",
+
+    feedbackError: "#DC2626",
+    feedbackErrorBg: "#FEE2E2",
+    feedbackErrorText: "#7F1D1D",
   },
 
   dark: {
@@ -49,6 +57,14 @@ export const Colors = {
     loaderPillLeft: "#2563EB",
     loaderPillRight: "#60A5FA",
     loaderBg: "#1F2937E5",
+
+    feedbackSuccess: "#00CC00",
+    feedbackSuccessBg: "#0D3616",
+    feedbackSuccessText: "#E6F5E6",
+
+    feedbackError: "#EF4444",
+    feedbackErrorBg: "#4C0D0D",
+    feedbackErrorText: "#FECACA",
   },
 };
 

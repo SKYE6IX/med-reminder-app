@@ -1,5 +1,6 @@
 import FormHeader from "@/component/ui/form-header";
 import FormInput from "@/component/ui/form-input/form-input";
+import { AxiosError } from "axios";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
@@ -8,9 +9,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
 import { authApi } from "@/utils/authApi";
 import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
@@ -28,6 +30,7 @@ type SignInState = {
 };
 
 export default function SignInScreen() {
+  const { show } = useFeedBackStore();
   const { setIsAuthenticated } = useAuthStore();
   const [signInState, setSignInState] = useState<SignInState>({
     formState: {
@@ -90,7 +93,6 @@ export default function SignInScreen() {
       });
       return;
     }
-
     setSignInState((prvState) => ({ ...prvState, isLoading: true }));
     await authApi
       .post<AuthResponse>("/login", {
@@ -105,12 +107,18 @@ export default function SignInScreen() {
           isLoading: false,
         }));
       })
-      .catch((err) => {
-        console.error("Error occur while register -> ", err);
+      .catch((error: AxiosError) => {
         setSignInState((prvState) => ({
           ...prvState,
           isLoading: false,
         }));
+        if (error.response?.status === 401) {
+          show({
+            title: "Не удалось авторизовать!",
+            message: "Неверный адрес электронной почты или пароль!",
+            status: "error",
+          });
+        }
       });
   };
 
@@ -138,6 +146,8 @@ export default function SignInScreen() {
           type="password"
           placeholder="Придумайте пароль"
           hasError={signInState.errorsSet.has("password")}
+          textContentType="password"
+          autoComplete="password"
         />
       </View>
 

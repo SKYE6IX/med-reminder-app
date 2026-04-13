@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/hooks/use-auth-store";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { clearTokens } from "@/utils/tokenUtils";
 import { Button } from "react-native";
 

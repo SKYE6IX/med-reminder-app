@@ -2,8 +2,8 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { useAuthStore } from "@/hooks/use-auth-store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useAuthStore } from "@/stores/use-auth-store";
 
 import { OnboardingView } from "@/component/onboadring-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
