@@ -1,19 +1,19 @@
 const blue = "#1256DB";
 const blueAccent = "#1E6EF4";
-const white = "#F7F7F7";
+const baseWhite = "#F7F7F7";
 
 export const Colors = {
   light: {
     textPrimary: "#353535",
     textMuted: "#9E9E9E",
 
-    backgroundPrimary: white,
-    backgroundSecondary: white,
+    backgroundPrimary: baseWhite,
+    backgroundSecondary: "#fff",
 
     borderColor: "#E6E6E6",
 
     buttonPrimaryBg: blue,
-    buttonOutlineBg: white,
+    buttonOutlineBg: baseWhite,
     backButtonColor: "#000000",
 
     tint: blue,
@@ -38,9 +38,9 @@ export const Colors = {
 
     buttonPrimaryBg: blueAccent,
     buttonOutlineBg: "#2C2C2E",
-    backButtonColor: white,
+    backButtonColor: baseWhite,
 
-    tint: blue,
+    tint: blueAccent,
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
     tabIconSelected: blue,

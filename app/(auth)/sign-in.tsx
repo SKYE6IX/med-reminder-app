@@ -87,8 +87,8 @@ export default function SignInScreen() {
             ),
           };
         });
-        return;
       });
+      return;
     }
 
     setSignInState((prvState) => ({ ...prvState, isLoading: true }));
@@ -129,7 +129,7 @@ export default function SignInScreen() {
           inputRef={emaiInputRef}
           type="email"
           placeholder="Введите адрес Вашей почты"
-          hasError={signInState.errorsSet.has("name")}
+          hasError={signInState.errorsSet.has("email")}
         />
         <FormInput
           label="Пароль"
