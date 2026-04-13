@@ -8,7 +8,6 @@
     "scheme": "medreminderapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.medreminderapp.MedRemindR",
       "icon": {

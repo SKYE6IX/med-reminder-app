@@ -6,7 +6,6 @@ import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import AppleAuthenticationBtn from "@/component/apple-authentication-btn";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
@@ -182,13 +181,12 @@ export default function CreateAccountScreen() {
         </View>
 
         {Platform.OS === "ios" && (
-          <AppleAuthenticationBtn />
-          // <CustomButton
-          //   label="Вход с аккаунтом Apple"
-          //   logoSrc={appleLogoSource}
-          //   variant="outline"
-          //   textVaraint="accentText"
-          // />
+          <CustomButton
+            label="Вход с аккаунтом Apple"
+            logoSrc={appleLogoSource}
+            variant="outline"
+            textVaraint="accentText"
+          />
         )}
 
         <CustomButton
