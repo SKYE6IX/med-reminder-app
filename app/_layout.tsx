@@ -48,6 +48,7 @@ export default function RootLayout() {
         useAuthStore.getState().setIsAuthenticated(res !== null);
       })
       .catch((err) => {
+        setIsTokenLoading(false);
         console.error(err);
       })
       .finally(() => {
@@ -65,7 +66,7 @@ export default function RootLayout() {
   // Check for if font state and the state of if the token completed loaded.
   useEffect(() => {
     checkIsAccesTokenValid();
-    if (loaded || error || !isTokenLoading) {
+    if ((loaded || error) && !isTokenLoading) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error, isTokenLoading]);
@@ -78,7 +79,8 @@ export default function RootLayout() {
     <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
       <StatusBar style="auto" />
       <FeedbackAlert />
-      <Stack>
+
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={isAuthenticated}>
           <Stack.Screen name="(tabs)" />
         </Stack.Protected>

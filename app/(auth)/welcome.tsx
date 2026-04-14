@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 
-import { OnboardingView } from "@/component/onboadring-view";
+import { OnboardingView } from "@/component/onboarding-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
 import { useColorScheme } from "@/hooks/use-color-scheme";

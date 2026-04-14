@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuthStore } from "@/stores/use-auth-store";
 
-import { OnboardingView } from "@/component/onboadring-view";
+import { OnboardingView } from "@/component/onboarding-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 
