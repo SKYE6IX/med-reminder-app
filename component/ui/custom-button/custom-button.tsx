@@ -5,8 +5,9 @@ import { Pressable, type PressableProps, Text } from "react-native";
 type CustomButtonProps = PressableProps & {
   label: string;
   variant?: "filled" | "outline" | "disabled" | "danger";
-  textVaraint?: "regularText" | "accentText" | "mutedText";
+  textVaraint?: "regularText" | "accentText" | "mutedText" | "tintText";
   logoSrc?: any;
+  svgIcon?: React.ReactNode;
 };
 
 export default function CustomButton({
@@ -16,6 +17,7 @@ export default function CustomButton({
   textVaraint = "regularText",
   onPress,
   logoSrc,
+  svgIcon,
 }: CustomButtonProps) {
   const buttonStyles = useLinkButtonStyles();
 
@@ -26,6 +28,7 @@ export default function CustomButton({
       style={[buttonStyles.base, buttonStyles[variant], style]}
     >
       {logoSrc && <Image source={logoSrc} style={buttonStyles.logo} />}
+      {svgIcon && svgIcon}
       <Text style={[buttonStyles.text, buttonStyles[textVaraint]]}>
         {label}
       </Text>

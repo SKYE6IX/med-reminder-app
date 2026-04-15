@@ -2,6 +2,8 @@ const blue = "#1256DB";
 const blueAccent = "#1E6EF4";
 const baseWhite = "#F7F7F7";
 
+// #AEAEB2 -> Higlighted color on the secondary background.
+
 export const Colors = {
   light: {
     textPrimary: "#353535",
@@ -14,6 +16,7 @@ export const Colors = {
 
     buttonPrimaryBg: blue,
     buttonOutlineBg: baseWhite,
+    buttonDisabledBg: "#E6E6E6",
     backButtonColor: "#000000",
 
     tint: blue,
@@ -46,6 +49,7 @@ export const Colors = {
 
     buttonPrimaryBg: blueAccent,
     buttonOutlineBg: "#2C2C2E",
+    buttonDisabledBg: "#2A2A2A",
     backButtonColor: baseWhite,
 
     tint: blueAccent,

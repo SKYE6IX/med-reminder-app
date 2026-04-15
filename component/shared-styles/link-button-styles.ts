@@ -7,12 +7,14 @@ export function useLinkButtonStyles() {
   const borderColor = useThemeColor({}, "borderColor");
   const textPrimary = useThemeColor({}, "textPrimary");
   const textMuted = useThemeColor({}, "textMuted");
+  const disabledBg = useThemeColor({}, "buttonDisabledBg");
+  const tintColor = useThemeColor({}, "tint");
 
   return StyleSheet.create({
     base: {
       width: "100%",
       height: 48,
-      borderRadius: 16,
+      borderRadius: 12,
       flexDirection: "row",
       gap: 10,
       justifyContent: "center",
@@ -31,7 +33,9 @@ export function useLinkButtonStyles() {
       borderWidth: 1,
       borderColor,
     },
-    disabled: {},
+    disabled: {
+      backgroundColor: disabledBg,
+    },
     danger: {},
     regularText: {
       color: "#FFF",
@@ -41,6 +45,9 @@ export function useLinkButtonStyles() {
     },
     mutedText: {
       color: textMuted,
+    },
+    tintText: {
+      color: tintColor,
     },
     logo: {
       width: 24,

@@ -17,6 +17,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -77,22 +78,24 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
-      <StatusBar style="auto" />
-      <FeedbackAlert />
+      <GestureHandlerRootView>
+        <StatusBar style="auto" />
+        <FeedbackAlert />
 
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Protected guard={isAuthenticated}>
-          <Stack.Screen name="(tabs)" />
-        </Stack.Protected>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name="(tabs)" />
+          </Stack.Protected>
 
-        <Stack.Protected guard={!hasCompleteOnboarding}>
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        </Stack.Protected>
+          <Stack.Protected guard={!hasCompleteOnboarding}>
+            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          </Stack.Protected>
 
-        <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        </Stack.Protected>
-      </Stack>
+          <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          </Stack.Protected>
+        </Stack>
+      </GestureHandlerRootView>
     </ThemeProvider>
   );
 }
