@@ -8,9 +8,12 @@ import SprayIcon from "@/component/icons/spray-icon";
 import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
+import AddProfile from "@/component/ui/add-profile";
+import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRouter } from "expo-router";
+import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const pillsFormList = [
@@ -26,113 +29,121 @@ const pillsFormList = [
 export default function DetailsStepScreen() {
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
+  const newProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
 
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
   return (
-    <View style={[styles.container, sharedStyles.container]}>
-      {/* Form selections */}
-      <View style={styles.pillFormContainer}>
-        <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
-        <View style={styles.pillFormWrapper}>
-          {pillsFormList.map((item, i) => (
-            <View key={item.name + i} style={styles.pillForm}>
-              <Pressable
-                style={[
-                  styles.pillFormPressable,
-                  { borderColor: borderColor, backgroundColor: bGColor },
-                ]}
-              >
-                <item.icon color={color} />
-              </Pressable>
-              <Text style={[styles.pillFormName, { color }]}>{item.name}</Text>
-            </View>
-          ))}
-          <View style={styles.ghostWrapper} />
+    <>
+      <View style={[styles.container, sharedStyles.container]}>
+        {/* Form selections */}
+        <View style={styles.pillFormContainer}>
+          <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
+          <View style={styles.pillFormWrapper}>
+            {pillsFormList.map((item, i) => (
+              <View key={item.name + i} style={styles.pillForm}>
+                <Pressable
+                  style={[
+                    styles.pillFormPressable,
+                    { borderColor: borderColor, backgroundColor: bGColor },
+                  ]}
+                >
+                  <item.icon color={color} />
+                </Pressable>
+                <Text style={[styles.pillFormName, { color }]}>
+                  {item.name}
+                </Text>
+              </View>
+            ))}
+            <View style={styles.ghostWrapper} />
+          </View>
         </View>
-      </View>
 
-      {/* Profile selection*/}
-      <View style={styles.profileSelectionContainer}>
-        <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
+        {/* Profile selection*/}
+        <View style={styles.profileSelectionContainer}>
+          <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
 
-        <View style={styles.profilesWrapper}>
-          {/* Self profile selection */}
-          <Pressable
-            style={[
-              styles.profileSelectionPressable,
-              { borderColor: borderColor, backgroundColor: bGColor },
-            ]}
-          >
-            <View style={[styles.profileSelectionIcon]}>
-              <PersonIcon color="#fff" />
-            </View>
+          <View style={styles.profilesWrapper}>
+            {/* Self profile selection */}
+            <Pressable
+              style={[
+                styles.profileSelectionPressable,
+                { borderColor: borderColor, backgroundColor: bGColor },
+              ]}
+            >
+              <View style={[styles.profileSelectionIcon]}>
+                <PersonIcon color="#fff" />
+              </View>
 
-            <View style={styles.profileSelectionTextWrapper}>
-              <Text style={[styles.profileSelectionNameText, { color }]}>
-                Для меня
-              </Text>
-              <Text style={[styles.profileSelectionRelationText, { color }]}>
-                Вы
-              </Text>
-            </View>
+              <View style={styles.profileSelectionTextWrapper}>
+                <Text style={[styles.profileSelectionNameText, { color }]}>
+                  Для меня
+                </Text>
+                <Text style={[styles.profileSelectionRelationText, { color }]}>
+                  Вы
+                </Text>
+              </View>
 
-            <View style={[styles.profileSelectionCircular]}>
-              <View style={[styles.profileSelectionCircularDot]} />
-            </View>
-          </Pressable>
+              <View style={[styles.profileSelectionCircular]}>
+                <View style={[styles.profileSelectionCircularDot]} />
+              </View>
+            </Pressable>
 
-          {/* other profile selection */}
-          <Pressable
-            style={[
-              styles.profileSelectionPressable,
-              { borderColor: borderColor, backgroundColor: bGColor },
-            ]}
-          >
-            <View style={[styles.profileSelectionIcon]}>
-              <PersonIcon color="#fff" />
-            </View>
+            {/* other profile selection */}
+            <Pressable
+              style={[
+                styles.profileSelectionPressable,
+                { borderColor: borderColor, backgroundColor: bGColor },
+              ]}
+            >
+              <View style={[styles.profileSelectionIcon]}>
+                <PersonIcon color="#fff" />
+              </View>
 
-            <View style={styles.profileSelectionTextWrapper}>
-              <Text style={[styles.profileSelectionNameText, { color }]}>
-                Анна
-              </Text>
-              <Text style={[styles.profileSelectionRelationText, { color }]}>
-                Мать
-              </Text>
-            </View>
+              <View style={styles.profileSelectionTextWrapper}>
+                <Text style={[styles.profileSelectionNameText, { color }]}>
+                  Анна
+                </Text>
+                <Text style={[styles.profileSelectionRelationText, { color }]}>
+                  Мать
+                </Text>
+              </View>
 
-            <View style={[styles.profileSelectionCircular]}>
-              <View style={[styles.profileSelectionCircularDot]} />
-            </View>
-          </Pressable>
+              <View style={[styles.profileSelectionCircular]}>
+                <View style={[styles.profileSelectionCircularDot]} />
+              </View>
+            </Pressable>
 
-          {/* <CustomButton
+            {/* <CustomButton
           label="Выбрать члена семьи"
           variant="outline"
           textVaraint="tintText"
           svgIcon={<PlusIcon color={tintColor} size={12} />}
         /> */}
 
-          <CustomButton
-            label="Добавить члена семьи"
-            variant="outline"
-            textVaraint="tintText"
-            svgIcon={<PlusIcon color={tintColor} size={12} />}
-          />
-        </View>
-      </View>
+            <CustomButton
+              label="Добавить члена семьи"
+              variant="outline"
+              textVaraint="tintText"
+              svgIcon={<PlusIcon color={tintColor} size={12} />}
+              onPress={() => newProfileBottomSheet.current?.open()}
+            />
 
-      <CustomButton
-        label="Далее"
-        style={sharedStyles.button}
-        variant="disabled"
-        textVaraint="mutedText"
-        onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
-      />
-    </View>
+            <AddProfile ref={newProfileBottomSheet} />
+          </View>
+        </View>
+
+        <CustomButton
+          label="Далее"
+          style={sharedStyles.button}
+          variant="disabled"
+          textVaraint="mutedText"
+          onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
+        />
+      </View>
+    </>
   );
 }
 

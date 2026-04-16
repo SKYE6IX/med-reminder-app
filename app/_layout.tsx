@@ -8,6 +8,7 @@ import {
   Roboto_600SemiBold,
   useFonts,
 } from "@expo-google-fonts/roboto";
+import { PortalProvider } from "@gorhom/portal";
 import {
   DarkTheme,
   DefaultTheme,
@@ -79,22 +80,27 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
       <GestureHandlerRootView>
-        <StatusBar style="auto" />
-        <FeedbackAlert />
+        <PortalProvider>
+          <StatusBar style="auto" />
+          <FeedbackAlert />
 
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name="(tabs)" />
-          </Stack.Protected>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name="(tabs)" />
+            </Stack.Protected>
 
-          <Stack.Protected guard={!hasCompleteOnboarding}>
-            <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-          </Stack.Protected>
+            <Stack.Protected guard={!hasCompleteOnboarding}>
+              <Stack.Screen
+                name="onboarding"
+                options={{ headerShown: false }}
+              />
+            </Stack.Protected>
 
-          <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack.Protected>
-        </Stack>
+            <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            </Stack.Protected>
+          </Stack>
+        </PortalProvider>
       </GestureHandlerRootView>
     </ThemeProvider>
   );

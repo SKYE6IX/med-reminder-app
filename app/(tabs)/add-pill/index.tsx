@@ -10,6 +10,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function NameStepScreen() {
   const [query, setQuery] = useState("");
+
   const color = useThemeColor({}, "textPrimary");
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");

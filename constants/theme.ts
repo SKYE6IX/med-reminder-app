@@ -2,8 +2,6 @@ const blue = "#1256DB";
 const blueAccent = "#1E6EF4";
 const baseWhite = "#F7F7F7";
 
-// #AEAEB2 -> Higlighted color on the secondary background.
-
 export const Colors = {
   light: {
     textPrimary: "#353535",
@@ -11,15 +9,17 @@ export const Colors = {
 
     backgroundPrimary: baseWhite,
     backgroundSecondary: "#fff",
+    backgroundTertiary: "#F7F7F7",
 
     borderColor: "#E6E6E6",
 
     buttonPrimaryBg: blue,
     buttonOutlineBg: baseWhite,
     buttonDisabledBg: "#E6E6E6",
-    backButtonColor: "#000000",
+    backButtonColor: "#353535",
 
     tint: blue,
+
     icon: "#6B6B6B",
     tabIconDefault: "#6B6B6B",
     tabIconSelected: blue,
@@ -36,6 +36,8 @@ export const Colors = {
     feedbackError: "#DC2626",
     feedbackErrorBg: "#FEE2E2",
     feedbackErrorText: "#7F1D1D",
+
+    bottomSheetBg: "#f2f2f7",
   },
 
   dark: {
@@ -44,6 +46,7 @@ export const Colors = {
 
     backgroundPrimary: "#1C1C1E",
     backgroundSecondary: "#2C2C2E",
+    backgroundTertiary: "#3A3A3C",
 
     borderColor: "#3A3A3C",
 
@@ -69,6 +72,8 @@ export const Colors = {
     feedbackError: "#EF4444",
     feedbackErrorBg: "#4C0D0D",
     feedbackErrorText: "#FECACA",
+
+    bottomSheetBg: "#1C1C1E",
   },
 };
 
