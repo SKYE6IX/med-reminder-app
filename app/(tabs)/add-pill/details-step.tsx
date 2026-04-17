@@ -297,6 +297,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "#fff",
   },
+
   changeSelectedProfile: {
     marginLeft: "auto",
     paddingLeft: 12,
