@@ -8,13 +8,17 @@ import SprayIcon from "@/component/icons/spray-icon";
 import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
-import AddProfile from "@/component/ui/add-profile";
-import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
+import BottomSheetWrapper, {
+  BottomSheetWrapperRef,
+} from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { mockProfiles } from "@/mock-data";
 
 const pillsFormList = [
   { name: "Капсулы", icon: CapsuleIcon },
@@ -30,120 +34,168 @@ export default function DetailsStepScreen() {
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
   const newProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
+  const chooseProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
 
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
+
+  const getRelationLabel = (value: string) => {
+    return RELATION_LIST.find((list) => list.value === value)?.label;
+  };
+
   return (
-    <>
-      <View style={[styles.container, sharedStyles.container]}>
-        {/* Form selections */}
-        <View style={styles.pillFormContainer}>
-          <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
-          <View style={styles.pillFormWrapper}>
-            {pillsFormList.map((item, i) => (
-              <View key={item.name + i} style={styles.pillForm}>
+    <View style={[styles.container, sharedStyles.container]}>
+      {/* Pill Form selections */}
+      <View style={styles.pillFormContainer}>
+        <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
+        <View style={styles.pillFormWrapper}>
+          {pillsFormList.map((item, i) => (
+            <View key={item.name + i} style={styles.pillForm}>
+              <Pressable
+                style={[
+                  styles.pillFormPressable,
+                  { borderColor: borderColor, backgroundColor: bGColor },
+                ]}
+              >
+                <item.icon color={color} />
+              </Pressable>
+              <Text style={[styles.pillFormName, { color }]}>{item.name}</Text>
+            </View>
+          ))}
+          <View style={styles.ghostWrapper} />
+        </View>
+      </View>
+
+      {/* Profile selection*/}
+      <View style={styles.profileSelectionContainer}>
+        <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
+
+        <View style={styles.profilesWrapper}>
+          {/* Self profile selection */}
+          <Pressable
+            style={[
+              styles.profileSelectionPressable,
+              { borderColor: borderColor, backgroundColor: bGColor },
+            ]}
+          >
+            <View style={[styles.profileSelectionIcon]}>
+              <PersonIcon color="#fff" />
+            </View>
+
+            <View style={styles.profileSelectionTextWrapper}>
+              <Text style={[styles.profileSelectionNameText, { color }]}>
+                Для меня
+              </Text>
+              <Text style={[styles.profileSelectionRelationText, { color }]}>
+                Вы
+              </Text>
+            </View>
+
+            <View style={[styles.profileSelectionCircular]}>
+              <View style={[styles.profileSelectionCircularDot]} />
+            </View>
+          </Pressable>
+
+          {/* Other profile selection */}
+          <Pressable
+            style={[
+              styles.profileSelectionPressable,
+              { borderColor: borderColor, backgroundColor: bGColor },
+            ]}
+          >
+            <View style={[styles.profileSelectionIcon]}>
+              <PersonIcon color="#fff" />
+            </View>
+            <View style={styles.profileSelectionTextWrapper}>
+              <Text style={[styles.profileSelectionNameText, { color }]}>
+                Анна
+              </Text>
+              <Text style={[styles.profileSelectionRelationText, { color }]}>
+                Мать
+              </Text>
+            </View>
+            <View style={styles.profileSelectionActionsContainer}>
+              <Pressable
+                style={[
+                  styles.changeSelectedProfile,
+                  { backgroundColor: tintColor },
+                ]}
+              >
+                <Text style={styles.changeSelectedProfileText}>Изменить</Text>
+              </Pressable>
+
+              <View style={[styles.profileSelectionCircular]}>
+                <View style={[styles.profileSelectionCircularDot]} />
+              </View>
+            </View>
+          </Pressable>
+
+          {/* Trigger button to show bottom sheet for profile list */}
+          <CustomButton
+            label="Выбрать члена семьи"
+            variant="outline"
+            textVaraint="tintText"
+            svgIcon={<PlusIcon color={tintColor} size={12} />}
+            onPress={() => chooseProfileBottomSheet.current?.open()}
+          />
+
+          {/* Bottom sheet for profile list */}
+          <BottomSheetWrapper
+            ref={chooseProfileBottomSheet}
+            title="Выбрать члена семьи"
+          >
+            <View style={styles.profileSelectionList}>
+              {mockProfiles.map((profile) => (
                 <Pressable
+                  key={profile.relation}
                   style={[
-                    styles.pillFormPressable,
+                    styles.profileSelectionPressable,
                     { borderColor: borderColor, backgroundColor: bGColor },
                   ]}
                 >
-                  <item.icon color={color} />
+                  <View style={[styles.profileSelectionIcon]}>
+                    <PersonIcon color="#fff" />
+                  </View>
+
+                  <View style={styles.profileSelectionTextWrapper}>
+                    <Text style={[styles.profileSelectionNameText, { color }]}>
+                      {profile.name}
+                    </Text>
+                    <Text
+                      style={[styles.profileSelectionRelationText, { color }]}
+                    >
+                      {getRelationLabel(profile.relation)}
+                    </Text>
+                  </View>
                 </Pressable>
-                <Text style={[styles.pillFormName, { color }]}>
-                  {item.name}
-                </Text>
-              </View>
-            ))}
-            <View style={styles.ghostWrapper} />
-          </View>
-        </View>
+              ))}
+            </View>
+          </BottomSheetWrapper>
 
-        {/* Profile selection*/}
-        <View style={styles.profileSelectionContainer}>
-          <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
-
-          <View style={styles.profilesWrapper}>
-            {/* Self profile selection */}
-            <Pressable
-              style={[
-                styles.profileSelectionPressable,
-                { borderColor: borderColor, backgroundColor: bGColor },
-              ]}
-            >
-              <View style={[styles.profileSelectionIcon]}>
-                <PersonIcon color="#fff" />
-              </View>
-
-              <View style={styles.profileSelectionTextWrapper}>
-                <Text style={[styles.profileSelectionNameText, { color }]}>
-                  Для меня
-                </Text>
-                <Text style={[styles.profileSelectionRelationText, { color }]}>
-                  Вы
-                </Text>
-              </View>
-
-              <View style={[styles.profileSelectionCircular]}>
-                <View style={[styles.profileSelectionCircularDot]} />
-              </View>
-            </Pressable>
-
-            {/* other profile selection */}
-            <Pressable
-              style={[
-                styles.profileSelectionPressable,
-                { borderColor: borderColor, backgroundColor: bGColor },
-              ]}
-            >
-              <View style={[styles.profileSelectionIcon]}>
-                <PersonIcon color="#fff" />
-              </View>
-
-              <View style={styles.profileSelectionTextWrapper}>
-                <Text style={[styles.profileSelectionNameText, { color }]}>
-                  Анна
-                </Text>
-                <Text style={[styles.profileSelectionRelationText, { color }]}>
-                  Мать
-                </Text>
-              </View>
-
-              <View style={[styles.profileSelectionCircular]}>
-                <View style={[styles.profileSelectionCircularDot]} />
-              </View>
-            </Pressable>
-
-            {/* <CustomButton
-          label="Выбрать члена семьи"
-          variant="outline"
-          textVaraint="tintText"
-          svgIcon={<PlusIcon color={tintColor} size={12} />}
-        /> */}
-
-            <CustomButton
+          {/* Trigger button for showing bottom sheet form for adding new profile */}
+          {/* <CustomButton
               label="Добавить члена семьи"
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={12} />}
               onPress={() => newProfileBottomSheet.current?.open()}
-            />
+            /> */}
 
-            <AddProfile ref={newProfileBottomSheet} />
-          </View>
+          {/* Bottom sheet adding new profile form  */}
+          {/* <AddProfile ref={newProfileBottomSheet} /> */}
         </View>
-
-        <CustomButton
-          label="Далее"
-          style={sharedStyles.button}
-          variant="disabled"
-          textVaraint="mutedText"
-          onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
-        />
       </View>
-    </>
+
+      <CustomButton
+        label="Далее"
+        style={sharedStyles.button}
+        variant="disabled"
+        textVaraint="mutedText"
+        onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
+      />
+    </View>
   );
 }
 
@@ -222,6 +274,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16.2,
   },
+
+  profileSelectionActionsContainer: {
+    marginLeft: "auto",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+
   profileSelectionCircular: {
     width: 20,
     height: 20,
@@ -236,5 +296,22 @@ const styles = StyleSheet.create({
     height: 15,
     borderRadius: 15,
     backgroundColor: "#fff",
+  },
+  changeSelectedProfile: {
+    marginLeft: "auto",
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderRadius: 12,
+  },
+  changeSelectedProfileText: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    lineHeight: 16.2,
+    color: "#F7F7F7",
+  },
+  profileSelectionList: {
+    gap: 8,
   },
 });

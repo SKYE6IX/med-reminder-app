@@ -50,3 +50,9 @@ export const pillNames = [
   "Glipizide",
   "Bupropion",
 ];
+
+export const mockProfiles = [
+  { name: "Mike", relation: "FATHER" },
+  { name: "Lola", relation: "SISTER" },
+  { name: "Emily", relation: "MOTHER" },
+];

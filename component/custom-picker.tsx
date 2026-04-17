@@ -1,0 +1,139 @@
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Picker } from "@react-native-picker/picker";
+import { useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+type CustomPickerProps = {
+  label: string;
+  items: { label: string; value: string }[];
+  svgIcon: React.ReactNode;
+  onValueSelected: (selectedValue: string) => void;
+};
+
+export default function CustomPicker({
+  items,
+  svgIcon,
+  label,
+  onValueSelected,
+}: CustomPickerProps) {
+  const [isSelectionVisible, setIsSelectionVisible] = useState(false);
+  const pickerRef = useRef<Picker<string>>(null);
+  const [selectedValue, setSelectedValue] = useState<string>("");
+
+  //   Theme color
+  const textColor = useThemeColor({}, "textPrimary");
+  const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
+  const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
+  const tintColor = useThemeColor({}, "tint");
+
+  const triggerRelationSelection = () => {
+    const isVisible = !isSelectionVisible;
+
+    if (!selectedValue) {
+      const value = items[0].value;
+      setSelectedValue(value);
+      onValueSelected(value);
+    }
+
+    if (isVisible) {
+      pickerRef.current?.focus();
+    } else {
+      pickerRef.current?.blur();
+    }
+
+    setIsSelectionVisible(isVisible);
+  };
+
+  const getSelectedValueLabel = (value: string) => {
+    return items.find((item) => item.value === value)?.label;
+  };
+
+  const handleValueChange = (value: string) => {
+    setSelectedValue(value);
+    onValueSelected(value);
+  };
+
+  return (
+    <View
+      style={[
+        styles.customPickerWrapper,
+        { backgroundColor: bGColorSecondary },
+      ]}
+    >
+      <View style={styles.customPickerHeader}>
+        {svgIcon}
+        <Text style={[styles.customPickerLabel, { color: textColor }]}>
+          {label}
+        </Text>
+        <Pressable
+          style={[
+            styles.customPickerPressable,
+            { backgroundColor: bGColorTertiary },
+          ]}
+          onPress={triggerRelationSelection}
+        >
+          <Text
+            style={[
+              styles.customePickerPressableText,
+              { color: isSelectionVisible ? tintColor : textColor },
+            ]}
+          >
+            {selectedValue ? getSelectedValueLabel(selectedValue) : "Выбрать"}
+          </Text>
+        </Pressable>
+      </View>
+      <Picker
+        ref={pickerRef}
+        selectedValue={selectedValue}
+        onValueChange={(itemValue) => handleValueChange(itemValue)}
+        mode="dropdown"
+        style={{
+          opacity: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
+        onFocus={() => setIsSelectionVisible(true)}
+        onBlur={() => setIsSelectionVisible(false)}
+        itemStyle={{
+          fontFamily: "Roboto_400Regular",
+          fontSize: 16,
+          lineHeight: 19.2,
+          color: textColor,
+        }}
+      >
+        {items.map((item) => (
+          <Picker.Item key={item.value} label={item.label} value={item.value} />
+        ))}
+      </Picker>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  customPickerWrapper: {
+    borderRadius: 12,
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  customPickerHeader: {
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  customPickerLabel: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    lineHeight: 19.2,
+  },
+  customPickerPressable: {
+    marginLeft: "auto",
+    padding: 8,
+    borderRadius: 12,
+  },
+  customePickerPressableText: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    lineHeight: 16.2,
+  },
+});
