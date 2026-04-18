@@ -23,6 +23,7 @@ type BottomSheetWrapperProps = {
   children: React.ReactNode;
   ref: RefObject<BottomSheetWrapperRef | null>;
   title: string;
+  snapPointPercent?: string;
 };
 
 interface HandleProps {
@@ -37,10 +38,16 @@ export default function BottomSheetWrapper({
   children,
   ref,
   title,
+  snapPointPercent = "100%",
 }: BottomSheetWrapperProps) {
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["1%", "100%"], []);
+
+  const snapPoints = useMemo(
+    () => ["1%", snapPointPercent],
+    [snapPointPercent],
+  );
+
   const handleSheetChanges = useCallback((index: number) => {
     if (index <= 1) {
       bottomSheetRef.current?.close();
