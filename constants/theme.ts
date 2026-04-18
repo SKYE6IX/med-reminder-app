@@ -9,7 +9,7 @@ export const Colors = {
 
     backgroundPrimary: baseWhite,
     backgroundSecondary: "#fff",
-    backgroundTertiary: "#F7F7F7",
+    backgroundTertiary: "#F3F4F6",
 
     borderColor: "#E6E6E6",
 

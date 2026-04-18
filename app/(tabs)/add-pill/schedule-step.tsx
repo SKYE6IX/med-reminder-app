@@ -1,6 +1,7 @@
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomFrequency from "@/component/ui/custom-frequency";
+import DosageSettings from "@/component/ui/dosage-settings";
 import SelectionDot from "@/component/ui/selection-dot";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRouter } from "expo-router";
@@ -45,8 +46,16 @@ export default function ScheduleStepScreen() {
   };
 
   return (
-    <View style={[styles.container, sharedStyles.container]}>
+    <View
+      style={[
+        styles.container,
+        sharedStyles.container,
+        // Needed to reset the padding and transfer it to the scrollView
+        { paddingLeft: 0, paddingRight: 0 },
+      ]}
+    >
       <ScrollView contentContainerStyle={styles.contentContainer}>
+        {/* Frequency Settings */}
         <View style={styles.frequencyContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
           <View style={styles.frequencyWrapper}>
@@ -94,6 +103,12 @@ export default function ScheduleStepScreen() {
           </View>
         </View>
 
+        {/* Dosage Settings */}
+        <View style={styles.dosageSettingContainer}>
+          <Text style={sharedStyles.title}>Дозировка</Text>
+          <DosageSettings />
+        </View>
+
         <CustomButton
           label="Далее"
           style={sharedStyles.button}
@@ -112,6 +127,8 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     gap: 32,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   frequencyContainer: {
     gap: 16,
@@ -137,5 +154,9 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 14,
     lineHeight: 16.2,
+  },
+
+  dosageSettingContainer: {
+    gap: 16,
   },
 });
