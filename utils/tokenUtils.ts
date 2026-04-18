@@ -38,6 +38,7 @@ export const getValidAccessToken = async (): Promise<string | null> => {
   if (!accessToken || !refreshToken) return null;
 
   if (!isTokenExpired(accessToken)) return accessToken;
+
   try {
     const { data } = await authApi.post<AuthResponse>("/refresh", {
       refreshToken,

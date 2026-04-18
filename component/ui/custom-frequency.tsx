@@ -1,7 +1,8 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Picker } from "@react-native-picker/picker";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import SelectionDot from "./selection-dot";
 
 type CustomFrequencyProps = {
@@ -10,12 +11,6 @@ type CustomFrequencyProps = {
 };
 
 type Unit = "HOUR" | "DAY";
-
-// TODO:
-// Control the height for android. The trick used in IOS isn't working so we can
-// 1. Use opacitiy to hide the tigger button for the picker.
-// 2. Set the default height to 60, no need for hidden text.
-// 3. Turn on the opacity back and increase the height.
 
 export default function CustomFrequency({
   isSelected,
@@ -27,16 +22,28 @@ export default function CustomFrequency({
   const [frequencyCount, setFrequencyCount] = useState<number>(1);
   const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOUR");
 
+  const height = useSharedValue(60);
+  const settingsViewOpacity = useSharedValue(0);
+
+  //   Themes color
   const color = useThemeColor({}, "textPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  useEffect(() => {
+    height.value = isSelected ? withSpring(100) : withSpring(60);
+    settingsViewOpacity.value = isSelected
+      ? withSpring(1, { duration: 100 })
+      : withSpring(0, { duration: 100 });
+  }, [height, isSelected, settingsViewOpacity]);
+
   return (
-    <View
+    <Animated.View
       style={[
         styles.container,
         {
+          height,
           borderWidth: isSelected ? undefined : 1,
           borderColor,
           backgroundColor: isSelected ? tintColor : bGColor,
@@ -60,7 +67,12 @@ export default function CustomFrequency({
       </Pressable>
 
       {/* Custom settings */}
-      <View style={styles.customFrequencyChoiceContainer}>
+      <Animated.View
+        style={[
+          styles.customFrequencyChoiceContainer,
+          { opacity: settingsViewOpacity },
+        ]}
+      >
         <Text style={styles.customFrequencySelectionLabel}>Каждые</Text>
 
         <View style={styles.customFrequencySelectionGroup}>
@@ -82,7 +94,7 @@ export default function CustomFrequency({
             </Text>
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
 
       {/* Count Picker */}
       <Picker
@@ -95,8 +107,6 @@ export default function CustomFrequency({
           height: 0,
           pointerEvents: "none",
         }}
-        // onFocus={() => setIsSelectionVisible(true)}
-        // onBlur={() => setIsSelectionVisible(false)}
         itemStyle={{
           fontFamily: "Roboto_400Regular",
           fontSize: 16,
@@ -109,6 +119,7 @@ export default function CustomFrequency({
         ))}
       </Picker>
 
+      {/* Unit Picker */}
       <Picker
         ref={unitPicker}
         selectedValue={frequencyUnit}
@@ -119,8 +130,6 @@ export default function CustomFrequency({
           height: 0,
           pointerEvents: "none",
         }}
-        // onFocus={() => setIsSelectionVisible(true)}
-        // onBlur={() => setIsSelectionVisible(false)}
         itemStyle={{
           fontFamily: "Roboto_400Regular",
           fontSize: 16,
@@ -131,7 +140,7 @@ export default function CustomFrequency({
         <Picker.Item label="Часа" value="HOUR" />
         <Picker.Item label="Дня" value="DAY" />
       </Picker>
-    </View>
+    </Animated.View>
   );
 }
 

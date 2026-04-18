@@ -65,15 +65,18 @@ export default function RootLayout() {
     Roboto_600SemiBold,
   });
 
-  // Check for if font state and the state of if the token completed loaded.
+  // Check for valid access token or get a refresh token if the token expired.
   useEffect(() => {
     checkIsAccesTokenValid();
+  }, []);
+
+  useEffect(() => {
     if ((loaded || error) && !isTokenLoading) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error, isTokenLoading]);
 
-  if (!loaded && !error && isTokenLoading) {
+  if (!loaded && !error) {
     return null;
   }
 
