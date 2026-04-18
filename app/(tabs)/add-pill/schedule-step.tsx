@@ -1,3 +1,4 @@
+import PlusIcon from "@/component/icons/plus-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import DosageSettings from "@/component/ui/dosage-settings";
@@ -13,6 +14,7 @@ export default function ScheduleStepScreen() {
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
+  const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
@@ -27,15 +29,44 @@ export default function ScheduleStepScreen() {
     >
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* Frequency Settings */}
-        <View style={styles.frequencyContainer}>
+        <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
           <FrequencySettings />
         </View>
 
         {/* Dosage Settings */}
-        <View style={styles.dosageSettingContainer}>
+        <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дозировка</Text>
           <DosageSettings />
+        </View>
+
+        {/* Time Settings */}
+        <View style={sharedStyles.sectionContainer}>
+          <Text style={sharedStyles.title}>Время приема</Text>
+          <View style={styles.timeSettingList}>
+            <Text
+              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
+            >
+              08:00
+            </Text>
+            <Text
+              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
+            >
+              12:00
+            </Text>
+            <Text
+              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
+            >
+              18:00
+            </Text>
+          </View>
+
+          <CustomButton
+            label="Установить время начала"
+            variant="outline"
+            textVaraint="tintText"
+            svgIcon={<PlusIcon color={tintColor} size={14} />}
+          />
         </View>
 
         <CustomButton
@@ -59,10 +90,21 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
   },
-  frequencyContainer: {
+  timeSettingList: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 16,
   },
-  dosageSettingContainer: {
-    gap: 16,
+  selectedTime: {
+    fontFamily: "Roboto_500Medium",
+    fontSize: 16,
+    lineHeight: 19.2,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderRadius: 12,
   },
 });

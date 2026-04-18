@@ -22,6 +22,9 @@ export function useAddPillScreenStyles() {
       lineHeight: 21,
       color,
     },
+    sectionContainer: {
+      gap: 16,
+    },
     button: {
       marginTop: "auto",
     },
