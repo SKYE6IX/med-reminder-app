@@ -4,26 +4,24 @@ import { View } from "react-native";
 import BottomSheetWrapper, {
   BottomSheetWrapperRef,
 } from "./bottom-sheet-wrapper";
-
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
   hideDateTime: () => void;
 }
 
-type DateTimeWrappeProps = {
+type DateTimeWrapperProps = {
   ref: RefObject<DateTimeWrapperRef | null>;
   mode: "date" | "time";
-  bottomSheetTitle: string;
+  bottomSheetTitle?: string;
 };
 
 export default function DateTimeWrapper({
   ref,
   mode,
   bottomSheetTitle,
-}: DateTimeWrappeProps) {
+}: DateTimeWrapperProps) {
   const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
-
   const [date, setDate] = useState(new Date(now));
 
   useImperativeHandle(ref, () => ({
@@ -38,7 +36,7 @@ export default function DateTimeWrapper({
   return (
     <BottomSheetWrapper
       ref={bottomSheetWrapperRef}
-      title={bottomSheetTitle}
+      title={bottomSheetTitle || ""}
       snapPointPercent="50%"
     >
       <View
