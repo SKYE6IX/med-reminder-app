@@ -1,10 +1,7 @@
-import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { RefObject, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import CustomPicker from "../custom-picker";
-import PeopleGroupIcon from "../icons/people-group";
 import { ThemedText } from "../themed-text/themed-text";
 import BottomSheetWrapper, {
   BottomSheetWrapperRef,
@@ -39,13 +36,13 @@ export default function AddProfile({ ref }: AddProfileProps) {
             placeholderTextColor="#9E9E9E"
           />
         </View>
-
+        {/* 
         <CustomPicker
           label="Отношения"
           items={RELATION_LIST}
           svgIcon={<PeopleGroupIcon color={textColor} />}
           onValueSelected={handleOnRelationSelected}
-        />
+        /> */}
 
         <CustomButton
           label="Добавить нового члена"

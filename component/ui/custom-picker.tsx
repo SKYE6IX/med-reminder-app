@@ -6,7 +6,9 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 type CustomPickerProps = {
   label: string;
   items: { label: string; value: string }[];
-  svgIcon: React.ReactNode;
+  svgIcon?: React.ReactNode;
+  isSelectionVisible?: boolean; // IOS ONLY
+  triggerSelection?: () => void; // IOS ONLY
   onValueSelected: (selectedValue: string) => void;
 };
 
@@ -111,7 +113,7 @@ export default function CustomPicker({
 
 const styles = StyleSheet.create({
   customPickerWrapper: {
-    borderRadius: 12,
+    borderRadius: 16,
     paddingLeft: 16,
     paddingRight: 16,
   },
@@ -127,9 +129,12 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
   },
   customPickerPressable: {
+    minWidth: 70,
     marginLeft: "auto",
     padding: 8,
     borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   customePickerPressableText: {
     fontFamily: "Roboto_400Regular",

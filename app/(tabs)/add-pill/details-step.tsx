@@ -8,9 +8,7 @@ import SprayIcon from "@/component/icons/spray-icon";
 import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
-import BottomSheetWrapper, {
-  BottomSheetWrapperRef,
-} from "@/component/ui/bottom-sheet-wrapper";
+import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -18,7 +16,7 @@ import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { mockProfiles } from "@/mock-data";
+import AddProfile from "@/component/ui/add-profile";
 
 const pillsFormList = [
   { name: "Капсулы", icon: CapsuleIcon },
@@ -133,16 +131,16 @@ export default function DetailsStepScreen() {
           </Pressable>
 
           {/* Trigger button to show bottom sheet for profile list */}
-          <CustomButton
+          {/* <CustomButton
             label="Выбрать члена семьи"
             variant="outline"
             textVaraint="tintText"
             svgIcon={<PlusIcon color={tintColor} size={12} />}
             onPress={() => chooseProfileBottomSheet.current?.open()}
-          />
+          /> */}
 
           {/* Bottom sheet for profile list */}
-          <BottomSheetWrapper
+          {/* <BottomSheetWrapper
             ref={chooseProfileBottomSheet}
             title="Выбрать члена семьи"
           >
@@ -172,19 +170,19 @@ export default function DetailsStepScreen() {
                 </Pressable>
               ))}
             </View>
-          </BottomSheetWrapper>
+          </BottomSheetWrapper> */}
 
           {/* Trigger button for showing bottom sheet form for adding new profile */}
-          {/* <CustomButton
-              label="Добавить члена семьи"
-              variant="outline"
-              textVaraint="tintText"
-              svgIcon={<PlusIcon color={tintColor} size={12} />}
-              onPress={() => newProfileBottomSheet.current?.open()}
-            /> */}
+          <CustomButton
+            label="Добавить члена семьи"
+            variant="outline"
+            textVaraint="tintText"
+            svgIcon={<PlusIcon color={tintColor} size={12} />}
+            onPress={() => newProfileBottomSheet.current?.open()}
+          />
 
           {/* Bottom sheet adding new profile form  */}
-          {/* <AddProfile ref={newProfileBottomSheet} /> */}
+          <AddProfile ref={newProfileBottomSheet} />
         </View>
       </View>
 

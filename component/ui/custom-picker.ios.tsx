@@ -1,13 +1,15 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { PickerIOS } from "@react-native-picker/picker";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 
 type CustomPickerProps = {
   items: { label: string; value: string }[];
   label: string;
-  svgIcon: React.ReactNode;
+  svgIcon?: React.ReactNode;
+  isSelectionVisible?: boolean; // IOS ONLY
+  triggerSelection?: () => void; // IOS ONLY
   onValueSelected: (selectedValue: string) => void;
 };
 
@@ -16,8 +18,12 @@ export default function CustomPicker({
   label,
   svgIcon,
   onValueSelected,
+  isSelectionVisible,
+  triggerSelection,
 }: CustomPickerProps) {
-  const [isSelectionVisible, setIsSelectionVisible] = useState(false);
+  const hasPopulated = useRef(false);
+  const value = items[0].value;
+
   const [selectedValue, setSelectedValue] = useState<string>("");
 
   // Themes color
@@ -28,19 +34,20 @@ export default function CustomPicker({
   const tintColor = useThemeColor({}, "tint");
 
   const height = useSharedValue(60);
-  const triggerRelationSelection = () => {
-    const isVisible = !isSelectionVisible;
 
-    if (!selectedValue) {
-      const value = items[0].value;
+  const populateSelectedvalue = useCallback(() => {
+    if (!hasPopulated.current) {
+      hasPopulated.current = true;
       setSelectedValue(value);
-      onValueSelected(value);
     }
+  }, [value]);
 
-    height.value = isVisible ? withSpring(280) : withSpring(60);
-
-    setIsSelectionVisible(isVisible);
-  };
+  useEffect(() => {
+    if (isSelectionVisible) {
+      populateSelectedvalue();
+    }
+    height.value = isSelectionVisible ? withSpring(280) : withSpring(60);
+  }, [height, isSelectionVisible, populateSelectedvalue]);
 
   const getSelectedValueLabel = (value: string) => {
     return items.find((item) => item.value === value)?.label;
@@ -68,7 +75,7 @@ export default function CustomPicker({
             styles.customPickerPressable,
             { backgroundColor: bGColorTertiary },
           ]}
-          onPress={triggerRelationSelection}
+          onPress={triggerSelection}
         >
           <Text
             style={[
@@ -128,9 +135,12 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
   },
   customPickerPressable: {
+    minWidth: 70,
     marginLeft: "auto",
     padding: 8,
     borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   customePickerPressableText: {
     fontFamily: "Roboto_400Regular",
