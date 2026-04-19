@@ -5,7 +5,6 @@ import { View } from "react-native";
 
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
-  hideDateTime: () => void;
 }
 
 type DateTimeWrapperProps = {
@@ -18,7 +17,6 @@ export default function DateTimePickerWrapper({
   mode,
 }: DateTimeWrapperProps) {
   const now = Date.now();
-
   const [date, setDate] = useState(new Date(now));
 
   const showMode = (currentMode: DateTimeWrapperProps["mode"]) => {
@@ -26,7 +24,7 @@ export default function DateTimePickerWrapper({
       value: date,
       onChange(event, date) {},
       mode: currentMode,
-      design: "material",
+      is24Hour: true,
     });
   };
 
@@ -34,7 +32,6 @@ export default function DateTimePickerWrapper({
     showDateTime() {
       showMode(mode);
     },
-    hideDateTime() {},
   }));
 
   return <View style={{ display: "none" }} />;

@@ -6,7 +6,6 @@ import BottomSheetWrapper, {
 } from "./bottom-sheet-wrapper";
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
-  hideDateTime: () => void;
 }
 
 type DateTimeWrapperProps = {
@@ -28,9 +27,6 @@ export default function DateTimeWrapper({
     showDateTime() {
       bottomSheetWrapperRef.current?.open();
     },
-    hideDateTime() {
-      bottomSheetWrapperRef.current?.close();
-    },
   }));
 
   return (
@@ -47,10 +43,9 @@ export default function DateTimeWrapper({
         }}
       >
         <DateTimePicker
-          testID="dateTimePicker"
           value={date}
           mode={mode}
-          onChange={() => {}}
+          onChange={(event, date) => {}}
           display={mode === "date" ? "inline" : "spinner"}
         />
       </View>
