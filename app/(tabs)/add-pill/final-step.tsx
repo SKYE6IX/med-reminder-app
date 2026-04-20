@@ -1,7 +1,7 @@
 import BellIcon from "@/component/icons/bell-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import CustomPicker from "@/component/ui/custom-picker";
+import CustomPicker from "@/component/ui/custom-picker/custom-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useState } from "react";
 import {

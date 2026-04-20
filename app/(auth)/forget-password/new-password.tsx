@@ -1,6 +1,6 @@
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import FormHeader from "@/component/ui/form-header";
-import FormInput from "@/component/ui/form-input/form-input";
+import FormHeader from "@/component/ui/form/form-header";
+import FormInput from "@/component/ui/form/form-input";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 

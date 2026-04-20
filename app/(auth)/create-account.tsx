@@ -1,5 +1,5 @@
-import FormHeader from "@/component/ui/form-header";
-import FormInput from "@/component/ui/form-input/form-input";
+import FormHeader from "@/component/ui/form/form-header";
+import FormInput from "@/component/ui/form/form-input";
 import { authApi } from "@/utils/authApi";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";

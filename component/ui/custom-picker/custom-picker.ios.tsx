@@ -76,6 +76,7 @@ export default function CustomPicker({
             { backgroundColor: bGColorTertiary },
           ]}
           onPress={triggerSelection}
+          role="button"
         >
           <Text
             style={[
@@ -90,6 +91,7 @@ export default function CustomPicker({
 
       <Animated.View style={{ opacity: isSelectionVisible ? undefined : 0 }}>
         <PickerIOS
+          testID="picker"
           selectedValue={selectedValue}
           onValueChange={(itemValue) => handleValueChange(itemValue.toString())}
           style={{

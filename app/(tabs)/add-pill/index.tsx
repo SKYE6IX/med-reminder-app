@@ -60,7 +60,6 @@ export default function NameStepScreen() {
             Добавить «{query}» как название
           </Text>
         </Pressable>
-
         {/* <FlatList
           data={results}
           renderItem={({ item }) => (
@@ -71,7 +70,6 @@ export default function NameStepScreen() {
           keyExtractor={(item) => item}
         /> */}
       </View>
-
       <CustomButton
         label="Далее"
         style={sharedStyles.button}
@@ -110,7 +108,6 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "90%",
   },
-  suggestionWrapper: {},
   item: {
     flexDirection: "row",
     alignItems: "center",

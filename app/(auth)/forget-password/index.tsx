@@ -1,5 +1,5 @@
-import FormHeader from "@/component/ui/form-header";
-import FormInput from "@/component/ui/form-input/form-input";
+import FormHeader from "@/component/ui/form/form-header";
+import FormInput from "@/component/ui/form/form-input";
 import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, View } from "react-native";

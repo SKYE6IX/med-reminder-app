@@ -19,6 +19,7 @@ export default function CustomPicker({
   onValueSelected,
 }: CustomPickerProps) {
   const [isSelectionVisible, setIsSelectionVisible] = useState(false);
+
   const pickerRef = useRef<Picker<string>>(null);
   const [selectedValue, setSelectedValue] = useState<string>("");
 
@@ -30,19 +31,16 @@ export default function CustomPicker({
 
   const triggerRelationSelection = () => {
     const isVisible = !isSelectionVisible;
-
     if (!selectedValue) {
       const value = items[0].value;
       setSelectedValue(value);
       onValueSelected(value);
     }
-
     if (isVisible) {
       pickerRef.current?.focus();
     } else {
       pickerRef.current?.blur();
     }
-
     setIsSelectionVisible(isVisible);
   };
 
@@ -73,6 +71,7 @@ export default function CustomPicker({
             { backgroundColor: bGColorTertiary },
           ]}
           onPress={triggerRelationSelection}
+          role="button"
         >
           <Text
             style={[
@@ -85,6 +84,7 @@ export default function CustomPicker({
         </Pressable>
       </View>
       <Picker
+        testID="picker"
         ref={pickerRef}
         selectedValue={selectedValue}
         onValueChange={(itemValue) => handleValueChange(itemValue)}
