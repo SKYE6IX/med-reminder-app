@@ -4,24 +4,64 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { pillNames } from "@/mock-data";
+import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 export default function NameStepScreen() {
-  const [query, setQuery] = useState("");
+  const sharedStyles = useAddPillScreenStyles();
 
+  const { setMedicationDetails } = useAddPillStore();
+
+  const [queryField, setQueryField] = useState("");
+  const [hideSuggestionBox, setHideSuggestionBox] = useState(true);
+  const isQueryFieldEmpty = queryField.length < 1;
+
+  // Themes
   const color = useThemeColor({}, "textPrimary");
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const tint = useThemeColor({}, "tint");
   const router = useRouter();
 
-  const sharedStyles = useAddPillScreenStyles();
+  // Mock Data!
+  const results = isQueryFieldEmpty
+    ? []
+    : pillNames.filter((pill) =>
+        pill.toLowerCase().startsWith(queryField.toLocaleLowerCase()),
+      );
 
-  const results = pillNames.filter((pill) =>
-    pill.toLowerCase().startsWith(query.toLowerCase()),
+  const canContinue = useAddPillStore((s) =>
+    s.isFieldFilled(["medicationName"]),
   );
+
+  const handleSetPillName = (value: string) => {
+    setMedicationDetails({
+      medicationName: value,
+    });
+    setQueryField(value);
+    setHideSuggestionBox(true);
+  };
+
+  const handleOnTextChange = (text: string) => {
+    if (text.length < 1) {
+      setMedicationDetails({
+        medicationName: "",
+      });
+    }
+    if (hideSuggestionBox) {
+      setHideSuggestionBox(false);
+    }
+    setQueryField(text);
+  };
 
   return (
     <View style={[styles.container, sharedStyles.container]}>
@@ -35,13 +75,11 @@ export default function NameStepScreen() {
         >
           <SearchIcon color={color} size={16} />
           <TextInput
-            value={query}
-            onChangeText={(text) => setQuery(text)}
+            value={queryField}
+            onChangeText={handleOnTextChange}
             style={[styles.input, { color }]}
             placeholder="Поиск"
             placeholderTextColor={color}
-            onFocus={() => {}} // show suggestion when user start to type
-            onBlur={() => {}} // hide when user are not type
             returnKeyType="search"
             keyboardType="default"
             autoCorrect={false}
@@ -51,31 +89,42 @@ export default function NameStepScreen() {
         </View>
       </View>
 
-      <View>
-        <Pressable style={[styles.item, { borderColor: inputBorderColor }]}>
-          <View style={[styles.iconWrapper, { backgroundColor: tint }]}>
-            <PlusIcon />
-          </View>
-          <Text style={[styles.itemText, { color }]}>
-            Добавить «{query}» как название
-          </Text>
-        </Pressable>
-        {/* <FlatList
-          data={results}
+      <View style={styles.suggestionWrapper}>
+        {!isQueryFieldEmpty && !hideSuggestionBox && (
+          <Pressable
+            style={[styles.item, { borderColor: inputBorderColor }]}
+            onPress={() => handleSetPillName(queryField)}
+          >
+            <View style={[styles.iconWrapper, { backgroundColor: tint }]}>
+              <PlusIcon />
+            </View>
+            <Text style={[styles.itemText, { color }]}>
+              Добавить «{queryField}» как название
+            </Text>
+          </Pressable>
+        )}
+
+        <FlatList
+          data={!hideSuggestionBox ? results : []}
           renderItem={({ item }) => (
-            <Pressable style={[styles.item, { borderColor: inputBorderColor }]}>
+            <Pressable
+              style={[styles.item, { borderColor: inputBorderColor }]}
+              onPress={() => handleSetPillName(item)}
+            >
               <Text style={[styles.itemText, { color }]}>{item}</Text>
             </Pressable>
           )}
           keyExtractor={(item) => item}
-        /> */}
+        />
       </View>
+
       <CustomButton
         label="Далее"
         style={sharedStyles.button}
-        variant="disabled"
-        textVaraint="mutedText"
+        variant={canContinue ? "filled" : "disabled"}
+        textVaraint={canContinue ? "regularText" : "mutedText"}
         onPress={() => router.navigate("/(tabs)/add-pill/details-step")}
+        disabled={!canContinue}
       />
     </View>
   );
@@ -129,5 +178,8 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,
+  },
+  suggestionWrapper: {
+    width: "auto",
   },
 });

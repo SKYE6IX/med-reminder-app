@@ -2,64 +2,101 @@ import CapsuleIcon from "@/component/icons/capsule-icon";
 import Ellipsis from "@/component/icons/ellipsis";
 import EyeDropIcon from "@/component/icons/eye-drop-icon";
 import InjectionIcon from "@/component/icons/injection-icon";
-import PersonIcon from "@/component/icons/person-icon";
 import PlusIcon from "@/component/icons/plus-icon";
 import SprayIcon from "@/component/icons/spray-icon";
 import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
-import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
+import AddProfile from "@/component/ui/add-profile";
+import BottomSheetWrapper, {
+  BottomSheetWrapperRef,
+} from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import { RELATION_LIST } from "@/constants/relation";
+import ProfileCard from "@/component/ui/profile-card";
+import { Relation } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { mockProfiles } from "@/mock-data";
+import { useAddPillStore } from "@/stores/add-pill-store";
+import { MedicationUnit } from "@/types/medication";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import AddProfile from "@/component/ui/add-profile";
-
-const pillsFormList = [
-  { name: "Капсулы", icon: CapsuleIcon },
-  { name: "Таблетки", icon: TabletIcon },
-  { name: "Инъекции", icon: InjectionIcon },
-  { name: "Спрей", icon: SprayIcon },
-  { name: "Капли", icon: EyeDropIcon },
-  { name: "Сироп", icon: SyrupBottleIcon },
-  { name: "Другое", icon: Ellipsis },
+const medicationUnits = [
+  { name: "Капсулы", icon: CapsuleIcon, value: MedicationUnit.CAPSULE },
+  { name: "Таблетки", icon: TabletIcon, value: MedicationUnit.TABLET },
+  { name: "Инъекции", icon: InjectionIcon, value: MedicationUnit.INJECTION },
+  { name: "Спрей", icon: SprayIcon, value: MedicationUnit.SPRAY },
+  { name: "Капли", icon: EyeDropIcon, value: MedicationUnit.DROPS },
+  { name: "Сироп", icon: SyrupBottleIcon, value: MedicationUnit.SYRUP },
+  { name: "Другое", icon: Ellipsis, value: MedicationUnit.OTHER },
 ];
 
 export default function DetailsStepScreen() {
+  const { setMedicationDetails, formState } = useAddPillStore();
+
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
+
   const newProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
   const chooseProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
 
+  // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
 
-  const getRelationLabel = (value: string) => {
-    return RELATION_LIST.find((list) => list.value === value)?.label;
+  const selfProfile = mockProfiles.find((profile) => profile.isSelf);
+
+  const relationProfile = mockProfiles.find(
+    (profile) => profile.id === formState.profileId && !profile.isSelf,
+  );
+
+  const relationProfiles = mockProfiles.filter((profile) => !profile.isSelf);
+
+  const isRelationProfileSelected = mockProfiles.some(
+    (profile) => !profile.isSelf && profile.id === formState.profileId,
+  );
+
+  const handleSetProfile = (profileId: string) => {
+    setMedicationDetails({ profileId });
+
+    chooseProfileBottomSheet.current?.close();
   };
 
   return (
     <View style={[styles.container, sharedStyles.container]}>
       {/* Pill Form selections */}
-      <View style={styles.pillFormContainer}>
+      <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
         <View style={styles.pillFormWrapper}>
-          {pillsFormList.map((item, i) => (
-            <View key={item.name + i} style={styles.pillForm}>
+          {medicationUnits.map((unit, i) => (
+            <View key={unit.value + i} style={styles.pillForm}>
               <Pressable
                 style={[
                   styles.pillFormPressable,
-                  { borderColor: borderColor, backgroundColor: bGColor },
+                  {
+                    borderWidth:
+                      unit.value === formState.medicationUnit ? undefined : 1,
+                    borderColor,
+                    backgroundColor:
+                      unit.value === formState.medicationUnit
+                        ? tintColor
+                        : bGColor,
+                  },
                 ]}
+                onPress={() =>
+                  setMedicationDetails({ medicationUnit: unit.value })
+                }
               >
-                <item.icon color={color} />
+                <unit.icon
+                  color={
+                    unit.value === formState.medicationUnit ? "#F7F7F7" : color
+                  }
+                />
               </Pressable>
-              <Text style={[styles.pillFormName, { color }]}>{item.name}</Text>
+              <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
             </View>
           ))}
           <View style={styles.ghostWrapper} />
@@ -67,110 +104,64 @@ export default function DetailsStepScreen() {
       </View>
 
       {/* Profile selection*/}
-      <View style={styles.profileSelectionContainer}>
+      <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
-
         <View style={styles.profilesWrapper}>
           {/* Self profile selection */}
-          <Pressable
-            style={[
-              styles.profileSelectionPressable,
-              { borderColor: borderColor, backgroundColor: bGColor },
-            ]}
-          >
-            <View style={[styles.profileSelectionIcon]}>
-              <PersonIcon color="#fff" />
-            </View>
-
-            <View style={styles.profileSelectionTextWrapper}>
-              <Text style={[styles.profileSelectionNameText, { color }]}>
-                Для меня
-              </Text>
-              <Text style={[styles.profileSelectionRelationText, { color }]}>
-                Вы
-              </Text>
-            </View>
-
-            <View style={[styles.profileSelectionCircular]}>
-              <View style={[styles.profileSelectionCircularDot]} />
-            </View>
-          </Pressable>
+          <ProfileCard
+            isSelected={selfProfile?.id === formState.profileId}
+            profileId={selfProfile?.id as string}
+            isSelf
+            hasActiveDot
+            setProfile={handleSetProfile}
+          />
 
           {/* Other profile selection */}
-          <Pressable
-            style={[
-              styles.profileSelectionPressable,
-              { borderColor: borderColor, backgroundColor: bGColor },
-            ]}
-          >
-            <View style={[styles.profileSelectionIcon]}>
-              <PersonIcon color="#fff" />
-            </View>
-            <View style={styles.profileSelectionTextWrapper}>
-              <Text style={[styles.profileSelectionNameText, { color }]}>
-                Анна
-              </Text>
-              <Text style={[styles.profileSelectionRelationText, { color }]}>
-                Мать
-              </Text>
-            </View>
-            <View style={styles.profileSelectionActionsContainer}>
-              <Pressable
-                style={[
-                  styles.changeSelectedProfile,
-                  { backgroundColor: tintColor },
-                ]}
-              >
-                <Text style={styles.changeSelectedProfileText}>Изменить</Text>
-              </Pressable>
-
-              <View style={[styles.profileSelectionCircular]}>
-                <View style={[styles.profileSelectionCircularDot]} />
-              </View>
-            </View>
-          </Pressable>
+          {relationProfile && (
+            <ProfileCard
+              isSelected={relationProfile.id === formState.profileId}
+              profileId={relationProfile.id}
+              name={relationProfile.name}
+              relation={relationProfile.relation as Relation}
+              isSelf={false}
+              hasActiveDot
+              setProfile={handleSetProfile}
+              changeProfile={() => chooseProfileBottomSheet.current?.open()}
+            />
+          )}
 
           {/* Trigger button to show bottom sheet for profile list */}
-          {/* <CustomButton
-            label="Выбрать члена семьи"
-            variant="outline"
-            textVaraint="tintText"
-            svgIcon={<PlusIcon color={tintColor} size={12} />}
-            onPress={() => chooseProfileBottomSheet.current?.open()}
-          /> */}
+          {relationProfiles.length > 1 && !isRelationProfileSelected && (
+            <CustomButton
+              label="Выбрать члена семьи"
+              variant="outline"
+              textVaraint="tintText"
+              svgIcon={<PlusIcon color={tintColor} size={12} />}
+              onPress={() => chooseProfileBottomSheet.current?.open()}
+            />
+          )}
 
           {/* Bottom sheet for profile list */}
-          {/* <BottomSheetWrapper
+          <BottomSheetWrapper
             ref={chooseProfileBottomSheet}
             title="Выбрать члена семьи"
           >
             <View style={styles.profileSelectionList}>
-              {mockProfiles.map((profile) => (
-                <Pressable
-                  key={profile.relation}
-                  style={[
-                    styles.profileSelectionPressable,
-                    { borderColor: borderColor, backgroundColor: bGColor },
-                  ]}
-                >
-                  <View style={[styles.profileSelectionIcon]}>
-                    <PersonIcon color="#fff" />
-                  </View>
-
-                  <View style={styles.profileSelectionTextWrapper}>
-                    <Text style={[styles.profileSelectionNameText, { color }]}>
-                      {profile.name}
-                    </Text>
-                    <Text
-                      style={[styles.profileSelectionRelationText, { color }]}
-                    >
-                      {getRelationLabel(profile.relation)}
-                    </Text>
-                  </View>
-                </Pressable>
+              {relationProfiles.map((profile) => (
+                <ProfileCard
+                  isSelected={false} // it's part of list.// no active state on list
+                  profileId={profile.id}
+                  key={profile.id}
+                  name={profile.name}
+                  relation={profile.relation as Relation}
+                  isSelf={false}
+                  hasActiveDot={false}
+                  asList
+                  setProfile={handleSetProfile}
+                />
               ))}
             </View>
-          </BottomSheetWrapper> */}
+          </BottomSheetWrapper>
 
           {/* Trigger button for showing bottom sheet form for adding new profile */}
           <CustomButton
@@ -180,7 +171,6 @@ export default function DetailsStepScreen() {
             svgIcon={<PlusIcon color={tintColor} size={12} />}
             onPress={() => newProfileBottomSheet.current?.open()}
           />
-
           {/* Bottom sheet adding new profile form  */}
           <AddProfile ref={newProfileBottomSheet} />
         </View>
@@ -201,9 +191,6 @@ const styles = StyleSheet.create({
   container: {
     gap: 32,
   },
-  pillFormContainer: {
-    gap: 16,
-  },
   pillFormWrapper: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -221,8 +208,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pillFormPressable: {
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
@@ -233,82 +219,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
   },
-  profileSelectionContainer: {
-    width: "100%",
-    gap: 16,
-  },
   profilesWrapper: {
     gap: 8,
-  },
-  profileSelectionPressable: {
-    width: "100%",
-    height: 65,
-    paddingLeft: 16,
-    paddingRight: 16,
-    borderWidth: 1,
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-  profileSelectionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#E8F1FF",
-  },
-  profileSelectionTextWrapper: {
-    gap: 4,
-  },
-  profileSelectionNameText: {
-    fontFamily: "Roboto_500Medium",
-    fontSize: 15,
-    lineHeight: 17.2,
-  },
-  profileSelectionRelationText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    lineHeight: 16.2,
-  },
-
-  profileSelectionActionsContainer: {
-    marginLeft: "auto",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-
-  profileSelectionCircular: {
-    width: 20,
-    height: 20,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: "auto",
-    backgroundColor: "#AEAEB2",
-  },
-  profileSelectionCircularDot: {
-    width: 15,
-    height: 15,
-    borderRadius: 15,
-    backgroundColor: "#fff",
-  },
-
-  changeSelectedProfile: {
-    marginLeft: "auto",
-    paddingLeft: 12,
-    paddingRight: 12,
-    paddingTop: 8,
-    paddingBottom: 8,
-    borderRadius: 12,
-  },
-  changeSelectedProfileText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    lineHeight: 16.2,
-    color: "#F7F7F7",
   },
   profileSelectionList: {
     gap: 8,

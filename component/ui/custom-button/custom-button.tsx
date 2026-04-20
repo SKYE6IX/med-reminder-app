@@ -18,6 +18,7 @@ export default function CustomButton({
   onPress,
   logoSrc,
   svgIcon,
+  ...rest
 }: CustomButtonProps) {
   const buttonStyles = useLinkButtonStyles();
 
@@ -26,6 +27,7 @@ export default function CustomButton({
       role="button"
       onPress={onPress}
       style={[buttonStyles.base, buttonStyles[variant], style]}
+      {...rest}
     >
       {logoSrc && <Image source={logoSrc} style={buttonStyles.logo} />}
       {svgIcon && svgIcon}
