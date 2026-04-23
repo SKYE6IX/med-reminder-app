@@ -2,8 +2,12 @@ import BellIcon from "@/component/icons/bell-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
+import Loader from "@/component/ui/loader";
+import { useMutation } from "@/hooks/use-mutation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
+import { CreateMedication, MedicationResponse } from "@/types/medication";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Platform,
@@ -38,9 +42,10 @@ const HALF_EXPAND = 197;
 const FULL_EXPAND = 417;
 
 export default function FinalStepScreen() {
+  const router = useRouter();
   const isIOS = Platform.OS === "ios";
 
-  const { formState, setMedicationDetails, setMedicationpack } =
+  const { formState, setMedicationDetails, setMedicationpack, clearFormState } =
     useAddPillStore();
 
   const sharedStyles = useAddPillScreenStyles();
@@ -173,8 +178,37 @@ export default function FinalStepScreen() {
     height: refillSettingHeight.value,
   }));
 
+  // Create a new medication
+  const [createMedication, { loading }] = useMutation<
+    MedicationResponse,
+    CreateMedication
+  >({
+    url: "medications",
+    method: "post",
+    onSuccess(data, variables) {
+      router.dismissAll();
+      clearFormState();
+      router.navigate("/(tabs)");
+    },
+  });
+
+  const createMedicationSchedule = async () => {
+    const data: CreateMedication = {
+      ...formState,
+      schedule: {
+        dosage: formState.schedule.dosage,
+        recurrenceRule: formState.schedule.rule.recurrenceRule,
+        startDate: formState.schedule.startDate,
+        timeZone: formState.schedule.timeZone,
+      },
+    };
+    await createMedication(data);
+  };
+
   return (
     <View style={[styles.container, sharedStyles.container]}>
+      <Loader visible={loading} />
+
       {/* Refill setting container */}
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
@@ -267,7 +301,11 @@ export default function FinalStepScreen() {
           ]}
         />
       </View>
-      <CustomButton label="Создавать" />
+      <CustomButton
+        label="Создавать"
+        onPress={createMedicationSchedule}
+        disabled={loading}
+      />
     </View>
   );
 }

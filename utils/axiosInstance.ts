@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { InternalAxiosRequestConfig } from "axios";
 import Constants from "expo-constants";
 import { getValidAccessToken } from "./tokenUtils";
 
@@ -20,4 +20,4 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-export { api };
+export { api, InternalAxiosRequestConfig };

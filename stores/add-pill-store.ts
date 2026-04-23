@@ -51,26 +51,30 @@ interface AddPillStore {
   setMedicationpack: (packData: MedicationPack | null) => void;
 
   isFieldFilled: (fields: FieldName[]) => boolean;
+
+  clearFormState: () => void;
 }
 
-export const useAddPillStore = create<AddPillStore>()((set, get) => ({
-  formState: {
-    profileId: "",
-    medicationName: "",
-    medicationUnit: MedicationUnit.CAPSULE,
-    medicationMeasurement: DosageMeasurement.TABLET,
-    medicationNote: null,
-    schedule: {
-      dosage: 1,
-      rule: {
-        recurrenceRule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
-        value: "ONCE_A_DAY",
-      },
-      startDate: getDateLocalString(),
-      timeZone: getTimeZone(),
+const DEFAULT_STATE: AddPillStore["formState"] = {
+  profileId: "",
+  medicationName: "",
+  medicationUnit: MedicationUnit.CAPSULE,
+  medicationMeasurement: DosageMeasurement.TABLET,
+  medicationNote: null,
+  schedule: {
+    dosage: 1,
+    rule: {
+      recurrenceRule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
+      value: "ONCE_A_DAY",
     },
-    medicationPack: null,
+    startDate: getDateLocalString(),
+    timeZone: getTimeZone(),
   },
+  medicationPack: null,
+};
+
+export const useAddPillStore = create<AddPillStore>()((set, get) => ({
+  formState: DEFAULT_STATE,
 
   setMedicationDetails(data) {
     set((state) => ({
@@ -114,5 +118,8 @@ export const useAddPillStore = create<AddPillStore>()((set, get) => ({
       if (typeof value === "string") return value.trim().length > 0;
       return true;
     });
+  },
+  clearFormState() {
+    set((state) => ({ ...state, formState: DEFAULT_STATE }));
   },
 }));
