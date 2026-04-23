@@ -9,16 +9,38 @@ import DateTimePickerWrapper, {
 import DosageSettings from "@/component/ui/dosage-settings";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { RuleValue, useAddPillStore } from "@/stores/add-pill-store";
+import { DosageMeasurement } from "@/types/medication";
+import { formateDate, getDateLocalString } from "@/utils/luxonUtil";
+import { generateTimeOccurrences, updateTimeRules } from "@/utils/rruleUtils";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ScheduleStepScreen() {
+  const { formState, setMedicatioSchedule, setMedicationDetails } =
+    useAddPillStore();
+
   const timeRef = useRef<DateTimeWrapperRef>(null);
   const dateRef = useRef<DateTimeWrapperRef>(null);
 
+  const displayStartDate = formateDate(
+    formState.schedule.startDate.replaceAll(".", " "),
+  );
+
+  // *** //
+  // We use this to target the first letter since there is no way to do this in
+  // Text. And the other date generation can be acesss ahead.
+  const [firstLetter, ...restArr] = Array.from(displayStartDate);
+  const rest = restArr.join("");
+  // ****/
+
   const sharedStyles = useAddPillScreenStyles();
   const router = useRouter();
+
+  const occurences = generateTimeOccurrences({
+    rrule: formState.schedule.rule.recurrenceRule,
+  });
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -28,6 +50,52 @@ export default function ScheduleStepScreen() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  // Rules settings
+  const handleSetRRules = ({
+    rules,
+    value,
+  }: {
+    rules: string;
+    value: RuleValue;
+  }) => {
+    setMedicatioSchedule({
+      rule: {
+        recurrenceRule: rules,
+        value,
+      },
+    });
+  };
+
+  // Time settings
+  const handleSetTime = (date: Date) => {
+    const newRules = updateTimeRules({
+      rrules: formState.schedule.rule.recurrenceRule,
+      date,
+    });
+    setMedicatioSchedule({
+      rule: {
+        recurrenceRule: newRules,
+        value: formState.schedule.rule.value,
+      },
+    });
+  };
+
+  // Date settings
+  const handleSetDate = (date: Date) => {
+    const startingDate = getDateLocalString(date);
+    setMedicatioSchedule({ startDate: startingDate });
+  };
+
+  // Dosage setting
+  const handleOnDosageSettingChange = ({
+    amount,
+    unit,
+  }: Partial<{ amount: number; unit: DosageMeasurement }>) => {
+    setMedicatioSchedule({ dosage: amount ?? formState.schedule.dosage });
+    setMedicationDetails({
+      medicationMeasurement: unit ?? formState.medicationMeasurement,
+    });
+  };
   return (
     <View
       style={[
@@ -41,36 +109,38 @@ export default function ScheduleStepScreen() {
         {/* Frequency Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
-          <FrequencySettings />
+          <FrequencySettings
+            onRRulesSet={handleSetRRules}
+            currentValue={formState.schedule.rule.value}
+          />
         </View>
 
         {/* Dosage Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дозировка</Text>
-          <DosageSettings />
+          <DosageSettings
+            dosageAmountState={formState.schedule.dosage}
+            dosageUnitState={formState.medicationMeasurement}
+            onDasgeSettingsChange={handleOnDosageSettingChange}
+          />
         </View>
 
         {/* Time Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Время приема</Text>
           <View style={styles.timeSettingList}>
-            <Text
-              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
-            >
-              08:00
-            </Text>
-            <Text
-              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
-            >
-              12:00
-            </Text>
-            <Text
-              style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
-            >
-              18:00
-            </Text>
+            {occurences.map((time, i) => (
+              <Text
+                key={time + i}
+                style={[
+                  styles.selectedTime,
+                  { backgroundColor: bGColor, color },
+                ]}
+              >
+                {time}
+              </Text>
+            ))}
           </View>
-
           <CustomButton
             label="Установить время начала"
             variant="outline"
@@ -78,7 +148,9 @@ export default function ScheduleStepScreen() {
             svgIcon={<PlusIcon color={tintColor} size={14} />}
             onPress={() => timeRef.current?.showDateTime()}
           />
+          {/* TIME PICKER */}
           <DateTimePickerWrapper
+            onDateTimeSelected={handleSetTime}
             ref={timeRef}
             mode="time"
             bottomSheetTitle="Время начала"
@@ -107,13 +179,21 @@ export default function ScheduleStepScreen() {
               <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>
                 Начало
               </Text>
-              <Text style={[styles.dateSettingValue, { color }]}>Сегодня</Text>
+
+              <Text style={[styles.dateSettingValue, { color }]}>
+                <Text style={styles.dateSettingValueUpperCase}>
+                  {firstLetter}
+                </Text>
+                {rest}
+              </Text>
             </View>
             <View style={styles.dateSettingRightIcon}>
               <ArrowDown />
             </View>
           </Pressable>
+
           <DateTimePickerWrapper
+            onDateTimeSelected={handleSetDate}
             ref={dateRef}
             mode="date"
             bottomSheetTitle="Дата начала"
@@ -123,8 +203,8 @@ export default function ScheduleStepScreen() {
         <CustomButton
           label="Далее"
           style={sharedStyles.button}
-          variant="disabled"
-          textVaraint="mutedText"
+          variant="filled"
+          textVaraint="regularText"
           onPress={() => router.navigate("/(tabs)/add-pill/final-step")}
         />
       </ScrollView>
@@ -146,7 +226,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 16,
+    gap: 12,
+    flexWrap: "wrap",
   },
   selectedTime: {
     fontFamily: "Roboto_500Medium",
@@ -181,6 +262,9 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_600SemiBold",
     fontSize: 16,
     lineHeight: 19.2,
+  },
+  dateSettingValueUpperCase: {
+    textTransform: "capitalize",
   },
   dateSettingLeftIcon: {
     width: 40,

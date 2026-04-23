@@ -1,17 +1,9 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { PickerIOS } from "@react-native-picker/picker";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
-
-type CustomPickerProps = {
-  items: { label: string; value: string }[];
-  label: string;
-  svgIcon?: React.ReactNode;
-  isSelectionVisible?: boolean; // IOS ONLY
-  triggerSelection?: () => void; // IOS ONLY
-  onValueSelected: (selectedValue: string) => void;
-};
+import { CustomPickerProps } from "./custom-picker";
 
 export default function CustomPicker({
   items,
@@ -20,12 +12,8 @@ export default function CustomPicker({
   onValueSelected,
   isSelectionVisible,
   triggerSelection,
+  selectedValue,
 }: CustomPickerProps) {
-  const hasPopulated = useRef(false);
-  const value = items[0].value;
-
-  const [selectedValue, setSelectedValue] = useState<string>("");
-
   // Themes color
   const textColor = useThemeColor({}, "textPrimary");
   const borderColor = useThemeColor({}, "borderColor");
@@ -35,26 +23,15 @@ export default function CustomPicker({
 
   const height = useSharedValue(60);
 
-  const populateSelectedvalue = useCallback(() => {
-    if (!hasPopulated.current) {
-      hasPopulated.current = true;
-      setSelectedValue(value);
-    }
-  }, [value]);
-
   useEffect(() => {
-    if (isSelectionVisible) {
-      populateSelectedvalue();
-    }
     height.value = isSelectionVisible ? withSpring(280) : withSpring(60);
-  }, [height, isSelectionVisible, populateSelectedvalue]);
+  }, [height, isSelectionVisible]);
 
   const getSelectedValueLabel = (value: string) => {
     return items.find((item) => item.value === value)?.label;
   };
 
   const handleValueChange = (value: string) => {
-    setSelectedValue(value);
     onValueSelected(value);
   };
 
@@ -121,7 +98,7 @@ export default function CustomPicker({
 
 const styles = StyleSheet.create({
   customPickerWrapper: {
-    borderRadius: 12,
+    borderRadius: 16,
     paddingLeft: 16,
     paddingRight: 16,
   },

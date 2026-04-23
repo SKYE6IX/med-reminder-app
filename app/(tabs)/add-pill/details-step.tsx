@@ -62,8 +62,13 @@ export default function DetailsStepScreen() {
   const handleSetProfile = (profileId: string) => {
     setMedicationDetails({ profileId });
 
+    // Close the bottomsheeet after selection
     chooseProfileBottomSheet.current?.close();
   };
+
+  const canContinue = useAddPillStore((s) =>
+    s.isFieldFilled(["medicationUnit", "profileId"]),
+  );
 
   return (
     <View style={[styles.container, sharedStyles.container]}>
@@ -179,9 +184,10 @@ export default function DetailsStepScreen() {
       <CustomButton
         label="Далее"
         style={sharedStyles.button}
-        variant="disabled"
-        textVaraint="mutedText"
+        variant={canContinue ? "filled" : "disabled"}
+        textVaraint={canContinue ? "regularText" : "mutedText"}
         onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
+        disabled={!canContinue}
       />
     </View>
   );

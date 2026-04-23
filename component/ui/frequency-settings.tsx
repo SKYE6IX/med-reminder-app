@@ -1,32 +1,55 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { RuleValue } from "@/stores/add-pill-store";
+import { buildRRules } from "@/utils/rruleUtils";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import CustomFrequency from "./custom-frequency";
+import CustomFrequency, { Unit } from "./custom-frequency";
 import SelectionDot from "./selection-dot";
 
-const FREQUENCIES = [
+export interface Frequency {
+  label: string;
+  info?: string;
+  value: RuleValue;
+  rrule: string;
+}
+
+type FrequencySettingsProps = {
+  currentValue: RuleValue;
+  onRRulesSet: ({ rules, value }: { rules: string; value: RuleValue }) => void;
+};
+
+const DEFALUT_FREQUENCIES: Frequency[] = [
   {
     label: "Один раз в день",
     info: "Каждые 24 часа",
-    value: "ONCE-A-DAY",
-    id: 1,
+    rrule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
+    value: "ONCE_A_DAY",
   },
   {
     label: "Два раза в день",
     info: "Каждые 12 часов",
-    value: "TWICE-A-DAY",
-    id: 2,
+    rrule: "FREQ=DAILY;BYHOUR=9,21;BYMINUTE=0",
+    value: "TWICE_A_DAY",
   },
   {
     label: "Три раза в день",
-    info: "Каждые 8 часов",
-    value: "THREE-TIMES-A-DAY",
-    id: 3,
+    info: "Каждые 7 часов",
+    rrule: "FREQ=DAILY;BYHOUR=9,14,21;BYMINUTE=0",
+    value: "THREE_TIMES_A_DAY",
   },
 ];
 
-export default function FrequencySettings() {
-  const [selectedFreq, setSelectedFreq] = useState("ONCE-A-DAY");
+export default function FrequencySettings({
+  onRRulesSet,
+  currentValue,
+}: FrequencySettingsProps) {
+  const [customFreqValues, setCustomFreqValues] = useState<{
+    count: number;
+    unit: Unit;
+  }>({
+    count: 3,
+    unit: "HOURLY",
+  });
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -34,17 +57,37 @@ export default function FrequencySettings() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  const handleSetSelectedFreq = (value: string) => {
-    setSelectedFreq(value);
+  const handleSetSelectedFreq = (freq: Frequency) => {
+    if (freq.value === "CUSTOM_RULES") {
+      const customRules = buildRRules({
+        repeatCount: customFreqValues.count,
+        repeatUnit: customFreqValues.unit,
+      });
+      onRRulesSet({ rules: customRules, value: "CUSTOM_RULES" });
+    } else {
+      onRRulesSet({ rules: freq.rrule, value: freq.value });
+    }
+  };
+
+  const handleOnCustomValueSet = ({
+    count,
+    unit,
+  }: {
+    count: number;
+    unit: Unit;
+  }) => {
+    const rrules = buildRRules({ repeatCount: count, repeatUnit: unit });
+    onRRulesSet({ rules: rrules, value: "CUSTOM_RULES" });
+    setCustomFreqValues({ count, unit });
   };
 
   return (
     <View style={styles.frequencyContainer}>
-      {FREQUENCIES.map((freq) => {
-        const isActive = freq.value === selectedFreq;
+      {DEFALUT_FREQUENCIES.map((freq) => {
+        const isActive = freq.value === currentValue;
         return (
           <Pressable
-            key={freq.id}
+            key={freq.value}
             style={[
               styles.frequencyPressable,
               {
@@ -53,7 +96,7 @@ export default function FrequencySettings() {
                 backgroundColor: isActive ? tintColor : bGColor,
               },
             ]}
-            onPress={() => handleSetSelectedFreq(freq.value)}
+            onPress={() => handleSetSelectedFreq(freq)}
           >
             <View style={styles.frequencyTextWrapper}>
               <Text
@@ -78,8 +121,9 @@ export default function FrequencySettings() {
         );
       })}
       <CustomFrequency
-        isSelected={selectedFreq === "CUSTOM-FREQ"}
+        isSelected={currentValue === "CUSTOM_RULES"}
         handleSelection={handleSetSelectedFreq}
+        onCustomValueSet={handleOnCustomValueSet}
       />
     </View>
   );

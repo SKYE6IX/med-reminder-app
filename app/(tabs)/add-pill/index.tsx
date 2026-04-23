@@ -19,11 +19,13 @@ import {
 export default function NameStepScreen() {
   const sharedStyles = useAddPillScreenStyles();
 
-  const { setMedicationDetails } = useAddPillStore();
+  const { setMedicationDetails, formState } = useAddPillStore();
 
-  const [queryField, setQueryField] = useState("");
   const [hideSuggestionBox, setHideSuggestionBox] = useState(true);
-  const isQueryFieldEmpty = queryField.length < 1;
+
+  const medicationName = formState.medicationName;
+
+  const isQueryFieldEmpty = medicationName.length < 1;
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -36,7 +38,7 @@ export default function NameStepScreen() {
   const results = isQueryFieldEmpty
     ? []
     : pillNames.filter((pill) =>
-        pill.toLowerCase().startsWith(queryField.toLocaleLowerCase()),
+        pill.toLowerCase().startsWith(medicationName.toLocaleLowerCase()),
       );
 
   const canContinue = useAddPillStore((s) =>
@@ -47,7 +49,6 @@ export default function NameStepScreen() {
     setMedicationDetails({
       medicationName: value,
     });
-    setQueryField(value);
     setHideSuggestionBox(true);
   };
 
@@ -56,11 +57,14 @@ export default function NameStepScreen() {
       setMedicationDetails({
         medicationName: "",
       });
+    } else {
+      setMedicationDetails({
+        medicationName: text,
+      });
     }
     if (hideSuggestionBox) {
       setHideSuggestionBox(false);
     }
-    setQueryField(text);
   };
 
   return (
@@ -75,7 +79,7 @@ export default function NameStepScreen() {
         >
           <SearchIcon color={color} size={16} />
           <TextInput
-            value={queryField}
+            value={medicationName}
             onChangeText={handleOnTextChange}
             style={[styles.input, { color }]}
             placeholder="Поиск"
@@ -93,13 +97,13 @@ export default function NameStepScreen() {
         {!isQueryFieldEmpty && !hideSuggestionBox && (
           <Pressable
             style={[styles.item, { borderColor: inputBorderColor }]}
-            onPress={() => handleSetPillName(queryField)}
+            onPress={() => handleSetPillName(medicationName)}
           >
             <View style={[styles.iconWrapper, { backgroundColor: tint }]}>
               <PlusIcon />
             </View>
             <Text style={[styles.itemText, { color }]}>
-              Добавить «{queryField}» как название
+              Добавить «{medicationName}» как название
             </Text>
           </Pressable>
         )}

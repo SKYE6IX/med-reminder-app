@@ -1,16 +1,24 @@
 import { DOSAGE_UNITS } from "@/constants/dosage-units";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useState } from "react";
+import { DosageMeasurement } from "@/types/medication";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import MinusIcon from "../icons/minus-icon";
 import PlusIcon from "../icons/plus-icon";
 
-export default function DosageSettings() {
-  const [dosageAmount, setDosageAmount] = useState(1);
-  const [selectedDosageUnit, setSelectedDosageUnit] = useState(
-    DOSAGE_UNITS[0].value,
-  );
+type DosageSettingsProps = {
+  dosageAmountState: number;
+  dosageUnitState: DosageMeasurement;
+  onDasgeSettingsChange: ({
+    amount,
+    unit,
+  }: Partial<{ amount: number; unit: DosageMeasurement }>) => void;
+};
 
+export default function DosageSettings({
+  dosageAmountState,
+  dosageUnitState,
+  onDasgeSettingsChange,
+}: DosageSettingsProps) {
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
@@ -18,17 +26,18 @@ export default function DosageSettings() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  const handleSetDosageUnit = (unit: string) => {
-    setSelectedDosageUnit(unit);
+  const handleSetDosageUnit = (unit: DosageMeasurement) => {
+    onDasgeSettingsChange({ unit });
   };
 
   const increaseDosageAmount = () => {
-    setDosageAmount((amount) => Math.round((amount + 0.5) * 10) / 10);
+    const amount = Math.round((dosageAmountState + 0.5) * 10) / 10;
+    onDasgeSettingsChange({ amount });
   };
+
   const decreaseDosageAmount = () => {
-    setDosageAmount((amount) =>
-      Math.max(1, Math.round((amount - 0.5) * 10) / 10),
-    );
+    const amount = Math.max(1, Math.round((dosageAmountState - 0.5) * 10) / 10);
+    onDasgeSettingsChange({ amount });
   };
 
   return (
@@ -42,12 +51,14 @@ export default function DosageSettings() {
               { backgroundColor: bGTertiary },
             ]}
             onPress={decreaseDosageAmount}
-            disabled={dosageAmount <= 1}
+            disabled={dosageAmountState <= 1}
           >
             <MinusIcon color={color} width={20} height={4} />
           </Pressable>
           <Text style={[styles.dosageAmountValue, { color: tintColor }]}>
-            {dosageAmount % 1 === 0 ? dosageAmount : dosageAmount.toFixed(1)}
+            {dosageAmountState % 1 === 0
+              ? dosageAmountState
+              : dosageAmountState.toFixed(1)}
           </Text>
           <Pressable
             style={[
@@ -64,7 +75,7 @@ export default function DosageSettings() {
         <Text style={[styles.label, { color }]}>Форма лекарства</Text>
         <View style={styles.dosageUnitWrapper}>
           {DOSAGE_UNITS.map((unit) => {
-            const isSelected = unit.value === selectedDosageUnit;
+            const isSelected = unit.value === dosageUnitState;
 
             return (
               <Pressable

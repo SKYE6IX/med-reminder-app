@@ -51,10 +51,13 @@ export const pillNames = [
   "Bupropion",
 ];
 
-// String id, String name, String relation, boolean isSelf
-
 export const mockProfiles = [
-  { id: "11122sdjxjhxj2", name: "Azeez", relation: "SELF", isSelf: true },
+  {
+    id: "eef65956-af4e-46c6-9363-bc1613b966c2",
+    name: "Azeez",
+    relation: "SELF",
+    isSelf: true,
+  },
   { id: "113sjhj44873628", name: "Mike", relation: "FATHER", isSelf: false },
   { id: "11e883wjhsjhuww2", name: "Lola", relation: "SISTER", isSelf: false },
   {

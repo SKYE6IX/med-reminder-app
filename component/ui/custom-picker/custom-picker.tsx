@@ -3,9 +3,10 @@ import { Picker } from "@react-native-picker/picker";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-type CustomPickerProps = {
+export type CustomPickerProps = {
   label: string;
   items: { label: string; value: string }[];
+  selectedValue: string;
   svgIcon?: React.ReactNode;
   isSelectionVisible?: boolean; // IOS ONLY
   triggerSelection?: () => void; // IOS ONLY
@@ -17,11 +18,10 @@ export default function CustomPicker({
   svgIcon,
   label,
   onValueSelected,
+  selectedValue,
 }: CustomPickerProps) {
   const [isSelectionVisible, setIsSelectionVisible] = useState(false);
-
   const pickerRef = useRef<Picker<string>>(null);
-  const [selectedValue, setSelectedValue] = useState<string>("");
 
   //   Theme color
   const textColor = useThemeColor({}, "textPrimary");
@@ -29,15 +29,13 @@ export default function CustomPicker({
   const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
   const tintColor = useThemeColor({}, "tint");
 
-  const triggerRelationSelection = () => {
+  const triggerSelection = () => {
     const isVisible = !isSelectionVisible;
-    if (!selectedValue) {
-      const value = items[0].value;
-      setSelectedValue(value);
-      onValueSelected(value);
-    }
     if (isVisible) {
       pickerRef.current?.focus();
+      if (!selectedValue) {
+        onValueSelected(items[0].value);
+      }
     } else {
       pickerRef.current?.blur();
     }
@@ -49,7 +47,6 @@ export default function CustomPicker({
   };
 
   const handleValueChange = (value: string) => {
-    setSelectedValue(value);
     onValueSelected(value);
   };
 
@@ -70,7 +67,7 @@ export default function CustomPicker({
             styles.customPickerPressable,
             { backgroundColor: bGColorTertiary },
           ]}
-          onPress={triggerRelationSelection}
+          onPress={triggerSelection}
           role="button"
         >
           <Text
@@ -83,6 +80,7 @@ export default function CustomPicker({
           </Text>
         </Pressable>
       </View>
+
       <Picker
         testID="picker"
         ref={pickerRef}

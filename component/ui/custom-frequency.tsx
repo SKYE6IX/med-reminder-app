@@ -3,24 +3,33 @@ import { Picker } from "@react-native-picker/picker";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import { Frequency } from "./frequency-settings";
 import SelectionDot from "./selection-dot";
 
-type CustomFrequencyProps = {
+export type Unit = "HOURLY" | "DAILY";
+
+export type CustomFrequencyProps = {
   isSelected: boolean;
-  handleSelection: (value: string) => void;
+  handleSelection: (freq: Frequency) => void;
+  onCustomValueSet: ({ count, unit }: { count: number; unit: Unit }) => void;
 };
 
-type Unit = "HOUR" | "DAY";
+const DEFAULT_VALUE: Frequency = {
+  label: "Своя частота",
+  rrule: "",
+  value: "CUSTOM_RULES",
+};
 
 export default function CustomFrequency({
   isSelected,
   handleSelection,
+  onCustomValueSet,
 }: CustomFrequencyProps) {
   const countPicker = useRef<Picker<number>>(null);
   const unitPicker = useRef<Picker<Unit>>(null);
 
-  const [frequencyCount, setFrequencyCount] = useState<number>(1);
-  const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOUR");
+  const [frequencyCount, setFrequencyCount] = useState<number>(3);
+  const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOURLY");
 
   const height = useSharedValue(60);
   const settingsViewOpacity = useSharedValue(0);
@@ -32,11 +41,21 @@ export default function CustomFrequency({
   const tintColor = useThemeColor({}, "tint");
 
   useEffect(() => {
-    height.value = isSelected ? withSpring(100) : withSpring(60);
-    settingsViewOpacity.value = isSelected
-      ? withSpring(1, { duration: 100 })
-      : withSpring(0, { duration: 100 });
+    height.value = withSpring(isSelected ? 100 : 60);
+    settingsViewOpacity.value = withSpring(isSelected ? 1 : 0, {
+      duration: 100,
+    });
   }, [height, isSelected, settingsViewOpacity]);
+
+  const handleSetFreqCount = (count: number) => {
+    setFrequencyCount(count);
+    onCustomValueSet({ count, unit: frequencyUnit });
+  };
+
+  const handleSetFreqUnit = (unit: Unit) => {
+    setFrequencyUnit(unit);
+    onCustomValueSet({ count: frequencyCount, unit });
+  };
 
   return (
     <Animated.View
@@ -50,10 +69,10 @@ export default function CustomFrequency({
         },
       ]}
     >
-      {/* Button trigger */}
+      {/* Selection button */}
       <Pressable
         style={styles.customFrequencyPressable}
-        onPress={() => handleSelection("CUSTOM-FREQ")}
+        onPress={() => handleSelection(DEFAULT_VALUE)}
       >
         <Text
           style={[
@@ -61,7 +80,7 @@ export default function CustomFrequency({
             { color: isSelected ? "#F7F7F7" : color },
           ]}
         >
-          Своя частота
+          {DEFAULT_VALUE.label}
         </Text>
         <SelectionDot isActive={isSelected} />
       </Pressable>
@@ -90,7 +109,7 @@ export default function CustomFrequency({
             onPress={() => unitPicker.current?.focus()}
           >
             <Text style={styles.customFrequencySelectionValue}>
-              {frequencyUnit === "HOUR" ? "Часа" : "Дня"}
+              {frequencyUnit === "HOURLY" ? "Часа" : "Дня"}
             </Text>
           </Pressable>
         </View>
@@ -100,7 +119,7 @@ export default function CustomFrequency({
       <Picker
         ref={countPicker}
         selectedValue={frequencyCount}
-        onValueChange={(itemValue) => setFrequencyCount(itemValue as number)}
+        onValueChange={(itemValue) => handleSetFreqCount(itemValue as number)}
         mode="dropdown"
         style={{
           opacity: 0,
@@ -123,7 +142,7 @@ export default function CustomFrequency({
       <Picker
         ref={unitPicker}
         selectedValue={frequencyUnit}
-        onValueChange={(itemValue) => setFrequencyUnit(itemValue as Unit)}
+        onValueChange={(itemValue) => handleSetFreqUnit(itemValue as Unit)}
         mode="dropdown"
         style={{
           opacity: 0,
@@ -137,8 +156,8 @@ export default function CustomFrequency({
           color,
         }}
       >
-        <Picker.Item label="Часа" value="HOUR" />
-        <Picker.Item label="Дня" value="DAY" />
+        <Picker.Item label="Часа" value="HOURLY" />
+        <Picker.Item label="Дня" value="DAILY" />
       </Picker>
     </Animated.View>
   );

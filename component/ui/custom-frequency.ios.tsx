@@ -3,24 +3,26 @@ import { PickerIOS } from "@react-native-picker/picker";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import { CustomFrequencyProps, Unit } from "./custom-frequency";
+import { Frequency } from "./frequency-settings";
 import SelectionDot from "./selection-dot";
 
-type CustomFrequencyProps = {
-  isSelected: boolean;
-  handleSelection: (value: string) => void;
+const DEFAULT_VALUE: Frequency = {
+  label: "Своя частота",
+  rrule: "",
+  value: "CUSTOM_RULES",
 };
-
-type Unit = "HOUR" | "DAY";
 
 export default function CustomFrequency({
   isSelected,
   handleSelection,
+  onCustomValueSet,
 }: CustomFrequencyProps) {
   const [showPicker, setShowPicker] = useState<"count" | "unit" | undefined>(
     undefined,
   );
-  const [frequencyCount, setFrequencyCount] = useState<number>(1);
-  const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOUR");
+  const [frequencyCount, setFrequencyCount] = useState<number>(3);
+  const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOURLY");
 
   const height = useSharedValue(60);
 
@@ -47,6 +49,16 @@ export default function CustomFrequency({
     }
   };
 
+  const handleSetFreqCount = (count: number) => {
+    setFrequencyCount(count);
+    onCustomValueSet({ count: Number(count), unit: frequencyUnit });
+  };
+
+  const handleSetFreqUnit = (unit: Unit) => {
+    setFrequencyUnit(unit);
+    onCustomValueSet({ count: Number(frequencyCount), unit });
+  };
+
   return (
     <Animated.View
       style={[
@@ -62,7 +74,7 @@ export default function CustomFrequency({
       {/* Button trigger */}
       <Pressable
         style={styles.customFrequencyPressable}
-        onPress={() => handleSelection("CUSTOM-FREQ")}
+        onPress={() => handleSelection(DEFAULT_VALUE)}
       >
         <Text
           style={[
@@ -70,7 +82,7 @@ export default function CustomFrequency({
             { color: isSelected ? "#F7F7F7" : color },
           ]}
         >
-          Своя частота
+          {DEFAULT_VALUE.label}
         </Text>
         <SelectionDot isActive={isSelected} />
       </Pressable>
@@ -94,7 +106,7 @@ export default function CustomFrequency({
             onPress={() => handleShowPick("unit")}
           >
             <Text style={styles.customFrequencySelectionValue}>
-              {frequencyUnit === "HOUR" ? "Часа" : "Дня"}
+              {frequencyUnit === "HOURLY" ? "Часа" : "Дня"}
             </Text>
           </Pressable>
         </View>
@@ -105,7 +117,7 @@ export default function CustomFrequency({
           <PickerIOS
             selectedValue={frequencyCount}
             onValueChange={(itemValue) =>
-              setFrequencyCount(itemValue as number)
+              handleSetFreqCount(itemValue as number)
             }
             style={{
               borderTopWidth: 1,
@@ -127,7 +139,7 @@ export default function CustomFrequency({
         {showPicker === "unit" && (
           <PickerIOS
             selectedValue={frequencyUnit}
-            onValueChange={(itemValue) => setFrequencyUnit(itemValue as Unit)}
+            onValueChange={(itemValue) => handleSetFreqUnit(itemValue as Unit)}
             style={{
               borderTopWidth: 1,
               borderColor,
@@ -139,8 +151,8 @@ export default function CustomFrequency({
               color: "#F7F7F7",
             }}
           >
-            <PickerIOS.Item label="Часа" value="HOUR" />
-            <PickerIOS.Item label="Дня" value="DAY" />
+            <PickerIOS.Item label="Часа" value="HOURLY" />
+            <PickerIOS.Item label="Дня" value="DAILY" />
           </PickerIOS>
         )}
       </View>

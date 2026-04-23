@@ -8,7 +8,7 @@ export enum MedicationUnit {
   OTHER = "OTHER",
 }
 
-export enum MedicationMeasurement {
+export enum DosageMeasurement {
   CAPSULE = "CAPSULE",
   TABLET = "TABLET",
   SPRAY = "SPRAY",

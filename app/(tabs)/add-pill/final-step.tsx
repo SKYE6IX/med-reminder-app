@@ -3,6 +3,7 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAddPillStore } from "@/stores/add-pill-store";
 import { useState } from "react";
 import {
   Platform,
@@ -26,20 +27,29 @@ const TOTAL_DOSAGES = Array.from({ length: (100 - 1) / 0.5 + 1 }, (_, i) => {
     value: `${value}`,
   };
 });
+
 const REMINDER_DAYS = Array.from({ length: 7 }, (_, i) => ({
   label: `${1 + i}`,
   value: `${1 + i}`,
 }));
+
 const COLLAPSED = 75;
 const HALF_EXPAND = 197;
 const FULL_EXPAND = 417;
 
 export default function FinalStepScreen() {
   const isIOS = Platform.OS === "ios";
+
+  const { formState, setMedicationDetails, setMedicationpack } =
+    useAddPillStore();
+
   const sharedStyles = useAddPillScreenStyles();
 
   const [showRefillBox, setShowRefillBox] = useState(false);
-  const [textAreaValue, setTextAreaValue] = useState("");
+  const refillSettingHeight = useSharedValue(COLLAPSED);
+
+  // @platform ANDROID ONLY
+  const pickersWrapperOpacity = useSharedValue(0);
 
   // @platform IOS ONLY
   const [isDosageAmountPickerVisible, setIsDosageAmountPickerVisible] =
@@ -47,6 +57,16 @@ export default function FinalStepScreen() {
   // @platform IOS ONLY
   const [isRefillDaysPickerVisible, setIsRefillDaysPickerVisible] =
     useState(false);
+
+  const totalDosageAmount = formState.medicationPack
+    ? `${formState.medicationPack.totalQuantity}`
+    : "";
+  const refillDaysReminder = formState.medicationPack
+    ? formState.medicationPack.notifyRule
+    : "";
+  const medicationNote = formState.medicationNote
+    ? formState.medicationNote
+    : "";
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -56,15 +76,12 @@ export default function FinalStepScreen() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  const refillSettingHeight = useSharedValue(COLLAPSED);
-
-  // @platform ANDROID ONLY
-  const pickersWrapperOpacity = useSharedValue(0);
-
   const toggleSwitch = () => {
     const isToggle = !showRefillBox;
+
     refillSettingHeight.value = withSpring(isToggle ? HALF_EXPAND : COLLAPSED);
 
+    // @platform ANDROID ONLY
     pickersWrapperOpacity.value = withDelay(
       isToggle ? 200 : 0,
       withSpring(isToggle ? 1 : 0, {
@@ -72,16 +89,43 @@ export default function FinalStepScreen() {
       }),
     );
 
+    // @platform IOS ONLY
     if (isToggle) {
       // Reset the picker state incase user switch the toggle while the state is still active
       setIsDosageAmountPickerVisible(false);
       setIsRefillDaysPickerVisible(false);
     }
+    // We reset the pack state back null, if switch state is false.
+    if (!isToggle) {
+      setMedicationpack(null);
+    }
     setShowRefillBox(isToggle);
   };
 
+  const handleTotalDosageAmtSet = (selectedValue: string) => {
+    setMedicationpack({
+      totalQuantity: Number(selectedValue),
+      notifyRule: refillDaysReminder,
+    });
+  };
+
+  const handleRefillDaysSet = (selectedValue: string) => {
+    setMedicationpack({
+      totalQuantity: Number(totalDosageAmount),
+      notifyRule: selectedValue,
+    });
+  };
+
+  const handleOnTextChange = (text: string) => {
+    if (text.length < 1) {
+      setMedicationDetails({ medicationNote: null });
+    } else {
+      setMedicationDetails({ medicationNote: text });
+    }
+  };
+
   // @platform IOS ONLY
-  // It control the height for the container when the pickers are triger.
+  // It control the height for the container when the pickers are trriger.
   // it goes from HALF_EXPAND to FULL_EXPAND.
   const controlFullExpand = (isPicker: boolean) => {
     const isActive = !isPicker;
@@ -100,6 +144,12 @@ export default function FinalStepScreen() {
     }
     controlFullExpand(isDosageAmountPickerVisible);
     setIsDosageAmountPickerVisible(!isDosageAmountPickerVisible);
+    if (!totalDosageAmount) {
+      setMedicationpack({
+        totalQuantity: Number(TOTAL_DOSAGES[0].value),
+        notifyRule: refillDaysReminder,
+      });
+    }
   };
 
   // @platform IOS ONLY
@@ -111,6 +161,12 @@ export default function FinalStepScreen() {
     }
     controlFullExpand(isRefillDaysPickerVisible);
     setIsRefillDaysPickerVisible(!isRefillDaysPickerVisible);
+    if (!refillDaysReminder) {
+      setMedicationpack({
+        totalQuantity: Number(totalDosageAmount),
+        notifyRule: REMINDER_DAYS[0].value,
+      });
+    }
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -171,17 +227,19 @@ export default function FinalStepScreen() {
             <CustomPicker
               label="Всего в упаковке"
               items={TOTAL_DOSAGES}
-              onValueSelected={() => {}}
-              isSelectionVisible={isDosageAmountPickerVisible}
-              triggerSelection={triggerDosageAmountPicker}
+              selectedValue={totalDosageAmount}
+              onValueSelected={handleTotalDosageAmtSet}
+              isSelectionVisible={isDosageAmountPickerVisible} // IOS ONLY
+              triggerSelection={triggerDosageAmountPicker} // IOS ONLY
             />
 
             <CustomPicker
               label="Напомнить за срок"
               items={REMINDER_DAYS}
-              onValueSelected={() => {}}
-              isSelectionVisible={isRefillDaysPickerVisible}
-              triggerSelection={triggerRefillDaysPicker}
+              selectedValue={refillDaysReminder}
+              onValueSelected={handleRefillDaysSet}
+              isSelectionVisible={isRefillDaysPickerVisible} // IOS ONLY
+              triggerSelection={triggerRefillDaysPicker} // IOS ONLY
             />
           </Animated.View>
         </Animated.View>
@@ -191,8 +249,8 @@ export default function FinalStepScreen() {
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Заметки</Text>
         <TextInput
-          value={textAreaValue}
-          onChangeText={(value) => setTextAreaValue(value)}
+          value={medicationNote}
+          onChangeText={(value) => handleOnTextChange(value)}
           autoCorrect={true}
           multiline={true}
           numberOfLines={4}
@@ -209,8 +267,7 @@ export default function FinalStepScreen() {
           ]}
         />
       </View>
-
-      <CustomButton label="Далее" />
+      <CustomButton label="Создавать" />
     </View>
   );
 }

@@ -4,20 +4,23 @@ import { View } from "react-native";
 import BottomSheetWrapper, {
   BottomSheetWrapperRef,
 } from "./bottom-sheet-wrapper";
+
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
 }
 
-type DateTimeWrapperProps = {
+export type DateTimeWrapperProps = {
   ref: RefObject<DateTimeWrapperRef | null>;
   mode: "date" | "time";
   bottomSheetTitle?: string;
+  onDateTimeSelected: (dateTime: Date) => void;
 };
 
 export default function DateTimeWrapper({
   ref,
   mode,
   bottomSheetTitle,
+  onDateTimeSelected,
 }: DateTimeWrapperProps) {
   const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
@@ -28,6 +31,16 @@ export default function DateTimeWrapper({
       bottomSheetWrapperRef.current?.open();
     },
   }));
+
+  const handleSetDateTime = (date?: Date) => {
+    if (date) {
+      setDate(date);
+      onDateTimeSelected(date);
+    }
+    if (mode === "date") {
+      bottomSheetWrapperRef.current?.close();
+    }
+  };
 
   return (
     <BottomSheetWrapper
@@ -45,8 +58,10 @@ export default function DateTimeWrapper({
         <DateTimePicker
           value={date}
           mode={mode}
-          onChange={(event, date) => {}}
+          onChange={(event, date) => handleSetDateTime(date)}
           display={mode === "date" ? "inline" : "spinner"}
+          locale="ru-RU"
+          minimumDate={mode === "date" ? new Date(now) : undefined}
         />
       </View>
     </BottomSheetWrapper>

@@ -1,9 +1,19 @@
-import { MedicationMeasurement, MedicationUnit } from "@/types/medication";
+import { DosageMeasurement, MedicationUnit } from "@/types/medication";
+import { getDateLocalString, getTimeZone } from "@/utils/luxonUtil";
 import { create } from "zustand";
+
+export type RuleValue =
+  | "ONCE_A_DAY"
+  | "TWICE_A_DAY"
+  | "THREE_TIMES_A_DAY"
+  | "CUSTOM_RULES";
 
 interface Schedule {
   dosage: number;
-  recurrenceRule: string;
+  rule: {
+    recurrenceRule: string;
+    value: RuleValue;
+  };
   startDate: string;
   timeZone: string;
 }
@@ -24,9 +34,9 @@ interface AddPillStore {
     profileId: string;
     medicationName: string;
     medicationUnit: MedicationUnit;
-    medicationMeasurement: MedicationMeasurement;
+    medicationMeasurement: DosageMeasurement;
     medicationNote: string | null;
-    schedule: Schedule | null;
+    schedule: Schedule;
     medicationPack: MedicationPack | null;
   };
 
@@ -36,9 +46,9 @@ interface AddPillStore {
     >,
   ) => void;
 
-  setMedicatioSchedule: (schedule: Schedule) => void;
+  setMedicatioSchedule: (schedule: Partial<Schedule>) => void;
 
-  setMedicationpack: (packData: MedicationPack) => void;
+  setMedicationpack: (packData: MedicationPack | null) => void;
 
   isFieldFilled: (fields: FieldName[]) => boolean;
 }
@@ -48,9 +58,17 @@ export const useAddPillStore = create<AddPillStore>()((set, get) => ({
     profileId: "",
     medicationName: "",
     medicationUnit: MedicationUnit.CAPSULE,
-    medicationMeasurement: MedicationMeasurement.TABLET,
+    medicationMeasurement: DosageMeasurement.TABLET,
     medicationNote: null,
-    schedule: null,
+    schedule: {
+      dosage: 1,
+      rule: {
+        recurrenceRule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
+        value: "ONCE_A_DAY",
+      },
+      startDate: getDateLocalString(),
+      timeZone: getTimeZone(),
+    },
     medicationPack: null,
   },
 
@@ -69,7 +87,10 @@ export const useAddPillStore = create<AddPillStore>()((set, get) => ({
       ...state,
       formState: {
         ...state.formState,
-        schedule: schedule,
+        schedule: {
+          ...state.formState.schedule,
+          ...schedule,
+        },
       },
     }));
   },
