@@ -1,16 +1,26 @@
-import PlusIcon from "@/component/icons/plus-icon";
-import CustomButton from "@/component/ui/custom-button/custom-button";
+import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const TABS = [
+  { label: "Все", value: "ALL" },
+  { label: "Принято", value: "TAKEN" },
+  { label: "Пропущено", value: "MISSED" },
+];
+
 export default function Home() {
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView
+      style={[styles.safeArea, { backgroundColor: bgPrimary }]}
+      edges={["top"]}
+    >
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerProfileContainer}>
@@ -26,7 +36,12 @@ export default function Home() {
 
         <WeekView />
 
-        <View style={styles.noContentWrapper}>
+        <View>
+          <Text></Text>
+          <Tabs tabs={TABS} onTabChange={() => {}} />
+        </View>
+
+        {/* <View style={styles.noContentWrapper}>
           <Image
             source={require("@/assets/images/pill-bottle.png")}
             style={styles.noContentImage}
@@ -42,7 +57,7 @@ export default function Home() {
             label="Добавить лекарства"
             svgIcon={<PlusIcon size={15} />}
           />
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );
