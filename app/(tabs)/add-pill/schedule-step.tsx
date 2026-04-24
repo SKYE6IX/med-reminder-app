@@ -11,7 +11,7 @@ import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { RuleValue, useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
-import { formateDate, getDateLocalString } from "@/utils/luxonUtil";
+import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { generateTimeOccurrences, updateTimeRules } from "@/utils/rruleUtils";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
@@ -24,7 +24,7 @@ export default function ScheduleStepScreen() {
   const timeRef = useRef<DateTimeWrapperRef>(null);
   const dateRef = useRef<DateTimeWrapperRef>(null);
 
-  const displayStartDate = formateDate(
+  const displayStartDate = formatRegularDate(
     formState.schedule.startDate.replaceAll(".", " "),
   );
 
