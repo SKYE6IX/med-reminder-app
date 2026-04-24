@@ -1,6 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { ProfileResponse } from "@/types/medication";
-import { BlurView } from "@react-native-community/blur";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
@@ -145,12 +144,6 @@ export default function MedicationCard() {
           opacity: 0.5,
         }}
       /> */}
-      <BlurView
-        style={styles.absolute}
-        blurType="light"
-        blurAmount={10}
-        reducedTransparencyFallbackColor="white"
-      />
     </View>
   );
 }
