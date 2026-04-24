@@ -1,3 +1,4 @@
+import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -36,9 +37,12 @@ export default function Home() {
 
         <WeekView />
 
-        <View>
-          <Text></Text>
+        <View style={styles.medicationScheduleContainer}>
+          <Text style={[styles.medicationScheduleTitle, { color }]}>
+            Лекарства на сегодня
+          </Text>
           <Tabs tabs={TABS} onTabChange={() => {}} />
+          <MedicationCard />
         </View>
 
         {/* <View style={styles.noContentWrapper}>
@@ -116,5 +120,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16.2,
     textAlign: "center",
+  },
+  medicationScheduleContainer: {
+    gap: 24,
+  },
+  medicationScheduleTitle: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 18,
+    lineHeight: 22,
   },
 });

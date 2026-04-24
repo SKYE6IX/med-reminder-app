@@ -50,13 +50,13 @@ export const formatHomeScreenDate = (isoDate: string) => {
   };
 
   if (date.hasSame(today, "day")) {
-    return `Сегодня, ${today.toLocaleString(toLocaleOptions)}`;
+    return `сегодня, ${today.toLocaleString(toLocaleOptions)}`;
   }
   if (date.hasSame(tomorrow, "day")) {
-    return `Завтра, ${tomorrow.toLocaleString(toLocaleOptions)}`;
+    return `завтра, ${tomorrow.toLocaleString(toLocaleOptions)}`;
   }
   if (date.hasSame(yesterday, "day")) {
-    return `Вчера, ${yesterday.toLocaleString(toLocaleOptions)}`;
+    return `вчера, ${yesterday.toLocaleString(toLocaleOptions)}`;
   }
   return date.toLocaleString({
     ...toLocaleOptions,
