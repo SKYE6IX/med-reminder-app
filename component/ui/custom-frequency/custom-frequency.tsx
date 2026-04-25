@@ -3,18 +3,19 @@ import { Picker } from "@react-native-picker/picker";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
-import { Frequency } from "./frequency-settings";
-import SelectionDot from "./selection-dot";
+import SelectionDot from "../selection-dot";
+import { useCustomFreqStyles } from "./shared-styles";
+import { CustomFrequencyProps, TCustomFrequency, Unit } from "./types";
 
-export type Unit = "HOURLY" | "DAILY";
+// How many time per day -> Which will be used to generate hour.
+// So if user chose every 3 hours and 2 times per day.
+// We will the two time to create two time start from 9. but no more than 23:59
 
-export type CustomFrequencyProps = {
-  isSelected: boolean;
-  handleSelection: (freq: Frequency) => void;
-  onCustomValueSet: ({ count, unit }: { count: number; unit: Unit }) => void;
-};
+// When user choose Day interval, we have to show how many time per each of those days
+// But this time we need to also show them to choose a time interval in whcih they need to
+// take each pills on each of if their pills.
 
-const DEFAULT_VALUE: Frequency = {
+const DEFAULT_VALUE: TCustomFrequency = {
   label: "Своя частота",
   rrule: "",
   value: "CUSTOM_RULES",
@@ -25,6 +26,7 @@ export default function CustomFrequency({
   handleSelection,
   onCustomValueSet,
 }: CustomFrequencyProps) {
+  const sharedStyles = useCustomFreqStyles();
   const countPicker = useRef<Picker<number>>(null);
   const unitPicker = useRef<Picker<Unit>>(null);
 
@@ -60,9 +62,10 @@ export default function CustomFrequency({
   return (
     <Animated.View
       style={[
+        sharedStyles.container,
         styles.container,
         {
-          height,
+          height: "auto",
           borderWidth: isSelected ? undefined : 1,
           borderColor,
           backgroundColor: isSelected ? tintColor : bGColor,
@@ -71,14 +74,11 @@ export default function CustomFrequency({
     >
       {/* Selection button */}
       <Pressable
-        style={styles.customFrequencyPressable}
+        style={sharedStyles.frequencyPressable}
         onPress={() => handleSelection(DEFAULT_VALUE)}
       >
         <Text
-          style={[
-            styles.customFrequencyPressableText,
-            { color: isSelected ? "#F7F7F7" : color },
-          ]}
+          style={[sharedStyles.frequencyPressableText, { color: isSelected ? "#F7F7F7" : color }]}
         >
           {DEFAULT_VALUE.label}
         </Text>
@@ -86,29 +86,22 @@ export default function CustomFrequency({
       </Pressable>
 
       {/* Custom settings */}
-      <Animated.View
-        style={[
-          styles.customFrequencyChoiceContainer,
-          { opacity: settingsViewOpacity },
-        ]}
-      >
-        <Text style={styles.customFrequencySelectionLabel}>Каждые</Text>
+      <Animated.View style={[sharedStyles.opitonsContainer, { opacity: settingsViewOpacity }]}>
+        <Text style={sharedStyles.optionsLabel}>Каждые</Text>
 
-        <View style={styles.customFrequencySelectionGroup}>
+        <View style={sharedStyles.optionsGroup}>
           <Pressable
-            style={[styles.customFrequencySelection, { width: 50 }]}
+            style={[sharedStyles.optionsGroupItem, { width: 50 }]}
             onPress={() => countPicker.current?.focus()}
           >
-            <Text style={styles.customFrequencySelectionValue}>
-              {frequencyCount}
-            </Text>
+            <Text style={sharedStyles.groupItemValue}>{frequencyCount}</Text>
           </Pressable>
 
           <Pressable
-            style={styles.customFrequencySelection}
+            style={sharedStyles.optionsGroupItem}
             onPress={() => unitPicker.current?.focus()}
           >
-            <Text style={styles.customFrequencySelectionValue}>
+            <Text style={sharedStyles.groupItemValue}>
               {frequencyUnit === "HOURLY" ? "Часа" : "Дня"}
             </Text>
           </Pressable>
@@ -165,50 +158,6 @@ export default function CustomFrequency({
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 16,
-    paddingRight: 16,
-    borderRadius: 16,
     height: 100,
-  },
-  customFrequencyPressable: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  customFrequencyPressableText: {
-    fontFamily: "Roboto_500Medium",
-    fontSize: 16,
-    lineHeight: 19.2,
-  },
-  customFrequencyChoiceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  customFrequencySelectionLabel: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 16,
-    lineHeight: 19.2,
-    color: "#F7F7F7",
-  },
-  customFrequencySelectionGroup: {
-    marginLeft: "auto",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  customFrequencySelection: {
-    width: 70,
-    alignItems: "center",
-    paddingTop: 4,
-    paddingBottom: 4,
-    borderRadius: 8,
-    backgroundColor: "#FFFFFF33",
-  },
-  customFrequencySelectionValue: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    lineHeight: 16.2,
-    color: "#F7F7F7",
   },
 });

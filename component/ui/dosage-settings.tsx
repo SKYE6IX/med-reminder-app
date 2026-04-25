@@ -1,4 +1,4 @@
-import { DOSAGE_UNITS } from "@/constants/dosage-units";
+import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { DosageMeasurement } from "@/types/medication";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -46,25 +46,17 @@ export default function DosageSettings({
         <Text style={[styles.label, { color }]}>Доза за приём</Text>
         <View style={styles.dosageAmountWrapper}>
           <Pressable
-            style={[
-              styles.dosageAmountPressable,
-              { backgroundColor: bGTertiary },
-            ]}
+            style={[styles.dosageAmountPressable, { backgroundColor: bGTertiary }]}
             onPress={decreaseDosageAmount}
             disabled={dosageAmountState <= 1}
           >
             <MinusIcon color={color} width={20} height={4} />
           </Pressable>
           <Text style={[styles.dosageAmountValue, { color: tintColor }]}>
-            {dosageAmountState % 1 === 0
-              ? dosageAmountState
-              : dosageAmountState.toFixed(1)}
+            {dosageAmountState % 1 === 0 ? dosageAmountState : dosageAmountState.toFixed(1)}
           </Text>
           <Pressable
-            style={[
-              styles.dosageAmountPressable,
-              { backgroundColor: bGTertiary },
-            ]}
+            style={[styles.dosageAmountPressable, { backgroundColor: bGTertiary }]}
             onPress={increaseDosageAmount}
           >
             <PlusIcon color={color} size={20} />
@@ -91,12 +83,7 @@ export default function DosageSettings({
                 onPress={() => handleSetDosageUnit(unit.value)}
               >
                 <Text style={styles.dosageUnitIcon}>{unit.icon}</Text>
-                <Text
-                  style={[
-                    styles.dosageUnitLabel,
-                    { color: isSelected ? "#fff" : color },
-                  ]}
-                >
+                <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
                   {unit.label}
                 </Text>
               </Pressable>

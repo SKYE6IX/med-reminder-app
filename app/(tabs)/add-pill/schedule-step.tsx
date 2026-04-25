@@ -3,9 +3,7 @@ import CalenderIcon from "@/component/icons/calender-icon";
 import PlusIcon from "@/component/icons/plus-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import DateTimePickerWrapper, {
-  DateTimeWrapperRef,
-} from "@/component/ui/date-time-wrapper";
+import DateTimePickerWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
 import DosageSettings from "@/component/ui/dosage-settings";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -18,15 +16,12 @@ import { useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ScheduleStepScreen() {
-  const { formState, setMedicatioSchedule, setMedicationDetails } =
-    useAddPillStore();
+  const { formState, setMedicatioSchedule, setMedicationDetails } = useAddPillStore();
 
   const timeRef = useRef<DateTimeWrapperRef>(null);
   const dateRef = useRef<DateTimeWrapperRef>(null);
 
-  const displayStartDate = formatRegularDate(
-    formState.schedule.startDate.replaceAll(".", " "),
-  );
+  const displayStartDate = formatRegularDate(formState.schedule.startDate.replaceAll(".", " "));
 
   // *** //
   // We use this to target the first letter since there is no way to do this in
@@ -51,13 +46,7 @@ export default function ScheduleStepScreen() {
   const tintColor = useThemeColor({}, "tint");
 
   // Rules settings
-  const handleSetRRules = ({
-    rules,
-    value,
-  }: {
-    rules: string;
-    value: RuleValue;
-  }) => {
+  const handleSetRRules = ({ rules, value }: { rules: string; value: RuleValue }) => {
     setMedicatioSchedule({
       rule: {
         recurrenceRule: rules,
@@ -98,6 +87,7 @@ export default function ScheduleStepScreen() {
   };
   return (
     <View
+      collapsable={false}
       style={[
         styles.container,
         sharedStyles.container,
@@ -105,7 +95,7 @@ export default function ScheduleStepScreen() {
         { paddingLeft: 0, paddingRight: 0 },
       ]}
     >
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView contentContainerStyle={[styles.contentContainer, sharedStyles.bottomInset]}>
         {/* Frequency Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
@@ -132,10 +122,7 @@ export default function ScheduleStepScreen() {
             {occurences.map((time, i) => (
               <Text
                 key={time + i}
-                style={[
-                  styles.selectedTime,
-                  { backgroundColor: bGColor, color },
-                ]}
+                style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
               >
                 {time}
               </Text>
@@ -161,29 +148,17 @@ export default function ScheduleStepScreen() {
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дата начала</Text>
           <Pressable
-            style={[
-              styles.dateSettingPressable,
-              { borderColor, backgroundColor: bGColor },
-            ]}
+            style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
             onPress={() => dateRef.current?.showDateTime()}
           >
-            <View
-              style={[
-                styles.dateSettingLeftIcon,
-                { backgroundColor: bGTertiary },
-              ]}
-            >
+            <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
               <CalenderIcon color={tintColor} />
             </View>
             <View style={styles.dateSettingTextWrapper}>
-              <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>
-                Начало
-              </Text>
+              <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>Начало</Text>
 
               <Text style={[styles.dateSettingValue, { color }]}>
-                <Text style={styles.dateSettingValueUpperCase}>
-                  {firstLetter}
-                </Text>
+                <Text style={styles.dateSettingValueUpperCase}>{firstLetter}</Text>
                 {rest}
               </Text>
             </View>

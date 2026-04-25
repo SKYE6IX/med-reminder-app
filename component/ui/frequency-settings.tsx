@@ -3,7 +3,8 @@ import { RuleValue } from "@/stores/add-pill-store";
 import { buildRRules } from "@/utils/rruleUtils";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import CustomFrequency, { Unit } from "./custom-frequency";
+import CustomFrequency from "./custom-frequency/custom-frequency";
+import { Unit } from "./custom-frequency/types";
 import SelectionDot from "./selection-dot";
 
 export interface Frequency {
@@ -33,16 +34,13 @@ const DEFALUT_FREQUENCIES: Frequency[] = [
   },
   {
     label: "Три раза в день",
-    info: "Каждые 7 часов",
+    info: "Каждые 8 часов",
     rrule: "FREQ=DAILY;BYHOUR=9,14,21;BYMINUTE=0",
     value: "THREE_TIMES_A_DAY",
   },
 ];
 
-export default function FrequencySettings({
-  onRRulesSet,
-  currentValue,
-}: FrequencySettingsProps) {
+export default function FrequencySettings({ onRRulesSet, currentValue }: FrequencySettingsProps) {
   const [customFreqValues, setCustomFreqValues] = useState<{
     count: number;
     unit: Unit;
@@ -69,13 +67,7 @@ export default function FrequencySettings({
     }
   };
 
-  const handleOnCustomValueSet = ({
-    count,
-    unit,
-  }: {
-    count: number;
-    unit: Unit;
-  }) => {
+  const handleOnCustomValueSet = ({ count, unit }: { count: number; unit: Unit }) => {
     const rrules = buildRRules({ repeatCount: count, repeatUnit: unit });
     onRRulesSet({ rules: rrules, value: "CUSTOM_RULES" });
     setCustomFreqValues({ count, unit });
@@ -99,20 +91,10 @@ export default function FrequencySettings({
             onPress={() => handleSetSelectedFreq(freq)}
           >
             <View style={styles.frequencyTextWrapper}>
-              <Text
-                style={[
-                  styles.frequencyTextTitle,
-                  { color: isActive ? "#F7F7F7" : color },
-                ]}
-              >
+              <Text style={[styles.frequencyTextTitle, { color: isActive ? "#F7F7F7" : color }]}>
                 {freq.label}
               </Text>
-              <Text
-                style={[
-                  styles.frequencyTextSubtitle,
-                  { color: isActive ? "#F7F7F7" : color },
-                ]}
-              >
+              <Text style={[styles.frequencyTextSubtitle, { color: isActive ? "#F7F7F7" : color }]}>
                 {freq.info}
               </Text>
             </View>

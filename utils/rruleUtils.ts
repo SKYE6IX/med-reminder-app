@@ -1,8 +1,10 @@
 import { Options, RRule } from "rrule";
 import { DateTime, getTimeZone } from "./luxonUtil";
 
-const DAY_START_HOUR = 7;
-const DAY_END_HOUR = 21;
+// Change time to all hours
+
+const DAY_START_HOUR = 5;
+const DAY_END_HOUR = 24;
 
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   const rule = RRule.fromString(rrule);
@@ -23,50 +25,51 @@ export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   return times;
 };
 
-export const updateTimeRules = ({
-  rrules,
-  date,
-}: {
-  rrules: string;
-  date: Date;
-}) => {
+export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }) => {
+  const now = DateTime.now();
   const rule = RRule.fromString(rrules);
+
+  const startOfTheDay = now.startOf("day");
+  const endOfTheDay = now.endOf("day");
+
+  const startOfDayMinutes = startOfTheDay.hour * 60 + startOfTheDay.minute;
+  const endOfDayMinutes = endOfTheDay.hour * 60 + endOfTheDay.minute;
 
   const localTime = DateTime.fromJSDate(date)
     .setZone(getTimeZone(), { keepLocalTime: true })
     .toJSDate();
 
-  const hours = rule.options.byhour;
-  const minutes = rule.options.byminute;
-  const count = hours.length;
+  const ruleHours = rule.options.byhour;
+  const ruleMinutes = rule.options.byminute;
 
-  const startHour = localTime.getHours();
-  const startMinute = localTime.getMinutes();
+  const totalTimeFrame = ruleHours.length ?? 1;
+
+  const newStartHour = localTime.getHours();
+  const newStartMinute = localTime.getMinutes();
 
   const clampedStartMinutes = Math.min(
-    Math.max(startHour * 60 + startMinute, DAY_START_HOUR * 60),
-    DAY_END_HOUR * 60,
+    Math.max(newStartHour * 60 + newStartMinute, startOfDayMinutes),
+    endOfDayMinutes,
   );
 
-  const existingMinutes = hours
-    .map((h, i) => h * 60 + (minutes[i] ?? 0))
+  const existingMinutes = ruleHours
+    .map((h, i) => h * 60 + (ruleMinutes[i] ?? 0))
     .sort((a, b) => a - b);
 
   const newByHour: number[] = [];
   const newByMinute: number[] = [];
 
-  if (count === 1) {
+  if (totalTimeFrame === 1) {
     newByHour.push(Math.floor(clampedStartMinutes / 60));
     newByMinute.push(clampedStartMinutes % 60);
   } else {
     const originalStart = existingMinutes[0];
+
     const offsets = existingMinutes.map((t) => t - originalStart);
 
     for (const offset of offsets) {
-      const doseMinutes = Math.min(
-        clampedStartMinutes + offset,
-        DAY_END_HOUR * 60,
-      );
+      const doseMinutes = Math.min(clampedStartMinutes + offset, endOfDayMinutes);
+
       newByHour.push(Math.floor(doseMinutes / 60));
       newByMinute.push(doseMinutes % 60);
     }

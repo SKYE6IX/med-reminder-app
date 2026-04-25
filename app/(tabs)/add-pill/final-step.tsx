@@ -259,7 +259,7 @@ export default function FinalStepScreen() {
             }}
           >
             <CustomPicker
-              label="Всего в упаковке"
+              label="Общее количество"
               items={TOTAL_DOSAGES}
               selectedValue={totalDosageAmount}
               onValueSelected={handleTotalDosageAmtSet}
@@ -268,7 +268,7 @@ export default function FinalStepScreen() {
             />
 
             <CustomPicker
-              label="Напомнить за срок"
+              label="Напомнить за срок (дни)"
               items={REMINDER_DAYS}
               selectedValue={refillDaysReminder}
               onValueSelected={handleRefillDaysSet}
@@ -302,7 +302,7 @@ export default function FinalStepScreen() {
         />
       </View>
       <CustomButton
-        label="Создавать"
+        label="Создать"
         onPress={createMedicationSchedule}
         disabled={loading}
       />
@@ -359,3 +359,8 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
 });
+
+// Emoji
+
+// Update changes:
+// 1.

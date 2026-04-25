@@ -1,12 +1,11 @@
 import { Colors } from "@/constants/theme";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { DynamicColorIOS } from "react-native";
 
 // TODO:
 // Default color selection isn't working yet and need fix.
 // The whole Native tabs is still unstable and need to make sure we adjust to it and fix
-// and bugs that might occurs along the way.
-
+// any bugs that might occurs along the way.
 export default function AppTab() {
   return (
     <NativeTabs
@@ -30,28 +29,28 @@ export default function AppTab() {
       })}
     >
       <NativeTabs.Trigger name="index">
-        <Label>Главная</Label>
-        <Icon sf="house.fill" />
+        <NativeTabs.Trigger.Label>Главная</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="house.fill" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="pills">
-        <Label>Лекарства</Label>
-        <Icon sf="pill" />
+        <NativeTabs.Trigger.Label>Лекарства</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="pill" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="add-pill">
-        <Label>Добавить</Label>
-        <Icon sf="plus.app" />
+      <NativeTabs.Trigger name="add-pill" disableAutomaticContentInsets>
+        <NativeTabs.Trigger.Label>Добавить</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="plus.app" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="refill-pill">
-        <Label>Запасы</Label>
-        <Icon sf="plus.arrow.trianglehead.clockwise" />
+        <NativeTabs.Trigger.Label>Запасы</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="plus.arrow.trianglehead.clockwise" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="settings">
-        <Label>Настройки</Label>
-        <Icon sf="gear" />
+        <NativeTabs.Trigger.Label>Настройки</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="gear" />
       </NativeTabs.Trigger>
     </NativeTabs>
   );

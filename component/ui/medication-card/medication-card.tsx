@@ -19,6 +19,11 @@ type MedicationCardProps = {
   handleToggleSwitch: () => void;
 };
 
+// Home ->
+// Medication List ->
+// Medication Details ->
+// Refill List ->
+
 export default function MedicationCard() {
   const [toggleSwitch, setToggleSwitch] = useState(false);
 
@@ -136,14 +141,6 @@ export default function MedicationCard() {
           />
         </View>
       </View>
-      {/* <View
-        pointerEvents="none"
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          backgroundColor: "#9E9E9E",
-          opacity: 0.5,
-        }}
-      /> */}
     </View>
   );
 }
@@ -155,7 +152,6 @@ const styles = StyleSheet.create({
     padding: 16,
     position: "relative",
     gap: 16,
-    // opacity: 0.5,
   },
   absolute: {
     position: "absolute",

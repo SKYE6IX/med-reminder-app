@@ -1,4 +1,3 @@
-import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -18,10 +17,7 @@ export default function Home() {
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   return (
-    <SafeAreaView
-      style={[styles.safeArea, { backgroundColor: bgPrimary }]}
-      edges={["top"]}
-    >
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerProfileContainer}>
@@ -38,11 +34,9 @@ export default function Home() {
         <WeekView />
 
         <View style={styles.medicationScheduleContainer}>
-          <Text style={[styles.medicationScheduleTitle, { color }]}>
-            Лекарства на сегодня
-          </Text>
+          <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
           <Tabs tabs={TABS} onTabChange={() => {}} />
-          <MedicationCard />
+          {/* <MedicationCard /> */}
         </View>
 
         {/* <View style={styles.noContentWrapper}>

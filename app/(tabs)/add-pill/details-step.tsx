@@ -8,9 +8,7 @@ import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import AddProfile from "@/component/ui/add-profile";
-import BottomSheetWrapper, {
-  BottomSheetWrapperRef,
-} from "@/component/ui/bottom-sheet-wrapper";
+import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import ProfileCard from "@/component/ui/profile-card";
 import { Relation } from "@/constants/relation";
@@ -66,12 +64,10 @@ export default function DetailsStepScreen() {
     chooseProfileBottomSheet.current?.close();
   };
 
-  const canContinue = useAddPillStore((s) =>
-    s.isFieldFilled(["medicationUnit", "profileId"]),
-  );
+  const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationUnit", "profileId"]));
 
   return (
-    <View style={[styles.container, sharedStyles.container]}>
+    <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
       {/* Pill Form selections */}
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
@@ -82,24 +78,14 @@ export default function DetailsStepScreen() {
                 style={[
                   styles.pillFormPressable,
                   {
-                    borderWidth:
-                      unit.value === formState.medicationUnit ? undefined : 1,
+                    borderWidth: unit.value === formState.medicationUnit ? undefined : 1,
                     borderColor,
-                    backgroundColor:
-                      unit.value === formState.medicationUnit
-                        ? tintColor
-                        : bGColor,
+                    backgroundColor: unit.value === formState.medicationUnit ? tintColor : bGColor,
                   },
                 ]}
-                onPress={() =>
-                  setMedicationDetails({ medicationUnit: unit.value })
-                }
+                onPress={() => setMedicationDetails({ medicationUnit: unit.value })}
               >
-                <unit.icon
-                  color={
-                    unit.value === formState.medicationUnit ? "#F7F7F7" : color
-                  }
-                />
+                <unit.icon color={unit.value === formState.medicationUnit ? "#F7F7F7" : color} />
               </Pressable>
               <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
             </View>
@@ -147,10 +133,7 @@ export default function DetailsStepScreen() {
           )}
 
           {/* Bottom sheet for profile list */}
-          <BottomSheetWrapper
-            ref={chooseProfileBottomSheet}
-            title="Выбрать члена семьи"
-          >
+          <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
             <View style={styles.profileSelectionList}>
               {relationProfiles.map((profile) => (
                 <ProfileCard

@@ -7,12 +7,7 @@ export const unstable_settings = {
   initialRouteName: "index",
 };
 
-const ADD_PILL_SEGMENTS = [
-  "add-pill",
-  "details-step",
-  "schedule-step",
-  "final-step",
-];
+const ADD_PILL_SEGMENTS = ["add-pill", "details-step", "schedule-step", "final-step"];
 
 export default function AddPillLayout() {
   const segments = useSegments();

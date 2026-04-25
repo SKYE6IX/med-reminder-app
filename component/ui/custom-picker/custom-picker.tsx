@@ -51,22 +51,12 @@ export default function CustomPicker({
   };
 
   return (
-    <View
-      style={[
-        styles.customPickerWrapper,
-        { backgroundColor: bGColorSecondary },
-      ]}
-    >
+    <View style={[styles.customPickerWrapper, { backgroundColor: bGColorSecondary }]}>
       <View style={styles.customPickerHeader}>
         {svgIcon}
-        <Text style={[styles.customPickerLabel, { color: textColor }]}>
-          {label}
-        </Text>
+        <Text style={[styles.customPickerLabel, { color: textColor }]}>{label}</Text>
         <Pressable
-          style={[
-            styles.customPickerPressable,
-            { backgroundColor: bGColorTertiary },
-          ]}
+          style={[styles.customPickerPressable, { backgroundColor: bGColorTertiary }]}
           onPress={triggerSelection}
           role="button"
         >

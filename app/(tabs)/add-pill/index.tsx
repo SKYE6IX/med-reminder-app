@@ -7,18 +7,10 @@ import { pillNames } from "@/mock-data";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function NameStepScreen() {
   const sharedStyles = useAddPillScreenStyles();
-
   const { setMedicationDetails, formState } = useAddPillStore();
 
   const [hideSuggestionBox, setHideSuggestionBox] = useState(true);
@@ -37,13 +29,9 @@ export default function NameStepScreen() {
   // Mock Data!
   const results = isQueryFieldEmpty
     ? []
-    : pillNames.filter((pill) =>
-        pill.toLowerCase().startsWith(medicationName.toLocaleLowerCase()),
-      );
+    : pillNames.filter((pill) => pill.toLowerCase().startsWith(medicationName.toLocaleLowerCase()));
 
-  const canContinue = useAddPillStore((s) =>
-    s.isFieldFilled(["medicationName"]),
-  );
+  const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationName"]));
 
   const handleSetPillName = (value: string) => {
     setMedicationDetails({
@@ -68,7 +56,7 @@ export default function NameStepScreen() {
   };
 
   return (
-    <View style={[styles.container, sharedStyles.container]}>
+    <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
       <View style={styles.headerWrapper}>
         <Text style={sharedStyles.title}>Название лекарства</Text>
         <View
