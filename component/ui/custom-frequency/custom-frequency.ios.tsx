@@ -5,28 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import SelectionDot from "../selection-dot";
+import { DEFAULT_VALUE, HEIGHT, getOptionsValueLabel, getUnitValueLabel } from "./helper";
 import { useCustomFreqStyles } from "./shared-styles";
-import { CustomFrequencyProps, CustomState, TCustomFrequency, Unit } from "./types";
-
-const DEFAULT_VALUE: TCustomFrequency = {
-  label: "Своя частота",
-  rrule: "",
-  value: "CUSTOM_RULES",
-};
-
-const HEIGHT = {
-  COLLAPSED: 60,
-  EXPANDED: {
-    BASE: 150, // Without extra option.
-    EXTRA: 190, // With extra opiton when user pick "DAILY".
-    PICKER: 375, // Full height if extra option isn't included.
-    EXTRA_WITH_PICKER: 415, // Full height if extra option is included.
-  },
-};
-
-const getOptionsValueLabel = (value: number, options: { label: string; value: number }[]) => {
-  return options.find((option) => option.value === value)?.label;
-};
+import { CustomFrequencyProps, CustomState, Unit } from "./types";
 
 export default function CustomFrequency({
   isSelected,
@@ -148,7 +129,9 @@ export default function CustomFrequency({
                 onPress={() => handleShowPick("unit")}
               >
                 <Text style={sharedStyles.groupItemValue}>
-                  {customState.frequencyUnit === "HOURLY" ? "Часа" : "Дня"}
+                  {customState.frequencyUnit === "HOURLY"
+                    ? getUnitValueLabel("HOURLY", customState.frequencyCount)
+                    : getUnitValueLabel("DAILY", customState.frequencyCount)}
                 </Text>
               </Pressable>
             </View>
@@ -161,7 +144,7 @@ export default function CustomFrequency({
               onValueChange={(itemValue) => handleSetFreqCount(itemValue as number)}
               style={{
                 borderTopWidth: 1,
-                borderColor,
+                borderColor: "#F7F7F7",
               }}
               itemStyle={{
                 fontFamily: "Roboto_400Regular",
@@ -181,7 +164,7 @@ export default function CustomFrequency({
               onValueChange={(itemValue) => handleSetFreqUnit(itemValue as Unit)}
               style={{
                 borderTopWidth: 1,
-                borderColor,
+                borderColor: "#F7F7F7",
               }}
               itemStyle={{
                 fontFamily: "Roboto_400Regular",
@@ -202,7 +185,7 @@ export default function CustomFrequency({
             styles.optionsWrapper,
             {
               borderTopWidth: 1,
-              borderColor,
+              borderColor: "#F7F7F7",
               marginTop: 8,
             },
           ]}
@@ -227,7 +210,7 @@ export default function CustomFrequency({
               onValueChange={(itemValue) => handleSetRepeatOption(Number(itemValue))}
               style={{
                 borderTopWidth: 1,
-                borderColor,
+                borderColor: "#F7F7F7",
               }}
               itemStyle={{
                 fontFamily: "Roboto_400Regular",
@@ -237,7 +220,11 @@ export default function CustomFrequency({
               }}
             >
               {REPEAT_OPTIONS.map((option) => (
-                <PickerIOS.Item key={option.value} label={option.label} value={option.value} />
+                <PickerIOS.Item
+                  key={option.value + option.label}
+                  label={option.label}
+                  value={option.value}
+                />
               ))}
             </PickerIOS>
           )}
@@ -265,7 +252,7 @@ export default function CustomFrequency({
                 onValueChange={(itemValue) => handleSetHourIntervalOption(Number(itemValue))}
                 style={{
                   borderTopWidth: 1,
-                  borderColor,
+                  borderColor: "#F7F7F7",
                 }}
                 itemStyle={{
                   fontFamily: "Roboto_400Regular",
@@ -275,7 +262,11 @@ export default function CustomFrequency({
                 }}
               >
                 {HOUR_INTERVAL_OPTION.map((option) => (
-                  <PickerIOS.Item key={option.value} label={option.label} value={option.value} />
+                  <PickerIOS.Item
+                    key={option.value + option.label}
+                    label={option.label}
+                    value={option.value}
+                  />
                 ))}
               </PickerIOS>
             )}

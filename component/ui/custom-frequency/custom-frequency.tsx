@@ -1,25 +1,13 @@
+import { HOUR_INTERVAL_OPTION, REPEAT_OPTIONS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Picker } from "@react-native-picker/picker";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { useSharedValue, withDelay, withSpring } from "react-native-reanimated";
 import SelectionDot from "../selection-dot";
+import { DEFAULT_VALUE, getOptionsValueLabel, getUnitValueLabel, HEIGHT } from "./helper";
 import { useCustomFreqStyles } from "./shared-styles";
-import { CustomFrequencyProps, TCustomFrequency, Unit } from "./types";
-
-// How many time per day -> Which will be used to generate hour.
-// So if user chose every 3 hours and 2 times per day.
-// We will the two time to create two time start from 9. but no more than 23:59
-
-// When user choose Day interval, we have to show how many time per each of those days
-// But this time we need to also show them to choose a time interval in whcih they need to
-// take each pills on each of if their pills.
-
-const DEFAULT_VALUE: TCustomFrequency = {
-  label: "Своя частота",
-  rrule: "",
-  value: "CUSTOM_RULES",
-};
+import { CustomFrequencyProps, CustomState, Unit } from "./types";
 
 export default function CustomFrequency({
   isSelected,
@@ -27,14 +15,25 @@ export default function CustomFrequency({
   onCustomValueSet,
 }: CustomFrequencyProps) {
   const sharedStyles = useCustomFreqStyles();
+
+  // Picker Refs
   const countPicker = useRef<Picker<number>>(null);
   const unitPicker = useRef<Picker<Unit>>(null);
+  const repeatOptionPicker = useRef<Picker<number>>(null);
+  const hourIntervalPicker = useRef<Picker<number>>(null);
 
-  const [frequencyCount, setFrequencyCount] = useState<number>(3);
-  const [frequencyUnit, setFrequencyUnit] = useState<Unit>("HOURLY");
+  const [customState, setCustomState] = useState<CustomState>({
+    showPicker: undefined,
+    frequencyCount: 3,
+    frequencyUnit: "HOURLY",
+    repeatOption: 3,
+    hourIntervalOpiton: 3,
+  });
 
-  const height = useSharedValue(60);
-  const settingsViewOpacity = useSharedValue(0);
+  const isDailyFreqUnit = customState.frequencyUnit === "DAILY";
+
+  const height = useSharedValue(HEIGHT.COLLAPSED);
+  const optionsContainerOpacity = useSharedValue(0);
 
   //   Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -42,21 +41,42 @@ export default function CustomFrequency({
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  const newHeight = useMemo(() => {
+    if (isSelected && !isDailyFreqUnit) {
+      return HEIGHT.EXPANDED.BASE;
+    } else if (isSelected && isDailyFreqUnit) {
+      return HEIGHT.EXPANDED.EXTRA;
+    } else {
+      return HEIGHT.COLLAPSED;
+    }
+  }, [isDailyFreqUnit, isSelected]);
+
   useEffect(() => {
-    height.value = withSpring(isSelected ? 100 : 60);
-    settingsViewOpacity.value = withSpring(isSelected ? 1 : 0, {
-      duration: 100,
-    });
-  }, [height, isSelected, settingsViewOpacity]);
+    height.value = withSpring(newHeight, { duration: 400 });
+    optionsContainerOpacity.value = withDelay(
+      isSelected ? 150 : 0,
+      withSpring(isSelected ? 1 : 0, { duration: 300 }),
+    );
+  }, [height, isSelected, newHeight, optionsContainerOpacity]);
 
   const handleSetFreqCount = (count: number) => {
-    setFrequencyCount(count);
-    onCustomValueSet({ count, unit: frequencyUnit });
+    setCustomState((prvState) => ({ ...prvState, frequencyCount: count }));
+    onCustomValueSet({ count: Number(count), unit: customState.frequencyUnit });
   };
 
   const handleSetFreqUnit = (unit: Unit) => {
-    setFrequencyUnit(unit);
-    onCustomValueSet({ count: frequencyCount, unit });
+    setCustomState((prvState) => ({ ...prvState, frequencyUnit: unit }));
+    onCustomValueSet({ count: Number(customState.frequencyCount), unit });
+  };
+
+  const handleSetRepeatOption = (repeat: number) => {
+    setCustomState((prvState) => ({ ...prvState, repeatOption: repeat }));
+    // onCustomValueSet({ count: Number(customState.frequencyCount), unit });
+  };
+
+  const handleSetHourIntervalOption = (interval: number) => {
+    setCustomState((prvState) => ({ ...prvState, hourIntervalOpiton: interval }));
+    // onCustomValueSet({ count: Number(customState.frequencyCount), unit });
   };
 
   return (
@@ -65,7 +85,7 @@ export default function CustomFrequency({
         sharedStyles.container,
         styles.container,
         {
-          height: "auto",
+          height,
           borderWidth: isSelected ? undefined : 1,
           borderColor,
           backgroundColor: isSelected ? tintColor : bGColor,
@@ -86,32 +106,79 @@ export default function CustomFrequency({
       </Pressable>
 
       {/* Custom settings */}
-      <Animated.View style={[sharedStyles.opitonsContainer, { opacity: settingsViewOpacity }]}>
-        <Text style={sharedStyles.optionsLabel}>Каждые</Text>
+      <Animated.View style={[sharedStyles.opitonsContainer, { opacity: optionsContainerOpacity }]}>
+        {/* BASE OPTIONS  */}
+        <View style={sharedStyles.opitonsItem}>
+          <Text style={sharedStyles.optionsLabel}>Каждые</Text>
+          <View style={sharedStyles.optionsGroup}>
+            <Pressable
+              style={[sharedStyles.optionsGroupItem, { width: 50 }]}
+              onPress={() => countPicker.current?.focus()}
+            >
+              <Text style={sharedStyles.groupItemValue}>{customState.frequencyCount}</Text>
+            </Pressable>
 
-        <View style={sharedStyles.optionsGroup}>
-          <Pressable
-            style={[sharedStyles.optionsGroupItem, { width: 50 }]}
-            onPress={() => countPicker.current?.focus()}
-          >
-            <Text style={sharedStyles.groupItemValue}>{frequencyCount}</Text>
-          </Pressable>
-
-          <Pressable
-            style={sharedStyles.optionsGroupItem}
-            onPress={() => unitPicker.current?.focus()}
-          >
-            <Text style={sharedStyles.groupItemValue}>
-              {frequencyUnit === "HOURLY" ? "Часа" : "Дня"}
-            </Text>
-          </Pressable>
+            <Pressable
+              style={sharedStyles.optionsGroupItem}
+              onPress={() => unitPicker.current?.focus()}
+            >
+              <Text style={sharedStyles.groupItemValue}>
+                {customState.frequencyUnit === "HOURLY"
+                  ? getUnitValueLabel("HOURLY", customState.frequencyCount)
+                  : getUnitValueLabel("DAILY", customState.frequencyCount)}
+              </Text>
+            </Pressable>
+          </View>
         </View>
+
+        {/* REPEAT OPTIONS */}
+        <View
+          style={[
+            sharedStyles.opitonsItem,
+            { borderTopWidth: 1, borderColor: "#F7F7F7", paddingTop: 8 },
+          ]}
+        >
+          <Text style={sharedStyles.optionsLabel}>В день</Text>
+          <View style={sharedStyles.optionsGroup}>
+            <Pressable
+              style={sharedStyles.optionsGroupItem}
+              onPress={() => repeatOptionPicker.current?.focus()}
+            >
+              <Text style={sharedStyles.groupItemValue}>
+                {getOptionsValueLabel(customState.repeatOption, REPEAT_OPTIONS)}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* CONDITIONAL OPTION BASE ON UNIT VALUE = "DAILY" */}
+        {isDailyFreqUnit && (
+          <View
+            style={[
+              sharedStyles.opitonsItem,
+              { borderTopWidth: 1, borderColor: "#F7F7F7", paddingTop: 8 },
+            ]}
+          >
+            <Text style={sharedStyles.optionsLabel}>Интервал между приемами</Text>
+            <View style={sharedStyles.optionsGroup}>
+              <Pressable
+                style={sharedStyles.optionsGroupItem}
+                onPress={() => hourIntervalPicker.current?.focus()}
+              >
+                <Text style={sharedStyles.groupItemValue}>
+                  {getOptionsValueLabel(customState.hourIntervalOpiton, HOUR_INTERVAL_OPTION)}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
       </Animated.View>
 
+      {/* PIKCERS COMPONENETS */}
       {/* Count Picker */}
       <Picker
         ref={countPicker}
-        selectedValue={frequencyCount}
+        selectedValue={customState.frequencyCount}
         onValueChange={(itemValue) => handleSetFreqCount(itemValue as number)}
         mode="dropdown"
         style={{
@@ -134,7 +201,7 @@ export default function CustomFrequency({
       {/* Unit Picker */}
       <Picker
         ref={unitPicker}
-        selectedValue={frequencyUnit}
+        selectedValue={customState.frequencyUnit}
         onValueChange={(itemValue) => handleSetFreqUnit(itemValue as Unit)}
         mode="dropdown"
         style={{
@@ -151,6 +218,60 @@ export default function CustomFrequency({
       >
         <Picker.Item label="Часа" value="HOURLY" />
         <Picker.Item label="Дня" value="DAILY" />
+      </Picker>
+
+      {/* Reapeat Option Picker*/}
+      <Picker
+        ref={repeatOptionPicker}
+        selectedValue={customState.repeatOption}
+        onValueChange={(itemValue) => handleSetRepeatOption(itemValue)}
+        mode="dropdown"
+        style={{
+          opacity: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
+        itemStyle={{
+          fontFamily: "Roboto_400Regular",
+          fontSize: 16,
+          lineHeight: 19.2,
+          color,
+        }}
+      >
+        {REPEAT_OPTIONS.map((option) => (
+          <Picker.Item
+            key={option.value + option.label}
+            label={option.label}
+            value={option.value}
+          />
+        ))}
+      </Picker>
+
+      {/* Hours Inteval Picker*/}
+      <Picker
+        ref={hourIntervalPicker}
+        selectedValue={customState.hourIntervalOpiton}
+        onValueChange={(itemValue) => handleSetHourIntervalOption(itemValue)}
+        mode="dropdown"
+        style={{
+          opacity: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
+        itemStyle={{
+          fontFamily: "Roboto_400Regular",
+          fontSize: 16,
+          lineHeight: 19.2,
+          color,
+        }}
+      >
+        {HOUR_INTERVAL_OPTION.map((option) => (
+          <Picker.Item
+            key={option.value + option.label}
+            label={option.label}
+            value={option.value}
+          />
+        ))}
       </Picker>
     </Animated.View>
   );
