@@ -1,53 +1,52 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { RuleValue } from "@/stores/add-pill-store";
-import { buildRRules } from "@/utils/rruleUtils";
-import { useState } from "react";
+import { SchedulePreset } from "@/stores/add-pill-store";
+import { buildRRule } from "@/utils/rruleUtils";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import CustomFrequency from "./custom-frequency/custom-frequency";
-import { Unit } from "./custom-frequency/types";
+import { CustomPattern } from "./custom-frequency/types";
 import SelectionDot from "./selection-dot";
 
-export interface Frequency {
+export interface FrequencySettingsState {
   label: string;
   info?: string;
-  value: RuleValue;
   rrule: string;
+  preset: SchedulePreset;
 }
 
 type FrequencySettingsProps = {
-  currentValue: RuleValue;
-  onRRulesSet: ({ rules, value }: { rules: string; value: RuleValue }) => void;
+  preset: SchedulePreset;
+  onFreqSet: ({ rrule, preset }: { rrule: string; preset: SchedulePreset }) => void;
 };
 
-const DEFALUT_FREQUENCIES: Frequency[] = [
+const DEFALUT_FREQUENCIES: FrequencySettingsState[] = [
   {
     label: "Один раз в день",
     info: "Каждые 24 часа",
-    rrule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
-    value: "ONCE_A_DAY",
+    rrule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
+    preset: "ONCE_A_DAY",
   },
   {
     label: "Два раза в день",
     info: "Каждые 12 часов",
-    rrule: "FREQ=DAILY;BYHOUR=9,21;BYMINUTE=0",
-    value: "TWICE_A_DAY",
+    rrule: "FREQ=DAILY;BYHOUR=8,21;BYMINUTE=0",
+    preset: "TWICE_A_DAY",
   },
   {
     label: "Три раза в день",
     info: "Каждые 8 часов",
-    rrule: "FREQ=DAILY;BYHOUR=9,14,21;BYMINUTE=0",
-    value: "THREE_TIMES_A_DAY",
+    rrule: "FREQ=DAILY;BYHOUR=7,15,23;BYMINUTE=0",
+    preset: "THREE_TIMES_A_DAY",
+  },
+  {
+    label: "Своя частота",
+    rrule: "FREQ=DAILY;BYHOUR=8,11,14;BYMINUTE=0",
+    preset: "CUSTOM",
   },
 ];
 
-export default function FrequencySettings({ onRRulesSet, currentValue }: FrequencySettingsProps) {
-  const [customFreqValues, setCustomFreqValues] = useState<{
-    count: number;
-    unit: Unit;
-  }>({
-    count: 3,
-    unit: "HOURLY",
-  });
+export default function FrequencySettings({ preset, onFreqSet }: FrequencySettingsProps) {
+  const regularDefualts = DEFALUT_FREQUENCIES.filter((freq) => freq.preset !== "CUSTOM");
+  const customDefault = DEFALUT_FREQUENCIES[DEFALUT_FREQUENCIES.length - 1];
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -55,31 +54,22 @@ export default function FrequencySettings({ onRRulesSet, currentValue }: Frequen
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  const handleSetSelectedFreq = (freq: Frequency) => {
-    if (freq.value === "CUSTOM_RULES") {
-      const customRules = buildRRules({
-        repeatCount: customFreqValues.count,
-        repeatUnit: customFreqValues.unit,
-      });
-      onRRulesSet({ rules: customRules, value: "CUSTOM_RULES" });
-    } else {
-      onRRulesSet({ rules: freq.rrule, value: freq.value });
-    }
+  const handleSetSelectedFreq = (freq: FrequencySettingsState) => {
+    onFreqSet({ rrule: freq.rrule, preset: freq.preset });
   };
 
-  const handleOnCustomValueSet = ({ count, unit }: { count: number; unit: Unit }) => {
-    const rrules = buildRRules({ repeatCount: count, repeatUnit: unit });
-    onRRulesSet({ rules: rrules, value: "CUSTOM_RULES" });
-    setCustomFreqValues({ count, unit });
+  const handleOnCustomPatternChange = (pattern: Partial<CustomPattern>) => {
+    const rrule = buildRRule(pattern as CustomPattern);
+    onFreqSet({ rrule, preset: "CUSTOM" });
   };
 
   return (
     <View style={styles.frequencyContainer}>
-      {DEFALUT_FREQUENCIES.map((freq) => {
-        const isActive = freq.value === currentValue;
+      {regularDefualts.map((freq) => {
+        const isActive = freq.preset === preset;
         return (
           <Pressable
-            key={freq.value}
+            key={freq.rrule}
             style={[
               styles.frequencyPressable,
               {
@@ -103,9 +93,10 @@ export default function FrequencySettings({ onRRulesSet, currentValue }: Frequen
         );
       })}
       <CustomFrequency
-        isSelected={currentValue === "CUSTOM_RULES"}
+        defaultvalue={customDefault}
+        isSelected={preset === customDefault.preset}
         handleSelection={handleSetSelectedFreq}
-        onCustomValueSet={handleOnCustomValueSet}
+        onCustomPatternChange={handleOnCustomPatternChange}
       />
     </View>
   );

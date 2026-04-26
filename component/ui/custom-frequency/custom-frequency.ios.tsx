@@ -1,30 +1,28 @@
-import { HOUR_INTERVAL_OPTION, REPEAT_OPTIONS } from "@/constants/schedule-options";
+import { HOUR_BETWEEN_OCCURENCES, OCCURENCES_PER_DAY } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { PickerIOS } from "@react-native-picker/picker";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import SelectionDot from "../selection-dot";
-import { DEFAULT_VALUE, HEIGHT, getOptionsValueLabel, getUnitValueLabel } from "./helper";
+import { DEFAULT_PATTERN, HEIGHT, getOptionsValueLabel, getUnitValueLabel } from "./helper";
 import { useCustomFreqStyles } from "./shared-styles";
 import { CustomFrequencyProps, CustomState, Unit } from "./types";
 
 export default function CustomFrequency({
   isSelected,
+  defaultvalue,
   handleSelection,
-  onCustomValueSet,
+  onCustomPatternChange,
 }: CustomFrequencyProps) {
   const sharedStyles = useCustomFreqStyles();
 
   const [customState, setCustomState] = useState<CustomState>({
     showPicker: undefined,
-    frequencyCount: 3,
-    frequencyUnit: "HOURLY",
-    repeatOption: 3,
-    hourIntervalOpiton: 3,
+    pattern: DEFAULT_PATTERN,
   });
 
-  const isDailyFreqUnit = customState.frequencyUnit === "DAILY";
+  const isDailyUnit = customState.pattern.unit === "DAILY";
   const height = useSharedValue(HEIGHT.COLLAPSED);
 
   //   Themes
@@ -35,11 +33,11 @@ export default function CustomFrequency({
 
   const newHeight = useMemo(() => {
     if (isSelected) {
-      if (customState.showPicker && !isDailyFreqUnit) {
+      if (customState.showPicker && !isDailyUnit) {
         return HEIGHT.EXPANDED.PICKER;
-      } else if (customState.showPicker && isDailyFreqUnit) {
+      } else if (customState.showPicker && isDailyUnit) {
         return HEIGHT.EXPANDED.EXTRA_WITH_PICKER;
-      } else if (!customState.showPicker && isDailyFreqUnit) {
+      } else if (!customState.showPicker && isDailyUnit) {
         return HEIGHT.EXPANDED.EXTRA;
       } else {
         return HEIGHT.EXPANDED.BASE;
@@ -47,14 +45,18 @@ export default function CustomFrequency({
     } else {
       return HEIGHT.COLLAPSED;
     }
-  }, [customState.showPicker, isDailyFreqUnit, isSelected]);
+  }, [customState.showPicker, isDailyUnit, isSelected]);
+
+  useEffect(() => {
+    setCustomState({ showPicker: undefined, pattern: DEFAULT_PATTERN });
+  }, [isSelected]);
 
   useEffect(() => {
     height.value = withSpring(newHeight);
   }, [height, isSelected, newHeight]);
 
   // Show picker
-  const handleShowPick = (picker: CustomState["showPicker"]) => {
+  const handleShowPicker = (picker: CustomState["showPicker"]) => {
     if (customState.showPicker === picker) {
       setCustomState((prvState) => ({ ...prvState, showPicker: undefined }));
     } else {
@@ -62,26 +64,64 @@ export default function CustomFrequency({
     }
   };
 
-  // Set freqCount
-  const handleSetFreqCount = (count: number) => {
-    setCustomState((prvState) => ({ ...prvState, frequencyCount: count }));
-    onCustomValueSet({ count: Number(count), unit: customState.frequencyUnit });
+  // Set intervalValue
+  const handleSetIntervalvalue = (intervalValue: number) => {
+    setCustomState((prvState) => ({
+      ...prvState,
+      pattern: { ...prvState.pattern, intervalValue },
+    }));
+    onCustomPatternChange({ ...customState.pattern, intervalValue });
   };
 
-  // Set freqUnit
-  const handleSetFreqUnit = (unit: Unit) => {
-    setCustomState((prvState) => ({ ...prvState, frequencyUnit: unit }));
-    onCustomValueSet({ count: Number(customState.frequencyCount), unit });
+  // Set unit
+  const handleSetUnit = (unit: Unit) => {
+    if (unit === "DAILY") {
+      const defaultHoursBetween = 3;
+      setCustomState((prvState) => ({
+        ...prvState,
+        pattern: { ...prvState.pattern, unit, hoursBetweenOccurrences: defaultHoursBetween },
+      }));
+      onCustomPatternChange({
+        ...customState.pattern,
+        hoursBetweenOccurrences: defaultHoursBetween,
+        unit,
+      });
+    } else {
+      setCustomState((prvState) => ({
+        ...prvState,
+        pattern: { ...prvState.pattern, unit },
+      }));
+      onCustomPatternChange({
+        ...customState.pattern,
+        unit,
+      });
+    }
   };
 
-  const handleSetRepeatOption = (repeat: number) => {
-    setCustomState((prvState) => ({ ...prvState, repeatOption: repeat }));
-    // onCustomValueSet({ count: Number(customState.frequencyCount), unit });
+  // Set occurencePerDay
+  const handleOccurencePerDay = (occurrencesPerDay: number) => {
+    setCustomState((prvState) => ({
+      ...prvState,
+      pattern: { ...prvState.pattern, occurrencesPerDay },
+    }));
+    onCustomPatternChange({
+      ...customState.pattern,
+      occurrencesPerDay,
+    });
   };
 
-  const handleSetHourIntervalOption = (interval: number) => {
-    setCustomState((prvState) => ({ ...prvState, hourIntervalOpiton: interval }));
-    // onCustomValueSet({ count: Number(customState.frequencyCount), unit });
+  // Set hoursBetweenOccurrences
+  const handlehoursBetweenOccurrences = (hoursBetweenOccurrences: number) => {
+    if (customState.pattern.unit === "DAILY") {
+      setCustomState((prvState) => ({
+        ...prvState,
+        pattern: { ...prvState.pattern, hoursBetweenOccurrences },
+      }));
+      onCustomPatternChange({
+        ...customState.pattern,
+        hoursBetweenOccurrences,
+      });
+    }
   };
 
   return (
@@ -100,12 +140,12 @@ export default function CustomFrequency({
       {/* Button trigger */}
       <Pressable
         style={sharedStyles.frequencyPressable}
-        onPress={() => handleSelection(DEFAULT_VALUE)}
+        onPress={() => handleSelection(defaultvalue)}
       >
         <Text
           style={[sharedStyles.frequencyPressableText, { color: isSelected ? "#F7F7F7" : color }]}
         >
-          {DEFAULT_VALUE.label}
+          {defaultvalue.label}
         </Text>
         <SelectionDot isActive={isSelected} />
       </Pressable>
@@ -119,29 +159,29 @@ export default function CustomFrequency({
             <View style={sharedStyles.optionsGroup}>
               <Pressable
                 style={[sharedStyles.optionsGroupItem, { width: 50 }]}
-                onPress={() => handleShowPick("count")}
+                onPress={() => handleShowPicker("intervalValue")}
               >
-                <Text style={sharedStyles.groupItemValue}>{customState.frequencyCount}</Text>
+                <Text style={sharedStyles.groupItemValue}>{customState.pattern.intervalValue}</Text>
               </Pressable>
 
               <Pressable
                 style={sharedStyles.optionsGroupItem}
-                onPress={() => handleShowPick("unit")}
+                onPress={() => handleShowPicker("intervalUnit")}
               >
                 <Text style={sharedStyles.groupItemValue}>
-                  {customState.frequencyUnit === "HOURLY"
-                    ? getUnitValueLabel("HOURLY", customState.frequencyCount)
-                    : getUnitValueLabel("DAILY", customState.frequencyCount)}
+                  {customState.pattern.unit === "HOURLY"
+                    ? getUnitValueLabel("HOURLY", customState.pattern.intervalValue)
+                    : getUnitValueLabel("DAILY", customState.pattern.intervalValue)}
                 </Text>
               </Pressable>
             </View>
           </View>
 
           {/* BASE OPTIONS PICKERS */}
-          {customState.showPicker === "count" && (
+          {customState.showPicker === "intervalValue" && (
             <PickerIOS
-              selectedValue={customState.frequencyCount}
-              onValueChange={(itemValue) => handleSetFreqCount(itemValue as number)}
+              selectedValue={customState.pattern.intervalValue}
+              onValueChange={(itemValue) => handleSetIntervalvalue(itemValue as number)}
               style={{
                 borderTopWidth: 1,
                 borderColor: "#F7F7F7",
@@ -158,10 +198,10 @@ export default function CustomFrequency({
               ))}
             </PickerIOS>
           )}
-          {customState.showPicker === "unit" && (
+          {customState.showPicker === "intervalUnit" && (
             <PickerIOS
-              selectedValue={customState.frequencyUnit}
-              onValueChange={(itemValue) => handleSetFreqUnit(itemValue as Unit)}
+              selectedValue={customState.pattern.unit}
+              onValueChange={(itemValue) => handleSetUnit(itemValue as Unit)}
               style={{
                 borderTopWidth: 1,
                 borderColor: "#F7F7F7",
@@ -179,7 +219,7 @@ export default function CustomFrequency({
           )}
         </View>
 
-        {/* REPEAT OPTIONS */}
+        {/* OCCURENCES_PER_DAY OPTIONS */}
         <View
           style={[
             styles.optionsWrapper,
@@ -195,19 +235,19 @@ export default function CustomFrequency({
             <View style={sharedStyles.optionsGroup}>
               <Pressable
                 style={sharedStyles.optionsGroupItem}
-                onPress={() => handleShowPick("repeat")}
+                onPress={() => handleShowPicker("occurrencesPerDay")}
               >
                 <Text style={sharedStyles.groupItemValue}>
-                  {getOptionsValueLabel(customState.repeatOption, REPEAT_OPTIONS)}
+                  {getOptionsValueLabel(customState.pattern.occurrencesPerDay, OCCURENCES_PER_DAY)}
                 </Text>
               </Pressable>
             </View>
           </View>
 
-          {customState.showPicker === "repeat" && (
+          {customState.showPicker === "occurrencesPerDay" && (
             <PickerIOS
-              selectedValue={customState.repeatOption}
-              onValueChange={(itemValue) => handleSetRepeatOption(Number(itemValue))}
+              selectedValue={customState.pattern.occurrencesPerDay}
+              onValueChange={(itemValue) => handleOccurencePerDay(Number(itemValue))}
               style={{
                 borderTopWidth: 1,
                 borderColor: "#F7F7F7",
@@ -219,7 +259,7 @@ export default function CustomFrequency({
                 color: "#F7F7F7",
               }}
             >
-              {REPEAT_OPTIONS.map((option) => (
+              {OCCURENCES_PER_DAY.map((option) => (
                 <PickerIOS.Item
                   key={option.value + option.label}
                   label={option.label}
@@ -230,26 +270,29 @@ export default function CustomFrequency({
           )}
         </View>
 
-        {/* CONDITIONAL OPTION BASE ON UNIT VALUE = "DAILY" */}
-        {isDailyFreqUnit && (
+        {/* HOUR_BETWEEN_OCCURENCES WHEN UNIT VALUE = "DAILY" */}
+        {customState.pattern.unit === "DAILY" && (
           <View style={[styles.optionsWrapper, { borderTopWidth: 1, borderColor, marginTop: 8 }]}>
             <View style={sharedStyles.opitonsItem}>
               <Text style={sharedStyles.optionsLabel}>Интервал между приемами</Text>
               <View style={sharedStyles.optionsGroup}>
                 <Pressable
                   style={sharedStyles.optionsGroupItem}
-                  onPress={() => handleShowPick("interval")}
+                  onPress={() => handleShowPicker("hoursBetweenOccurrences")}
                 >
                   <Text style={sharedStyles.groupItemValue}>
-                    {getOptionsValueLabel(customState.hourIntervalOpiton, HOUR_INTERVAL_OPTION)}
+                    {getOptionsValueLabel(
+                      customState.pattern.hoursBetweenOccurrences,
+                      HOUR_BETWEEN_OCCURENCES,
+                    )}
                   </Text>
                 </Pressable>
               </View>
             </View>
-            {customState.showPicker === "interval" && (
+            {customState.showPicker === "hoursBetweenOccurrences" && (
               <PickerIOS
-                selectedValue={customState.hourIntervalOpiton}
-                onValueChange={(itemValue) => handleSetHourIntervalOption(Number(itemValue))}
+                selectedValue={customState.pattern.hoursBetweenOccurrences}
+                onValueChange={(itemValue) => handlehoursBetweenOccurrences(Number(itemValue))}
                 style={{
                   borderTopWidth: 1,
                   borderColor: "#F7F7F7",
@@ -261,7 +304,7 @@ export default function CustomFrequency({
                   color: "#F7F7F7",
                 }}
               >
-                {HOUR_INTERVAL_OPTION.map((option) => (
+                {HOUR_BETWEEN_OCCURENCES.map((option) => (
                   <PickerIOS.Item
                     key={option.value + option.label}
                     label={option.label}

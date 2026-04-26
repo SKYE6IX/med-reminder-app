@@ -2,22 +2,16 @@ import { DosageMeasurement, MedicationUnit } from "@/types/medication";
 import { getDateLocalString, getTimeZone } from "@/utils/luxonUtil";
 import { create } from "zustand";
 
-export type RuleValue =
-  | "ONCE_A_DAY"
-  | "TWICE_A_DAY"
-  | "THREE_TIMES_A_DAY"
-  | "CUSTOM_RULES";
-
+export type SchedulePreset = "ONCE_A_DAY" | "TWICE_A_DAY" | "THREE_TIMES_A_DAY" | "CUSTOM";
 interface Schedule {
   dosage: number;
   rule: {
     recurrenceRule: string;
-    value: RuleValue;
+    preset: SchedulePreset;
   };
   startDate: string;
   timeZone: string;
 }
-
 interface MedicationPack {
   totalQuantity: number;
   notifyRule: string;
@@ -28,7 +22,6 @@ const NULLABLE_FIELDS: Partial<Record<FieldName, true>> = {
   medicationPack: true,
   medicationNote: true,
 };
-
 interface AddPillStore {
   formState: {
     profileId: string;
@@ -41,9 +34,7 @@ interface AddPillStore {
   };
 
   setMedicationDetails: (
-    data: Partial<
-      Omit<AddPillStore["formState"], "schedule" | "medicationPack">
-    >,
+    data: Partial<Omit<AddPillStore["formState"], "schedule" | "medicationPack">>,
   ) => void;
 
   setMedicatioSchedule: (schedule: Partial<Schedule>) => void;
@@ -64,8 +55,8 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
   schedule: {
     dosage: 1,
     rule: {
-      recurrenceRule: "FREQ=DAILY;BYHOUR=9;BYMINUTE=0",
-      value: "ONCE_A_DAY",
+      recurrenceRule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
+      preset: "ONCE_A_DAY",
     },
     startDate: getDateLocalString(),
     timeZone: getTimeZone(),

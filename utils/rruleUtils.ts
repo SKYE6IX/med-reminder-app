@@ -1,17 +1,11 @@
+import { CustomPattern } from "@/component/ui/custom-frequency/types";
 import { Options, RRule } from "rrule";
 import { DateTime, getTimeZone } from "./luxonUtil";
 
-// Change time to all hours
-
-const DAY_START_HOUR = 5;
-const DAY_END_HOUR = 24;
-
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   const rule = RRule.fromString(rrule);
-
   const byhour = rule.options.byhour;
   const byminute = rule.options.byminute;
-
   const times = byhour
     .map((hour, i) => {
       const minute = byminute[i] ?? 0;
@@ -25,9 +19,9 @@ export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   return times;
 };
 
-export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }) => {
+export const updateTimeOcurrencesRule = ({ rrule, date }: { rrule: string; date: Date }) => {
   const now = DateTime.now();
-  const rule = RRule.fromString(rrules);
+  const rule = RRule.fromString(rrule);
 
   const startOfTheDay = now.startOf("day");
   const endOfTheDay = now.endOf("day");
@@ -39,13 +33,13 @@ export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }
     .setZone(getTimeZone(), { keepLocalTime: true })
     .toJSDate();
 
+  const newStartHour = localTime.getHours();
+  const newStartMinute = localTime.getMinutes();
+
   const ruleHours = rule.options.byhour;
   const ruleMinutes = rule.options.byminute;
 
-  const totalTimeFrame = ruleHours.length ?? 1;
-
-  const newStartHour = localTime.getHours();
-  const newStartMinute = localTime.getMinutes();
+  const totalOccurences = ruleHours.length ?? 1;
 
   const clampedStartMinutes = Math.min(
     Math.max(newStartHour * 60 + newStartMinute, startOfDayMinutes),
@@ -59,7 +53,7 @@ export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }
   const newByHour: number[] = [];
   const newByMinute: number[] = [];
 
-  if (totalTimeFrame === 1) {
+  if (totalOccurences === 1) {
     newByHour.push(Math.floor(clampedStartMinutes / 60));
     newByMinute.push(clampedStartMinutes % 60);
   } else {
@@ -67,9 +61,13 @@ export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }
 
     const offsets = existingMinutes.map((t) => t - originalStart);
 
-    for (const offset of offsets) {
-      const doseMinutes = Math.min(clampedStartMinutes + offset, endOfDayMinutes);
+    const maxOffset = offsets[offsets.length - 1];
+    if (clampedStartMinutes + maxOffset > endOfDayMinutes) {
+      return rrule;
+    }
 
+    for (const offset of offsets) {
+      const doseMinutes = clampedStartMinutes + offset;
       newByHour.push(Math.floor(doseMinutes / 60));
       newByMinute.push(doseMinutes % 60);
     }
@@ -85,25 +83,30 @@ export const updateTimeRules = ({ rrules, date }: { rrules: string; date: Date }
   return updatedRule.toString().replace("RRULE:", "");
 };
 
-export const buildRRules = ({
-  repeatCount,
-  repeatUnit,
-}: {
-  repeatCount: number;
-  repeatUnit: "DAILY" | "HOURLY";
-}) => {
+export const buildRRule = (customPattern: CustomPattern) => {
   let options: Partial<Options>;
 
-  if (repeatUnit === "DAILY") {
+  if (customPattern.unit === "DAILY") {
+    const byhours = populateOcurrencesTimes(
+      customPattern.hoursBetweenOccurrences,
+      customPattern.occurrencesPerDay,
+    ).map((time) => time.getHours());
+
     options = {
-      interval: repeatCount,
-      byhour: populateTimes().map((time) => time.getHours()),
+      interval: customPattern.intervalValue,
+      byhour: byhours,
     };
   } else {
+    const byhours = populateOcurrencesTimes(
+      customPattern.intervalValue,
+      customPattern.occurrencesPerDay,
+    ).map((time) => time.getHours());
+
     options = {
-      byhour: populateTimes(repeatCount).map((time) => time.getHours()),
+      byhour: byhours,
     };
   }
+
   const rule = new RRule({
     ...options,
     freq: RRule.DAILY,
@@ -114,29 +117,34 @@ export const buildRRules = ({
   return rule.toString().replace("RRULE:", "");
 };
 
-const populateTimes = (repeatCount: number = 1) => {
-  const START_HOUR = 9;
-  const END_HOUR = 21;
-  const totalHours = END_HOUR - START_HOUR;
+// DAILY
+const populateOcurrencesTimes = (
+  hoursBetweenOccurrences: number,
+  occurrencesPerDay: number = 1,
+) => {
+  const START_HOUR = 7;
+  const END_HOUR = 24;
 
-  const start = DateTime.now().set({
+  const now = DateTime.now();
+
+  const start = now.set({
     hour: START_HOUR,
     minute: 0,
     second: 0,
-    millisecond: 0,
   });
 
-  const times: DateTime[] = [];
-
-  const steps = Math.floor(totalHours / repeatCount);
-
-  if (repeatCount === 1) {
+  if (occurrencesPerDay === 1) {
     return [start.toJSDate()];
   }
 
-  for (let i = 0; i <= steps; i++) {
-    times.push(start.plus({ hours: i * repeatCount }));
-  }
+  const endOfDay = now.set({ hour: END_HOUR, minute: 0, second: 0 });
 
+  const times: DateTime[] = [];
+
+  for (let i = 0; i <= occurrencesPerDay - 1; i++) {
+    const next = start.plus({ hours: i * hoursBetweenOccurrences });
+    if (next >= endOfDay) break;
+    times.push(next);
+  }
   return times.map((times) => times.toJSDate());
 };

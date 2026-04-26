@@ -1,9 +1,9 @@
-import { TCustomFrequency, Unit } from "./types";
+import { CustomPattern, Unit } from "./types";
 
-export const DEFAULT_VALUE: TCustomFrequency = {
-  label: "Своя частота",
-  rrule: "",
-  value: "CUSTOM_RULES",
+export const DEFAULT_PATTERN: CustomPattern = {
+  unit: "HOURLY",
+  intervalValue: 3,
+  occurrencesPerDay: 3,
 };
 
 export const HEIGHT = {

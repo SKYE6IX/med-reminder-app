@@ -9,7 +9,7 @@ export const DOSAGE_UNITS = [
   { label: "Капсула", icon: "⚪", value: DosageMeasurement.CAPSULE },
 ];
 
-export const REPEAT_OPTIONS = [
+export const OCCURENCES_PER_DAY = [
   { label: "1 раз", value: 1 },
   { label: "2 раза", value: 2 },
   { label: "3 раза", value: 3 },
@@ -22,7 +22,7 @@ export const REPEAT_OPTIONS = [
   { label: "10 раз", value: 10 },
 ];
 
-export const HOUR_INTERVAL_OPTION = [
+export const HOUR_BETWEEN_OCCURENCES = [
   { label: "1 час", value: 1 },
   { label: "2 часа", value: 2 },
   { label: "3 часа", value: 3 },

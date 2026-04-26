@@ -7,10 +7,10 @@ import DateTimePickerWrapper, { DateTimeWrapperRef } from "@/component/ui/date-t
 import DosageSettings from "@/component/ui/dosage-settings";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { RuleValue, useAddPillStore } from "@/stores/add-pill-store";
+import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
-import { generateTimeOccurrences, updateTimeRules } from "@/utils/rruleUtils";
+import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -22,13 +22,6 @@ export default function ScheduleStepScreen() {
   const dateRef = useRef<DateTimeWrapperRef>(null);
 
   const displayStartDate = formatRegularDate(formState.schedule.startDate.replaceAll(".", " "));
-
-  // *** //
-  // We use this to target the first letter since there is no way to do this in
-  // Text. And the other date generation can be acesss ahead.
-  const [firstLetter, ...restArr] = Array.from(displayStartDate);
-  const rest = restArr.join("");
-  // ****/
 
   const sharedStyles = useAddPillScreenStyles();
   const router = useRouter();
@@ -45,26 +38,26 @@ export default function ScheduleStepScreen() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  // Rules settings
-  const handleSetRRules = ({ rules, value }: { rules: string; value: RuleValue }) => {
+  // Frequency settings
+  const handleSetFrequency = ({ rrule, preset }: { rrule: string; preset: SchedulePreset }) => {
     setMedicatioSchedule({
       rule: {
-        recurrenceRule: rules,
-        value,
+        recurrenceRule: rrule,
+        preset,
       },
     });
   };
 
   // Time settings
   const handleSetTime = (date: Date) => {
-    const newRules = updateTimeRules({
-      rrules: formState.schedule.rule.recurrenceRule,
+    const newRules = updateTimeOcurrencesRule({
+      rrule: formState.schedule.rule.recurrenceRule,
       date,
     });
     setMedicatioSchedule({
       rule: {
         recurrenceRule: newRules,
-        value: formState.schedule.rule.value,
+        preset: formState.schedule.rule.preset,
       },
     });
   };
@@ -85,6 +78,7 @@ export default function ScheduleStepScreen() {
       medicationMeasurement: unit ?? formState.medicationMeasurement,
     });
   };
+
   return (
     <View
       collapsable={false}
@@ -100,8 +94,8 @@ export default function ScheduleStepScreen() {
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
           <FrequencySettings
-            onRRulesSet={handleSetRRules}
-            currentValue={formState.schedule.rule.value}
+            onFreqSet={handleSetFrequency}
+            preset={formState.schedule.rule.preset}
           />
         </View>
 
@@ -156,11 +150,7 @@ export default function ScheduleStepScreen() {
             </View>
             <View style={styles.dateSettingTextWrapper}>
               <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>Начало</Text>
-
-              <Text style={[styles.dateSettingValue, { color }]}>
-                <Text style={styles.dateSettingValueUpperCase}>{firstLetter}</Text>
-                {rest}
-              </Text>
+              <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
             </View>
             <View style={styles.dateSettingRightIcon}>
               <ArrowDown />
@@ -237,9 +227,6 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_600SemiBold",
     fontSize: 16,
     lineHeight: 19.2,
-  },
-  dateSettingValueUpperCase: {
-    textTransform: "capitalize",
   },
   dateSettingLeftIcon: {
     width: 40,

@@ -9,14 +9,7 @@ import { useAddPillStore } from "@/stores/add-pill-store";
 import { CreateMedication, MedicationResponse } from "@/types/medication";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  Platform,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Platform, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -45,8 +38,7 @@ export default function FinalStepScreen() {
   const router = useRouter();
   const isIOS = Platform.OS === "ios";
 
-  const { formState, setMedicationDetails, setMedicationpack, clearFormState } =
-    useAddPillStore();
+  const { formState, setMedicationDetails, setMedicationpack, clearFormState } = useAddPillStore();
 
   const sharedStyles = useAddPillScreenStyles();
 
@@ -57,21 +49,15 @@ export default function FinalStepScreen() {
   const pickersWrapperOpacity = useSharedValue(0);
 
   // @platform IOS ONLY
-  const [isDosageAmountPickerVisible, setIsDosageAmountPickerVisible] =
-    useState(false);
+  const [isDosageAmountPickerVisible, setIsDosageAmountPickerVisible] = useState(false);
   // @platform IOS ONLY
-  const [isRefillDaysPickerVisible, setIsRefillDaysPickerVisible] =
-    useState(false);
+  const [isRefillDaysPickerVisible, setIsRefillDaysPickerVisible] = useState(false);
 
   const totalDosageAmount = formState.medicationPack
     ? `${formState.medicationPack.totalQuantity}`
     : "";
-  const refillDaysReminder = formState.medicationPack
-    ? formState.medicationPack.notifyRule
-    : "";
-  const medicationNote = formState.medicationNote
-    ? formState.medicationNote
-    : "";
+  const refillDaysReminder = formState.medicationPack ? formState.medicationPack.notifyRule : "";
+  const medicationNote = formState.medicationNote ? formState.medicationNote : "";
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -135,9 +121,7 @@ export default function FinalStepScreen() {
   const controlFullExpand = (isPicker: boolean) => {
     const isActive = !isPicker;
     if (isActive && refillSettingHeight.value === FULL_EXPAND) return;
-    refillSettingHeight.value = withSpring(
-      isActive ? FULL_EXPAND : HALF_EXPAND,
-    );
+    refillSettingHeight.value = withSpring(isActive ? FULL_EXPAND : HALF_EXPAND);
   };
 
   // @platform IOS ONLY
@@ -179,10 +163,7 @@ export default function FinalStepScreen() {
   }));
 
   // Create a new medication
-  const [createMedication, { loading }] = useMutation<
-    MedicationResponse,
-    CreateMedication
-  >({
+  const [createMedication, { loading }] = useMutation<MedicationResponse, CreateMedication>({
     url: "medications",
     method: "post",
     onSuccess(data, variables) {
@@ -224,21 +205,12 @@ export default function FinalStepScreen() {
           ]}
         >
           <View style={styles.refillSettingTop}>
-            <View
-              style={[
-                styles.refillSettingIcon,
-                { backgroundColor: bGTertiary },
-              ]}
-            >
+            <View style={[styles.refillSettingIcon, { backgroundColor: bGTertiary }]}>
               <BellIcon />
             </View>
             <View style={styles.refillSettingTextWrapper}>
-              <Text style={[styles.refillSettingTextLabel, { color }]}>
-                Напоминание
-              </Text>
-              <Text
-                style={[styles.refillSettingTextInfo, { color: colorMuted }]}
-              >
+              <Text style={[styles.refillSettingTextLabel, { color }]}>Напоминание</Text>
+              <Text style={[styles.refillSettingTextInfo, { color: colorMuted }]}>
                 Уведомить до окончания запаса
               </Text>
             </View>
@@ -295,17 +267,10 @@ export default function FinalStepScreen() {
           placeholder="Заметка о лекарстве"
           placeholderTextColor="#9E9E9E"
           maxLength={500}
-          style={[
-            styles.textAreaInput,
-            { borderColor, backgroundColor: bGColor, color },
-          ]}
+          style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
         />
       </View>
-      <CustomButton
-        label="Создать"
-        onPress={createMedicationSchedule}
-        disabled={loading}
-      />
+      <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={loading} />
     </View>
   );
 }
