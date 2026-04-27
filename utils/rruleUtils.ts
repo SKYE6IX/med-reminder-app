@@ -4,18 +4,26 @@ import { DateTime, getTimeZone } from "./luxonUtil";
 
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   const rule = RRule.fromString(rrule);
-  const byhour = rule.options.byhour;
-  const byminute = rule.options.byminute;
-  const times = byhour
-    .map((hour, i) => {
-      const minute = byminute[i] ?? 0;
-      const date = DateTime.now().set({ hour, minute, second: 0 });
-      return date.toJSDate().toLocaleTimeString("ru-RU", {
-        formatMatcher: "best fit",
-        timeStyle: "short",
-      });
-    })
+
+  const ruleWithMaxCount = new RRule({
+    ...rule.options,
+    count: rule.options.byhour?.length ?? 1,
+  });
+
+  const times = ruleWithMaxCount
+    .all()
+    .map((time) =>
+      DateTime.fromJSDate(time)
+        .toUTC()
+        .setZone("local", { keepLocalTime: true })
+        .toJSDate()
+        .toLocaleTimeString("ru", {
+          formatMatcher: "best fit",
+          timeStyle: "short",
+        }),
+    )
     .sort();
+
   return times;
 };
 
@@ -37,7 +45,7 @@ export const updateTimeOcurrencesRule = ({ rrule, date }: { rrule: string; date:
   const newStartMinute = localTime.getMinutes();
 
   const ruleHours = rule.options.byhour;
-  const ruleMinutes = rule.options.byminute;
+  const ruleMinute = rule.options.byminute[0];
 
   const totalOccurences = ruleHours.length ?? 1;
 
@@ -46,22 +54,21 @@ export const updateTimeOcurrencesRule = ({ rrule, date }: { rrule: string; date:
     endOfDayMinutes,
   );
 
-  const existingMinutes = ruleHours
-    .map((h, i) => h * 60 + (ruleMinutes[i] ?? 0))
-    .sort((a, b) => a - b);
+  const existingMinutes = ruleHours.map((h, i) => h * 60 + (ruleMinute ?? 0)).sort((a, b) => a - b);
 
   const newByHour: number[] = [];
-  const newByMinute: number[] = [];
+  let newByMinute: number;
 
   if (totalOccurences === 1) {
     newByHour.push(Math.floor(clampedStartMinutes / 60));
-    newByMinute.push(clampedStartMinutes % 60);
+    newByMinute = clampedStartMinutes % 60;
   } else {
     const originalStart = existingMinutes[0];
 
     const offsets = existingMinutes.map((t) => t - originalStart);
 
     const maxOffset = offsets[offsets.length - 1];
+
     if (clampedStartMinutes + maxOffset > endOfDayMinutes) {
       return rrule;
     }
@@ -69,15 +76,16 @@ export const updateTimeOcurrencesRule = ({ rrule, date }: { rrule: string; date:
     for (const offset of offsets) {
       const doseMinutes = clampedStartMinutes + offset;
       newByHour.push(Math.floor(doseMinutes / 60));
-      newByMinute.push(doseMinutes % 60);
     }
+    newByMinute = clampedStartMinutes % 60;
   }
 
   const updatedRule = new RRule({
     freq: rule.options.freq,
+    interval: rule.options.interval,
     byhour: newByHour,
     byminute: newByMinute,
-    bysecond: [0],
+    bysecond: 0,
   });
 
   return updatedRule.toString().replace("RRULE:", "");
@@ -110,8 +118,8 @@ export const buildRRule = (customPattern: CustomPattern) => {
   const rule = new RRule({
     ...options,
     freq: RRule.DAILY,
-    byminute: [0],
-    bysecond: [0],
+    byminute: 0,
+    bysecond: 0,
   });
 
   return rule.toString().replace("RRULE:", "");

@@ -324,8 +324,3 @@ const styles = StyleSheet.create({
     maxHeight: 200,
   },
 });
-
-// Emoji
-
-// Update changes:
-// 1.
