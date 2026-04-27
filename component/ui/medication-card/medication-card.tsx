@@ -1,32 +1,46 @@
+import ClockIcon from "@/component/icons/clock-icon";
+import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { ProfileResponse } from "@/types/medication";
+import { DosageMeasurement, ProfileResponse } from "@/types/medication";
+import { toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { StyleSheet, Switch, Text, View } from "react-native";
 
 type MedicationCardProps = {
-  imageUrl?: string;
+  imageUrl: string;
   name: string;
   profile: ProfileResponse;
   dosage?: number;
-  dosageUnit?: string;
+  dosageUnit?: DosageMeasurement;
+  scheduleTime?: string;
   freq?: string;
-  hasBadge?: boolean;
+  badge?: "upcoming" | "taken" | "missed";
   hasSwitch?: boolean;
   showProgress?: boolean;
   startedDate?: string;
-  handlePressButton: () => void;
-  handleToggleSwitch: () => void;
+  onButtonPress: () => void;
+  onSwitchToggle?: () => void;
 };
 
-// Home ->
-// Medication List ->
-// Medication Details ->
-// Refill List ->
-
-export default function MedicationCard() {
+export default function MedicationCard({
+  imageUrl,
+  name,
+  profile,
+  dosage,
+  dosageUnit,
+  scheduleTime,
+  freq,
+  badge,
+  hasSwitch,
+  showProgress,
+  startedDate,
+  onButtonPress,
+  onSwitchToggle,
+}: MedicationCardProps) {
   const [toggleSwitch, setToggleSwitch] = useState(false);
 
+  // Themes color
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const mutedColor = useThemeColor({}, "textMuted");
@@ -37,13 +51,21 @@ export default function MedicationCard() {
     setToggleSwitch(!toggleSwitch);
   };
 
+  const getDosage = () => {
+    const label = DOSAGE_UNITS.find((unit) => unit.value === dosageUnit)?.label;
+    return `${dosage + " " + label}`;
+  };
+
+  const date = new Date(scheduleTime ?? 0);
+  const scheduleAt = toLocalTime(date);
+
+  const badgeBgColor = badge === "taken" ? "#009E00" : badge === "missed" ? "#DC0000" : tintColor;
+
   return (
     <View style={[styles.card, { backgroundColor: bgSecondary }]}>
       <View style={styles.cardInnerContainer}>
         {/* Image Wrapper */}
-        <View
-          style={[styles.cardImageWrapper, { backgroundColor: bgTertiary }]}
-        >
+        <View style={[styles.cardImageWrapper, { backgroundColor: bgTertiary }]}>
           <Image
             source={require("@/assets/images/pill.png")}
             style={styles.cardImage}
@@ -51,48 +73,42 @@ export default function MedicationCard() {
             contentPosition="top center"
           />
         </View>
-
+        {/* Метформин */}
         {/* Content Wrapper */}
         <View style={styles.cardContentContainer}>
           {/* Inner wrapper */}
           <View style={styles.cardContentInner}>
-            <Text style={[styles.medicationName, { color }]}>Метформин</Text>
+            <Text style={[styles.medicationName, { color }]}>{name}</Text>
 
             {/* Dosage */}
-            <Text style={[styles.medicationDosage, { color }]}>1 капсула</Text>
+            {dosage && <Text style={[styles.medicationDosage, { color }]}>{getDosage()}</Text>}
 
             {/* Schedule */}
-            <View style={styles.medicationSchedule}>
-              <Text style={[styles.medicationScheduleText, { color }]}>
-                09:00
-              </Text>
-              <View
-                style={[
-                  styles.medicationScheduleDivider,
-                  { backgroundColor: mutedColor },
-                ]}
-              />
-              <Text style={[styles.medicationScheduleText, { color }]}>
-                Ежедневно
-              </Text>
-            </View>
+            {scheduleTime && (
+              <View style={styles.medicationSchedule}>
+                <Text style={[styles.medicationScheduleText, { color }]}>{scheduleAt}</Text>
+                <View style={[styles.medicationScheduleDivider, { backgroundColor: mutedColor }]} />
+                <Text style={[styles.medicationScheduleText, { color }]}>Ежедневно</Text>
+              </View>
+            )}
 
             {/* Starting date */}
-            <Text style={[styles.medicationStartDate, { color }]}>
-              Начало 25 июля
-            </Text>
+            {startedDate && (
+              <Text style={[styles.medicationStartDate, { color }]}>Начало 25 июля</Text>
+            )}
 
             <View style={styles.cardContentWrapperBottom}>
               {/* Profile, not shown for self owner */}
-              <View style={styles.profile}>
-                <View style={[styles.profileImage]}>
-                  <Text style={[styles.profileImagePlaceholder, { color }]}>
-                    Л
-                  </Text>
+              {!profile.isSelf && (
+                <View style={styles.profile}>
+                  <View style={[styles.profileImage]}>
+                    <Text style={[styles.profileImagePlaceholder, { color }]}>
+                      {profile.name.charAt(0)}
+                    </Text>
+                  </View>
+                  <Text style={[styles.profileText, { color }]}>{profile.name}</Text>
                 </View>
-                <Text style={[styles.profileText, { color }]}>Людмила</Text>
-              </View>
-
+              )}
               {/* Action button */}
               {/* <Pressable
                 style={[styles.cardButton, { backgroundColor: tintColor }]}
@@ -103,44 +119,48 @@ export default function MedicationCard() {
           </View>
 
           {/* Switch */}
-          <Switch
-            onValueChange={handleToggleSwitch}
-            value={toggleSwitch}
-            trackColor={{ false: bgTertiary, true: tintColor }}
-            thumbColor="#F7F7F7"
-          />
+          {hasSwitch && (
+            <Switch
+              onValueChange={handleToggleSwitch}
+              value={toggleSwitch}
+              trackColor={{ false: bgTertiary, true: tintColor }}
+              thumbColor="#F7F7F7"
+            />
+          )}
         </View>
       </View>
 
       {/* Badge */}
-      {/* <View style={[styles.badge, { backgroundColor: tintColor }]}> */}
-      {/* Upcoming  tintColor*/}
-      {/* <ClockIcon />
-        <Text style={styles.badgeText}>2ч 23м</Text> */}
+      {badge && (
+        <View style={[styles.badge, { backgroundColor: badgeBgColor }]}>
+          {/* Upcoming  tintColor*/}
+          {badge === "upcoming" && (
+            <>
+              <ClockIcon />
+              <Text style={styles.badgeText}>2ч 23м</Text>
+            </>
+          )}
 
-      {/* Taken #009E00 */}
-      {/* <Text style={styles.badgeText}>Принятые</Text> */}
+          {/* Taken #009E00 */}
+          {badge === "taken" && <Text style={styles.badgeText}>Принятые</Text>}
 
-      {/* Missed #DC0000 */}
-      {/* <Text style={styles.badgeText}>Пропущенно</Text> */}
-      {/* </View> */}
+          {/* Missed #DC0000 */}
+          {badge === "missed" && <Text style={styles.badgeText}>Пропущенно</Text>}
+        </View>
+      )}
 
       {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressHeader}>
-          <Text style={[styles.progressTextValue, { color: mutedColor }]}>
-            25 из 60 принято
-          </Text>
-          <Text style={[styles.progressTextValue, { color: tintColor }]}>
-            42%
-          </Text>
+      {showProgress && (
+        <View style={styles.progressContainer}>
+          <View style={styles.progressHeader}>
+            <Text style={[styles.progressTextValue, { color: mutedColor }]}>25 из 60 принято</Text>
+            <Text style={[styles.progressTextValue, { color: tintColor }]}>42%</Text>
+          </View>
+          <View style={[styles.progressPipe, { backgroundColor: bgTertiary }]}>
+            <View style={[styles.progressActivePipe, { backgroundColor: tintColor }]} />
+          </View>
         </View>
-        <View style={[styles.progressPipe, { backgroundColor: bgTertiary }]}>
-          <View
-            style={[styles.progressActivePipe, { backgroundColor: tintColor }]}
-          />
-        </View>
-      </View>
+      )}
     </View>
   );
 }
@@ -191,6 +211,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 14,
     lineHeight: 16.2,
+    textTransform: "lowercase",
   },
   medicationSchedule: {
     flexDirection: "row",

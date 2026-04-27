@@ -1,11 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const TAB_WIDTH = 110;
 const TAB_SPACE = 8;
@@ -38,24 +34,12 @@ export default function Tabs({ tabs, onTabChange }: TabsProps) {
   return (
     <View style={[styles.tabs, { backgroundColor: bgSecondary }]}>
       {tabs.map((tab, i) => (
-        <Pressable
-          key={tab.value}
-          style={[styles.tab]}
-          onPress={() => handlePress(tab.value, i)}
-        >
+        <Pressable key={tab.value} style={[styles.tab]} onPress={() => handlePress(tab.value, i)}>
           <Text style={[styles.tabLabel, { color }]}>{tab.label}</Text>
         </Pressable>
       ))}
-      <Animated.View
-        style={[
-          styles.tabIndicator,
-          animatedStyles,
-          { backgroundColor: tintColor },
-        ]}
-      >
-        <Text style={[styles.tabLabel, { color: "#F7F7F7" }]}>
-          {activeLabel}
-        </Text>
+      <Animated.View style={[styles.tabIndicator, animatedStyles, { backgroundColor: tintColor }]}>
+        <Text style={[styles.tabLabel, { color: "#F7F7F7" }]}>{activeLabel}</Text>
       </Animated.View>
     </View>
   );

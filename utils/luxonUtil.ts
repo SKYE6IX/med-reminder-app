@@ -11,9 +11,14 @@ export const getDateLocalString = (date: Date = new Date()) => {
 };
 
 export const toLocalTime = (date: Date) => {
-  return DateTime.fromJSDate(date, { zone: "utc" })
+  return DateTime.fromJSDate(date)
+    .toUTC()
     .setZone(getTimeZone(), { keepLocalTime: true })
-    .toJSDate();
+    .toJSDate()
+    .toLocaleTimeString("ru", {
+      formatMatcher: "best fit",
+      timeStyle: "short",
+    });
 };
 
 export const formatRegularDate = (isoDate: string) => {

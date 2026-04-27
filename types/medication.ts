@@ -57,9 +57,27 @@ export interface MedicationResponse {
   id: string;
   medicationName: string;
   medicationUnit: MedicationUnit;
+  medicationImageUrl: string;
   status: string;
   note: string | null;
   createdAt: string;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
+}
+
+export interface MedicationScheduleResponse {
+  id: string;
+  status: string;
+  medicationName: string;
+  medicationImageUrl: string;
+  dosage: number;
+  measurement: DosageMeasurement;
+  scheduleAt: string;
+  profile: {
+    id: string;
+    name: string;
+    relation: Relation;
+    isSelf: boolean;
+  };
+  takenAt: string | null;
 }

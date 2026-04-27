@@ -1,9 +1,17 @@
+import PlusIcon from "@/component/icons/plus-icon";
+import CustomButton from "@/component/ui/custom-button/custom-button";
+import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { mockMedicationsSchedule } from "@/mock-data";
+import { MedicationScheduleResponse, ProfileResponse } from "@/types/medication";
 import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+type TABS_VALUE = "ALL" | "TAKEN" | "MISSED";
 
 const TABS = [
   { label: "Все", value: "ALL" },
@@ -12,9 +20,38 @@ const TABS = [
 ];
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
+
+  const insets = useSafeAreaInsets();
+
+  // Themes
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
+  const getFilterMedicationSchedule = () => {
+    const filterList = mockMedicationsSchedule.filter((med) => med.status === activeTab);
+    if (filterList.length > 1) {
+      return filterList;
+    }
+    return mockMedicationsSchedule;
+  };
+
+  const getScheduleBadge = (
+    medicationSchedule: MedicationScheduleResponse,
+  ): "upcoming" | "taken" | "missed" => {
+    if (medicationSchedule.status === "TAKEN") {
+      return "taken";
+    } else if (medicationSchedule.status === "MISSED") {
+      return "missed";
+    } else {
+      return "upcoming";
+    }
+  };
+
+  const handleOnTabChange = (tab: TABS_VALUE) => {
+    setActiveTab(tab);
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
@@ -31,31 +68,54 @@ export default function Home() {
           <Text style={[styles.headerProfileName, { color }]}>Людмила</Text>
         </View>
 
-        <WeekView />
-
-        <View style={styles.medicationScheduleContainer}>
-          <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
-          <Tabs tabs={TABS} onTabChange={() => {}} />
-          {/* <MedicationCard /> */}
+        <View style={styles.calederWrapper}>
+          <WeekView />
         </View>
 
-        {/* <View style={styles.noContentWrapper}>
-          <Image
-            source={require("@/assets/images/pill-bottle.png")}
-            style={styles.noContentImage}
+        <View style={{ flex: 1 }}>
+          <View style={styles.tabsWrapper}>
+            <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
+            <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+          </View>
+          <FlatList
+            style={{ flex: 1 }}
+            data={getFilterMedicationSchedule()}
+            renderItem={({ item }) => (
+              <MedicationCard
+                imageUrl={item.medicationImageUrl}
+                name={item.medicationName}
+                profile={item.profile as ProfileResponse}
+                onButtonPress={() => {}}
+                badge={getScheduleBadge(item)}
+                dosage={item.dosage}
+                dosageUnit={item.measurement}
+                scheduleTime={item.scheduleAt}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.listContentContainer,
+              { paddingBottom: insets.bottom + 10 },
+            ]}
           />
-          <Text style={[styles.noContentTitle, { color }]}>
-            На этот день лекарства не запланированы
-          </Text>
-          <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-            Если вы ещё не добавили лекарство, сделайте это сейчас.
-          </Text>
+        </View>
 
-          <CustomButton
-            label="Добавить лекарства"
-            svgIcon={<PlusIcon size={15} />}
-          />
-        </View> */}
+        {getFilterMedicationSchedule().length < 1 && (
+          <View style={styles.noContentWrapper}>
+            <Image
+              source={require("@/assets/images/pill-bottle.png")}
+              style={styles.noContentImage}
+            />
+            <Text style={[styles.noContentTitle, { color }]}>
+              На этот день лекарства не запланированы
+            </Text>
+            <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
+              Если вы ещё не добавили лекарство, сделайте это сейчас.
+            </Text>
+
+            <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -67,8 +127,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingLeft: 20,
-    paddingRight: 20,
     gap: 32,
   },
   header: {
@@ -76,6 +134,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   headerProfileContainer: {
     width: 45,
@@ -92,10 +152,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
   },
+  calederWrapper: {
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
   noContentWrapper: {
     flex: 1,
     gap: 20,
     alignItems: "center",
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   noContentImage: {
     width: 160,
@@ -115,12 +181,21 @@ const styles = StyleSheet.create({
     lineHeight: 16.2,
     textAlign: "center",
   },
-  medicationScheduleContainer: {
-    gap: 24,
+  tabsWrapper: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    gap: 16,
   },
   medicationScheduleTitle: {
     fontFamily: "Roboto_400Regular",
     fontSize: 18,
     lineHeight: 22,
+  },
+  listContentContainer: {
+    paddingTop: 16,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 16,
+    gap: 16,
   },
 });

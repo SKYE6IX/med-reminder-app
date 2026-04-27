@@ -10,9 +10,7 @@ export default function WeekView() {
 
   const [currentDate, setCurrentDate] = useState(now);
   //   Default to today
-  const [selectedISODate, setSelectedISODate] = useState(
-    now.setLocale("ru").toISODate(),
-  );
+  const [selectedISODate, setSelectedISODate] = useState(now.setLocale("ru").toISODate());
 
   const week = useMemo(() => getWeekDays(currentDate), [currentDate]);
 
@@ -33,9 +31,7 @@ export default function WeekView() {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color }]}>
-        {formatHomeScreenDate(selectedISODate)}
-      </Text>
+      <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
       <View style={styles.weekContainer}>
         <Pressable style={styles.weekController} onPress={goPrevWeek}>
           <ArrowLeft size={30} color={color} />
@@ -53,20 +49,10 @@ export default function WeekView() {
                 ]}
                 onPress={() => handleSetISODate(w.iso)}
               >
-                <Text
-                  style={[
-                    styles.weekText,
-                    { color: isActive ? tintColor : color },
-                  ]}
-                >
+                <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
                   {w.day}
                 </Text>
-                <Text
-                  style={[
-                    styles.weekText,
-                    { color: isActive ? tintColor : color },
-                  ]}
-                >
+                <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
                   {w.date}
                 </Text>
               </Pressable>

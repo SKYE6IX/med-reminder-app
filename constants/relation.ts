@@ -1,6 +1,17 @@
-type RelationItem = { label: string; value: string };
+export type Relation =
+  | "FATHER"
+  | "MOTHER"
+  | "SON"
+  | "DAUGHTER"
+  | "BROTHER"
+  | "SISTER"
+  | "WIFE"
+  | "HUSBAND"
+  | "SELF";
 
-export const RELATION_LIST = [
+type RelationItem = { label: string; value: Relation };
+
+export const RELATION_LIST: RelationItem[] = [
   { label: "Отец", value: "FATHER" },
   { label: "Мать", value: "MOTHER" },
   { label: "Сын", value: "SON" },
@@ -9,6 +20,4 @@ export const RELATION_LIST = [
   { label: "Сестра", value: "SISTER" },
   { label: "Жена", value: "WIFE" },
   { label: "Муж", value: "HUSBAND" },
-] as const satisfies RelationItem[];
-
-export type Relation = (typeof RELATION_LIST)[number]["value"];
+];
