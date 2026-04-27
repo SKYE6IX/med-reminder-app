@@ -9,11 +9,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/roboto";
 import { PortalProvider } from "@gorhom/portal";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -93,10 +89,7 @@ export default function RootLayout() {
             </Stack.Protected>
 
             <Stack.Protected guard={!hasCompleteOnboarding}>
-              <Stack.Screen
-                name="onboarding"
-                options={{ headerShown: false }}
-              />
+              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
             </Stack.Protected>
 
             <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
