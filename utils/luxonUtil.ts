@@ -1,5 +1,7 @@
 import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
+// To use Later DateTime.now().toFormat("HH 'hours and' mm 'minutes'")
+
 export const getTimeZone = () => DateTime.now().zoneName;
 
 export const getDateLocalString = (date: Date = new Date()) => {
@@ -36,6 +38,7 @@ export const formatRegularDate = (isoDate: string) => {
   if (date.hasSame(tomorrow, "day")) {
     return "Завтра";
   }
+
   return date.toFormat("MMMM d", { locale: "ru" });
 };
 

@@ -169,7 +169,7 @@ export default function DetailsStepScreen() {
         style={sharedStyles.button}
         variant={canContinue ? "filled" : "disabled"}
         textVaraint={canContinue ? "regularText" : "mutedText"}
-        onPress={() => router.navigate("/(tabs)/add-pill/schedule-step")}
+        onPress={() => router.navigate("/(tabs)/add-medication/schedule-step")}
         disabled={!canContinue}
       />
     </View>

@@ -6,7 +6,7 @@ import Loader from "@/component/ui/loader";
 import { useMutation } from "@/hooks/use-mutation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
-import { CreateMedication, MedicationResponse } from "@/types/medication";
+import { CreateMedication, MedicationProfileResponse } from "@/types/medication";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, StyleSheet, Switch, Text, TextInput, View } from "react-native";
@@ -163,7 +163,7 @@ export default function FinalStepScreen() {
   }));
 
   // Create a new medication
-  const [createMedication, { loading }] = useMutation<MedicationResponse, CreateMedication>({
+  const [createMedication, { loading }] = useMutation<MedicationProfileResponse, CreateMedication>({
     url: "medications",
     method: "post",
     onSuccess(data, variables) {

@@ -83,9 +83,9 @@ export default function RootLayout() {
           <StatusBar style="auto" />
           <FeedbackAlert />
 
-          <Stack screenOptions={{ headerShown: false }}>
+          <Stack>
             <Stack.Protected guard={isAuthenticated}>
-              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack.Protected>
 
             <Stack.Protected guard={!hasCompleteOnboarding}>
@@ -101,3 +101,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+//  <Stack.Screen options={{ headerShown: true, title: "Home" }} />;

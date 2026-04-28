@@ -2,10 +2,9 @@ import ClockIcon from "@/component/icons/clock-icon";
 import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { DosageMeasurement, ProfileResponse } from "@/types/medication";
-import { toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 type MedicationCardProps = {
   imageUrl: string;
@@ -19,8 +18,10 @@ type MedicationCardProps = {
   hasSwitch?: boolean;
   showProgress?: boolean;
   startedDate?: string;
-  onButtonPress: () => void;
-  onSwitchToggle?: () => void;
+  isActive?: boolean;
+  onButtonPress?: () => void;
+  onSwitchToggle?: (status: "active" | "inactive") => void;
+  onNavigate?: () => void;
 };
 
 export default function MedicationCard({
@@ -35,10 +36,12 @@ export default function MedicationCard({
   hasSwitch,
   showProgress,
   startedDate,
+  isActive,
   onButtonPress,
   onSwitchToggle,
+  onNavigate,
 }: MedicationCardProps) {
-  const [toggleSwitch, setToggleSwitch] = useState(false);
+  const [toggleSwitch, setToggleSwitch] = useState(isActive);
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -48,16 +51,21 @@ export default function MedicationCard({
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
 
   const handleToggleSwitch = () => {
-    setToggleSwitch(!toggleSwitch);
+    const isToggle = !toggleSwitch;
+
+    if (isToggle && onSwitchToggle) {
+      onSwitchToggle("active");
+    } else if (!isToggle && onSwitchToggle) {
+      onSwitchToggle("inactive");
+    }
+
+    setToggleSwitch(isToggle);
   };
 
   const getDosage = () => {
     const label = DOSAGE_UNITS.find((unit) => unit.value === dosageUnit)?.label;
     return `${dosage + " " + label}`;
   };
-
-  const date = new Date(scheduleTime ?? 0);
-  const scheduleAt = toLocalTime(date);
 
   const badgeBgColor = badge === "taken" ? "#009E00" : badge === "missed" ? "#DC0000" : tintColor;
 
@@ -73,11 +81,11 @@ export default function MedicationCard({
             contentPosition="top center"
           />
         </View>
-        {/* Метформин */}
+
         {/* Content Wrapper */}
         <View style={styles.cardContentContainer}>
           {/* Inner wrapper */}
-          <View style={styles.cardContentInner}>
+          <Pressable style={styles.cardContentInner} onPress={onNavigate}>
             <Text style={[styles.medicationName, { color }]}>{name}</Text>
 
             {/* Dosage */}
@@ -86,7 +94,7 @@ export default function MedicationCard({
             {/* Schedule */}
             {scheduleTime && (
               <View style={styles.medicationSchedule}>
-                <Text style={[styles.medicationScheduleText, { color }]}>{scheduleAt}</Text>
+                <Text style={[styles.medicationScheduleText, { color }]}>{scheduleTime}</Text>
                 <View style={[styles.medicationScheduleDivider, { backgroundColor: mutedColor }]} />
                 <Text style={[styles.medicationScheduleText, { color }]}>Ежедневно</Text>
               </View>
@@ -94,7 +102,7 @@ export default function MedicationCard({
 
             {/* Starting date */}
             {startedDate && (
-              <Text style={[styles.medicationStartDate, { color }]}>Начало 25 июля</Text>
+              <Text style={[styles.medicationStartDate, { color }]}>Начало {startedDate}</Text>
             )}
 
             <View style={styles.cardContentWrapperBottom}>
@@ -116,7 +124,7 @@ export default function MedicationCard({
                 <Text style={styles.cardButtonText}>Принять</Text>
               </Pressable> */}
             </View>
-          </View>
+          </Pressable>
 
           {/* Switch */}
           {hasSwitch && (

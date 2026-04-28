@@ -170,7 +170,7 @@ export default function ScheduleStepScreen() {
           style={sharedStyles.button}
           variant="filled"
           textVaraint="regularText"
-          onPress={() => router.navigate("/(tabs)/add-pill/final-step")}
+          onPress={() => router.navigate("/(tabs)/add-medication/final-step")}
         />
       </ScrollView>
     </View>

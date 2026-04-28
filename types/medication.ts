@@ -22,6 +22,7 @@ interface MedicationPack {
   totalQuantity: number;
   notifyRule: string;
 }
+
 interface ScheduleCreation {
   dosage: number;
   recurrenceRule: string;
@@ -52,8 +53,7 @@ export interface ProfileResponse {
   relation: Relation;
   isSelf: boolean;
 }
-
-export interface MedicationResponse {
+export interface MedicationProfileResponse {
   id: string;
   medicationName: string;
   medicationUnit: MedicationUnit;

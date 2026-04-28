@@ -22,6 +22,7 @@ export default function WeekView() {
     setCurrentDate((prev) => prev.minus({ weeks: 1 }));
   };
 
+  // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
 

@@ -6,6 +6,7 @@ import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { mockMedicationsSchedule } from "@/mock-data";
 import { MedicationScheduleResponse, ProfileResponse } from "@/types/medication";
+import { toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -53,6 +54,11 @@ export default function Home() {
     setActiveTab(tab);
   };
 
+  const getScheduleTime = (scheduleTime: string) => {
+    const date = new Date(scheduleTime);
+    return toLocalTime(date);
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <View style={styles.container}>
@@ -72,35 +78,35 @@ export default function Home() {
           <WeekView />
         </View>
 
-        <View style={{ flex: 1 }}>
-          <View style={styles.tabsWrapper}>
-            <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
-            <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+        {getFilterMedicationSchedule().length > 1 ? (
+          <View style={{ flex: 1 }}>
+            <View style={styles.tabsWrapper}>
+              <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
+              <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+            </View>
+            <FlatList
+              style={{ flex: 1 }}
+              data={getFilterMedicationSchedule()}
+              renderItem={({ item }) => (
+                <MedicationCard
+                  imageUrl={item.medicationImageUrl}
+                  name={item.medicationName}
+                  profile={item.profile as ProfileResponse}
+                  onButtonPress={() => {}}
+                  badge={getScheduleBadge(item)}
+                  dosage={item.dosage}
+                  dosageUnit={item.measurement}
+                  scheduleTime={getScheduleTime(item.scheduleAt)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={[
+                styles.listContentContainer,
+                { paddingBottom: insets.bottom + 10 },
+              ]}
+            />
           </View>
-          <FlatList
-            style={{ flex: 1 }}
-            data={getFilterMedicationSchedule()}
-            renderItem={({ item }) => (
-              <MedicationCard
-                imageUrl={item.medicationImageUrl}
-                name={item.medicationName}
-                profile={item.profile as ProfileResponse}
-                onButtonPress={() => {}}
-                badge={getScheduleBadge(item)}
-                dosage={item.dosage}
-                dosageUnit={item.measurement}
-                scheduleTime={item.scheduleAt}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={[
-              styles.listContentContainer,
-              { paddingBottom: insets.bottom + 10 },
-            ]}
-          />
-        </View>
-
-        {getFilterMedicationSchedule().length < 1 && (
+        ) : (
           <View style={styles.noContentWrapper}>
             <Image
               source={require("@/assets/images/pill-bottle.png")}

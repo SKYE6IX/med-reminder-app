@@ -46,17 +46,17 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon sf="house.fill" md="home" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="pills">
+      <NativeTabs.Trigger name="medications">
         <NativeTabs.Trigger.Label>Лекарства</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="pill" md="pill" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="add-pill">
+      <NativeTabs.Trigger name="add-medication">
         <NativeTabs.Trigger.Label>Добавить</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="plus.app" md="add_box" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="refill-pill">
+      <NativeTabs.Trigger name="refill-medications">
         <NativeTabs.Trigger.Label>Запасы</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="plus.arrow.trianglehead.clockwise" md="refresh" />
       </NativeTabs.Trigger>
