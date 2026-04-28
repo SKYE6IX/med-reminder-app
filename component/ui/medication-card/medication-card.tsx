@@ -9,7 +9,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 type MedicationCardProps = {
   imageUrl: string;
   name: string;
-  profile: ProfileResponse;
+  profile?: ProfileResponse;
   dosage?: number;
   dosageUnit?: DosageMeasurement;
   scheduleTime?: string;
@@ -19,6 +19,7 @@ type MedicationCardProps = {
   showProgress?: boolean;
   startedDate?: string;
   isActive?: boolean;
+  actionButtonLabel?: string;
   onButtonPress?: () => void;
   onSwitchToggle?: (status: "active" | "inactive") => void;
   onNavigate?: () => void;
@@ -37,6 +38,7 @@ export default function MedicationCard({
   showProgress,
   startedDate,
   isActive,
+  actionButtonLabel,
   onButtonPress,
   onSwitchToggle,
   onNavigate,
@@ -107,22 +109,29 @@ export default function MedicationCard({
 
             <View style={styles.cardContentWrapperBottom}>
               {/* Profile, not shown for self owner */}
-              {!profile.isSelf && (
-                <View style={styles.profile}>
-                  <View style={[styles.profileImage]}>
-                    <Text style={[styles.profileImagePlaceholder, { color }]}>
-                      {profile.name.charAt(0)}
-                    </Text>
-                  </View>
-                  <Text style={[styles.profileText, { color }]}>{profile.name}</Text>
-                </View>
+              {profile && (
+                <>
+                  {!profile.isSelf && (
+                    <View style={styles.profile}>
+                      <View style={[styles.profileImage]}>
+                        <Text style={[styles.profileImagePlaceholder, { color }]}>
+                          {profile.name.charAt(0)}
+                        </Text>
+                      </View>
+                      <Text style={[styles.profileText, { color }]}>{profile.name}</Text>
+                    </View>
+                  )}
+                </>
               )}
               {/* Action button */}
-              {/* <Pressable
-                style={[styles.cardButton, { backgroundColor: tintColor }]}
-              >
-                <Text style={styles.cardButtonText}>Принять</Text>
-              </Pressable> */}
+              {actionButtonLabel && onButtonPress && (
+                <Pressable
+                  style={[styles.cardButton, { backgroundColor: tintColor }]}
+                  onPress={onButtonPress}
+                >
+                  <Text style={styles.cardButtonText}>{actionButtonLabel}</Text>
+                </Pressable>
+              )}
             </View>
           </Pressable>
 

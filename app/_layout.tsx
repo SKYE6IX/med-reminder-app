@@ -82,7 +82,6 @@ export default function RootLayout() {
         <PortalProvider>
           <StatusBar style="auto" />
           <FeedbackAlert />
-
           <Stack>
             <Stack.Protected guard={isAuthenticated}>
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
