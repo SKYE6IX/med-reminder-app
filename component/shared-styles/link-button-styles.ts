@@ -36,7 +36,9 @@ export function useLinkButtonStyles() {
     disabled: {
       backgroundColor: disabledBg,
     },
-    danger: {},
+    danger: {
+      backgroundColor: "#DC0000",
+    },
     regularText: {
       color: "#FFF",
     },

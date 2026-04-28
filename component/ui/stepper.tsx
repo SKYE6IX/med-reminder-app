@@ -1,9 +1,6 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { StyleSheet, View } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const WRAPPER_WIDTH = 230;
@@ -24,11 +21,7 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
     <View style={[styles.container, { top: insets.top }]}>
       <View style={styles.wrapper}>
         <Animated.View
-          style={[
-            styles.stepProgress,
-            { backgroundColor: tintColor },
-            animatedStyle,
-          ]}
+          style={[styles.stepProgress, { backgroundColor: tintColor }, animatedStyle]}
         />
         {Array.from({ length: STEP_LENGTH }).map((_, i) => (
           <View key={i} style={[styles.step]} />

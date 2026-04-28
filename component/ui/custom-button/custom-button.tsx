@@ -26,14 +26,13 @@ export default function CustomButton({
     <Pressable
       role="button"
       onPress={onPress}
+      // @ts-ignore the style showned type error
       style={[buttonStyles.base, buttonStyles[variant], style]}
       {...rest}
     >
       {logoSrc && <Image source={logoSrc} style={buttonStyles.logo} />}
       {svgIcon && svgIcon}
-      <Text style={[buttonStyles.text, buttonStyles[textVaraint]]}>
-        {label}
-      </Text>
+      <Text style={[buttonStyles.text, buttonStyles[textVaraint]]}>{label}</Text>
     </Pressable>
   );
 }

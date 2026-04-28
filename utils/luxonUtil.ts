@@ -14,10 +14,9 @@ export const getDateLocalString = (date: Date = new Date()) => {
 
 export const toLocalTime = (date: Date) => {
   return DateTime.fromJSDate(date)
-    .toUTC()
     .setZone(getTimeZone(), { keepLocalTime: true })
     .toJSDate()
-    .toLocaleTimeString("ru", {
+    .toLocaleTimeString("ru-RU", {
       formatMatcher: "best fit",
       timeStyle: "short",
     });

@@ -115,7 +115,12 @@ export const buildRRule = (customPattern: CustomPattern) => {
   return rule.toString().replace("RRULE:", "");
 };
 
-// DAILY
+export const getRuleText = (rrule: string) => {
+  const rule = RRule.fromString(rrule);
+
+  return rule.toText();
+};
+
 const populateOcurrencesTimes = (
   hoursBetweenOccurrences: number,
   occurrencesPerDay: number = 1,

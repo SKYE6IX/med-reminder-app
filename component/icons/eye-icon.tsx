@@ -6,11 +6,7 @@ type Props = {
   height?: number;
 };
 
-export default function EyeIcon({
-  color = "#353535",
-  width = 19,
-  height = 15,
-}: Props) {
+export default function EyeIcon({ color = "#353535", width = 19, height = 15 }: Props) {
   return (
     <Svg width={width} height={height} viewBox="0 0 20 16" fill="none">
       <Path

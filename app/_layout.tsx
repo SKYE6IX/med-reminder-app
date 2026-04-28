@@ -101,5 +101,3 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
-
-//  <Stack.Screen options={{ headerShown: true, title: "Home" }} />;
