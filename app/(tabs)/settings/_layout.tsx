@@ -30,6 +30,48 @@ export default function SettingsLayout() {
         <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Профиль</Stack.Screen.Title>
       </Stack.Screen>
+
+      <Stack.Screen name="relations">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Моя семья</Stack.Screen.Title>
+      </Stack.Screen>
+
+      <Stack.Screen name="notifications">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          Настройки уведомлений
+        </Stack.Screen.Title>
+      </Stack.Screen>
+
+      <Stack.Screen name="reminders">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          Настройки напоминаний
+        </Stack.Screen.Title>
+      </Stack.Screen>
+
+      <Stack.Screen name="security">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          Приватность и безопасность
+        </Stack.Screen.Title>
+      </Stack.Screen>
+
+      <Stack.Screen name="subscription">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Подписка</Stack.Screen.Title>
+      </Stack.Screen>
+
+      <Stack.Screen name="about">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>О нас</Stack.Screen.Title>
+      </Stack.Screen>
     </Stack>
   );
 }

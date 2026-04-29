@@ -31,7 +31,7 @@ export default function Profile() {
       style={[styles.safeArea, { backgroundColor: bgPrimary }]}
       edges={isIOS ? ["top", "bottom"] : ["top"]}
     >
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
         <View style={styles.header}>
           <View style={styles.avatarWrapper}>
             <Image source={avatarPlaceholder} style={styles.avatar} />

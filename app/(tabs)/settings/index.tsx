@@ -38,7 +38,7 @@ export default function Settings() {
           { paddingTop: !isIOS ? insets.top : undefined, paddingBottom: 10 },
         ]}
       >
-        {/* PROFILE SETTINGS */}
+        {/* PROFILE SETTINGS ✅ */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Профиль</Text>
           <SettingsCard
@@ -48,15 +48,17 @@ export default function Settings() {
             avatarUrl="url"
             onPress={() => router.navigate("/(tabs)/settings/profile")}
           />
+
           <SettingsCard
             title="Моя семья"
             description="Управление данными семьи"
             interaction="press"
             svgIcon={<PeopleGroupIcon color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/relations")}
           />
         </View>
 
-        {/* REMINDERS & ALARM SETTINGS */}
+        {/* NOTIFICATION & REMINDER SETTINGS ✅ */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Напоминания и оповещения</Text>
           <SettingsCard
@@ -64,16 +66,18 @@ export default function Settings() {
             description="Включите или выключите уведомления"
             interaction="press"
             svgIcon={<BellIcon color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/notifications")}
           />
           <SettingsCard
             title="Настройки напоминаний"
             description="Выберите звук для напоминаний о приёме лекарств"
             interaction="press"
             svgIcon={<SoundIcon color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/reminders")}
           />
         </View>
 
-        {/* GENERAL SETTINGS (Subscription) */}
+        {/* GENERAL SETTINGS (Subscription)  */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Общие</Text>
           <SettingsCard
@@ -81,21 +85,23 @@ export default function Settings() {
             description="Управление подпиской"
             interaction="press"
             svgIcon={<EyeIcon color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/subscription")}
           />
         </View>
 
-        {/* SECURITY SETTINGS */}
+        {/* SECURITY SETTINGS ✅*/}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Безопасность</Text>
           <SettingsCard
-            title="Конфиденциальность и безопасность"
+            title="Приватность и безопасность"
             description="Управляйте паролями и безопасностью приложения"
             interaction="press"
             svgIcon={<LockIcon color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/security")}
           />
         </View>
 
-        {/* ABOUT US */}
+        {/* ABOUT US ✅ */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>О нас</Text>
           <SettingsCard
@@ -103,9 +109,9 @@ export default function Settings() {
             description="Узнайте больше о приложении и его версии"
             interaction="press"
             svgIcon={<InfoCircle color={color} />}
+            onPress={() => router.navigate("/(tabs)/settings/about")}
           />
         </View>
-
         {/* SIGN OUT BUTTON */}
         <CustomButton label="Выйти" variant="danger" svgIcon={<LogoutIcon color="#F7F7F7" />} />
       </ScrollView>

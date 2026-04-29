@@ -78,8 +78,10 @@ export default function SettingsCard({
       <View style={[styles.container, { backgroundColor: bgSecondary, borderColor }]}>
         <View style={[styles.iconLeftWrapper, { backgroundColor: bgTertiary }]}>{svgIcon}</View>
         <View style={styles.textWrapper}>
-          <Text style={[styles.title, { color }]}>{title}</Text>
-          <Text style={[styles.description, { color: mutedColor }]}>{description}</Text>
+          <Text style={[styles.title, styles.titleWithSwitch, { color }]}>{title}</Text>
+          <Text style={[styles.description, styles.descriptionWithSwitch, { color: mutedColor }]}>
+            {description}
+          </Text>
         </View>
 
         <View style={styles.rightElement}>
@@ -152,5 +154,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 14,
     maxWidth: 230,
+  },
+  titleWithSwitch: {
+    maxWidth: 200,
+  },
+  descriptionWithSwitch: {
+    maxWidth: 210,
   },
 });
