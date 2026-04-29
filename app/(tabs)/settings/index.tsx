@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/stores/use-auth-store";
 import { clearTokens } from "@/utils/tokenUtils";
 import { useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import BellIcon from "@/component/icons/bell-icon";
@@ -16,6 +16,7 @@ import SettingsCard from "@/component/ui/settings-card/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function Settings() {
+  const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -34,7 +35,7 @@ export default function Settings() {
       <ScrollView
         contentContainerStyle={[
           styles.contentStyle,
-          { paddingTop: insets.top, paddingBottom: insets.bottom + 10 },
+          { paddingTop: !isIOS ? insets.top : undefined, paddingBottom: 10 },
         ]}
       >
         {/* PROFILE SETTINGS */}
