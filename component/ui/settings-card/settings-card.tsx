@@ -47,6 +47,7 @@ export default function SettingsCard({
       <Pressable
         style={[styles.container, { backgroundColor: bgSecondary, borderColor }]}
         disabled={disabled}
+        onPress={onPress}
       >
         {avatarUrl ? (
           <View style={styles.avatarWrapper}>

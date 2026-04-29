@@ -1,11 +1,5 @@
 import React, { useState, type RefObject } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-  type TextInputProps,
-} from "react-native";
+import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from "react-native";
 
 import CloseIcon from "@/component/icons/close-icon";
 import ExclamationCircleIcon from "@/component/icons/exclamation-circle-icon";
@@ -56,6 +50,7 @@ export default function FormInput({
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
   return (
     <View style={styles.container}>
       <ThemedText type="label">{label}</ThemedText>
@@ -74,7 +69,7 @@ export default function FormInput({
             inputRef?.current?.isFocused() ? styles.inputFocus : undefined,
             hasError ? styles.error : undefined,
           ]}
-          placeholderTextColor="#9E9E9E"
+          placeholderTextColor={mutedColor}
           secureTextEntry={type === "password" && !hidePassword}
           clearTextOnFocus={false}
           testID="form-test-input"
@@ -127,7 +122,7 @@ const styles = StyleSheet.create({
   input: {
     height: "100%",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     paddingLeft: 16,

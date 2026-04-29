@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/stores/use-auth-store";
 import { clearTokens } from "@/utils/tokenUtils";
+import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -13,7 +14,9 @@ import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import SettingsCard from "@/component/ui/settings-card/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
+
 export default function Settings() {
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const { setIsAuthenticated } = useAuthStore();
@@ -42,6 +45,7 @@ export default function Settings() {
             description="Посмотреть профиль"
             interaction="press"
             avatarUrl="url"
+            onPress={() => router.navigate("/(tabs)/settings/profile")}
           />
           <SettingsCard
             title="Моя семья"

@@ -44,14 +44,9 @@ export default function CustomPicker({
     >
       <View style={styles.customPickerHeader}>
         {svgIcon}
-        <Text style={[styles.customPickerLabel, { color: textColor }]}>
-          {label}
-        </Text>
+        <Text style={[styles.customPickerLabel, { color: textColor }]}>{label}</Text>
         <Pressable
-          style={[
-            styles.customPickerPressable,
-            { backgroundColor: bGColorTertiary },
-          ]}
+          style={[styles.customPickerPressable, { backgroundColor: bGColorTertiary }]}
           onPress={triggerSelection}
           role="button"
         >
@@ -84,11 +79,7 @@ export default function CustomPicker({
           }}
         >
           {items.map((item) => (
-            <PickerIOS.Item
-              key={item.value}
-              label={item.label}
-              value={item.value}
-            />
+            <PickerIOS.Item key={item.value} label={item.label} value={item.value} />
           ))}
         </PickerIOS>
       </Animated.View>

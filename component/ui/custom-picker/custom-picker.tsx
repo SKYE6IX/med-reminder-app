@@ -70,7 +70,6 @@ export default function CustomPicker({
           </Text>
         </Pressable>
       </View>
-
       <Picker
         testID="picker"
         ref={pickerRef}
