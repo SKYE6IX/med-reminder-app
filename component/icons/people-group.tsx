@@ -6,11 +6,7 @@ type Props = {
   height?: number;
 };
 
-export default function PeopleGroupIcon({
-  color = "#353535",
-  width = 22,
-  height = 20,
-}: Props) {
+export default function PeopleGroupIcon({ color = "#353535", width = 22, height = 20 }: Props) {
   return (
     <Svg width={width} height={height} viewBox="0 0 22 20" fill="none">
       <Path
@@ -20,5 +16,3 @@ export default function PeopleGroupIcon({
     </Svg>
   );
 }
-
-//     style="fill:#353535;fill:color(display-p3 0.2078 0.2078 0.2078);fill-opacity:1;"
