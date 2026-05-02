@@ -59,7 +59,7 @@ export default function RootLayout() {
         setIsReady(true);
       }
     } catch (error) {
-      console.error(error);
+      console.log("An error occur when checking auth or fetching user -> ", error);
       setIsReady(true);
     }
   };

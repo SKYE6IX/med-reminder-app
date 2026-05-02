@@ -68,52 +68,54 @@ export default function Medications() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <Loader visible={loading} />
-      <Text style={[styles.headerTitle, { color }]}>Мои лекарства</Text>
-
-      {hasMedicationsProfiles ? (
+      {!loading && (
         <>
-          <View style={styles.tabWrapper}>
-            <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
-          </View>
-          {!loading && (
-            <FlatList
-              style={{ flex: 1 }}
-              data={getFilterMedicationsProfile()}
-              renderItem={({ item }) => (
-                <MedicationCard
-                  imageUrl={item.medicationImageUrl}
-                  name={item.medicationName}
-                  profile={item.profile as ProfileResponse}
-                  dosage={item.schedule.dosage}
-                  dosageUnit={getDosageUnit(item.schedule.measurement)}
-                  hasSwitch
-                  showProgress
-                  startedDate={getStartedDate(item.schedule.startDate)}
-                  isActive={item.status.toUpperCase() === "ACTIVE"}
-                  onSwitchToggle={handleOnSwitchToggle}
-                  onNavigate={() => router.navigate(`/medications/${item.id}`)}
+          {hasMedicationsProfiles ? (
+            <View style={[styles.contentWrapper, { paddingTop: insets.top }]}>
+              <View style={styles.tabWrapper}>
+                <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+              </View>
+              {!loading && (
+                <FlatList
+                  style={{ flex: 1 }}
+                  data={getFilterMedicationsProfile()}
+                  renderItem={({ item }) => (
+                    <MedicationCard
+                      imageUrl={item.medicationImageUrl}
+                      name={item.medicationName}
+                      profile={item.profile as ProfileResponse}
+                      dosage={item.schedule.dosage}
+                      dosageUnit={getDosageUnit(item.schedule.measurement)}
+                      hasSwitch
+                      showProgress
+                      startedDate={getStartedDate(item.schedule.startDate)}
+                      isActive={item.status.toUpperCase() === "ACTIVE"}
+                      onSwitchToggle={handleOnSwitchToggle}
+                      onNavigate={() => router.navigate(`/medications/${item.id}`)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={[
+                    styles.listContentContainer,
+                    { paddingBottom: insets.bottom + 10 },
+                  ]}
                 />
               )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={[
-                styles.listContentContainer,
-                { paddingBottom: insets.bottom + 10 },
-              ]}
-            />
+            </View>
+          ) : (
+            <View style={[styles.noContentWrapper, { paddingBottom: insets.bottom + 10 }]}>
+              <Image
+                source={require("@/assets/images/pill-bottle.png")}
+                style={styles.noContentImage}
+              />
+              <Text style={[styles.noContentTitle, { color }]}>У тебя нет никаких лекарств.</Text>
+              <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
+                Теперь добавьте новое лекарство.
+              </Text>
+              <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
+            </View>
           )}
         </>
-      ) : (
-        <View style={[styles.noContentWrapper, { paddingBottom: insets.bottom + 10 }]}>
-          <Image
-            source={require("@/assets/images/pill-bottle.png")}
-            style={styles.noContentImage}
-          />
-          <Text style={[styles.noContentTitle, { color }]}>У тебя нет никаких лекарств.</Text>
-          <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-            Теперь добавьте новое лекарство.
-          </Text>
-          <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
-        </View>
       )}
     </SafeAreaView>
   );
@@ -121,6 +123,9 @@ export default function Medications() {
 
 const styles = StyleSheet.create({
   safeArea: {
+    flex: 1,
+  },
+  contentWrapper: {
     flex: 1,
   },
   headerTitle: {

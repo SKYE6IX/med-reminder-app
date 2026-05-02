@@ -7,26 +7,36 @@ import NoteIcon from "@/component/icons/note-icon";
 import PillFilledIcon from "@/component/icons/pill-filled-icon";
 import PillIcon from "@/component/icons/pill-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
 import { DOSAGE_UNITS } from "@/constants/schedule-options";
+import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { mockMedications } from "@/mock-data";
-import { ProfileResponse } from "@/types/medication";
+import { MedicationProfileResponse } from "@/types/medication";
+import { ProfileResponse } from "@/types/user";
 import { formatRegularDate, getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
-import { getRuleText } from "@/utils/rruleUtils";
+import { useLocalSearchParams } from "expo-router";
+import { useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MedicationDetails() {
   const insets = useSafeAreaInsets();
+  const { medicationProfileId } = useLocalSearchParams();
+
+  const pathVariable = useMemo(() => medicationProfileId, [medicationProfileId]);
+
+  const {
+    data: medicationProfile,
+    loading,
+    error,
+  } = useQuery<MedicationProfileResponse>({ url: `medications/${pathVariable}` });
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
-
-  const medicationProfile = mockMedications[4];
 
   const handleOnSwitchToggle = (status: "active" | "inactive") => {
     // Perform operation to update the active status of the
@@ -39,154 +49,154 @@ export default function MedicationDetails() {
     const convertedString = getDateLocalString(date).replaceAll(".", " ");
     return formatRegularDate(convertedString);
   };
-
   const getStartTime = (startTime: string) => {
     const date = new Date(startTime);
     return toLocalTime(date);
   };
-
-  const getDosage = () => {
-    const label = DOSAGE_UNITS.find(
-      (unit) => unit.value === medicationProfile.schedule.measurement,
-    )?.label;
-    return `${medicationProfile.schedule.dosage + " " + label}`;
+  const getDosageUnit = (value: string) => {
+    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
+    return label;
   };
 
-  const rruleText = getRuleText(medicationProfile.schedule.recurrenceRule);
+  // const rruleText = getRuleText(medicationProfile.schedule.recurrenceRule);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+      <Loader visible={loading} />
       <ScrollView
-        contentContainerStyle={[styles.scrollContent]}
-        contentInset={{ top: -(insets.top - 10) }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: insets.top, paddingBottom: insets.bottom + 10 },
+        ]}
       >
-        <Text style={[styles.headerTitle, { color }]}>Информация о лекарстве</Text>
-        <View style={styles.contentContainer}>
-          <MedicationCard
-            imageUrl=""
-            name={medicationProfile.medicationName}
-            profile={medicationProfile.profile as ProfileResponse}
-            hasSwitch
-            isActive={medicationProfile.status.toUpperCase() === "ACTIVE"}
-            onSwitchToggle={handleOnSwitchToggle}
-          />
+        {medicationProfile && (
+          <View style={styles.contentContainer}>
+            <MedicationCard
+              imageUrl=""
+              name={medicationProfile.medicationName}
+              profile={medicationProfile.profile as ProfileResponse}
+              hasSwitch
+              isActive={medicationProfile.status.toUpperCase() === "ACTIVE"}
+              onSwitchToggle={handleOnSwitchToggle}
+            />
 
-          {/* Details Wrapper */}
-          <View style={styles.detailsContainer}>
-            {/* Schedule Information Wrapper */}
-            <View style={styles.detailsWrapper}>
-              <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
-              {/* GROUP */}
-              <View style={styles.detailsGroup}>
-                {/* DATE STARTED */}
-                <View
-                  style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                >
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+            {/* Details Wrapper */}
+            <View style={styles.detailsContainer}>
+              {/* Schedule Information Wrapper */}
+              <View style={styles.detailsWrapper}>
+                <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
+                {/* GROUP */}
+                <View style={styles.detailsGroup}>
+                  {/* DATE STARTED */}
+                  <View
+                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
+                  >
+                    <View style={styles.cardHeader}>
+                      <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+                    </View>
+                    <View style={styles.cardBody}>
+                      <CalenderIcon color={color} />
+                      <Text style={[styles.cardTextContent, { color }]}>
+                        {getStartedDate(medicationProfile.schedule.startDate)}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.cardBody}>
-                    <CalenderIcon color={color} />
-                    <Text style={[styles.cardTextContent, { color }]}>
-                      {getStartedDate(medicationProfile.schedule.startDate)}
-                    </Text>
-                  </View>
+
+                  {/* TIME STARTED */}
+                  <Pressable
+                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
+                  >
+                    <View style={styles.cardHeader}>
+                      <Text style={[styles.cardTitle, { color }]}>Время начала</Text>
+                      <ArrowRight color={color} />
+                    </View>
+                    <View style={styles.cardBody}>
+                      <ClockIcon color={color} />
+                      <Text style={[styles.cardTextContent, { color }]}>
+                        {getStartTime(medicationProfile.schedule.starTime)}
+                      </Text>
+                    </View>
+                  </Pressable>
                 </View>
 
-                {/* TIME STARTED */}
-                <Pressable
-                  style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                >
+                {/* FREQUENCY RRULES */}
+                <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
                   <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Время начала</Text>
+                    <Text style={[styles.cardTitle, { color }]}>Частота приема</Text>
                     <ArrowRight color={color} />
                   </View>
                   <View style={styles.cardBody}>
-                    <ClockIcon color={color} />
+                    <AlarmClockIcon color={color} />
                     <Text style={[styles.cardTextContent, { color }]}>
-                      {getStartTime(medicationProfile.schedule.starTime)}
+                      Каждые 6 часов, 3 раза в день
                     </Text>
                   </View>
                 </Pressable>
               </View>
 
-              {/* FREQUENCY RRULES */}
-              <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={[styles.cardTitle, { color }]}>Частота приема</Text>
-                  <ArrowRight color={color} />
-                </View>
-                <View style={styles.cardBody}>
-                  <AlarmClockIcon color={color} />
-                  <Text style={[styles.cardTextContent, { color }]}>
-                    Каждые 6 часов, 3 раза в день
-                  </Text>
-                </View>
-              </Pressable>
-            </View>
+              {/* Dosage Information */}
+              <View style={styles.detailsWrapper}>
+                <Text style={[styles.detailsTitle, { color }]}>Дозировка</Text>
 
-            {/* Dosage Information */}
-            <View style={styles.detailsWrapper}>
-              <Text style={[styles.detailsTitle, { color }]}>Дозировка</Text>
+                <View style={styles.detailsGroup}>
+                  {/* DOSAGE AMOUNT */}
+                  <Pressable
+                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
+                  >
+                    <View style={styles.cardHeader}>
+                      <Text style={[styles.cardTitle, { color }]}>Доза за прием</Text>
+                      <ArrowRight color={color} />
+                    </View>
+                    <View style={styles.cardBody}>
+                      <PillIcon color={color} size={16} />
+                      <Text style={[styles.cardTextContent, { color }]}>
+                        {`${medicationProfile.schedule.dosage} ${getDosageUnit(medicationProfile.schedule.measurement)}`}
+                      </Text>
+                    </View>
+                  </Pressable>
 
-              <View style={styles.detailsGroup}>
-                {/* DOSAGE AMOUNT */}
-                <Pressable
-                  style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                >
+                  {/* STOCK DOSAGE AMOUNT */}
+                  <View
+                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
+                  >
+                    <View style={styles.cardHeader}>
+                      <Text style={[styles.cardTitle, { color }]}>Запас</Text>
+                    </View>
+                    <View style={styles.cardBody}>
+                      <LineChartIcon color={color} />
+                      <Text style={[styles.cardTextContent, { color }]}>30 таблеток</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* NOTE ABOUT DOSAGE USAGE */}
+                <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
                   <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Доза за прием</Text>
+                    <Text style={[styles.cardTitle, { color }]}>Заметки</Text>
                     <ArrowRight color={color} />
                   </View>
                   <View style={styles.cardBody}>
-                    <PillIcon color={color} size={16} />
-                    <Text style={[styles.cardTextContent, { color }]}>
-                      {getDosage().toLowerCase()}
+                    <NoteIcon color={color} />
+                    <Text style={[styles.cardTextContent, { color: mutedColor }]}>
+                      {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
                     </Text>
                   </View>
                 </Pressable>
 
-                {/* STOCK DOAGE AMOUNT */}
-                <View
-                  style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                >
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Запас</Text>
-                  </View>
-                  <View style={styles.cardBody}>
-                    <LineChartIcon color={color} />
-                    <Text style={[styles.cardTextContent, { color }]}>30 таблеток</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* NOTE ABOUT DOSAGE USAGE */}
-              <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
-                <View style={styles.cardHeader}>
-                  <Text style={[styles.cardTitle, { color }]}>Заметки</Text>
-                  <ArrowRight color={color} />
-                </View>
-                <View style={styles.cardBody}>
-                  <NoteIcon color={color} />
+                {/* TOTAL DOSAGE TAKEN INFO */}
+                <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
+                  <PillFilledIcon color={color} />
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
-                    {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
+                    20 таблеток принято
                   </Text>
                 </View>
-              </Pressable>
-
-              {/* TOTAL DOSAGE TAKEN INFO */}
-              <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
-                <PillFilledIcon color={color} />
-                <Text style={[styles.cardTextContent, { color: mutedColor }]}>
-                  20 таблеток принято
-                </Text>
               </View>
             </View>
-          </View>
 
-          {/* DELETE PILL BUTTON */}
-          <CustomButton label="Удалить лекарство" variant="danger" />
-        </View>
+            {/* DELETE PILL BUTTON */}
+            <CustomButton label="Удалить лекарство" variant="danger" />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -199,7 +209,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingLeft: 20,
     paddingRight: 20,
-    paddingBottom: 10,
     gap: 32,
   },
   headerTitle: {
