@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface UseQueryOptions {
   url: string;
-  params: any;
+  params?: any;
 }
 
 type UseQueryReturn<TData, TError> = {

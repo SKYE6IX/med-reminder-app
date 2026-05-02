@@ -1,10 +1,13 @@
 import PlusIcon from "@/component/icons/plus-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
+import { DOSAGE_UNITS } from "@/constants/schedule-options";
+import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { mockMedications } from "@/mock-data";
-import { ProfileResponse } from "@/types/medication";
+import { MedicationProfileResponse } from "@/types/medication";
+import { ProfileResponse } from "@/types/user";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -26,24 +29,30 @@ export default function Medications() {
 
   const insets = useSafeAreaInsets();
 
+  const { data, loading, error } = useQuery<MedicationProfileResponse[]>({ url: "/medications" });
+
+  const hasMedicationsProfiles = data && data.length >= 1 ? true : false;
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const getFilterMedications = () => {
-    const filterList = mockMedications.filter((med) => med.status.toUpperCase() === activeTab);
-    if (filterList.length > 1) {
-      return filterList;
+  const getFilterMedicationsProfile = () => {
+    if (activeTab === "ALL") {
+      return data;
     }
-    return mockMedications;
-    // return [];
+    return data?.filter((medProfile) => medProfile.status.toUpperCase() === activeTab);
   };
 
   const getStartedDate = (isoString: string) => {
     const date = new Date(isoString);
     const convertedString = getDateLocalString(date).replaceAll(".", " ");
     return formatRegularDate(convertedString);
+  };
+
+  const getDosageUnit = (value: string) => {
+    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
+    return label;
   };
 
   const handleOnTabChange = (tab: TABS_VALUE) => {
@@ -58,37 +67,40 @@ export default function Medications() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+      <Loader visible={loading} />
       <Text style={[styles.headerTitle, { color }]}>Мои лекарства</Text>
 
-      {getFilterMedications().length > 1 ? (
+      {hasMedicationsProfiles ? (
         <>
           <View style={styles.tabWrapper}>
             <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
           </View>
-          <FlatList
-            style={{ flex: 1 }}
-            data={getFilterMedications()}
-            renderItem={({ item }) => (
-              <MedicationCard
-                imageUrl={item.medicationImageUrl}
-                name={item.medicationName}
-                profile={item.profile as ProfileResponse}
-                dosage={item.schedule.dosage}
-                dosageUnit={item.schedule.measurement}
-                hasSwitch
-                showProgress
-                startedDate={getStartedDate(item.schedule.startDate)}
-                isActive={item.status.toUpperCase() === "ACTIVE"}
-                onSwitchToggle={handleOnSwitchToggle}
-                onNavigate={() => router.navigate(`/medications/${item.id}`)}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={[
-              styles.listContentContainer,
-              { paddingBottom: insets.bottom + 10 },
-            ]}
-          />
+          {!loading && (
+            <FlatList
+              style={{ flex: 1 }}
+              data={getFilterMedicationsProfile()}
+              renderItem={({ item }) => (
+                <MedicationCard
+                  imageUrl={item.medicationImageUrl}
+                  name={item.medicationName}
+                  profile={item.profile as ProfileResponse}
+                  dosage={item.schedule.dosage}
+                  dosageUnit={getDosageUnit(item.schedule.measurement)}
+                  hasSwitch
+                  showProgress
+                  startedDate={getStartedDate(item.schedule.startDate)}
+                  isActive={item.status.toUpperCase() === "ACTIVE"}
+                  onSwitchToggle={handleOnSwitchToggle}
+                  onNavigate={() => router.navigate(`/medications/${item.id}`)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={[
+                styles.listContentContainer,
+                { paddingBottom: insets.bottom + 10 },
+              ]}
+            />
+          )}
         </>
       ) : (
         <View style={[styles.noContentWrapper, { paddingBottom: insets.bottom + 10 }]}>
