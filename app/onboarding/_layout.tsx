@@ -29,10 +29,7 @@ export default function OnboardingLayout() {
           headerBackButtonDisplayMode: "minimal",
         }}
       />
-      <OnboardingStepper
-        steps={ONBOARDING_SEGMENTS}
-        currentStep={currentStep}
-      />
+      <OnboardingStepper steps={ONBOARDING_SEGMENTS} currentStep={currentStep} />
     </React.Fragment>
   );
 }

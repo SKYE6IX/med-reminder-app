@@ -1,7 +1,6 @@
 import ClockIcon from "@/component/icons/clock-icon";
-import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { DosageMeasurement, ProfileResponse } from "@/types/medication";
+import { ProfileResponse } from "@/types/user";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
@@ -11,7 +10,7 @@ type MedicationCardProps = {
   name: string;
   profile?: ProfileResponse;
   dosage?: number;
-  dosageUnit?: DosageMeasurement;
+  dosageUnit?: string;
   scheduleTime?: string;
   freq?: string;
   badge?: "upcoming" | "taken" | "missed";
@@ -60,13 +59,7 @@ export default function MedicationCard({
     } else if (!isToggle && onSwitchToggle) {
       onSwitchToggle("inactive");
     }
-
     setToggleSwitch(isToggle);
-  };
-
-  const getDosage = () => {
-    const label = DOSAGE_UNITS.find((unit) => unit.value === dosageUnit)?.label;
-    return `${dosage + " " + label}`;
   };
 
   const badgeBgColor = badge === "taken" ? "#009E00" : badge === "missed" ? "#DC0000" : tintColor;
@@ -91,7 +84,9 @@ export default function MedicationCard({
             <Text style={[styles.medicationName, { color }]}>{name}</Text>
 
             {/* Dosage */}
-            {dosage && <Text style={[styles.medicationDosage, { color }]}>{getDosage()}</Text>}
+            {dosage && (
+              <Text style={[styles.medicationDosage, { color }]}>{`${dosage} ${dosageUnit}`}</Text>
+            )}
 
             {/* Schedule */}
             {scheduleTime && (

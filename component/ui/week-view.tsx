@@ -1,14 +1,24 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { DateTime, formatHomeScreenDate, getWeekDays } from "@/utils/luxonUtil";
+import {
+  DateTime,
+  formatHomeScreenDate,
+  getWeekDays,
+  getWeekViewDescription,
+} from "@/utils/luxonUtil";
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ArrowLeft from "../icons/arrow-left";
 import ArrowRight from "../icons/arrow-right";
 
-export default function WeekView() {
-  const now = DateTime.now();
+type WeekViewProps = {
+  showDescription: boolean;
+  onDateChange: (selectedDate: string) => void;
+};
 
+export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
+  const now = DateTime.now();
   const [currentDate, setCurrentDate] = useState(now);
+
   //   Default to today
   const [selectedISODate, setSelectedISODate] = useState(now.setLocale("ru").toISODate());
 
@@ -28,7 +38,10 @@ export default function WeekView() {
 
   const handleSetISODate = (ISODate: string) => {
     setSelectedISODate(ISODate);
+    onDateChange(ISODate);
   };
+
+  const description = getWeekViewDescription(selectedISODate);
 
   return (
     <View style={styles.container}>
@@ -60,19 +73,22 @@ export default function WeekView() {
             );
           })}
         </View>
-
         <Pressable style={styles.weekController} onPress={goNextWeek}>
           <ArrowRight size={30} color={color} />
         </Pressable>
       </View>
+
+      {showDescription && (
+        <Text style={[styles.weekDescription, { color }]}>Лекарства на {description}</Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: 100,
-    gap: 8,
+    height: 120,
+    gap: 10,
   },
   title: {
     fontFamily: "Roboto_500Medium",
@@ -109,5 +125,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
     textTransform: "uppercase",
+  },
+  weekDescription: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 18,
+    lineHeight: 22,
   },
 });

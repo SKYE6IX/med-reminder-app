@@ -1,10 +1,10 @@
-import { InternalAxiosRequestConfig, api } from "@/utils/axiosInstance";
+import { AxiosRequestConfig, api } from "@/utils/axiosInstance";
 import { useState } from "react";
 
 interface UseMutationOptions<TData, TVariables, TError = Error> {
   url: string;
   method: "post" | "put";
-  headers?: InternalAxiosRequestConfig;
+  config?: AxiosRequestConfig;
   onSuccess?: (data: TData, variables: TVariables) => void;
   onError?: (error: TError, variables: TVariables) => void;
 }
@@ -25,11 +25,11 @@ export function useMutation<TData, TVariables, TError = Error>(
   const [data, setData] = useState<TData | null>(null);
   const [error, setError] = useState<TError | null>(null);
 
-  const { onError, onSuccess, url, method, headers } = options;
+  const { onError, onSuccess, url, method, config } = options;
 
   const mutate = async (body: TVariables) => {
     setIsLoading(true);
-    await api[method](url, body, headers && headers)
+    await api[method](url, body, config && config)
       .then((response) => {
         const data = response.data;
         setData(data);

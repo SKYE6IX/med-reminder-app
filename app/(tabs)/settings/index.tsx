@@ -113,7 +113,12 @@ export default function Settings() {
           />
         </View>
         {/* SIGN OUT BUTTON */}
-        <CustomButton label="Выйти" variant="danger" svgIcon={<LogoutIcon color="#F7F7F7" />} />
+        <CustomButton
+          label="Выйти"
+          variant="danger"
+          svgIcon={<LogoutIcon color="#F7F7F7" />}
+          onPress={logoutUser}
+        />
       </ScrollView>
     </SafeAreaView>
   );

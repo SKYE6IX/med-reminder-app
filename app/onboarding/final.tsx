@@ -10,7 +10,9 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 
 // TODO:
-// 1. Set up notification access for push notification;
+// 1. Set up not notification and alarm grants here.
+// Perhaps we should make sure user grant this permission since
+// the whole idea od the app is that.
 
 export default function OnboardingFinalScreen() {
   const router = useRouter();
@@ -38,11 +40,7 @@ export default function OnboardingFinalScreen() {
           Уведомления будут приходить согласно вашим настройкам.
         </ThemedText>
       </View>
-      <CustomButton
-        label="Дальше"
-        style={styles.button}
-        onPress={handleCompleteOnboarding}
-      />
+      <CustomButton label="Дальше" style={styles.button} onPress={handleCompleteOnboarding} />
     </OnboardingView>
   );
 }

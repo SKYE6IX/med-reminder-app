@@ -1,4 +1,5 @@
 import { Relation } from "@/constants/relation";
+import { ProfileResponse } from "./user";
 
 export enum MedicationUnit {
   CAPSULE = "CAPSULE",
@@ -47,12 +48,6 @@ export interface CreateMedication {
   medicationPack: MedicationPack | null;
 }
 
-export interface ProfileResponse {
-  id: string;
-  name: string;
-  relation: Relation;
-  isSelf: boolean;
-}
 export interface MedicationProfileResponse {
   id: string;
   medicationName: string;

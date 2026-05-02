@@ -28,7 +28,6 @@ export const useAuthStore = create<AuthStore>()(
         getItem,
         removeItem: deleteItemAsync,
       })),
-
       partialize: (state) => ({
         hasCompleteOnboarding: state.hasCompleteOnboarding,
       }),

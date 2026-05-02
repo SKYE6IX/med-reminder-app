@@ -11,19 +11,15 @@ export default function OnboardingFirstScreen() {
       <Image
         source={require("@/assets/images/onboarding-image-screen-1.png")}
         style={styles.image}
+        contentPosition="top center"
       />
       <View style={styles.textContainer}>
         <ThemedText type="title">Ваше здоровье - в Ваших руках</ThemedText>
         <ThemedText type="subtitle">
-          Возьмите под контроль свое самочувствие с помощью простых напоминаний
-          о приеме лекарств.
+          Возьмите под контроль свое самочувствие с помощью простых напоминаний о приеме лекарств.
         </ThemedText>
       </View>
-      <CustomLink
-        label="Дальше"
-        href="/onboarding/second"
-        style={styles.link}
-      />
+      <CustomLink label="Дальше" href="/onboarding/second" style={styles.link} />
     </OnboardingView>
   );
 }

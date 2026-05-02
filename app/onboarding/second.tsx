@@ -11,14 +11,12 @@ export default function OnboardingSecondScreen() {
       <Image
         source={require("@/assets/images/onboarding-image-screen-2.png")}
         style={styles.image}
+        contentPosition="top center"
       />
       <View style={styles.textContainer}>
-        <ThemedText type="title">
-          Умные напоминания, простой контроль лекрств
-        </ThemedText>
+        <ThemedText type="title">Умные напоминания, простой контроль лекрств</ThemedText>
         <ThemedText type="subtitle">
-          Следуйте графику спокойно и без лишних усилий — вы больше не
-          пропустите приём лекарства.
+          Следуйте графику спокойно и без лишних усилий — вы больше не пропустите приём лекарства.
         </ThemedText>
       </View>
       <CustomLink label="Дальше" href="/onboarding/third" style={styles.link} />

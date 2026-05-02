@@ -1,12 +1,16 @@
 import PlusIcon from "@/component/icons/plus-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
+import { DOSAGE_UNITS } from "@/constants/schedule-options";
+import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { mockMedicationsSchedule } from "@/mock-data";
-import { MedicationScheduleResponse, ProfileResponse } from "@/types/medication";
-import { toLocalTime } from "@/utils/luxonUtil";
+import { useUserStore } from "@/stores/user-store";
+import { MedicationScheduleResponse } from "@/types/medication";
+import { ProfileResponse } from "@/types/user";
+import { getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
@@ -19,11 +23,20 @@ const TABS = [
   { label: "Принято", value: "TAKEN" },
   { label: "Пропущено", value: "MISSED" },
 ];
+const localDateString = getDateLocalString();
 
 export default function Home() {
+  const { userData } = useUserStore();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
-
+  const [selectedDate, setSelectedDate] = useState(localDateString);
   const insets = useSafeAreaInsets();
+
+  const { data, loading, error } = useQuery<MedicationScheduleResponse[]>({
+    url: "medications/schedules/event",
+    params: {
+      eventDate: selectedDate,
+    },
+  });
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -31,12 +44,14 @@ export default function Home() {
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   const getFilterMedicationSchedule = () => {
-    const filterList = mockMedicationsSchedule.filter((med) => med.status === activeTab);
-    if (filterList.length > 1) {
-      return filterList;
+    if (activeTab === "ALL") {
+      return data;
+    } else {
+      return data?.filter((med) => med.status === activeTab);
     }
-    return mockMedicationsSchedule;
   };
+
+  const hasMedicationSchedule = data && data.length >= 1 ? true : false;
 
   const getScheduleBadge = (
     medicationSchedule: MedicationScheduleResponse,
@@ -50,6 +65,11 @@ export default function Home() {
     }
   };
 
+  const getDosageUnit = (value: string) => {
+    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
+    return label;
+  };
+
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
   };
@@ -59,68 +79,81 @@ export default function Home() {
     return toLocalTime(date);
   };
 
+  const handleOnDateChange = (ISODate: string) => {
+    const date = new Date(ISODate);
+    const toLocalDateString = getDateLocalString(date);
+    setSelectedDate(toLocalDateString);
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+      <Loader visible={loading} />
       <View style={styles.container}>
+        {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.headerProfileContainer}>
             <Image
               source={require("@/assets/mock-profile.jpg")}
-              style={styles.headerProfileImage}
+              style={styles.headerAvatar}
               contentFit="cover"
               contentPosition="top center"
             />
           </View>
-          <Text style={[styles.headerProfileName, { color }]}>Людмила</Text>
+          <Text style={[styles.headerProfileName, { color }]}>{userData?.name}</Text>
         </View>
 
-        <View style={styles.calederWrapper}>
-          <WeekView />
+        {/* WEEK VIEW */}
+        <View style={styles.weekViewWrapper}>
+          <WeekView showDescription={hasMedicationSchedule} onDateChange={handleOnDateChange} />
         </View>
 
-        {getFilterMedicationSchedule().length > 1 ? (
-          <View style={{ flex: 1 }}>
-            <View style={styles.tabsWrapper}>
-              <Text style={[styles.medicationScheduleTitle, { color }]}>Лекарства на сегодня</Text>
-              <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
-            </View>
-            <FlatList
-              style={{ flex: 1 }}
-              data={getFilterMedicationSchedule()}
-              renderItem={({ item }) => (
-                <MedicationCard
-                  imageUrl={item.medicationImageUrl}
-                  name={item.medicationName}
-                  profile={item.profile as ProfileResponse}
-                  onButtonPress={() => {}}
-                  badge={getScheduleBadge(item)}
-                  dosage={item.dosage}
-                  dosageUnit={item.measurement}
-                  scheduleTime={getScheduleTime(item.scheduleAt)}
+        {/* CONTENT BODY */}
+        {!loading && (
+          <>
+            {hasMedicationSchedule ? (
+              <View style={{ flex: 1 }}>
+                <View style={styles.tabsWrapper}>
+                  <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+                </View>
+                <FlatList
+                  style={{ flex: 1 }}
+                  data={getFilterMedicationSchedule()}
+                  renderItem={({ item }) => (
+                    <MedicationCard
+                      imageUrl={item.medicationImageUrl}
+                      name={item.medicationName}
+                      profile={item.profile as ProfileResponse}
+                      onButtonPress={() => {}}
+                      badge={getScheduleBadge(item)}
+                      dosage={item.dosage}
+                      dosageUnit={getDosageUnit(item.measurement)}
+                      scheduleTime={getScheduleTime(item.scheduleAt)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={[
+                    styles.listContentContainer,
+                    { paddingBottom: insets.bottom + 10 },
+                  ]}
                 />
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={[
-                styles.listContentContainer,
-                { paddingBottom: insets.bottom + 10 },
-              ]}
-            />
-          </View>
-        ) : (
-          <View style={styles.noContentWrapper}>
-            <Image
-              source={require("@/assets/images/pill-bottle.png")}
-              style={styles.noContentImage}
-            />
-            <Text style={[styles.noContentTitle, { color }]}>
-              На этот день лекарства не запланированы
-            </Text>
-            <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-              Если вы ещё не добавили лекарство, сделайте это сейчас.
-            </Text>
+              </View>
+            ) : (
+              <View style={styles.noContentWrapper}>
+                <Image
+                  source={require("@/assets/images/pill-bottle.png")}
+                  style={styles.noContentImage}
+                />
+                <Text style={[styles.noContentTitle, { color }]}>
+                  На этот день лекарства не запланированы
+                </Text>
+                <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
+                  Если вы ещё не добавили лекарство, сделайте это сейчас.
+                </Text>
 
-            <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
-          </View>
+                <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
+              </View>
+            )}
+          </>
         )}
       </View>
     </SafeAreaView>
@@ -149,7 +182,7 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     overflow: "hidden",
   },
-  headerProfileImage: {
+  headerAvatar: {
     width: "100%",
     height: "100%",
   },
@@ -158,7 +191,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
   },
-  calederWrapper: {
+  weekViewWrapper: {
     paddingLeft: 20,
     paddingRight: 20,
   },
@@ -190,12 +223,6 @@ const styles = StyleSheet.create({
   tabsWrapper: {
     paddingLeft: 20,
     paddingRight: 20,
-    gap: 16,
-  },
-  medicationScheduleTitle: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 18,
-    lineHeight: 22,
   },
   listContentContainer: {
     paddingTop: 16,

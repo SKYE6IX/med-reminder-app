@@ -167,9 +167,8 @@ export default function FinalStepScreen() {
     url: "medications",
     method: "post",
     onSuccess(data, variables) {
-      router.dismissAll();
       clearFormState();
-      router.navigate("/(tabs)");
+      router.dismissTo("/");
     },
   });
 

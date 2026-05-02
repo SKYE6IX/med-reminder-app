@@ -89,4 +89,32 @@ export const getWeekDays = (date = DateTime.now()) => {
   });
 };
 
-export { DateTime, Duration };
+export const getWeekViewDescription = (isoDate: string) => {
+  const date = DateTime.fromISO(isoDate, {
+    locale: "ru",
+    setZone: true,
+  });
+  const today = DateTime.now().setLocale("ru");
+  const tomorrow = today.plus({ days: 1 });
+  const yesterday = today.minus({ days: 1 });
+
+  const toLocaleOptions: DateTimeFormatOptions = {
+    month: "long",
+    day: "2-digit",
+  };
+
+  if (date.hasSame(today, "day")) {
+    return `сегодня`;
+  }
+  if (date.hasSame(tomorrow, "day")) {
+    return `завтра`;
+  }
+  if (date.hasSame(yesterday, "day")) {
+    return `вчера`;
+  }
+  return date.toLocaleString({
+    ...toLocaleOptions,
+  });
+};
+
+export { DateTime, DateTimeFormatOptions, Duration };
