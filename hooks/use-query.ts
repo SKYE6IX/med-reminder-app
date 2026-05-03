@@ -15,6 +15,10 @@ type UseQueryReturn<TData, TError> = {
 export function useQuery<TData, TError = Error>(
   options: UseQueryOptions,
 ): UseQueryReturn<TData, TError> {
+  const { url, params } = options;
+
+  const queryParams = useMemo(() => params, [params]);
+
   const [state, setState] = useState<{
     isLoading: boolean;
     data: TData | null;
@@ -25,12 +29,13 @@ export function useQuery<TData, TError = Error>(
     error: null,
   });
 
-  const { url, params } = options;
-
-  const queryParams = useMemo(() => params, [params]);
-
   const makeQuery = useCallback(async () => {
-    setState((prev) => ({ ...prev, isLoading: true }));
+    const cacheKey = api.generateKey({ url, params: queryParams ?? {}, method: "get" });
+    const cached = await api.storage.get(cacheKey);
+    const hasCachedData = cached?.state === "cached";
+
+    setState((prev) => ({ ...prev, isLoading: !hasCachedData }));
+
     try {
       const response = await api.get(url, { params: queryParams ?? {} });
       const data = response.data;

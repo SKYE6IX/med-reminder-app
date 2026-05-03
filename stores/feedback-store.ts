@@ -5,7 +5,7 @@ interface FeebackStore {
   status: "success" | "error";
   title: string;
   message: string;
-  show: ({
+  showFeedBack: ({
     title,
     message,
     status,
@@ -14,7 +14,7 @@ interface FeebackStore {
     message: string;
     status: FeebackStore["status"];
   }) => void;
-  hide: () => void;
+  hideFeedBack: () => void;
 }
 
 export const useFeedBackStore = create<FeebackStore>()((set) => ({
@@ -22,11 +22,11 @@ export const useFeedBackStore = create<FeebackStore>()((set) => ({
   status: "success",
   title: "",
   message: "",
-  show({ title, message, status }) {
+  showFeedBack({ title, message, status }) {
     set({ title, message, status, visible: true });
     setTimeout(() => set({ visible: false }), 3000);
   },
-  hide() {
+  hideFeedBack() {
     set({ visible: false });
   },
 }));

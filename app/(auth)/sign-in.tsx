@@ -1,6 +1,5 @@
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
-import { AxiosError } from "axios";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
@@ -10,13 +9,18 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useMutation } from "@/hooks/use-mutation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
-import { authApi } from "@/utils/authApi";
-import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
+import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
+import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateSignInInputs } from "@/utils/validator";
+
+// TODO:
+// Refactor mutation to use useMutations hook for both
+// sign in and create account.
 
 type FormState = {
   email: string;
@@ -26,11 +30,10 @@ type FormState = {
 type SignInState = {
   formState: FormState;
   errorsSet: Set<string>;
-  isLoading: boolean;
 };
 
 export default function SignInScreen() {
-  const { show } = useFeedBackStore();
+  const { showFeedBack } = useFeedBackStore();
   const { setIsAuthenticated } = useAuthStore();
   const [signInState, setSignInState] = useState<SignInState>({
     formState: {
@@ -38,7 +41,6 @@ export default function SignInScreen() {
       password: "",
     },
     errorsSet: new Set(),
-    isLoading: false,
   });
 
   const scheme = useColorScheme();
@@ -55,13 +57,7 @@ export default function SignInScreen() {
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
 
   // Handle when each text input value changes
-  const handleOnValueChanges = ({
-    name,
-    value,
-  }: {
-    name: string;
-    value: string;
-  }) => {
+  const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
     setSignInState((prvState) => {
       const updatedErrors = new Set(prvState.errorsSet);
       updatedErrors.delete(name);
@@ -76,57 +72,60 @@ export default function SignInScreen() {
     });
   };
 
+  const [loginUser, { loading }] = useMutation<AuthResponse, FormState>({
+    url: "/auth/login",
+    method: "post",
+    config: {
+      cache: {
+        update: {
+          "user-data": "delete",
+        },
+      },
+    },
+    async onSuccess(data, variables) {
+      // Clear the token if exist before saving new one;
+      clearTokens();
+      // Safe the new token
+      saveTokens(data.accessToken, data.refreshToken);
+      await getAuthorizedUser();
+      setIsAuthenticated(true);
+    },
+    onError(error, variables) {
+      if (error.response?.status === 401) {
+        showFeedBack({
+          title: "Не удалось авторизовать!",
+          message: "Неверный адрес электронной почты или пароль!",
+          status: "error",
+        });
+      } else {
+        console.log("Unknow Error occur in sign in!");
+      }
+    },
+  });
+
   // Handle the submission of form
   const handleSubmitForm = async () => {
     // Check all field are filled correctly.
     const validatedInputs = validateSignInInputs(signInState.formState);
+
     if (validatedInputs.error) {
       validatedInputs.error.issues.forEach((issue) => {
         setSignInState((prvState) => {
           return {
             ...prvState,
-            errorsSet: new Set(prvState.errorsSet).add(
-              issue.path[0].toString(),
-            ),
+            errorsSet: new Set(prvState.errorsSet).add(issue.path[0].toString()),
           };
         });
       });
       return;
     }
-    setSignInState((prvState) => ({ ...prvState, isLoading: true }));
-    await authApi
-      .post<AuthResponse>("/login", {
-        ...validatedInputs.data,
-      })
-      .then(async ({ data }) => {
-        saveTokens(data.accessToken, data.refreshToken);
-        const validToken = await getValidAccessToken();
-        setIsAuthenticated(validToken !== null);
-        setSignInState((prvState) => ({
-          ...prvState,
-          isLoading: false,
-        }));
-      })
-      .catch((error: AxiosError) => {
-        setSignInState((prvState) => ({
-          ...prvState,
-          isLoading: false,
-        }));
-        if (error.response?.status === 401) {
-          show({
-            title: "Не удалось авторизовать!",
-            message: "Неверный адрес электронной почты или пароль!",
-            status: "error",
-          });
-        }
-      });
+
+    await loginUser({ ...validatedInputs.data });
   };
 
   return (
-    <View
-      style={[{ paddingBottom: Math.max(insets.bottom, 30) }, styles.container]}
-    >
-      <Loader visible={signInState.isLoading} />
+    <View style={[{ paddingBottom: Math.max(insets.bottom, 30) }, styles.container]}>
+      <Loader visible={loading} />
 
       <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
       <View style={styles.inputsWrapper}>
@@ -152,7 +151,7 @@ export default function SignInScreen() {
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Войти" onPress={handleSubmitForm} />
+        <CustomButton label="Войти" onPress={handleSubmitForm} disabled={loading} />
         <ThemedText style={styles.resetPasswordText}>
           Забыли пароль?
           <Link href="/forget-password" style={{ color: linkColor }}>

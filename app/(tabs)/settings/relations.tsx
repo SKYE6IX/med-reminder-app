@@ -1,13 +1,20 @@
 import DeleteIcon from "@/component/icons/delete-icon";
 import PlusIcon from "@/component/icons/plus-icon";
+import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { ProfileResponse } from "@/types/user";
 import { Image } from "expo-image";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Relations() {
   const isIOS = Platform.OS === "ios";
+
   const insets = useSafeAreaInsets();
+
+  const { data, loading, error } = useQuery<ProfileResponse[]>({ url: "users/profiles" });
+
+  const relationsProfile = data?.filter((profile) => !profile.isSelf) ?? [];
 
   //   Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -21,19 +28,23 @@ export default function Relations() {
       <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
         <View style={[styles.contentCotainer, { backgroundColor: bgSecondary, borderColor }]}>
           {/* PROFILE LIST */}
-          <View style={styles.contentItemWrapper}>
-            <View style={styles.circle}>
-              <Image
-                source={require("@/assets/mock-profile-2.jpg")}
-                style={styles.relationAvatar}
-                contentPosition="top center"
-              />
+          {relationsProfile.map((profile) => (
+            <View key={profile.id} style={styles.contentItemWrapper}>
+              <View style={styles.circle}>
+                <Image
+                  source={require("@/assets/mock-profile-2.jpg")}
+                  style={styles.relationAvatar}
+                  contentPosition="top center"
+                />
+              </View>
+              <Text style={[styles.label, { color }]}>{profile.name}</Text>
+              <Pressable
+                style={[styles.circle, { backgroundColor: bgTertiary, marginLeft: "auto" }]}
+              >
+                <DeleteIcon />
+              </Pressable>
             </View>
-            <Text style={[styles.label, { color }]}>Сестра</Text>
-            <Pressable style={[styles.circle, { backgroundColor: bgTertiary, marginLeft: "auto" }]}>
-              <DeleteIcon />
-            </Pressable>
-          </View>
+          ))}
 
           {/* ADD NEW PROFILE */}
           <Pressable style={styles.contentItemWrapper}>

@@ -1,6 +1,5 @@
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
-import { authApi } from "@/utils/authApi";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Platform, StyleSheet, TextInput, View } from "react-native";
@@ -12,34 +11,36 @@ import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/stores/use-auth-store";
-import { getValidAccessToken, saveTokens } from "@/utils/tokenUtils";
+import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateCreateAccountInputs } from "@/utils/validator";
 
+import { useMutation } from "@/hooks/use-mutation";
+import { useFeedBackStore } from "@/stores/feedback-store";
 import { AuthResponse } from "@/types/auth-response";
+import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
 
 type FormState = {
   email: string;
   name: string;
   password: string;
 };
+
 type CreateAccountState = {
   formState: FormState;
   errorsSet: Set<string>;
-  isLoading: boolean;
 };
 
 export default function CreateAccountScreen() {
+  const { showFeedBack } = useFeedBackStore();
   const { setIsAuthenticated } = useAuthStore();
-  const [createAccountState, setCreateAccountState] =
-    useState<CreateAccountState>({
-      formState: {
-        email: "",
-        name: "",
-        password: "",
-      },
-      errorsSet: new Set(),
-      isLoading: false,
-    });
+  const [createAccountState, setCreateAccountState] = useState<CreateAccountState>({
+    formState: {
+      email: "",
+      name: "",
+      password: "",
+    },
+    errorsSet: new Set(),
+  });
 
   const insets = useSafeAreaInsets();
   const textInputRef = useRef<TextInput>(null);
@@ -55,13 +56,7 @@ export default function CreateAccountScreen() {
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
 
   // Handle when each text input value changes
-  const handleOnValueChanges = ({
-    name,
-    value,
-  }: {
-    name: string;
-    value: string;
-  }) => {
+  const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
     setCreateAccountState((prvState) => {
       const updatedErrors = new Set(prvState.errorsSet);
       updatedErrors.delete(name);
@@ -76,55 +71,59 @@ export default function CreateAccountScreen() {
     });
   };
 
+  const [registerUser, { loading }] = useMutation<AuthResponse, FormState>({
+    url: "/auth/login",
+    method: "post",
+    config: {
+      cache: {
+        update: {
+          "user-data": "delete",
+        },
+      },
+    },
+    async onSuccess(data, variables) {
+      // Clear the token if exist before saving new one;
+      clearTokens();
+      // Safe the new token
+      saveTokens(data.accessToken, data.refreshToken);
+      await getAuthorizedUser();
+      setIsAuthenticated(true);
+    },
+    onError(error, variables) {
+      if (error.response?.status === 401) {
+        showFeedBack({
+          title: "Что-то пошло не так!",
+          message: "Что-то пошло не так при создании учетной записи. Попробуйте еще раз!",
+          status: "error",
+        });
+      } else {
+        console.log("Unkown Error occur in Creating Account!");
+      }
+    },
+  });
+
   // Handle the submission of form
   const handleSubmitForm = async () => {
     // Check all field are filled correctly.
-    const validatedInputs = validateCreateAccountInputs(
-      createAccountState.formState,
-    );
+    const validatedInputs = validateCreateAccountInputs(createAccountState.formState);
     if (validatedInputs.error) {
       validatedInputs.error.issues.forEach((issue) => {
         setCreateAccountState((prvState) => {
           return {
             ...prvState,
-            errorsSet: new Set(prvState.errorsSet).add(
-              issue.path[0].toString(),
-            ),
+            errorsSet: new Set(prvState.errorsSet).add(issue.path[0].toString()),
           };
         });
-        return;
       });
+      return;
     }
 
-    // If all passed above, we continue.
-    setCreateAccountState((prvState) => ({ ...prvState, isLoading: true }));
-    await authApi
-      .post<AuthResponse>("/register", {
-        ...validatedInputs.data,
-      })
-      .then(async ({ data }) => {
-        saveTokens(data.accessToken, data.refreshToken);
-        const validToken = await getValidAccessToken();
-        setIsAuthenticated(validToken !== null);
-        setCreateAccountState((prvState) => ({
-          ...prvState,
-          isLoading: false,
-        }));
-      })
-      .catch((err) => {
-        console.error("Error occur while register -> ", err);
-        setCreateAccountState((prvState) => ({
-          ...prvState,
-          isLoading: false,
-        }));
-      });
+    await registerUser({ ...validatedInputs.data });
   };
 
   return (
-    <View
-      style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}
-    >
-      <Loader visible={createAccountState.isLoading} />
+    <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
+      <Loader visible={loading} />
 
       <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
 
@@ -160,7 +159,7 @@ export default function CreateAccountScreen() {
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} />
+        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={loading} />
         <ThemedText style={styles.termsText}>
           Создавая аккаунт, Вы принимаете
           <Link href="/" style={{ color: linkColor }}>

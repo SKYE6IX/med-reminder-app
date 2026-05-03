@@ -1,9 +1,7 @@
 import FeedbackAlert from "@/component/ui/feedback-alert";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuthStore } from "@/stores/use-auth-store";
-import { useUserStore } from "@/stores/user-store";
-import { UserResponse } from "@/types/user";
-import { api } from "@/utils/axiosInstance";
+import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
 import { getValidAccessToken } from "@/utils/tokenUtils";
 import {
   Roboto_400Regular,
@@ -53,8 +51,7 @@ export default function RootLayout() {
     try {
       const token = await getValidAccessToken();
       if (token) {
-        const { data } = await api.get<UserResponse>("/users");
-        useUserStore.getState().setUser(data);
+        await getAuthorizedUser();
         useAuthStore.getState().setIsAuthenticated(true);
         setIsReady(true);
       }

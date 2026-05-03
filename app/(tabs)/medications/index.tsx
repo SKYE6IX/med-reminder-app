@@ -12,7 +12,7 @@ import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TABS_VALUE = "ALL" | "ACTIVE" | "INACTIVE";
@@ -24,6 +24,7 @@ const TABS = [
 ];
 
 export default function Medications() {
+  const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
@@ -71,7 +72,9 @@ export default function Medications() {
       {!loading && (
         <>
           {hasMedicationsProfiles ? (
-            <View style={[styles.contentWrapper, { paddingTop: insets.top }]}>
+            <View
+              style={[styles.contentWrapper, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}
+            >
               <View style={styles.tabWrapper}>
                 <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
               </View>

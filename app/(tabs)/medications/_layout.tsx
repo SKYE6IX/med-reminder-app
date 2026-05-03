@@ -27,7 +27,7 @@ export default function PillsLayout() {
         <Stack.Header
           transparent
           blurEffect="systemMaterial"
-          style={{ shadowColor: "transparent", backgroundColor: "transparent" }}
+          style={{ shadowColor: "transparent", backgroundColor: bgPrimary }}
         />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
           Информация о лекарстве

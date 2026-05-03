@@ -7,7 +7,11 @@ import { Image } from "expo-image";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useUserStore } from "@/stores/user-store";
+
 export default function Profile() {
+  const { userData } = useUserStore();
+
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const scheme = useColorScheme();
@@ -44,7 +48,7 @@ export default function Profile() {
         <View style={styles.body}>
           <FormInput
             label="Имя"
-            placeholder="Анна"
+            placeholder={userData?.name}
             type="text"
             name="name"
             hasError={false}
@@ -53,7 +57,7 @@ export default function Profile() {
 
           <FormInput
             label="Почта"
-            placeholder="Annaivanova@gmail.com"
+            placeholder={userData?.email}
             type="email"
             name="email"
             hasError={false}
@@ -67,7 +71,7 @@ export default function Profile() {
               style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
             >
               <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                Введите дату Вашего рождения
+                {userData?.dateOfBirth || "Введите дату Вашего рождения"}
               </Text>
             </Pressable>
           </View>
@@ -78,7 +82,9 @@ export default function Profile() {
             <Pressable
               style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
             >
-              <Text style={[styles.bodyItemValue, { color: mutedColor }]}>Введите Ваш пол</Text>
+              <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
+                {userData?.gender || "Введите Ваш пол"}
+              </Text>
             </Pressable>
           </View>
         </View>

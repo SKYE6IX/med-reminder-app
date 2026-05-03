@@ -17,10 +17,11 @@ import { ProfileResponse } from "@/types/user";
 import { formatRegularDate, getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
 import { useLocalSearchParams } from "expo-router";
 import { useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MedicationDetails() {
+  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const { medicationProfileId } = useLocalSearchParams();
 
@@ -66,7 +67,7 @@ export default function MedicationDetails() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingTop: insets.top, paddingBottom: insets.bottom + 10 },
+          { paddingTop: isIOS ? undefined : insets.top + 10, paddingBottom: 10 },
         ]}
       >
         {medicationProfile && (

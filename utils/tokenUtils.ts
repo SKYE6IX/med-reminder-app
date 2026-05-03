@@ -1,13 +1,19 @@
 import type { AuthResponse } from "@/types/auth-response";
+import axios from "axios";
+import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
-import { authApi } from "./authApi";
 
 interface JwtPayload {
   sub: string;
   exp: number;
   iat: number;
 }
+
+const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
+const authRefresh = axios.create({
+  baseURL: `http://${localhost}:8080/auth`,
+});
 
 export const isTokenExpired = (token: string) => {
   try {
@@ -40,7 +46,7 @@ export const getValidAccessToken = async (): Promise<string | null> => {
   if (!isTokenExpired(accessToken)) return accessToken;
 
   try {
-    const { data } = await authApi.post<AuthResponse>("/refresh", {
+    const { data } = await authRefresh.post<AuthResponse>("/refresh", {
       refreshToken,
     });
 

@@ -15,7 +15,11 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import SettingsCard from "@/component/ui/settings-card/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
+import { useUserStore } from "@/stores/user-store";
+
 export default function Settings() {
+  const { userData } = useUserStore();
+
   const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -42,7 +46,7 @@ export default function Settings() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Профиль</Text>
           <SettingsCard
-            title="Мария"
+            title={userData!.name}
             description="Посмотреть профиль"
             interaction="press"
             avatarUrl="url"

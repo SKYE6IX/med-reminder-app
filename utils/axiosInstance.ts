@@ -1,29 +1,35 @@
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { setupCache } from "axios-cache-interceptor";
+import { buildKeyGenerator, CacheRequestConfig, setupCache } from "axios-cache-interceptor";
 import Constants from "expo-constants";
 import { asyncStorageAdapter } from "./cache-storage";
 import { getValidAccessToken } from "./tokenUtils";
 
 const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
-
 const instance = axios.create({
-  baseURL: `http://${localhost}:8080/`,
+  baseURL: `http://${localhost}:8080`,
 });
 
 const api = setupCache(instance, {
   storage: asyncStorageAdapter,
   ttl: 60 * 60 * 1000,
+  interpretHeader: false,
+  generateKey: buildKeyGenerator((request) => ({
+    method: request.method,
+    url: request.url,
+    params: request.params,
+  })),
 });
 
 const MAX_RETRIES = 3;
 
 api.interceptors.request.use(async (config) => {
   const token = await getValidAccessToken();
-
   if (!token) {
     return config;
   }
+
   config.headers.Authorization = `Bearer ${token}`;
+
   return config;
 });
 
@@ -53,4 +59,4 @@ api.interceptors.response.use(
   },
 );
 
-export { api, axios, AxiosError, AxiosRequestConfig };
+export { api, axios, AxiosError, AxiosRequestConfig, CacheRequestConfig };
