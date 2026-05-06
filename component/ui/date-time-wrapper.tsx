@@ -15,8 +15,8 @@ export type DateTimeWrapperProps = {
   bottomSheetTitle?: string;
 
   // @platform IOS ONLY
-  showButton?: boolean;
-  onButtonPress?: () => void;
+  showUpdateButton?: boolean;
+  onUpdateButtonPress?: () => void;
   // The event is only used with Android.
   onDateTimeSelected: (dateTime: Date, event?: DateTimePickerEvent["type"]) => void;
 };
@@ -26,8 +26,8 @@ export default function DateTimeWrapper({
   mode,
   bottomSheetTitle,
   onDateTimeSelected,
-  showButton,
-  onButtonPress,
+  showUpdateButton,
+  onUpdateButtonPress,
 }: DateTimeWrapperProps) {
   const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
@@ -56,7 +56,7 @@ export default function DateTimeWrapper({
     <BottomSheetWrapper
       ref={bottomSheetWrapperRef}
       title={bottomSheetTitle || ""}
-      snapPointPercent={showButton ? "50%" : "45%"}
+      snapPointPercent={showUpdateButton ? "50%" : "45%"}
     >
       <View
         style={{
@@ -74,7 +74,7 @@ export default function DateTimeWrapper({
           locale="ru-RU"
           minimumDate={mode === "date" ? new Date(now) : undefined}
         />
-        {showButton && <CustomButton label="Применить" onPress={onButtonPress} />}
+        {showUpdateButton && <CustomButton label="Применить" onPress={onUpdateButtonPress} />}
       </View>
     </BottomSheetWrapper>
   );

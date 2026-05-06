@@ -10,12 +10,12 @@ export interface FrequencySettingsState {
   label: string;
   info?: string;
   rrule: string;
-  preset: SchedulePreset;
+  preset: SchedulePreset | undefined;
 }
 
 type FrequencySettingsProps = {
-  preset: SchedulePreset;
-  onFreqSet: ({ rrule, preset }: { rrule: string; preset: SchedulePreset }) => void;
+  preset: SchedulePreset | undefined;
+  onFreqSet: ({ rrule, preset }: { rrule: string; preset: SchedulePreset | undefined }) => void;
 };
 
 const DEFALUT_FREQUENCIES: FrequencySettingsState[] = [

@@ -39,7 +39,13 @@ export default function ScheduleStepScreen() {
   const tintColor = useThemeColor({}, "tint");
 
   // Frequency settings
-  const handleSetFrequency = ({ rrule, preset }: { rrule: string; preset: SchedulePreset }) => {
+  const handleSetFrequency = ({
+    rrule,
+    preset,
+  }: {
+    rrule: string;
+    preset: SchedulePreset | undefined;
+  }) => {
     setMedicatioSchedule({
       rule: {
         recurrenceRule: rrule,

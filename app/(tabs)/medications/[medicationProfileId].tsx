@@ -4,10 +4,10 @@ import PillFilledIcon from "@/component/icons/pill-filled-icon";
 import DeleteMedicationProfile from "@/component/ui/delete-medication-profile";
 import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
-import DosageSettings from "@/component/ui/medication-details/dosage-settings";
-import FrequencySettings from "@/component/ui/medication-details/frequency-settings";
-import NoteSettings from "@/component/ui/medication-details/note-settings";
-import TimeSettings from "@/component/ui/medication-details/time-settings";
+import DetailsDosageSettings from "@/component/ui/medication-details/dosage-settings";
+import DetailsFrequencySettings from "@/component/ui/medication-details/frequency-settings";
+import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
+import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
@@ -108,11 +108,11 @@ export default function MedicationDetails() {
                   </View>
 
                   {/* TIME STARTED */}
-                  <TimeSettings medicationProfile={medicationProfile} />
+                  <DetailsTimeSettings medicationProfile={medicationProfile} />
                 </View>
 
                 {/* FREQUENCY RRULES */}
-                <FrequencySettings medicationProfile={medicationProfile} />
+                <DetailsFrequencySettings medicationProfile={medicationProfile} />
               </View>
 
               {/* Dosage Information */}
@@ -121,7 +121,7 @@ export default function MedicationDetails() {
 
                 <View style={styles.detailsGroup}>
                   {/* DOSAGE AMOUNT */}
-                  <DosageSettings medicationProfile={medicationProfile} />
+                  <DetailsDosageSettings medicationProfile={medicationProfile} />
 
                   {/* STOCK DOSAGE AMOUNT */}
                   <View
@@ -138,7 +138,7 @@ export default function MedicationDetails() {
                 </View>
 
                 {/* NOTE ABOUT DOSAGE USAGE */}
-                <NoteSettings medicationProfile={medicationProfile} />
+                <DetailsNoteSettings medicationProfile={medicationProfile} />
 
                 {/* TOTAL DOSAGE TAKEN INFO */}
                 <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>

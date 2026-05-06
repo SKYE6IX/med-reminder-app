@@ -17,7 +17,7 @@ const getStartTime = (startTime: string) => {
   return toLocalTime(date);
 };
 
-export default function TimeSettings({
+export default function DetailsTimeSettings({
   medicationProfile,
 }: {
   medicationProfile: MedicationProfileResponse;
@@ -79,8 +79,8 @@ export default function TimeSettings({
         ref={timeRef}
         mode="time"
         bottomSheetTitle="Время начала"
-        showButton
-        onButtonPress={handleOnButtonPress}
+        showUpdateButton
+        onUpdateButtonPress={handleOnButtonPress}
       />
       <Loader visible={isPending} />
     </React.Fragment>

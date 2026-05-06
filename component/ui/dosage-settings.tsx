@@ -8,6 +8,7 @@ import PlusIcon from "../icons/plus-icon";
 type DosageSettingsProps = {
   dosageAmountState: number;
   dosageUnitState: DosageMeasurement;
+  showUnitForm?: boolean;
   onDasgeSettingsChange: ({
     amount,
     unit,
@@ -18,6 +19,7 @@ export default function DosageSettings({
   dosageAmountState,
   dosageUnitState,
   onDasgeSettingsChange,
+  showUnitForm = true,
 }: DosageSettingsProps) {
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -63,34 +65,36 @@ export default function DosageSettings({
           </Pressable>
         </View>
       </View>
-      <View style={styles.bodyView}>
-        <Text style={[styles.label, { color }]}>Форма лекарства</Text>
-        <View style={styles.dosageUnitWrapper}>
-          {DOSAGE_UNITS.map((unit) => {
-            const isSelected = unit.value === dosageUnitState;
 
-            return (
-              <Pressable
-                key={unit.value}
-                style={[
-                  styles.dosageUnitPressabale,
-                  {
-                    borderWidth: isSelected ? undefined : 1,
-                    borderColor,
-                    backgroundColor: isSelected ? tintColor : undefined,
-                  },
-                ]}
-                onPress={() => handleSetDosageUnit(unit.value)}
-              >
-                <Text style={styles.dosageUnitIcon}>{unit.icon}</Text>
-                <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
-                  {unit.label}
-                </Text>
-              </Pressable>
-            );
-          })}
+      {showUnitForm && (
+        <View style={styles.bodyView}>
+          <Text style={[styles.label, { color }]}>Форма лекарства</Text>
+          <View style={styles.dosageUnitWrapper}>
+            {DOSAGE_UNITS.map((unit) => {
+              const isSelected = unit.value === dosageUnitState.toUpperCase();
+              return (
+                <Pressable
+                  key={unit.value}
+                  style={[
+                    styles.dosageUnitPressabale,
+                    {
+                      borderWidth: isSelected ? undefined : 1,
+                      borderColor,
+                      backgroundColor: isSelected ? tintColor : undefined,
+                    },
+                  ]}
+                  onPress={() => handleSetDosageUnit(unit.value)}
+                >
+                  <Text style={styles.dosageUnitIcon}>{unit.icon}</Text>
+                  <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
+                    {unit.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }

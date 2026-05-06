@@ -7,7 +7,7 @@ interface Schedule {
   dosage: number;
   rule: {
     recurrenceRule: string;
-    preset: SchedulePreset;
+    preset: SchedulePreset | undefined;
   };
   startDate: string;
   timeZone: string;
