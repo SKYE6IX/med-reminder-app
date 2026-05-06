@@ -11,9 +11,6 @@ interface JwtPayload {
 }
 
 const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
-const authRefresh = axios.create({
-  baseURL: `http://${localhost}:8080/auth`,
-});
 
 export const isTokenExpired = (token: string) => {
   try {
@@ -46,7 +43,7 @@ export const getValidAccessToken = async (): Promise<string | null> => {
   if (!isTokenExpired(accessToken)) return accessToken;
 
   try {
-    const { data } = await authRefresh.post<AuthResponse>("/refresh", {
+    const { data } = await axios.post<AuthResponse>(`http://${localhost}:8080/auth/refresh`, {
       refreshToken,
     });
 

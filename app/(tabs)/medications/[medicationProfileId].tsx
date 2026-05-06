@@ -1,37 +1,59 @@
-import AlarmClockIcon from "@/component/icons/alarm-clock-icon";
-import ArrowRight from "@/component/icons/arrow-right";
 import CalenderIcon from "@/component/icons/calender-icon";
-import ClockIcon from "@/component/icons/clock-icon";
 import LineChartIcon from "@/component/icons/line-chart-icon";
-import NoteIcon from "@/component/icons/note-icon";
 import PillFilledIcon from "@/component/icons/pill-filled-icon";
-import PillIcon from "@/component/icons/pill-icon";
-import CustomButton from "@/component/ui/custom-button/custom-button";
+import DeleteMedicationProfile from "@/component/ui/delete-medication-profile";
 import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
-import { DOSAGE_UNITS } from "@/constants/schedule-options";
-import { useQuery } from "@/hooks/use-query";
+import DosageSettings from "@/component/ui/medication-details/dosage-settings";
+import FrequencySettings from "@/component/ui/medication-details/frequency-settings";
+import NoteSettings from "@/component/ui/medication-details/note-settings";
+import TimeSettings from "@/component/ui/medication-details/time-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
-import { formatRegularDate, getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
+import { api } from "@/utils/axiosInstance";
+import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useMemo } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+const getStartedDate = (isoString: string) => {
+  const date = new Date(isoString);
+  const convertedString = getDateLocalString(date).replaceAll(".", " ");
+  return formatRegularDate(convertedString);
+};
+
+// Medication profile details query
+const fetchMedicationProfileDetails = async (id: string) => {
+  const response = await api.get<MedicationProfileResponse>(`medications/${id}`);
+  return response.data;
+};
 
 export default function MedicationDetails() {
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const { medicationProfileId } = useLocalSearchParams();
 
-  const pathVariable = useMemo(() => medicationProfileId, [medicationProfileId]);
+  // Query details data
+  const { data: medicationProfile, isLoading } = useQuery({
+    queryKey: ["medication-profile", "details", medicationProfileId],
+    queryFn: () => fetchMedicationProfileDetails(medicationProfileId as string),
+    staleTime: 60 * 60 * 1000,
+  });
 
-  const {
-    data: medicationProfile,
-    loading,
-    error,
-  } = useQuery<MedicationProfileResponse>({ url: `medications/${pathVariable}` });
+  // Updating mutation
+  const { mutate, isPending } = useUpdateMedicationMutation();
+
+  // Update the medication profile status
+  const handleOnSwitchToggle = (status: "active" | "inactive", id: string) => {
+    if (status === "active") {
+      mutate({ id, data: { isActive: true } });
+    } else if (status === "inactive") {
+      mutate({ id, data: { isActive: false } });
+    }
+  };
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -39,40 +61,21 @@ export default function MedicationDetails() {
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
 
-  const handleOnSwitchToggle = (status: "active" | "inactive") => {
-    // Perform operation to update the active status of the
-    // medication profile.
-    console.log("current status -> ", status);
-  };
-
-  const getStartedDate = (isoString: string) => {
-    const date = new Date(isoString);
-    const convertedString = getDateLocalString(date).replaceAll(".", " ");
-    return formatRegularDate(convertedString);
-  };
-  const getStartTime = (startTime: string) => {
-    const date = new Date(startTime);
-    return toLocalTime(date);
-  };
-  const getDosageUnit = (value: string) => {
-    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-    return label;
-  };
-
-  // const rruleText = getRuleText(medicationProfile.schedule.recurrenceRule);
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <Loader visible={loading} />
       <ScrollView
+        automaticallyAdjustContentInsets={false}
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: isIOS ? undefined : insets.top + 10, paddingBottom: 10 },
         ]}
       >
+        <Loader visible={isLoading || isPending} />
         {medicationProfile && (
           <View style={styles.contentContainer}>
             <MedicationCard
+              id={medicationProfile.id}
               imageUrl=""
               name={medicationProfile.medicationName}
               profile={medicationProfile.profile as ProfileResponse}
@@ -86,6 +89,7 @@ export default function MedicationDetails() {
               {/* Schedule Information Wrapper */}
               <View style={styles.detailsWrapper}>
                 <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
+
                 {/* GROUP */}
                 <View style={styles.detailsGroup}>
                   {/* DATE STARTED */}
@@ -104,35 +108,11 @@ export default function MedicationDetails() {
                   </View>
 
                   {/* TIME STARTED */}
-                  <Pressable
-                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                  >
-                    <View style={styles.cardHeader}>
-                      <Text style={[styles.cardTitle, { color }]}>Время начала</Text>
-                      <ArrowRight color={color} />
-                    </View>
-                    <View style={styles.cardBody}>
-                      <ClockIcon color={color} />
-                      <Text style={[styles.cardTextContent, { color }]}>
-                        {getStartTime(medicationProfile.schedule.starTime)}
-                      </Text>
-                    </View>
-                  </Pressable>
+                  <TimeSettings medicationProfile={medicationProfile} />
                 </View>
 
                 {/* FREQUENCY RRULES */}
-                <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Частота приема</Text>
-                    <ArrowRight color={color} />
-                  </View>
-                  <View style={styles.cardBody}>
-                    <AlarmClockIcon color={color} />
-                    <Text style={[styles.cardTextContent, { color }]}>
-                      Каждые 6 часов, 3 раза в день
-                    </Text>
-                  </View>
-                </Pressable>
+                <FrequencySettings medicationProfile={medicationProfile} />
               </View>
 
               {/* Dosage Information */}
@@ -141,20 +121,7 @@ export default function MedicationDetails() {
 
                 <View style={styles.detailsGroup}>
                   {/* DOSAGE AMOUNT */}
-                  <Pressable
-                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                  >
-                    <View style={styles.cardHeader}>
-                      <Text style={[styles.cardTitle, { color }]}>Доза за прием</Text>
-                      <ArrowRight color={color} />
-                    </View>
-                    <View style={styles.cardBody}>
-                      <PillIcon color={color} size={16} />
-                      <Text style={[styles.cardTextContent, { color }]}>
-                        {`${medicationProfile.schedule.dosage} ${getDosageUnit(medicationProfile.schedule.measurement)}`}
-                      </Text>
-                    </View>
-                  </Pressable>
+                  <DosageSettings medicationProfile={medicationProfile} />
 
                   {/* STOCK DOSAGE AMOUNT */}
                   <View
@@ -171,18 +138,7 @@ export default function MedicationDetails() {
                 </View>
 
                 {/* NOTE ABOUT DOSAGE USAGE */}
-                <Pressable style={[styles.card, { backgroundColor: bgSecondary }]}>
-                  <View style={styles.cardHeader}>
-                    <Text style={[styles.cardTitle, { color }]}>Заметки</Text>
-                    <ArrowRight color={color} />
-                  </View>
-                  <View style={styles.cardBody}>
-                    <NoteIcon color={color} />
-                    <Text style={[styles.cardTextContent, { color: mutedColor }]}>
-                      {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
-                    </Text>
-                  </View>
-                </Pressable>
+                <NoteSettings medicationProfile={medicationProfile} />
 
                 {/* TOTAL DOSAGE TAKEN INFO */}
                 <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
@@ -195,7 +151,7 @@ export default function MedicationDetails() {
             </View>
 
             {/* DELETE PILL BUTTON */}
-            <CustomButton label="Удалить лекарство" variant="danger" />
+            <DeleteMedicationProfile medicationProfileId={medicationProfileId as string} />
           </View>
         )}
       </ScrollView>

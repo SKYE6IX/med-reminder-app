@@ -1,20 +1,18 @@
 import DeleteIcon from "@/component/icons/delete-icon";
 import PlusIcon from "@/component/icons/plus-icon";
-import { useQuery } from "@/hooks/use-query";
+import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { ProfileResponse } from "@/types/user";
 import { Image } from "expo-image";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Relations() {
   const isIOS = Platform.OS === "ios";
-
   const insets = useSafeAreaInsets();
 
-  const { data, loading, error } = useQuery<ProfileResponse[]>({ url: "users/profiles" });
+  const { profiles } = useProfilesQuery();
 
-  const relationsProfile = data?.filter((profile) => !profile.isSelf) ?? [];
+  const relationsProfile = profiles?.filter((profile) => !profile.isSelf) ?? [];
 
   //   Themes color
   const color = useThemeColor({}, "textPrimary");

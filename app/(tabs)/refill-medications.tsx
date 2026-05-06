@@ -30,6 +30,7 @@ export default function RefillPill() {
         data={getSomeMock()}
         renderItem={({ item }) => (
           <MedicationCard
+            id={item.id}
             imageUrl={item.medicationImageUrl}
             name={item.medicationName}
             startedDate={getStartedDate(item.schedule.startDate)}

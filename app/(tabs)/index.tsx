@@ -1,20 +1,22 @@
 import PlusIcon from "@/component/icons/plus-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { DOSAGE_UNITS } from "@/constants/schedule-options";
-import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useUserStore } from "@/stores/user-store";
+import { useUserData } from "@/hooks/use-user-data";
 import { MedicationScheduleResponse } from "@/types/medication";
-import { ProfileResponse } from "@/types/user";
 import { getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+import MedicationCard from "@/component/ui/medication-card/medication-card";
+import { ProfileResponse } from "@/types/user";
+import { api } from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
 type TABS_VALUE = "ALL" | "TAKEN" | "MISSED";
 
@@ -23,20 +25,54 @@ const TABS = [
   { label: "Принято", value: "TAKEN" },
   { label: "Пропущено", value: "MISSED" },
 ];
+
 const localDateString = getDateLocalString();
 
+const getScheduleBadge = (
+  medicationSchedule: MedicationScheduleResponse,
+): "upcoming" | "taken" | "missed" => {
+  if (medicationSchedule.status === "TAKEN") {
+    return "taken";
+  } else if (medicationSchedule.status === "MISSED") {
+    return "missed";
+  } else {
+    return "upcoming";
+  }
+};
+
+const getDosageUnit = (value: string) => {
+  const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
+  return label;
+};
+
+const getScheduleTime = (scheduleTime: string) => {
+  const date = new Date(scheduleTime);
+  return toLocalTime(date);
+};
+
+// Fetch schedule events query
+const fetchScheduleEvents = async (params: string) => {
+  const response = await api.get("medications/schedules/event", {
+    params: {
+      eventDate: params,
+    },
+  });
+  return response.data;
+};
+
 export default function Home() {
-  const { userData } = useUserStore();
+  const { user } = useUserData();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
   const insets = useSafeAreaInsets();
 
-  const { data, loading, error } = useQuery<MedicationScheduleResponse[]>({
-    url: "medications/schedules/event",
-    params: {
-      eventDate: selectedDate,
-    },
+  const { data, isLoading } = useQuery<MedicationScheduleResponse[]>({
+    queryKey: ["schedule-events", selectedDate],
+    queryFn: () => fetchScheduleEvents(selectedDate),
+    staleTime: 60 * 60 * 10000,
   });
+
+  const hasMedicationSchedule = data && data.length >= 1 ? true : false;
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -51,32 +87,8 @@ export default function Home() {
     }
   };
 
-  const hasMedicationSchedule = data && data.length >= 1 ? true : false;
-
-  const getScheduleBadge = (
-    medicationSchedule: MedicationScheduleResponse,
-  ): "upcoming" | "taken" | "missed" => {
-    if (medicationSchedule.status === "TAKEN") {
-      return "taken";
-    } else if (medicationSchedule.status === "MISSED") {
-      return "missed";
-    } else {
-      return "upcoming";
-    }
-  };
-
-  const getDosageUnit = (value: string) => {
-    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-    return label;
-  };
-
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
-  };
-
-  const getScheduleTime = (scheduleTime: string) => {
-    const date = new Date(scheduleTime);
-    return toLocalTime(date);
   };
 
   const handleOnDateChange = (ISODate: string) => {
@@ -87,7 +99,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <Loader visible={loading} />
+      <Loader visible={isLoading} />
       <View style={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
@@ -99,7 +111,7 @@ export default function Home() {
               contentPosition="top center"
             />
           </View>
-          <Text style={[styles.headerProfileName, { color }]}>{userData?.name}</Text>
+          <Text style={[styles.headerProfileName, { color }]}>{user?.name}</Text>
         </View>
 
         {/* WEEK VIEW */}
@@ -108,7 +120,7 @@ export default function Home() {
         </View>
 
         {/* CONTENT BODY */}
-        {!loading && (
+        {!isLoading && (
           <>
             {hasMedicationSchedule ? (
               <View style={{ flex: 1 }}>
@@ -120,6 +132,7 @@ export default function Home() {
                   data={getFilterMedicationSchedule()}
                   renderItem={({ item }) => (
                     <MedicationCard
+                      id={item.id}
                       imageUrl={item.medicationImageUrl}
                       name={item.medicationName}
                       profile={item.profile as ProfileResponse}

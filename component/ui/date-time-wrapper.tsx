@@ -1,19 +1,24 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { RefObject, useImperativeHandle, useRef, useState } from "react";
 import { View } from "react-native";
-import BottomSheetWrapper, {
-  BottomSheetWrapperRef,
-} from "./bottom-sheet-wrapper";
+import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
+import CustomButton from "./custom-button/custom-button";
 
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
+  closeDateTime: () => void;
 }
 
 export type DateTimeWrapperProps = {
   ref: RefObject<DateTimeWrapperRef | null>;
   mode: "date" | "time";
   bottomSheetTitle?: string;
-  onDateTimeSelected: (dateTime: Date) => void;
+
+  // @platform IOS ONLY
+  showButton?: boolean;
+  onButtonPress?: () => void;
+  // The event is only used with Android.
+  onDateTimeSelected: (dateTime: Date, event?: DateTimePickerEvent["type"]) => void;
 };
 
 export default function DateTimeWrapper({
@@ -21,6 +26,8 @@ export default function DateTimeWrapper({
   mode,
   bottomSheetTitle,
   onDateTimeSelected,
+  showButton,
+  onButtonPress,
 }: DateTimeWrapperProps) {
   const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
@@ -29,6 +36,9 @@ export default function DateTimeWrapper({
   useImperativeHandle(ref, () => ({
     showDateTime() {
       bottomSheetWrapperRef.current?.open();
+    },
+    closeDateTime() {
+      bottomSheetWrapperRef.current?.close();
     },
   }));
 
@@ -46,13 +56,14 @@ export default function DateTimeWrapper({
     <BottomSheetWrapper
       ref={bottomSheetWrapperRef}
       title={bottomSheetTitle || ""}
-      snapPointPercent="50%"
+      snapPointPercent={showButton ? "50%" : "45%"}
     >
       <View
         style={{
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
+          gap: 10,
         }}
       >
         <DateTimePicker
@@ -63,6 +74,7 @@ export default function DateTimeWrapper({
           locale="ru-RU"
           minimumDate={mode === "date" ? new Date(now) : undefined}
         />
+        {showButton && <CustomButton label="Применить" onPress={onButtonPress} />}
       </View>
     </BottomSheetWrapper>
   );

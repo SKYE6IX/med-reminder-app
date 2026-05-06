@@ -12,8 +12,8 @@ import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import ProfileCard from "@/component/ui/profile-card";
 import { Relation } from "@/constants/relation";
+import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { mockProfiles } from "@/mock-data";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { MedicationUnit } from "@/types/medication";
 import { useRouter } from "expo-router";
@@ -32,6 +32,7 @@ const medicationUnits = [
 
 export default function DetailsStepScreen() {
   const { setMedicationDetails, formState } = useAddPillStore();
+  const { profiles } = useProfilesQuery();
 
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
@@ -45,21 +46,18 @@ export default function DetailsStepScreen() {
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
 
-  const selfProfile = mockProfiles.find((profile) => profile.isSelf);
+  const selfProfile = profiles.find((profile) => profile.isSelf);
 
-  const relationProfile = mockProfiles.find(
+  const selectedRelationProfile = profiles.find(
     (profile) => profile.id === formState.profileId && !profile.isSelf,
   );
 
-  const relationProfiles = mockProfiles.filter((profile) => !profile.isSelf);
+  const relationProfileList = profiles.filter((profile) => !profile.isSelf);
 
-  const isRelationProfileSelected = mockProfiles.some(
-    (profile) => !profile.isSelf && profile.id === formState.profileId,
-  );
+  const isRelationProfileSelected = selectedRelationProfile?.id === formState.profileId;
 
   const handleSetProfile = (profileId: string) => {
     setMedicationDetails({ profileId });
-
     // Close the bottomsheeet after selection
     chooseProfileBottomSheet.current?.close();
   };
@@ -107,13 +105,13 @@ export default function DetailsStepScreen() {
             setProfile={handleSetProfile}
           />
 
-          {/* Other profile selection */}
-          {relationProfile && (
+          {/* Relation Profile Selection */}
+          {selectedRelationProfile && (
             <ProfileCard
-              isSelected={relationProfile.id === formState.profileId}
-              profileId={relationProfile.id}
-              name={relationProfile.name}
-              relation={relationProfile.relation as Relation}
+              isSelected={isRelationProfileSelected}
+              profileId={selectedRelationProfile.id}
+              name={selectedRelationProfile.name}
+              relation={selectedRelationProfile.relation as Relation}
               isSelf={false}
               hasActiveDot
               setProfile={handleSetProfile}
@@ -122,7 +120,7 @@ export default function DetailsStepScreen() {
           )}
 
           {/* Trigger button to show bottom sheet for profile list */}
-          {relationProfiles.length > 1 && !isRelationProfileSelected && (
+          {relationProfileList.length >= 1 && !isRelationProfileSelected && (
             <CustomButton
               label="Выбрать члена семьи"
               variant="outline"
@@ -135,9 +133,9 @@ export default function DetailsStepScreen() {
           {/* Bottom sheet for profile list */}
           <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
             <View style={styles.profileSelectionList}>
-              {relationProfiles.map((profile) => (
+              {relationProfileList.map((profile) => (
                 <ProfileCard
-                  isSelected={false} // it's part of list.// no active state on list
+                  isSelected={false} // it's part of list. // no active state on list
                   profileId={profile.id}
                   key={profile.id}
                   name={profile.name}

@@ -4,72 +4,107 @@ import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
 import { DOSAGE_UNITS } from "@/constants/schedule-options";
-import { useQuery } from "@/hooks/use-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
+import { api } from "@/utils/axiosInstance";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-type TABS_VALUE = "ALL" | "ACTIVE" | "INACTIVE";
+type TABS_VALUE = "ALL" | "ACTIVE" | "IN_ACTIVE";
 
 const TABS = [
   { label: "Все", value: "ALL" },
   { label: "Активно", value: "ACTIVE" },
-  { label: "Неактивно", value: "INACTIVE" },
+  { label: "Неактивно", value: "IN_ACTIVE" },
 ];
+
+const getStartedDate = (isoString: string) => {
+  const date = new Date(isoString);
+  const convertedString = getDateLocalString(date).replaceAll(".", " ");
+  return formatRegularDate(convertedString);
+};
+
+const getDosageUnit = (value: string) => {
+  const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
+  return label;
+};
+
+// Fetch query
+const fetchMedicationProfiles = async () => {
+  const response = await api.get("medications");
+  return response.data;
+};
 
 export default function Medications() {
   const isIOS = Platform.OS === "ios";
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
-
   const insets = useSafeAreaInsets();
 
-  const { data, loading, error } = useQuery<MedicationProfileResponse[]>({ url: "/medications" });
+  const isMounted = useRef(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
+
+  // Query data list
+  const { data, isLoading } = useQuery<MedicationProfileResponse[]>({
+    queryKey: ["medication-profile", "list"],
+    queryFn: fetchMedicationProfiles,
+    staleTime: 60 * 60 * 1000,
+  });
+
+  // Updating mutation
+  const { mutate, isPending } = useUpdateMedicationMutation();
 
   const hasMedicationsProfiles = data && data.length >= 1 ? true : false;
-  // Themes color
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const getFilterMedicationsProfile = () => {
+  const getFilterMedicationsProfile = useMemo(() => {
     if (activeTab === "ALL") {
       return data;
     }
     return data?.filter((medProfile) => medProfile.status.toUpperCase() === activeTab);
-  };
+  }, [activeTab, data]);
 
-  const getStartedDate = (isoString: string) => {
-    const date = new Date(isoString);
-    const convertedString = getDateLocalString(date).replaceAll(".", " ");
-    return formatRegularDate(convertedString);
-  };
-
-  const getDosageUnit = (value: string) => {
-    const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-    return label;
-  };
+  // We force a re-render for the UI so the List information
+  // is up to date we the data.
+  useFocusEffect(
+    useCallback(() => {
+      if (!isMounted.current) {
+        isMounted.current = true;
+        return;
+      }
+      setRefreshKey((prev) => prev + 1);
+    }, []),
+  );
 
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
   };
 
-  const handleOnSwitchToggle = (status: "active" | "inactive") => {
-    // Perform operation to update the active status of the
-    // medication profile.
-    console.log("current status -> ", status);
+  // Themes color
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
+  // Update the medication profile status
+  const handleOnSwitchToggle = (status: "active" | "inactive", id: string) => {
+    if (status === "active") {
+      mutate({ id, data: { isActive: true } });
+    } else if (status === "inactive") {
+      mutate({ id, data: { isActive: false } });
+    }
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <Loader visible={loading} />
-      {!loading && (
+      <Loader visible={isLoading || isPending} />
+      {!isLoading && (
         <>
           {hasMedicationsProfiles ? (
             <View
@@ -78,12 +113,14 @@ export default function Medications() {
               <View style={styles.tabWrapper}>
                 <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
               </View>
-              {!loading && (
+              {!isLoading && (
                 <FlatList
+                  key={refreshKey}
                   style={{ flex: 1 }}
-                  data={getFilterMedicationsProfile()}
+                  data={getFilterMedicationsProfile}
                   renderItem={({ item }) => (
                     <MedicationCard
+                      id={item.id}
                       imageUrl={item.medicationImageUrl}
                       name={item.medicationName}
                       profile={item.profile as ProfileResponse}

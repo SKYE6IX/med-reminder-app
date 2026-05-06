@@ -3,10 +3,12 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
 import Loader from "@/component/ui/loader";
-import { useMutation } from "@/hooks/use-mutation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { CreateMedication, MedicationProfileResponse } from "@/types/medication";
+import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, StyleSheet, Switch, Text, TextInput, View } from "react-native";
@@ -34,6 +36,11 @@ const COLLAPSED = 75;
 const HALF_EXPAND = 197;
 const FULL_EXPAND = 417;
 
+const createMedicationMutation = async (body: CreateMedication) => {
+  const response = await api.post<MedicationProfileResponse>("medications", body);
+  return response.data;
+};
+
 export default function FinalStepScreen() {
   const router = useRouter();
   const isIOS = Platform.OS === "ios";
@@ -50,12 +57,13 @@ export default function FinalStepScreen() {
 
   // @platform IOS ONLY
   const [isDosageAmountPickerVisible, setIsDosageAmountPickerVisible] = useState(false);
-  // @platform IOS ONLY
   const [isRefillDaysPickerVisible, setIsRefillDaysPickerVisible] = useState(false);
+  // ** END **
 
   const totalDosageAmount = formState.medicationPack
     ? `${formState.medicationPack.totalQuantity}`
     : "";
+
   const refillDaysReminder = formState.medicationPack ? formState.medicationPack.notifyRule : "";
   const medicationNote = formState.medicationNote ? formState.medicationNote : "";
 
@@ -162,13 +170,26 @@ export default function FinalStepScreen() {
     height: refillSettingHeight.value,
   }));
 
-  // Create a new medication
-  const [createMedication, { loading }] = useMutation<MedicationProfileResponse, CreateMedication>({
-    url: "medications",
-    method: "post",
-    onSuccess(data, variables) {
+  const { mutate, isPending } = useMutation({
+    mutationFn: createMedicationMutation,
+    async onSuccess(data) {
+      // Update the cache for medication profiles.
+      queryClient.setQueryData(
+        ["medication-profiles"],
+        (existingData: MedicationProfileResponse[]) =>
+          existingData ? [...existingData, data] : existingData,
+      );
+      await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
       clearFormState();
-      router.dismissTo("/");
+      router.dismissAll();
+      router.navigate("/");
+    },
+    onError(error, variables, onMutateResult, context) {
+      if (axios.isAxiosError(error)) {
+        console.log("An axios error occur when create a medication -> ", error);
+      } else {
+        console.log("Unknow error occur when create a medication -> ", error);
+      }
     },
   });
 
@@ -182,12 +203,13 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
-    await createMedication(data);
+
+    mutate(data);
   };
 
   return (
     <View style={[styles.container, sharedStyles.container]}>
-      <Loader visible={loading} />
+      <Loader visible={isPending} />
 
       {/* Refill setting container */}
       <View style={sharedStyles.sectionContainer}>
@@ -269,7 +291,7 @@ export default function FinalStepScreen() {
           style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
         />
       </View>
-      <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={loading} />
+      <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
     </View>
   );
 }

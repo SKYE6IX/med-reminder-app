@@ -10,14 +10,15 @@ import {
   useFonts,
 } from "@expo-google-fonts/roboto";
 import { PortalProvider } from "@gorhom/portal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { deleteItemAsync } from "expo-secure-store";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import { queryClient } from "@/utils/query-client";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -51,8 +52,11 @@ export default function RootLayout() {
     try {
       const token = await getValidAccessToken();
       if (token) {
-        await getAuthorizedUser();
+        getAuthorizedUser();
         useAuthStore.getState().setIsAuthenticated(true);
+        setIsReady(true);
+      } else {
+        useAuthStore.getState().setIsAuthenticated(false);
         setIsReady(true);
       }
     } catch (error) {
@@ -68,56 +72,40 @@ export default function RootLayout() {
     Roboto_600SemiBold,
   });
 
-  // Development Functions
-  const clearOnbordingComplete = () => {
-    deleteItemAsync("auth-store");
-  };
-
-  const getAllKeys = async () => {
-    try {
-      const keys = await AsyncStorage.getAllKeys();
-      console.log(keys);
-    } catch (e) {
-      // read key error
-    }
-    // example console.log result:
-    // ['@MyApp_user', '@MyApp_key']
-  };
-
   // Check for valid access token or get a refresh token if the token expired.
   useEffect(() => {
     checkTokenAndFetchUser();
   }, []);
 
   useEffect(() => {
-    // clearOnbordingComplete();
-    // getAllKeys();
-    if ((loaded || error) && isReady) {
+    if (isReady && (loaded || error)) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error, isReady]);
 
   return (
-    <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
-      <GestureHandlerRootView>
-        <PortalProvider>
-          <StatusBar style="auto" />
-          <FeedbackAlert />
-          <Stack>
-            <Stack.Protected guard={!hasCompleteOnboarding}>
-              <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-            </Stack.Protected>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider value={isDark ? CustomDarkTheme : CustomLightTheme}>
+        <GestureHandlerRootView>
+          <PortalProvider>
+            <StatusBar style="auto" />
+            <FeedbackAlert />
+            <Stack>
+              <Stack.Protected guard={!hasCompleteOnboarding}>
+                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+              </Stack.Protected>
 
-            <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack.Protected>
+              <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              </Stack.Protected>
 
-            <Stack.Protected guard={isAuthenticated}>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack.Protected>
-          </Stack>
-        </PortalProvider>
-      </GestureHandlerRootView>
-    </ThemeProvider>
+              <Stack.Protected guard={isAuthenticated}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              </Stack.Protected>
+            </Stack>
+          </PortalProvider>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

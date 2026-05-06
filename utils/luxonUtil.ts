@@ -4,22 +4,33 @@ import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
 export const getTimeZone = () => DateTime.now().zoneName;
 
-export const getDateLocalString = (date: Date = new Date()) => {
+export const toLocalUtcTime = (date: Date) => {
   return DateTime.fromJSDate(date)
     .toUTC()
     .setZone("local", { keepLocalTime: true })
     .toJSDate()
-    .toLocaleDateString("ru-RU");
+    .toLocaleTimeString("ru", {
+      formatMatcher: "best fit",
+      timeStyle: "short",
+    });
 };
 
 export const toLocalTime = (date: Date) => {
   return DateTime.fromJSDate(date)
     .setZone(getTimeZone(), { keepLocalTime: true })
     .toJSDate()
-    .toLocaleTimeString("ru-RU", {
+    .toLocaleTimeString("ru", {
       formatMatcher: "best fit",
       timeStyle: "short",
     });
+};
+
+export const getDateLocalString = (date: Date = new Date()) => {
+  return DateTime.fromJSDate(date)
+    .toUTC()
+    .setZone("local", { keepLocalTime: true })
+    .toJSDate()
+    .toLocaleDateString("ru-RU");
 };
 
 export const formatRegularDate = (isoDate: string) => {

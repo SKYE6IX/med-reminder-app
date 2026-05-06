@@ -1,6 +1,6 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { PickerIOS } from "@react-native-picker/picker";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import { CustomPickerProps } from "./custom-picker";
@@ -14,6 +14,8 @@ export default function CustomPicker({
   triggerSelection,
   selectedValue,
 }: CustomPickerProps) {
+  const [localValue, setLocalValue] = useState(selectedValue);
+
   // Themes color
   const textColor = useThemeColor({}, "textPrimary");
   const borderColor = useThemeColor({}, "borderColor");
@@ -32,6 +34,7 @@ export default function CustomPicker({
   };
 
   const handleValueChange = (value: string) => {
+    setLocalValue(value);
     onValueSelected(value);
   };
 
@@ -64,7 +67,7 @@ export default function CustomPicker({
       <Animated.View style={{ opacity: isSelectionVisible ? undefined : 0 }}>
         <PickerIOS
           testID="picker"
-          selectedValue={selectedValue}
+          selectedValue={localValue}
           onValueChange={(itemValue) => handleValueChange(itemValue.toString())}
           style={{
             borderTopWidth: 1,

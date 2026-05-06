@@ -51,30 +51,17 @@ export default function ProfileCard({
       </View>
 
       <View style={styles.profileTextWrapper}>
-        <Text
-          style={[
-            styles.profileNameText,
-            { color: isSelected ? "#F7F7F7" : color },
-          ]}
-        >
+        <Text style={[styles.profileNameText, { color: isSelected ? "#F7F7F7" : color }]}>
           {isSelf ? "Для меня" : name}
         </Text>
-        <Text
-          style={[
-            styles.profileRelationText,
-            { color: isSelected ? "#F7F7F7" : color },
-          ]}
-        >
+        <Text style={[styles.profileRelationText, { color: isSelected ? "#F7F7F7" : color }]}>
           {isSelf ? "Вы" : getRelationLabel(relation || "")}
         </Text>
       </View>
 
       <View style={styles.profileActionsContainer}>
         {!isSelf && !asList && (
-          <Pressable
-            style={styles.changeSelectedProfile}
-            onPress={changeProfile}
-          >
+          <Pressable style={styles.changeSelectedProfile} onPress={changeProfile}>
             <Text style={styles.changeSelectedProfileText}>Изменить</Text>
           </Pressable>
         )}

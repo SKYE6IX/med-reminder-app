@@ -9,18 +9,15 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useMutation } from "@/hooks/use-mutation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
-import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
+import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateSignInInputs } from "@/utils/validator";
-
-// TODO:
-// Refactor mutation to use useMutations hook for both
-// sign in and create account.
+import { useMutation } from "@tanstack/react-query";
 
 type FormState = {
   email: string;
@@ -30,6 +27,11 @@ type FormState = {
 type SignInState = {
   formState: FormState;
   errorsSet: Set<string>;
+};
+
+const signInMutation = async (formState: FormState) => {
+  const response = await api.post<AuthResponse>("auth/login", formState);
+  return response.data;
 };
 
 export default function SignInScreen() {
@@ -72,33 +74,24 @@ export default function SignInScreen() {
     });
   };
 
-  const [loginUser, { loading }] = useMutation<AuthResponse, FormState>({
-    url: "/auth/login",
-    method: "post",
-    config: {
-      cache: {
-        update: {
-          "user-data": "delete",
-        },
-      },
-    },
-    async onSuccess(data, variables) {
-      // Clear the token if exist before saving new one;
+  const { mutate, isPending } = useMutation({
+    mutationFn: signInMutation,
+    onSuccess(data) {
       clearTokens();
-      // Safe the new token
       saveTokens(data.accessToken, data.refreshToken);
-      await getAuthorizedUser();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       setIsAuthenticated(true);
     },
-    onError(error, variables) {
-      if (error.response?.status === 401) {
-        showFeedBack({
-          title: "Не удалось авторизовать!",
-          message: "Неверный адрес электронной почты или пароль!",
-          status: "error",
-        });
+    onError(error, variables, onMutateResult, context) {
+      if (axios.isAxiosError(error)) {
+        error.response?.status === 401 &&
+          showFeedBack({
+            title: "Не удалось авторизовать!",
+            message: "Неверный адрес электронной почты или пароль!",
+            status: "error",
+          });
       } else {
-        console.log("Unknow Error occur in sign in!");
+        console.log("An unknown error occur in sign in mutation", error);
       }
     },
   });
@@ -107,7 +100,6 @@ export default function SignInScreen() {
   const handleSubmitForm = async () => {
     // Check all field are filled correctly.
     const validatedInputs = validateSignInInputs(signInState.formState);
-
     if (validatedInputs.error) {
       validatedInputs.error.issues.forEach((issue) => {
         setSignInState((prvState) => {
@@ -120,12 +112,12 @@ export default function SignInScreen() {
       return;
     }
 
-    await loginUser({ ...validatedInputs.data });
+    mutate({ ...validatedInputs.data });
   };
 
   return (
     <View style={[{ paddingBottom: Math.max(insets.bottom, 30) }, styles.container]}>
-      <Loader visible={loading} />
+      <Loader visible={isPending} />
 
       <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
       <View style={styles.inputsWrapper}>
@@ -151,7 +143,7 @@ export default function SignInScreen() {
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Войти" onPress={handleSubmitForm} disabled={loading} />
+        <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
         <ThemedText style={styles.resetPasswordText}>
           Забыли пароль?
           <Link href="/forget-password" style={{ color: linkColor }}>

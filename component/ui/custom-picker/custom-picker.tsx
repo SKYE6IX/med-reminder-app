@@ -20,6 +20,7 @@ export default function CustomPicker({
   onValueSelected,
   selectedValue,
 }: CustomPickerProps) {
+  const [localValue, setLocalValue] = useState(selectedValue);
   const [isSelectionVisible, setIsSelectionVisible] = useState(false);
   const pickerRef = useRef<Picker<string>>(null);
 
@@ -35,6 +36,7 @@ export default function CustomPicker({
       pickerRef.current?.focus();
       if (!selectedValue) {
         onValueSelected(items[0].value);
+        setLocalValue(items[0].value);
       }
     } else {
       pickerRef.current?.blur();
@@ -73,7 +75,7 @@ export default function CustomPicker({
       <Picker
         testID="picker"
         ref={pickerRef}
-        selectedValue={selectedValue}
+        selectedValue={localValue}
         onValueChange={(itemValue) => handleValueChange(itemValue)}
         mode="dropdown"
         style={{

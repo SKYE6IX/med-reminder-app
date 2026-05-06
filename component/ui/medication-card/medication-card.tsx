@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 
 type MedicationCardProps = {
+  id: string;
   imageUrl: string;
   name: string;
   profile?: ProfileResponse;
@@ -20,11 +21,12 @@ type MedicationCardProps = {
   isActive?: boolean;
   actionButtonLabel?: string;
   onButtonPress?: () => void;
-  onSwitchToggle?: (status: "active" | "inactive") => void;
+  onSwitchToggle?: (status: "active" | "inactive", id: string) => void;
   onNavigate?: () => void;
 };
 
 export default function MedicationCard({
+  id,
   imageUrl,
   name,
   profile,
@@ -55,9 +57,9 @@ export default function MedicationCard({
     const isToggle = !toggleSwitch;
 
     if (isToggle && onSwitchToggle) {
-      onSwitchToggle("active");
+      onSwitchToggle("active", id);
     } else if (!isToggle && onSwitchToggle) {
-      onSwitchToggle("inactive");
+      onSwitchToggle("inactive", id);
     }
     setToggleSwitch(isToggle);
   };

@@ -55,6 +55,8 @@ export default function NameStepScreen() {
     }
   };
 
+  // console.log("Current form state -> ", formState);
+
   return (
     <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
       <View style={styles.headerWrapper}>
@@ -134,7 +136,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     height: 48,
     paddingLeft: 16,
     paddingRight: 16,

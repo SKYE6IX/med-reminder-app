@@ -7,17 +7,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/stores/use-auth-store";
-import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateCreateAccountInputs } from "@/utils/validator";
 
-import { useMutation } from "@/hooks/use-mutation";
+import Loader from "@/component/ui/loader";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { AuthResponse } from "@/types/auth-response";
-import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
+import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
+import { clearTokens, saveTokens } from "@/utils/tokenUtils";
+import { useMutation } from "@tanstack/react-query";
 
 type FormState = {
   email: string;
@@ -28,6 +29,11 @@ type FormState = {
 type CreateAccountState = {
   formState: FormState;
   errorsSet: Set<string>;
+};
+
+const createAccountMutation = async (formState: FormState) => {
+  const response = await api.post<AuthResponse>("auth/register", formState);
+  return response.data;
 };
 
 export default function CreateAccountScreen() {
@@ -71,33 +77,24 @@ export default function CreateAccountScreen() {
     });
   };
 
-  const [registerUser, { loading }] = useMutation<AuthResponse, FormState>({
-    url: "/auth/login",
-    method: "post",
-    config: {
-      cache: {
-        update: {
-          "user-data": "delete",
-        },
-      },
-    },
-    async onSuccess(data, variables) {
-      // Clear the token if exist before saving new one;
+  const { mutate, isPending } = useMutation({
+    mutationFn: createAccountMutation,
+    onSuccess(data) {
       clearTokens();
-      // Safe the new token
       saveTokens(data.accessToken, data.refreshToken);
-      await getAuthorizedUser();
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       setIsAuthenticated(true);
     },
-    onError(error, variables) {
-      if (error.response?.status === 401) {
+    onError(error) {
+      if (axios.isAxiosError(error)) {
         showFeedBack({
           title: "Что-то пошло не так!",
           message: "Что-то пошло не так при создании учетной записи. Попробуйте еще раз!",
           status: "error",
         });
+        console.log("An Axios error occur -> ", error);
       } else {
-        console.log("Unkown Error occur in Creating Account!");
+        console.log("An unknown error occur in create account mutation", error);
       }
     },
   });
@@ -118,12 +115,12 @@ export default function CreateAccountScreen() {
       return;
     }
 
-    await registerUser({ ...validatedInputs.data });
+    mutate({ ...validatedInputs.data });
   };
 
   return (
     <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
-      <Loader visible={loading} />
+      <Loader visible={isPending} />
 
       <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
 
@@ -159,7 +156,7 @@ export default function CreateAccountScreen() {
       </View>
 
       <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={loading} />
+        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
         <ThemedText style={styles.termsText}>
           Создавая аккаунт, Вы принимаете
           <Link href="/" style={{ color: linkColor }}>

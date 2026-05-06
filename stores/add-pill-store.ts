@@ -110,6 +110,7 @@ export const useAddPillStore = create<AddPillStore>()((set, get) => ({
       return true;
     });
   },
+
   clearFormState() {
     set((state) => ({ ...state, formState: DEFAULT_STATE }));
   },

@@ -3,14 +3,13 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import FormInput from "@/component/ui/form/form-input";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useUserData } from "@/hooks/use-user-data";
 import { Image } from "expo-image";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useUserStore } from "@/stores/user-store";
-
 export default function Profile() {
-  const { userData } = useUserStore();
+  const { user } = useUserData();
 
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
@@ -48,7 +47,7 @@ export default function Profile() {
         <View style={styles.body}>
           <FormInput
             label="Имя"
-            placeholder={userData?.name}
+            placeholder={user?.name}
             type="text"
             name="name"
             hasError={false}
@@ -57,7 +56,7 @@ export default function Profile() {
 
           <FormInput
             label="Почта"
-            placeholder={userData?.email}
+            placeholder={user?.email}
             type="email"
             name="email"
             hasError={false}
@@ -71,7 +70,7 @@ export default function Profile() {
               style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
             >
               <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                {userData?.dateOfBirth || "Введите дату Вашего рождения"}
+                {user?.dateOfBirth || "Введите дату Вашего рождения"}
               </Text>
             </Pressable>
           </View>
@@ -83,7 +82,7 @@ export default function Profile() {
               style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
             >
               <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                {userData?.gender || "Введите Ваш пол"}
+                {user?.gender || "Введите Ваш пол"}
               </Text>
             </Pressable>
           </View>

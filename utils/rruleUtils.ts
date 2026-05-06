@@ -1,6 +1,6 @@
 import { CustomPattern } from "@/component/ui/custom-frequency/types";
 import { Options, RRule } from "rrule";
-import { DateTime, getTimeZone, toLocalTime } from "./luxonUtil";
+import { DateTime, getTimeZone, toLocalUtcTime } from "./luxonUtil";
 
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   const rule = RRule.fromString(rrule);
@@ -12,7 +12,7 @@ export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
 
   const times = ruleWithMaxCount
     .all()
-    .map((time) => toLocalTime(time))
+    .map((time) => toLocalUtcTime(time))
     .sort();
   return times;
 };

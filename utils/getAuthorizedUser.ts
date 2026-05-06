@@ -1,10 +1,13 @@
-import { useUserStore } from "@/stores/user-store";
-import { UserResponse } from "@/types/user";
 import { api } from "./axiosInstance";
+import { queryClient } from "./query-client";
 
 export const getAuthorizedUser = async () => {
-  const { data } = await api.get<UserResponse>("/users", {
-    id: "user-data",
+  queryClient.fetchQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await api.get("users");
+      return response.data;
+    },
+    staleTime: Infinity,
   });
-  useUserStore.getState().setUser(data);
 };

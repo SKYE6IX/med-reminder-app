@@ -12,8 +12,8 @@ export function useLinkButtonStyles() {
 
   return StyleSheet.create({
     base: {
-      width: "100%",
       height: 48,
+      width: "100%",
       borderRadius: 12,
       flexDirection: "row",
       gap: 10,
