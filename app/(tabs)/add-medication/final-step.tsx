@@ -175,7 +175,7 @@ export default function FinalStepScreen() {
     async onSuccess(data) {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
-        ["medication-profiles"],
+        ["medication-profile", "list"],
         (existingData: MedicationProfileResponse[]) =>
           existingData ? [...existingData, data] : existingData,
       );

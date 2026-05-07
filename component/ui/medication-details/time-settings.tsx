@@ -1,6 +1,6 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import ClockIcon from "@/component/icons/clock-icon";
-import DateTimePickerWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
+import DateTimeWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
@@ -74,7 +74,7 @@ export default function DetailsTimeSettings({
           </Text>
         </View>
       </Pressable>
-      <DateTimePickerWrapper
+      <DateTimeWrapper
         onDateTimeSelected={(date, event) => handleSetTime(date, event)}
         ref={timeRef}
         mode="time"

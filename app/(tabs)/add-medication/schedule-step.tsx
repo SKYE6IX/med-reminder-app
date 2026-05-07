@@ -95,7 +95,7 @@ export default function ScheduleStepScreen() {
         { paddingLeft: 0, paddingRight: 0 },
       ]}
     >
-      <ScrollView contentContainerStyle={[styles.contentContainer, sharedStyles.bottomInset]}>
+      <ScrollView contentContainerStyle={[styles.contentContainer]}>
         {/* Frequency Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     gap: 32,
     paddingLeft: 20,
     paddingRight: 20,
+    paddingBottom: 10,
   },
   timeSettingList: {
     width: "100%",

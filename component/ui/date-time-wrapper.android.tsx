@@ -7,10 +7,11 @@ export interface DateTimeWrapperRef {
   showDateTime: () => void;
 }
 
-export default function DateTimePickerWrapper({
+export default function DateTimeWrapper({
   ref,
   mode,
   onDateTimeSelected,
+  disabledDate,
 }: DateTimeWrapperProps) {
   const now = Date.now();
   const [date, setDate] = useState(new Date(now));
@@ -30,7 +31,7 @@ export default function DateTimePickerWrapper({
       },
       mode: currentMode,
       is24Hour: true,
-      minimumDate: mode === "date" ? new Date(now) : undefined,
+      minimumDate: disabledDate && mode === "date" ? new Date(now) : undefined,
     });
   };
 

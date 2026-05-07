@@ -45,7 +45,7 @@ export default function CustomPicker({
   };
 
   const getSelectedValueLabel = (value: string) => {
-    return items.find((item) => item.value === value)?.label;
+    return items.find((item) => item.value.toUpperCase() === value.toUpperCase())?.label;
   };
 
   const handleValueChange = (value: string) => {

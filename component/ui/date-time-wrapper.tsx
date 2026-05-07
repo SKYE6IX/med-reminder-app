@@ -13,6 +13,7 @@ export type DateTimeWrapperProps = {
   ref: RefObject<DateTimeWrapperRef | null>;
   mode: "date" | "time";
   bottomSheetTitle?: string;
+  disabledDate?: boolean;
 
   // @platform IOS ONLY
   showUpdateButton?: boolean;
@@ -28,6 +29,7 @@ export default function DateTimeWrapper({
   onDateTimeSelected,
   showUpdateButton,
   onUpdateButtonPress,
+  disabledDate = true,
 }: DateTimeWrapperProps) {
   const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
@@ -46,9 +48,6 @@ export default function DateTimeWrapper({
     if (date) {
       setDate(date);
       onDateTimeSelected(date);
-    }
-    if (mode === "date") {
-      bottomSheetWrapperRef.current?.close();
     }
   };
 
@@ -72,7 +71,7 @@ export default function DateTimeWrapper({
           onChange={(event, date) => handleSetDateTime(date)}
           display={mode === "date" ? "inline" : "spinner"}
           locale="ru-RU"
-          minimumDate={mode === "date" ? new Date(now) : undefined}
+          minimumDate={disabledDate && mode === "date" ? new Date(now) : undefined}
         />
         {showUpdateButton && <CustomButton label="Применить" onPress={onUpdateButtonPress} />}
       </View>
