@@ -1,0 +1,173 @@
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { useAuthStore } from "@/stores/use-auth-store";
+import { api, axios } from "@/utils/axiosInstance";
+import { clearTokens } from "@/utils/tokenUtils";
+import { validateResetPasswordInputs } from "@/utils/validator";
+import { useMutation } from "@tanstack/react-query";
+import { RefObject, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
+import CustomButton from "../custom-button/custom-button";
+import FormInput from "../form/form-input";
+import Loader from "../loader";
+
+type ChangePasswordSheetProps = {
+  bottomSheetRef: RefObject<BottomSheetWrapperRef | null>;
+};
+
+interface FormState {
+  oldPassword: string;
+  newPassword: string;
+}
+
+type ChangePasswordState = {
+  formState: FormState;
+  errorsSet: Set<string>;
+};
+
+const resetPasswordMutation = async (resetData: FormState) => {
+  const response = await api.post("auth/reset-password", resetData);
+  return response.data;
+};
+
+export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSheetProps) {
+  const { showFeedBack } = useFeedBackStore();
+  const [changePasswordState, setChangePasswordState] = useState<ChangePasswordState>({
+    formState: {
+      oldPassword: "",
+      newPassword: "",
+    },
+    errorsSet: new Set(),
+  });
+
+  const timerRef = useRef<number>(null);
+
+  const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
+    setChangePasswordState((prvState) => {
+      const updatedErrors = new Set(prvState.errorsSet);
+      updatedErrors.delete(name);
+      return {
+        ...prvState,
+        formState: {
+          ...prvState.formState,
+          [name]: value,
+        },
+        errorsSet: updatedErrors,
+      };
+    });
+
+    if (name === "repeatPassword") {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
+        if (value !== changePasswordState.formState.newPassword) {
+          setChangePasswordState((prvState) => ({
+            ...prvState,
+            errorsSet: new Set(prvState.errorsSet).add("repeatPassword"),
+          }));
+        } else {
+          setChangePasswordState((prvState) => {
+            const updateErrors = new Set(prvState.errorsSet);
+            updateErrors.delete("repeatPassword");
+            return {
+              ...prvState,
+              errorsSet: updateErrors,
+            };
+          });
+        }
+      }, 1000);
+    }
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: resetPasswordMutation,
+    onSuccess() {
+      showFeedBack({
+        title: "Пароль изменен!",
+        message: "Успешно смените пароль!",
+        status: "success",
+      });
+      clearTokens();
+      useAuthStore.getState().setIsAuthenticated(false);
+    },
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          showFeedBack({ title: "Ошибка!", message: "Неверный старый пароль.", status: "error" });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+            status: "error",
+          });
+        }
+      }
+    },
+  });
+
+  const handleResetPassword = () => {
+    const validatedInputs = validateResetPasswordInputs(changePasswordState.formState);
+    if (validatedInputs.error) {
+      validatedInputs.error.issues.forEach((issue) => {
+        setChangePasswordState((prvState) => {
+          return {
+            ...prvState,
+            errorsSet: new Set(prvState.errorsSet).add(issue.path[0].toString()),
+          };
+        });
+      });
+      return;
+    } else if (changePasswordState.errorsSet.has("repeatPassword")) {
+      return;
+    }
+    mutate(validatedInputs.data);
+  };
+
+  return (
+    <BottomSheetWrapper ref={bottomSheetRef} title="Изменить пароль">
+      <Loader visible={isPending} />
+      <View style={styles.container}>
+        <FormInput
+          label="Старый пароль"
+          name="oldPassword"
+          onValueChange={handleOnValueChanges}
+          type="password"
+          placeholder="Введите Ваш старый пароль"
+          hasError={changePasswordState.errorsSet.has("oldPassword")}
+          returnKeyType="next"
+        />
+
+        <FormInput
+          label="Новый пароль"
+          name="newPassword"
+          onValueChange={handleOnValueChanges}
+          type="password"
+          placeholder="Введите Ваш новый пароль"
+          hasError={changePasswordState.errorsSet.has("newPassword")}
+          textContentType="newPassword"
+          autoComplete="new-password"
+          returnKeyType="next"
+        />
+
+        <FormInput
+          label="Подтвердите новый пароль"
+          name="repeatPassword"
+          onValueChange={handleOnValueChanges}
+          type="password"
+          placeholder="Повторно введите Ваш новый пароль"
+          hasError={changePasswordState.errorsSet.has("repeatPassword")}
+          returnKeyType="done"
+        />
+
+        <CustomButton label="Изменить пароль" disabled={isPending} onPress={handleResetPassword} />
+      </View>
+    </BottomSheetWrapper>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+  },
+});

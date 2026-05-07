@@ -12,7 +12,7 @@ import LogoutIcon from "@/component/icons/log-out-icon";
 import PeopleGroupIcon from "@/component/icons/people-group";
 import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import SettingsCard from "@/component/ui/settings-card/settings-card";
+import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 
 import { useUserData } from "@/hooks/use-user-data";

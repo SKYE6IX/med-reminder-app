@@ -2,7 +2,7 @@ import BellOnIcon from "@/component/icons/bell-on-icon";
 import LockverifiedIcon from "@/component/icons/lock-verified-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
 import SignalIcon from "@/component/icons/signal-icon";
-import SettingsCard from "@/component/ui/settings-card/settings-card";
+import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";

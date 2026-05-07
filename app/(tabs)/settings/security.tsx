@@ -1,8 +1,11 @@
 import PhoneIcon from "@/component/icons/phone-icon";
 import UserCloseIcon from "@/component/icons/user-close-icon";
 import UserLockIcon from "@/component/icons/user-lock-icon";
-import SettingsCard from "@/component/ui/settings-card/settings-card";
+import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
+import ChangePasswordSheet from "@/component/ui/settings/change-password-sheet";
+import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -10,8 +13,11 @@ export default function Security() {
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
+  const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
+
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
       <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
@@ -20,6 +26,7 @@ export default function Security() {
           description="Изменить пароль профиля пользователя"
           svgIcon={<UserLockIcon color={color} />}
           interaction="press"
+          onPress={() => changePasswordSheetRef.current?.open()}
         />
 
         <SettingsCard
@@ -36,6 +43,9 @@ export default function Security() {
           interaction="press"
         />
       </View>
+
+      {/* Bottom Sheets */}
+      <ChangePasswordSheet bottomSheetRef={changePasswordSheetRef} />
     </SafeAreaView>
   );
 }

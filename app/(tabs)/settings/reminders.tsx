@@ -1,7 +1,7 @@
 import AlarmClockIcon from "@/component/icons/alarm-clock-icon";
 import BellNotificationIcon from "@/component/icons/bell-notification-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
-import SettingsCard from "@/component/ui/settings-card/settings-card";
+import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";

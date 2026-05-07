@@ -1,6 +1,6 @@
 import ChatStartIcon from "@/component/icons/chat-start-icon";
 import PhoneCallIcon from "@/component/icons/phone-call-icon";
-import SettingsCard from "@/component/ui/settings-card/settings-card";
+import SettingsCard from "@/component/ui/settings/settings-card";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Image } from "expo-image";
