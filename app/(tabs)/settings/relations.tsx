@@ -54,7 +54,7 @@ export default function Relations() {
       );
       deleteProfileBottomSheetRef.current?.close();
     },
-    onError(error, variables, onMutateResult, context) {
+    onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when creating relatiion profile -> ", error);
       } else {

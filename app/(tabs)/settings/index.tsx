@@ -12,27 +12,51 @@ import LogoutIcon from "@/component/icons/log-out-icon";
 import PeopleGroupIcon from "@/component/icons/people-group";
 import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
-
 import { useUserData } from "@/hooks/use-user-data";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { api, axios } from "@/utils/axiosInstance";
+import { useMutation } from "@tanstack/react-query";
+
+const logOutMutation = async () => {
+  await api.post("auth/logout");
+};
 
 export default function Settings() {
   const { user } = useUserData();
+  const { showFeedBack } = useFeedBackStore();
 
   const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const { setIsAuthenticated } = useAuthStore();
-  const logoutUser = () => {
-    clearTokens();
-    setIsAuthenticated(false);
-  };
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: logOutMutation,
+    onSuccess() {
+      clearTokens();
+      setIsAuthenticated(false);
+    },
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        console.log("An axios error occur when creating relatiion profile -> ", error);
+      } else {
+        console.log("An unknown error occur when creating relatiion profile -> ", error);
+      }
+      showFeedBack({
+        title: "Ошибка!",
+        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+        status: "error",
+      });
+    },
+  });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgPrimary }]} edges={["top"]}>
@@ -42,6 +66,7 @@ export default function Settings() {
           { paddingTop: !isIOS ? insets.top : undefined, paddingBottom: 10 },
         ]}
       >
+        <Loader visible={isPending} />
         {/* PROFILE SETTINGS ✅ */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color }]}>Профиль</Text>
@@ -121,7 +146,7 @@ export default function Settings() {
           label="Выйти"
           variant="danger"
           svgIcon={<LogoutIcon color="#F7F7F7" />}
-          onPress={logoutUser}
+          onPress={() => mutate()}
         />
       </ScrollView>
     </SafeAreaView>
