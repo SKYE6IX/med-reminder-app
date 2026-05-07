@@ -50,7 +50,7 @@ export default function Settings() {
             description="Посмотреть профиль"
             interaction="press"
             avatarUrl="url"
-            onPress={() => router.navigate("/(tabs)/settings/profile")}
+            onPress={() => router.navigate("/(tabs)/settings/user-details")}
           />
 
           <SettingsCard

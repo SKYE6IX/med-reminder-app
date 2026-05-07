@@ -1,16 +1,21 @@
 import DeleteIcon from "@/component/icons/delete-icon";
 import PlusIcon from "@/component/icons/plus-icon";
+import AddProfile from "@/component/ui/add-profile";
+import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Image } from "expo-image";
+import { useRef } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Relations() {
+  const { profiles } = useProfilesQuery();
+
+  const addProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
+
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
-
-  const { profiles } = useProfilesQuery();
 
   const relationsProfile = profiles?.filter((profile) => !profile.isSelf) ?? [];
 
@@ -45,7 +50,10 @@ export default function Relations() {
           ))}
 
           {/* ADD NEW PROFILE */}
-          <Pressable style={styles.contentItemWrapper}>
+          <Pressable
+            style={styles.contentItemWrapper}
+            onPress={() => addProfileBottomSheetRef.current?.open()}
+          >
             <View style={[styles.circle, { backgroundColor: bgTertiary }]}>
               <PlusIcon color={color} size={15} />
             </View>
@@ -53,6 +61,7 @@ export default function Relations() {
           </Pressable>
         </View>
       </View>
+      <AddProfile ref={addProfileBottomSheetRef} />
     </SafeAreaView>
   );
 }

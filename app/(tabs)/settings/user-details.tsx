@@ -35,7 +35,7 @@ const updateUserMutation = async (updateData: UpdateData) => {
   return response.data;
 };
 
-export default function Profile() {
+export default function UserDetails() {
   const { showFeedBack } = useFeedBackStore();
   const { user } = useUserData();
   const isIOS = Platform.OS === "ios";

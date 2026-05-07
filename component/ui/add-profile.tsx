@@ -1,6 +1,11 @@
 import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { ProfileResponse } from "@/types/user";
+import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useMutation } from "@tanstack/react-query";
 import { RefObject, startTransition, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import PeopleGroupIcon from "../icons/people-group";
@@ -8,6 +13,7 @@ import { ThemedText } from "../themed-text/themed-text";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
 import CustomButton from "./custom-button/custom-button";
 import CustomPicker from "./custom-picker/custom-picker";
+import Loader from "./loader";
 
 type AddProfileProps = {
   ref: RefObject<BottomSheetWrapperRef | null>;
@@ -18,7 +24,13 @@ interface AddProfileForm {
   relation: string;
 }
 
+const addRelationProfileMutation = async (data: AddProfileForm) => {
+  const response = await api.post<ProfileResponse>("users/profiles", data);
+  return response.data;
+};
+
 export default function AddProfile({ ref }: AddProfileProps) {
+  const { showFeedBack } = useFeedBackStore();
   const [formState, setFormState] = useState<AddProfileForm>({
     name: "",
     relation: "",
@@ -53,42 +65,41 @@ export default function AddProfile({ ref }: AddProfileProps) {
     setFormState((prv) => ({ ...prv, name: text }));
   };
 
-  // const [addProfile, { loading }] = useMutation<ProfileResponse, AddProfileForm>({
-  //   url: "/users/profiles",
-  //   method: "post",
-  //   config: {
-  //     cache: {
-  //       update: {
-  //         "profile-list": (profileListCache, addProfileResponse) => {
-  //           if (profileListCache.state !== "cached") {
-  //             return "ignore";
-  //           }
-
-  //           // @ts-expect-error type not available
-  //           profileListCache.data.data.push(addProfileResponse.data);
-  //           // profileListCache.data.data = [
-  //           //   ...(profileListCache.data.data as ProfileResponse[]),
-  //           //   addProfileResponse.data,
-  //           // ];
-
-  //           return profileListCache;
-  //         },
-  //       },
-  //     },
-  //   },
-  //   onSuccess(data) {
-  //     emitCacheUpdate("profile-list");
-  //     ref.current?.close();
-  //   },
-  // });
+  const { isPending, mutate } = useMutation({
+    mutationFn: addRelationProfileMutation,
+    onSuccess(data) {
+      queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
+        existingData ? [...existingData, data] : [data],
+      );
+      showFeedBack({
+        title: "Добавлено отношение!",
+        message: "Успешно добавлено новое отношение!",
+        status: "success",
+      });
+      ref.current?.close();
+      setFormState({ name: "", relation: "" });
+    },
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        console.log("An axios error occur when creating relatiion profile -> ", error);
+      } else {
+        console.log("An unknown error occur when creating relatiion profile -> ", error);
+      }
+      showFeedBack({
+        title: "Ошибка!",
+        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+        status: "error",
+      });
+    },
+  });
 
   const handleAddProfile = async () => {
-    // await addProfile(formState);
+    mutate(formState);
   };
 
   return (
     <BottomSheetWrapper ref={ref} title="Добавить члена семьи">
-      {/* <Loader visible={loading} /> */}
+      <Loader visible={isPending} />
       <View style={styles.profileFormContainer}>
         <View style={styles.profileFormInputWrapper}>
           <ThemedText type="label">Имя</ThemedText>

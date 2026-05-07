@@ -25,7 +25,7 @@ export default function SettingsLayout() {
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Настройки</Stack.Screen.Title>
       </Stack.Screen>
 
-      <Stack.Screen name="profile">
+      <Stack.Screen name="user-details">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Профиль</Stack.Screen.Title>

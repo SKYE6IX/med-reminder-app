@@ -177,7 +177,7 @@ export default function FinalStepScreen() {
       queryClient.setQueryData(
         ["medication-profile", "list"],
         (existingData: MedicationProfileResponse[]) =>
-          existingData ? [...existingData, data] : existingData,
+          existingData ? [...existingData, data] : [data],
       );
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
       clearFormState();
