@@ -3,6 +3,7 @@ import UserCloseIcon from "@/component/icons/user-close-icon";
 import UserLockIcon from "@/component/icons/user-lock-icon";
 import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import ChangePasswordSheet from "@/component/ui/settings/change-password-sheet";
+import DeleteAccountSheet from "@/component/ui/settings/delete-account-sheet";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRef } from "react";
@@ -14,6 +15,7 @@ export default function Security() {
   const insets = useSafeAreaInsets();
 
   const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
+  const deleteAccountSheetRef = useRef<BottomSheetWrapperRef>(null);
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
@@ -41,11 +43,13 @@ export default function Security() {
           description="Безвозвратно удалить ваш аккаунт с лекарствами."
           svgIcon={<UserCloseIcon color={color} />}
           interaction="press"
+          onPress={() => deleteAccountSheetRef.current?.open()}
         />
       </View>
 
       {/* Bottom Sheets */}
       <ChangePasswordSheet bottomSheetRef={changePasswordSheetRef} />
+      <DeleteAccountSheet bottomSheetRef={deleteAccountSheetRef} />
     </SafeAreaView>
   );
 }
