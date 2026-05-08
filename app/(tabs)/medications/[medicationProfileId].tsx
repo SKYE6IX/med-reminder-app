@@ -105,7 +105,7 @@ export default function MedicationDetails() {
                   <DetailsTimeSettings medicationProfile={medicationProfile} />
                 </View>
 
-                {/* FREQUENCY RRULES */}
+                {/* FREQUENCY RRULE */}
                 <DetailsFrequencySettings medicationProfile={medicationProfile} />
               </View>
 

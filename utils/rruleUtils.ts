@@ -14,6 +14,7 @@ export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
     .all()
     .map((time) => toLocalUtcTime(time))
     .sort();
+
   return times;
 };
 
@@ -91,6 +92,7 @@ export const buildRRule = (customPattern: CustomPattern) => {
     ).map((time) => time.getHours());
 
     options = {
+      freq: RRule.DAILY,
       interval: customPattern.intervalValue,
       byhour: byhours,
     };
@@ -99,15 +101,14 @@ export const buildRRule = (customPattern: CustomPattern) => {
       customPattern.intervalValue,
       customPattern.occurrencesPerDay,
     ).map((time) => time.getHours());
-
     options = {
+      freq: RRule.HOURLY,
       byhour: byhours,
     };
   }
 
   const rule = new RRule({
     ...options,
-    freq: RRule.DAILY,
     byminute: 0,
     bysecond: 0,
   });
@@ -151,3 +152,79 @@ const populateOcurrencesTimes = (
   }
   return times.map((times) => times.toJSDate());
 };
+
+export const formatRRuleToRussian = (rrule: string | undefined) => {
+  if (!rrule) return;
+  const rule = RRule.fromString(rrule);
+  const options = rule.options;
+  const interval = options.interval || 1;
+
+  switch (options.freq) {
+    case RRule.HOURLY: {
+      const hours = options.byhour || [];
+      const equalInterval = calculateEqualHourInterval(hours);
+
+      if (equalInterval) {
+        return `Каждые ${equalInterval} ${pluralizeHours(equalInterval)}, ${hours.length} ${pluralizeTimes(hours.length)} в день`;
+      }
+
+      return "Каждый час";
+    }
+
+    case RRule.DAILY: {
+      const hours = options.byhour || [];
+      const minutes = options.byminute;
+
+      let baseText = "";
+      if (interval === 1) {
+        baseText = "Каждый день";
+      } else {
+        baseText = `Каждые ${interval} ${pluralizeDays(interval)}`;
+      }
+
+      if (hours.length === 1) {
+        const hour = String(hours[0]).padStart(2, "0");
+        return `${baseText} в ${hour}:${minutes[0]}`;
+      }
+
+      const equalInterval = calculateEqualHourInterval(hours);
+
+      if (equalInterval) {
+        return `${baseText}, каждые ${equalInterval} ${pluralizeHours(equalInterval)}`;
+      }
+
+      return `${baseText}, ${hours.length} ${pluralizeTimes(hours.length)} в день`;
+    }
+  }
+};
+
+const calculateEqualHourInterval = (hours: number[]) => {
+  if (hours.length < 2) {
+    return null;
+  }
+  const sorted = [...hours].sort((a, b) => a - b);
+  const diffs: number[] = [];
+
+  for (let i = 1; i < sorted.length; i++) {
+    diffs.push(sorted[i] - sorted[i - 1]);
+  }
+  const isEqual = diffs.every((d) => d === diffs[0]);
+
+  return isEqual ? diffs[0] : null;
+};
+
+const pluralize = (count: number, one: string, few: string, many: string) => {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) {
+    return one;
+  }
+  if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) {
+    return few;
+  }
+  return many;
+};
+
+const pluralizeHours = (count: number) => pluralize(count, "час", "часа", "часов");
+const pluralizeDays = (count: number) => pluralize(count, "день", "дня", "дней");
+const pluralizeTimes = (count: number) => pluralize(count, "раз", "раза", "раз");

@@ -1,8 +1,8 @@
 import BellIcon from "@/component/icons/bell-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import CustomPicker from "@/component/ui/custom-picker/custom-picker";
 import Loader from "@/component/ui/loader";
+import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { CreateMedication, MedicationProfileResponse } from "@/types/medication";
@@ -18,19 +18,6 @@ import Animated, {
   withDelay,
   withSpring,
 } from "react-native-reanimated";
-
-const TOTAL_DOSAGES = Array.from({ length: (100 - 1) / 0.5 + 1 }, (_, i) => {
-  const value = 1 + i * 0.5;
-  return {
-    label: `${value}`,
-    value: `${value}`,
-  };
-});
-
-const REMINDER_DAYS = Array.from({ length: 7 }, (_, i) => ({
-  label: `${1 + i}`,
-  value: `${1 + i}`,
-}));
 
 const COLLAPSED = 75;
 const HALF_EXPAND = 197;
@@ -55,15 +42,7 @@ export default function FinalStepScreen() {
   // @platform ANDROID ONLY
   const pickersWrapperOpacity = useSharedValue(0);
 
-  // @platform IOS ONLY
-  const [isDosageAmountPickerVisible, setIsDosageAmountPickerVisible] = useState(false);
-  const [isRefillDaysPickerVisible, setIsRefillDaysPickerVisible] = useState(false);
-  // ** END **
-
-  const totalDosageAmount = formState.medicationPack
-    ? `${formState.medicationPack.totalQuantity}`
-    : "";
-
+  const amountInPack = formState.medicationPack ? `${formState.medicationPack.totalQuantity}` : "";
   const refillDaysReminder = formState.medicationPack ? formState.medicationPack.notifyRule : "";
   const medicationNote = formState.medicationNote ? formState.medicationNote : "";
 
@@ -88,12 +67,6 @@ export default function FinalStepScreen() {
       }),
     );
 
-    // @platform IOS ONLY
-    if (isToggle) {
-      // Reset the picker state incase user switch the toggle while the state is still active
-      setIsDosageAmountPickerVisible(false);
-      setIsRefillDaysPickerVisible(false);
-    }
     // We reset the pack state back null, if switch state is false.
     if (!isToggle) {
       setMedicationpack(null);
@@ -101,7 +74,7 @@ export default function FinalStepScreen() {
     setShowRefillBox(isToggle);
   };
 
-  const handleTotalDosageAmtSet = (selectedValue: string) => {
+  const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationpack({
       totalQuantity: Number(selectedValue),
       notifyRule: refillDaysReminder,
@@ -110,7 +83,7 @@ export default function FinalStepScreen() {
 
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationpack({
-      totalQuantity: Number(totalDosageAmount),
+      totalQuantity: Number(amountInPack),
       notifyRule: selectedValue,
     });
   };
@@ -132,40 +105,6 @@ export default function FinalStepScreen() {
     refillSettingHeight.value = withSpring(isActive ? FULL_EXPAND : HALF_EXPAND);
   };
 
-  // @platform IOS ONLY
-  const triggerDosageAmountPicker = () => {
-    if (!isIOS) return;
-    // Flip refill day picker to false only of it's true.
-    if (isRefillDaysPickerVisible) {
-      setIsRefillDaysPickerVisible(false);
-    }
-    controlFullExpand(isDosageAmountPickerVisible);
-    setIsDosageAmountPickerVisible(!isDosageAmountPickerVisible);
-    if (!totalDosageAmount) {
-      setMedicationpack({
-        totalQuantity: Number(TOTAL_DOSAGES[0].value),
-        notifyRule: refillDaysReminder,
-      });
-    }
-  };
-
-  // @platform IOS ONLY
-  const triggerRefillDaysPicker = () => {
-    if (!isIOS) return;
-    // Flip dosage amount picker to false only of it's true.
-    if (isDosageAmountPickerVisible) {
-      setIsDosageAmountPickerVisible(false);
-    }
-    controlFullExpand(isRefillDaysPickerVisible);
-    setIsRefillDaysPickerVisible(!isRefillDaysPickerVisible);
-    if (!refillDaysReminder) {
-      setMedicationpack({
-        totalQuantity: Number(totalDosageAmount),
-        notifyRule: REMINDER_DAYS[0].value,
-      });
-    }
-  };
-
   const animatedStyle = useAnimatedStyle(() => ({
     height: refillSettingHeight.value,
   }));
@@ -184,7 +123,7 @@ export default function FinalStepScreen() {
       router.dismissAll();
       router.navigate("/");
     },
-    onError(error, variables, onMutateResult, context) {
+    onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when create a medication -> ", error);
       } else {
@@ -203,14 +142,12 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
-
     mutate(data);
   };
 
   return (
     <View style={[styles.container, sharedStyles.container]}>
       <Loader visible={isPending} />
-
       {/* Refill setting container */}
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
@@ -251,22 +188,13 @@ export default function FinalStepScreen() {
               pointerEvents: showRefillBox ? "auto" : "none",
             }}
           >
-            <CustomPicker
-              label="Общее количество"
-              items={TOTAL_DOSAGES}
-              selectedValue={totalDosageAmount}
-              onValueSelected={handleTotalDosageAmtSet}
-              isSelectionVisible={isDosageAmountPickerVisible} // IOS ONLY
-              triggerSelection={triggerDosageAmountPicker} // IOS ONLY
-            />
-
-            <CustomPicker
-              label="Напомнить за срок (дни)"
-              items={REMINDER_DAYS}
-              selectedValue={refillDaysReminder}
-              onValueSelected={handleRefillDaysSet}
-              isSelectionVisible={isRefillDaysPickerVisible} // IOS ONLY
-              triggerSelection={triggerRefillDaysPicker} // IOS ONLY
+            <MedicationPackPicker
+              amountInPack={amountInPack}
+              refillDaysReminder={refillDaysReminder}
+              onAmountInPackSet={handleAmountInPackSet}
+              onRefillDaysReminderSet={handleRefillDaysSet}
+              onPickerTrigger={controlFullExpand}
+              isToggle={showRefillBox}
             />
           </Animated.View>
         </Animated.View>

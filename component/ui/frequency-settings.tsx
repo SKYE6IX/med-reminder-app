@@ -28,7 +28,7 @@ const DEFALUT_FREQUENCIES: FrequencySettingsState[] = [
   {
     label: "Два раза в день",
     info: "Каждые 12 часов",
-    rrule: "FREQ=DAILY;BYHOUR=8,21;BYMINUTE=0",
+    rrule: "FREQ=DAILY;BYHOUR=8,20;BYMINUTE=0",
     preset: "TWICE_A_DAY",
   },
   {
@@ -39,7 +39,7 @@ const DEFALUT_FREQUENCIES: FrequencySettingsState[] = [
   },
   {
     label: "Своя частота",
-    rrule: "FREQ=DAILY;BYHOUR=8,11,14;BYMINUTE=0",
+    rrule: "FREQ=HOURLY;BYHOUR=8,11,14;BYMINUTE=0",
     preset: "CUSTOM",
   },
 ];
@@ -58,6 +58,7 @@ export default function FrequencySettings({ preset, onFreqSet }: FrequencySettin
     onFreqSet({ rrule: freq.rrule, preset: freq.preset });
   };
 
+  // When custom rules changes
   const handleOnCustomPatternChange = (pattern: Partial<CustomPattern>) => {
     const rrule = buildRRule(pattern as CustomPattern);
     onFreqSet({ rrule, preset: "CUSTOM" });

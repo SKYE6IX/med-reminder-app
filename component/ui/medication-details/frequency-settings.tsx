@@ -4,6 +4,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { SchedulePreset } from "@/stores/add-pill-store";
 import { MedicationProfileResponse } from "@/types/medication";
+import { formatRRuleToRussian } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
@@ -46,6 +47,8 @@ export default function DetailsFrequencySettings({
     }
   };
 
+  const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
+
   return (
     <React.Fragment>
       <Pressable style={sharedStyles.card} onPress={() => bottomSheetRef.current?.open()}>
@@ -55,7 +58,7 @@ export default function DetailsFrequencySettings({
         </View>
         <View style={sharedStyles.cardBody}>
           <AlarmClockIcon color={color} />
-          <Text style={sharedStyles.cardTextContent}>Каждые 6 часов, 3 раза в день</Text>
+          <Text style={sharedStyles.cardTextContent}>{ruleToText}</Text>
         </View>
       </Pressable>
 

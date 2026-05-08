@@ -31,11 +31,9 @@ export default function DeleteMedicationProfile({
     mutationFn: deleteMedicationProfileMutation,
     async onSuccess(data, variables) {
       queryClient.setQueryData(
-        ["medication-profiles"],
-        (existingData: MedicationProfileResponse[]) => {
-          const filterData = existingData.filter((data) => data.id !== variables);
-          return filterData;
-        },
+        ["medication-profile", "list"],
+        (existingData: MedicationProfileResponse[]) =>
+          existingData.filter((oldData) => oldData.id !== variables),
       );
       bottomSheetRef.current?.close();
       router.back();

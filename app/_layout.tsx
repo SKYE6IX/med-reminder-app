@@ -122,7 +122,7 @@ export default function RootLayout() {
 // them to keep all events up to dates ✅
 
 // Medication Details Page
-// 1. We need to render the right text in Russian for the rules.
+// 1. We need to render the right text in Russian for the rules. ✅
 // 2. Update how many pills has been taken.
 // 3. Give oppurtunity for user to to add the pack later if they didn't add it.
 // 4. Display the times for when user is updating ther rules so they can see it.

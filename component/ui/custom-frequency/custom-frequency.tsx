@@ -67,6 +67,7 @@ export default function CustomFrequency({
       ...prvState,
       pattern: { ...prvState.pattern, intervalValue },
     }));
+
     onCustomPatternChange({ ...customState.pattern, intervalValue });
   };
 
@@ -78,6 +79,7 @@ export default function CustomFrequency({
         ...prvState,
         pattern: { ...prvState.pattern, unit, hoursBetweenOccurrences: defaultHoursBetween },
       }));
+
       onCustomPatternChange({
         ...customState.pattern,
         hoursBetweenOccurrences: defaultHoursBetween,
@@ -88,6 +90,7 @@ export default function CustomFrequency({
         ...prvState,
         pattern: { ...prvState.pattern, unit },
       }));
+
       onCustomPatternChange({
         ...customState.pattern,
         unit,
@@ -101,6 +104,7 @@ export default function CustomFrequency({
       ...prvState,
       pattern: { ...prvState.pattern, occurrencesPerDay },
     }));
+
     onCustomPatternChange({
       ...customState.pattern,
       occurrencesPerDay,
