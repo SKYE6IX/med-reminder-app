@@ -3,22 +3,33 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
-import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { MedicationScheduleResponse } from "@/types/medication";
-import { getDateLocalString, toLocalTime } from "@/utils/luxonUtil";
+import { getDateLocalString, getUpcomingTime, toLocalTime } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import MedicationCard from "@/component/ui/medication-card/medication-card";
+import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getScheduleBadge } from "@/helpers/getScheduleBadge";
+import { getTakenAt } from "@/helpers/getTakenAt";
+import { showEventActionButton } from "@/helpers/showEventActionButton";
+import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
-import { api } from "@/utils/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
+import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
+import { useFocusEffect } from "@react-navigation/native";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 type TABS_VALUE = "ALL" | "TAKEN" | "MISSED";
+
+interface UpdateScheduleEvent {
+  id: string;
+  action: "TAKEN" | "MISSED";
+}
 
 const TABS = [
   { label: "Все", value: "ALL" },
@@ -28,23 +39,6 @@ const TABS = [
 
 const localDateString = getDateLocalString();
 
-const getScheduleBadge = (
-  medicationSchedule: MedicationScheduleResponse,
-): "upcoming" | "taken" | "missed" => {
-  if (medicationSchedule.status === "TAKEN") {
-    return "taken";
-  } else if (medicationSchedule.status === "MISSED") {
-    return "missed";
-  } else {
-    return "upcoming";
-  }
-};
-
-const getDosageUnit = (value: string) => {
-  const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-  return label;
-};
-
 const getScheduleTime = (scheduleTime: string) => {
   const date = new Date(scheduleTime);
   return toLocalTime(date);
@@ -52,7 +46,7 @@ const getScheduleTime = (scheduleTime: string) => {
 
 // Fetch schedule events query
 const fetchScheduleEvents = async (params: string) => {
-  const response = await api.get("medications/schedules/event", {
+  const response = await api.get<MedicationScheduleResponse[]>("medications/schedules/event", {
     params: {
       eventDate: params,
     },
@@ -60,32 +54,95 @@ const fetchScheduleEvents = async (params: string) => {
   return response.data;
 };
 
+// Update schedule events
+const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
+  const response = await api.put<MedicationScheduleResponse>(
+    `medications/schedules/event/${data.id}`,
+    { action: data.action },
+  );
+  return response.data;
+};
+
 export default function Home() {
   const { user } = useUserData();
+
+  const initialFocus = useRef(true);
+
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
-  const insets = useSafeAreaInsets();
+  const [onFocusTrigger, setOnFocusTrigger] = useState(0);
 
-  const { data, isLoading } = useQuery<MedicationScheduleResponse[]>({
+  const insets = useSafeAreaInsets();
+  const { showFeedBack } = useFeedBackStore();
+
+  // Query schedule event list
+  const { data, isLoading } = useQuery({
     queryKey: ["schedule-events", selectedDate],
     queryFn: () => fetchScheduleEvents(selectedDate),
     staleTime: 60 * 60 * 10000,
   });
 
-  const hasMedicationSchedule = data && data.length >= 1 ? true : false;
+  // Update schedule event
+  const { isPending, mutate } = useMutation({
+    mutationFn: updateScheduleEventMutaion,
+    onSuccess(data, variables) {
+      queryClient.setQueryData(
+        ["schedule-events", selectedDate],
+        (existingData: MedicationScheduleResponse[]) =>
+          existingData.map((scheduleEvent) =>
+            scheduleEvent.id === variables.id ? data : scheduleEvent,
+          ),
+      );
+    },
+    onError(error, variables, onMutateResult, context) {
+      if (axios.isAxiosError(error)) {
+        console.log("An axios error occur when updating schedule event -> ", error);
+      } else {
+        console.log("An Unknown error occur when updating schedule event -> ", error);
+      }
+      showFeedBack({
+        title: "Ошибка!",
+        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+        status: "error",
+      });
+    },
+  });
+
+  const hasScheduleEvents = data && data.length >= 1 ? true : false;
+
+  // When screen is back on focus after initial
+  // we trigger a re-render for Flatlist to keep events card up to date
+  useFocusEffect(
+    useCallback(() => {
+      if (initialFocus.current) {
+        initialFocus.current = false;
+        return;
+      }
+      setOnFocusTrigger((prv) => prv + 1);
+    }, []),
+  );
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const getFilterMedicationSchedule = () => {
+  const filterScheduleEvents = useMemo(() => {
     if (activeTab === "ALL") {
-      return data;
+      return data?.sort((a, b) => {
+        const aIsDone = a.status === "TAKEN" || a.status === "MISSED";
+        const bIsDone = b.status === "TAKEN" || b.status === "MISSED";
+        if (aIsDone && !bIsDone) return 1;
+        if (!aIsDone && bIsDone) return -1;
+
+        const sortA = new Date(a.scheduleAt).getHours();
+        const sortB = new Date(b.scheduleAt).getHours();
+        return sortA - sortB;
+      });
     } else {
       return data?.filter((med) => med.status === activeTab);
     }
-  };
+  }, [activeTab, data]);
 
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
@@ -99,7 +156,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <Loader visible={isLoading} />
+      <Loader visible={isLoading || isPending} />
       <View style={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
@@ -116,31 +173,35 @@ export default function Home() {
 
         {/* WEEK VIEW */}
         <View style={styles.weekViewWrapper}>
-          <WeekView showDescription={hasMedicationSchedule} onDateChange={handleOnDateChange} />
+          <WeekView showDescription={hasScheduleEvents} onDateChange={handleOnDateChange} />
         </View>
 
         {/* CONTENT BODY */}
         {!isLoading && (
           <>
-            {hasMedicationSchedule ? (
+            {hasScheduleEvents ? (
               <View style={{ flex: 1 }}>
                 <View style={styles.tabsWrapper}>
                   <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
                 </View>
                 <FlatList
                   style={{ flex: 1 }}
-                  data={getFilterMedicationSchedule()}
+                  data={filterScheduleEvents}
+                  extraData={onFocusTrigger}
                   renderItem={({ item }) => (
                     <MedicationCard
                       id={item.id}
                       imageUrl={item.medicationImageUrl}
                       name={item.medicationName}
                       profile={item.profile as ProfileResponse}
-                      onButtonPress={() => {}}
                       badge={getScheduleBadge(item)}
+                      upcomingValue={getUpcomingTime(item.scheduleAt)}
                       dosage={item.dosage}
                       dosageUnit={getDosageUnit(item.measurement)}
                       scheduleTime={getScheduleTime(item.scheduleAt)}
+                      takenAt={getTakenAt(item.takenAt)}
+                      showEventButtons={showEventActionButton(item)}
+                      onEventButtonPress={(action) => mutate({ id: item.id, action })}
                     />
                   )}
                   keyExtractor={(item) => item.id}

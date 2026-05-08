@@ -3,13 +3,13 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
-import { DOSAGE_UNITS } from "@/constants/schedule-options";
+import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
-import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -25,17 +25,6 @@ const TABS = [
   { label: "Активно", value: "ACTIVE" },
   { label: "Неактивно", value: "IN_ACTIVE" },
 ];
-
-const getStartedDate = (isoString: string) => {
-  const date = new Date(isoString);
-  const convertedString = getDateLocalString(date).replaceAll(".", " ");
-  return formatRegularDate(convertedString);
-};
-
-const getDosageUnit = (value: string) => {
-  const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-  return label;
-};
 
 // Fetch query
 const fetchMedicationProfiles = async () => {

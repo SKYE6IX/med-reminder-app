@@ -35,7 +35,7 @@ export default function RefillPill() {
             name={item.medicationName}
             startedDate={getStartedDate(item.schedule.startDate)}
             actionButtonLabel="Пополнить"
-            onButtonPress={() => {}}
+            onEventButtonPress={() => {}}
           />
         )}
         keyExtractor={(item) => item.id}

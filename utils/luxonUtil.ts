@@ -1,7 +1,5 @@
 import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
-// To use Later DateTime.now().toFormat("HH 'hours and' mm 'minutes'")
-
 export const getTimeZone = () => DateTime.now().zoneName;
 
 export const toLocalUtcTime = (date: Date) => {
@@ -126,6 +124,24 @@ export const getWeekViewDescription = (isoDate: string) => {
   return date.toLocaleString({
     ...toLocaleOptions,
   });
+};
+
+export const getUpcomingTime = (isoDateTime: string) => {
+  if (!isoDateTime) return;
+
+  const now = DateTime.now().setZone(getTimeZone());
+  const scheduleTime = DateTime.fromISO(isoDateTime, {
+    locale: "ru",
+    setZone: true,
+  });
+
+  if (!scheduleTime.hasSame(now, "day")) return;
+
+  if (scheduleTime < now) return;
+
+  const upcomingTime = scheduleTime.minus({ hours: now.hour, minutes: now.minute });
+
+  return upcomingTime.setLocale("ru").toFormat("H'ч 'mm'м'");
 };
 
 export { DateTime, DateTimeFormatOptions, Duration };

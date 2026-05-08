@@ -8,22 +8,16 @@ import DetailsDosageSettings from "@/component/ui/medication-details/dosage-sett
 import DetailsFrequencySettings from "@/component/ui/medication-details/frequency-settings";
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
+import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfileResponse } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
-import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
-const getStartedDate = (isoString: string) => {
-  const date = new Date(isoString);
-  const convertedString = getDateLocalString(date).replaceAll(".", " ");
-  return formatRegularDate(convertedString);
-};
 
 // Medication profile details query
 const fetchMedicationProfileDetails = async (id: string) => {

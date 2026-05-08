@@ -13,14 +13,16 @@ type MedicationCardProps = {
   dosage?: number;
   dosageUnit?: string;
   scheduleTime?: string;
+  takenAt?: string;
   freq?: string;
   badge?: "upcoming" | "taken" | "missed";
+  upcomingValue?: string;
   hasSwitch?: boolean;
   showProgress?: boolean;
   startedDate?: string;
   isActive?: boolean;
-  actionButtonLabel?: string;
-  onButtonPress?: () => void;
+  showEventButtons?: boolean;
+  onEventButtonPress?: (action: "TAKEN" | "MISSED") => void;
   onSwitchToggle?: (status: "active" | "inactive", id: string) => void;
   onNavigate?: () => void;
 };
@@ -33,14 +35,16 @@ export default function MedicationCard({
   dosage,
   dosageUnit,
   scheduleTime,
+  takenAt,
   freq,
   badge,
+  upcomingValue,
   hasSwitch,
   showProgress,
   startedDate,
   isActive,
-  actionButtonLabel,
-  onButtonPress,
+  showEventButtons,
+  onEventButtonPress,
   onSwitchToggle,
   onNavigate,
 }: MedicationCardProps) {
@@ -55,7 +59,6 @@ export default function MedicationCard({
 
   const handleToggleSwitch = () => {
     const isToggle = !toggleSwitch;
-
     if (isToggle && onSwitchToggle) {
       onSwitchToggle("active", id);
     } else if (!isToggle && onSwitchToggle) {
@@ -90,13 +93,19 @@ export default function MedicationCard({
               <Text style={[styles.medicationDosage, { color }]}>{`${dosage} ${dosageUnit}`}</Text>
             )}
 
-            {/* Schedule */}
-            {scheduleTime && (
-              <View style={styles.medicationSchedule}>
-                <Text style={[styles.medicationScheduleText, { color }]}>{scheduleTime}</Text>
-                <View style={[styles.medicationScheduleDivider, { backgroundColor: mutedColor }]} />
-                <Text style={[styles.medicationScheduleText, { color }]}>Ежедневно</Text>
-              </View>
+            {/* Schedule and time taken */}
+            {takenAt ? (
+              <Text style={[styles.medicationScheduleText, { color }]}>{takenAt}</Text>
+            ) : (
+              scheduleTime && (
+                <View style={styles.medicationSchedule}>
+                  <Text style={[styles.medicationScheduleText, { color }]}>{scheduleTime}</Text>
+                  <View
+                    style={[styles.medicationScheduleDivider, { backgroundColor: mutedColor }]}
+                  />
+                  <Text style={[styles.medicationScheduleText, { color }]}>Ежедневно</Text>
+                </View>
+              )
             )}
 
             {/* Starting date */}
@@ -104,32 +113,39 @@ export default function MedicationCard({
               <Text style={[styles.medicationStartDate, { color }]}>Начало {startedDate}</Text>
             )}
 
-            <View style={styles.cardContentWrapperBottom}>
-              {/* Profile, not shown for self owner */}
-              {profile && (
-                <>
-                  {!profile.isSelf && (
-                    <View style={styles.profile}>
-                      <View style={[styles.profileImage]}>
-                        <Text style={[styles.profileImagePlaceholder, { color }]}>
-                          {profile.name.charAt(0)}
-                        </Text>
-                      </View>
-                      <Text style={[styles.profileText, { color }]}>{profile.name}</Text>
+            {/* Profile, not shown for self owner */}
+            {profile && (
+              <>
+                {!profile.isSelf && (
+                  <View style={styles.profile}>
+                    <View style={[styles.profileImage]}>
+                      <Text style={[styles.profileImagePlaceholder, { color }]}>
+                        {profile.name.charAt(0)}
+                      </Text>
                     </View>
-                  )}
-                </>
-              )}
-              {/* Action button */}
-              {actionButtonLabel && onButtonPress && (
+                    <Text style={[styles.profileText, { color }]}>{profile.name}</Text>
+                  </View>
+                )}
+              </>
+            )}
+
+            {/* Action buttons */}
+            {showEventButtons && onEventButtonPress && (
+              <View style={styles.cardActionButtons}>
                 <Pressable
                   style={[styles.cardButton, { backgroundColor: tintColor }]}
-                  onPress={onButtonPress}
+                  onPress={() => onEventButtonPress("TAKEN")}
                 >
-                  <Text style={styles.cardButtonText}>{actionButtonLabel}</Text>
+                  <Text style={styles.cardButtonText}>Принять</Text>
                 </Pressable>
-              )}
-            </View>
+                <Pressable
+                  style={[styles.cardButton, { backgroundColor: "#DC0000" }]}
+                  onPress={() => onEventButtonPress("MISSED")}
+                >
+                  <Text style={styles.cardButtonText}>Пропустить</Text>
+                </Pressable>
+              </View>
+            )}
           </Pressable>
 
           {/* Switch */}
@@ -147,18 +163,18 @@ export default function MedicationCard({
       {/* Badge */}
       {badge && (
         <View style={[styles.badge, { backgroundColor: badgeBgColor }]}>
-          {/* Upcoming  tintColor*/}
+          {/* Upcoming */}
           {badge === "upcoming" && (
             <>
               <ClockIcon />
-              <Text style={styles.badgeText}>2ч 23м</Text>
+              <Text style={styles.badgeText}>{upcomingValue}</Text>
             </>
           )}
 
-          {/* Taken #009E00 */}
+          {/* Taken */}
           {badge === "taken" && <Text style={styles.badgeText}>Принятые</Text>}
 
-          {/* Missed #DC0000 */}
+          {/* Missed */}
           {badge === "missed" && <Text style={styles.badgeText}>Пропущенно</Text>}
         </View>
       )}
@@ -246,10 +262,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 16.2,
   },
-  cardContentWrapperBottom: {
+  cardActionButtons: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
   },
   profile: {
     flexDirection: "row",
@@ -293,7 +309,7 @@ const styles = StyleSheet.create({
     color: "#F7F7F7",
   },
   cardButton: {
-    width: 100,
+    width: 90,
     height: 24,
     justifyContent: "center",
     alignItems: "center",

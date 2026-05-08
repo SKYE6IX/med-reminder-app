@@ -7,7 +7,7 @@ export enum MedicationUnit {
   SPRAY = "SPRAY",
   DROPS = "DROPS",
   SYRUP = "SYRUP",
-  INJECTION = " INJECTION",
+  INJECTION = "INJECTION",
   OTHER = "OTHER",
 }
 

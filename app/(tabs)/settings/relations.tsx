@@ -94,7 +94,7 @@ export default function Relations() {
                 style={[styles.circle, { backgroundColor: bgTertiary, marginLeft: "auto" }]}
                 onPress={() => openDeleteBottomSheet(profile.id)}
               >
-                <DeleteIcon />
+                <DeleteIcon color={color} />
               </Pressable>
             </View>
           ))}

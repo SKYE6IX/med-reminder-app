@@ -1,6 +1,6 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import PillIcon from "@/component/icons/pill-icon";
-import { DOSAGE_UNITS } from "@/constants/schedule-options";
+import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { DosageMeasurement, MedicationProfileResponse } from "@/types/medication";
@@ -11,11 +11,6 @@ import CustomButton from "../custom-button/custom-button";
 import DosageSettings from "../dosage-settings";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
-
-const getDosageUnit = (value: string) => {
-  const label = DOSAGE_UNITS.find((unit) => unit.value === value.toUpperCase())?.label;
-  return label;
-};
 
 export default function DetailsDosageSettings({
   medicationProfile,

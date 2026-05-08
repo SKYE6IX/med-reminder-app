@@ -109,3 +109,27 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+// TODO:
+// Index Page for Schedule Events
+// 1. We need to display the upcoming hour for only pills that are on the day of when user
+// open the app. ✅
+// 2. The button need to be available immediately when the the is equal or passed. Same time when
+// notification set up will go off. ✅
+// 3. With sorting, it more than just using the schedule time. It neccessary to push down the taken
+// badge or missed badge down in the ALL tabs. and all the upcoming shown first. ✅
+// 4. The item need to update to re-render when the screen is focus back to
+// them to keep all events up to dates ✅
+
+// Medication Details Page
+// 1. We need to render the right text in Russian for the rules.
+// 2. Update how many pills has been taken.
+// 3. Give oppurtunity for user to to add the pack later if they didn't add it.
+// 4. Display the times for when user is updating ther rules so they can see it.
+
+// Pack Set up
+// 1. Consume data for packs
+// 2. Set up progess based on the pill taken and how many left.
+
+// Medication Card
+// 1. Some dosage meter shown undifined. Fix it. ✅
