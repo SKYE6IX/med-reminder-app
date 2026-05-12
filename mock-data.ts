@@ -1,7 +1,7 @@
 import {
   DosageMeasurement,
   MedicationProfile,
-  MedicationScheduleResponse,
+  MedicationSchedule,
   MedicationUnit,
   ProfileResponse,
 } from "./types/medication";
@@ -316,7 +316,7 @@ export const mockMedications: MedicationProfile[] = [
   },
 ];
 
-export const mockMedicationsSchedule: MedicationScheduleResponse[] = [
+export const mockMedicationsSchedule: MedicationSchedule[] = [
   {
     id: "1",
     status: "PENDING",

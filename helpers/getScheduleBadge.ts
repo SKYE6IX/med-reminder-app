@@ -1,8 +1,8 @@
-import { MedicationScheduleResponse } from "@/types/medication";
+import { MedicationSchedule } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 
 export const getScheduleBadge = (
-  medicationSchedule: MedicationScheduleResponse,
+  medicationSchedule: MedicationSchedule,
 ): "upcoming" | "taken" | "missed" | undefined => {
   const now = DateTime.now().setZone(getTimeZone());
   const scheduleTime = DateTime.fromISO(medicationSchedule.scheduleAt, {

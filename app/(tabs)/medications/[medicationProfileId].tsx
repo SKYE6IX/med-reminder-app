@@ -1,8 +1,8 @@
 import CalenderIcon from "@/component/icons/calender-icon";
 import PillFilledIcon from "@/component/icons/pill-filled-icon";
+import MedicationDetailCard from "@/component/ui/cards/medication-detail-card";
 import DeleteMedicationProfile from "@/component/ui/delete-medication-profile";
 import Loader from "@/component/ui/loader";
-import MedicationCard from "@/component/ui/medication-card/medication-card";
 import DetailsDosageSettings from "@/component/ui/medication-details/dosage-settings";
 import DetailsFrequencySettings from "@/component/ui/medication-details/frequency-settings";
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
@@ -13,7 +13,6 @@ import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
-import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -69,13 +68,8 @@ export default function MedicationDetails() {
         <Loader visible={isLoading || isPending} />
         {medicationProfile && (
           <View style={styles.contentContainer}>
-            <MedicationCard
-              id={medicationProfile.id}
-              imageUrl=""
-              name={medicationProfile.medicationName}
-              profile={medicationProfile.profile as ProfileResponse}
-              hasSwitch
-              isActive={medicationProfile.status.toUpperCase() === "ACTIVE"}
+            <MedicationDetailCard
+              medicationProfile={medicationProfile}
               onSwitchToggle={handleOnSwitchToggle}
             />
 

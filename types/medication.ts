@@ -60,7 +60,7 @@ export interface MedicationProfile {
   amountTaken: string;
   amountInPack: string;
 }
-export interface MedicationScheduleResponse {
+export interface MedicationSchedule {
   id: string;
   status: string;
   medicationName: string;

@@ -5,20 +5,15 @@ import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
-import { MedicationScheduleResponse } from "@/types/medication";
-import { getDateLocalString, getUpcomingTime, toLocalTime } from "@/utils/luxonUtil";
+import { MedicationSchedule } from "@/types/medication";
+import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import MedicationCard from "@/component/ui/medication-card/medication-card";
-import { getDosageUnit } from "@/helpers/getDosageUnit";
-import { getScheduleBadge } from "@/helpers/getScheduleBadge";
-import { getTakenAt } from "@/helpers/getTakenAt";
-import { showEventActionButton } from "@/helpers/showEventActionButton";
+import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { ProfileResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useFocusEffect } from "@react-navigation/native";
@@ -36,17 +31,11 @@ const TABS = [
   { label: "Принято", value: "TAKEN" },
   { label: "Пропущено", value: "MISSED" },
 ];
-
 const localDateString = getDateLocalString();
-
-const getScheduleTime = (scheduleTime: string) => {
-  const date = new Date(scheduleTime);
-  return toLocalTime(date);
-};
 
 // Fetch schedule events query
 const fetchScheduleEvents = async (params: string) => {
-  const response = await api.get<MedicationScheduleResponse[]>("medications/schedules/event", {
+  const response = await api.get<MedicationSchedule[]>("medications/schedules/event", {
     params: {
       eventDate: params,
     },
@@ -56,10 +45,9 @@ const fetchScheduleEvents = async (params: string) => {
 
 // Update schedule events
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
-  const response = await api.put<MedicationScheduleResponse>(
-    `medications/schedules/event/${data.id}`,
-    { action: data.action },
-  );
+  const response = await api.put<MedicationSchedule>(`medications/schedules/event/${data.id}`, {
+    action: data.action,
+  });
   return response.data;
 };
 
@@ -88,14 +76,13 @@ export default function Home() {
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["schedule-events", selectedDate],
-        (existingData: MedicationScheduleResponse[]) =>
+        (existingData: MedicationSchedule[]) =>
           existingData.map((scheduleEvent) =>
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
       );
       await queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] });
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating schedule event -> ", error);
@@ -191,19 +178,10 @@ export default function Home() {
                   data={filterScheduleEvents}
                   extraData={onFocusTrigger}
                   renderItem={({ item }) => (
-                    <MedicationCard
-                      id={item.id}
-                      imageUrl={item.medicationImageUrl}
-                      name={item.medicationName}
-                      profile={item.profile as ProfileResponse}
-                      eventBadge={getScheduleBadge(item)}
-                      upcomingEventBadgeValue={getUpcomingTime(item.scheduleAt)}
-                      dosage={item.dosage}
-                      dosageUnit={getDosageUnit(item.measurement)}
-                      scheduleTime={getScheduleTime(item.scheduleAt)}
-                      takenAt={getTakenAt(item.takenAt)}
-                      showEventButtons={showEventActionButton(item)}
-                      onEventButtonPress={(action) => mutate({ id: item.id, action })}
+                    <ScheduleEventCard
+                      key={item.id}
+                      scheduleEvent={item}
+                      onActionBtnPress={(action) => mutate({ id: item.id, action })}
                     />
                   )}
                   keyExtractor={(item) => item.id}

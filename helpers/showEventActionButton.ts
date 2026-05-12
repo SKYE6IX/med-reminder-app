@@ -1,7 +1,7 @@
-import { MedicationScheduleResponse } from "@/types/medication";
+import { MedicationSchedule } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 
-export const showEventActionButton = (event: MedicationScheduleResponse) => {
+export const showEventActionButton = (event: MedicationSchedule) => {
   if (!event) {
     return false;
   }

@@ -1,14 +1,11 @@
 import PlusIcon from "@/component/icons/plus-icon";
+import MedicationListCard from "@/component/ui/cards/medication-list-card";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import MedicationCard from "@/component/ui/medication-card/medication-card";
 import Tabs from "@/component/ui/tabs";
-import { getDosageUnit } from "@/helpers/getDosageUnit";
-import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
-import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
@@ -28,7 +25,7 @@ const TABS = [
 
 // Fetch query
 const fetchMedicationProfiles = async () => {
-  const response = await api.get("medications");
+  const response = await api.get<MedicationProfile[]>("medications");
   return response.data;
 };
 
@@ -42,7 +39,7 @@ export default function Medications() {
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
   // Query data list
-  const { data, isLoading } = useQuery<MedicationProfile[]>({
+  const { data, isLoading } = useQuery({
     queryKey: ["medication-profile", "list"],
     queryFn: fetchMedicationProfiles,
     staleTime: 60 * 60 * 1000,
@@ -108,19 +105,10 @@ export default function Medications() {
                   style={{ flex: 1 }}
                   data={getFilterMedicationsProfile}
                   renderItem={({ item }) => (
-                    <MedicationCard
-                      id={item.id}
-                      imageUrl={item.medicationImageUrl}
-                      name={item.medicationName}
-                      profile={item.profile as ProfileResponse}
-                      dosage={item.schedule.dosage}
-                      dosageUnit={getDosageUnit(item.schedule.measurement)}
-                      hasSwitch
-                      showProgress
-                      startedDate={getStartedDate(item.schedule.startDate)}
-                      isActive={item.status.toUpperCase() === "ACTIVE"}
+                    <MedicationListCard
+                      key={item.id}
+                      medicationProfile={item}
                       onSwitchToggle={handleOnSwitchToggle}
-                      onNavigate={() => router.navigate(`/medications/${item.id}`)}
                     />
                   )}
                   keyExtractor={(item) => item.id}

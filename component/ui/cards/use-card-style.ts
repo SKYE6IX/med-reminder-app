@@ -45,8 +45,8 @@ export function useCardStyles() {
     cardContentRow: {
       flex: 1,
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "flex-start",
+      gap: 10,
     },
     cardTextLarge: {
       fontFamily: "Roboto_500Medium",
@@ -70,10 +70,12 @@ export function useCardStyles() {
       fontFamily: "Roboto_500Medium",
       fontSize: 14,
       lineHeight: 16.2,
+      color,
     },
     medicationScheduleDivider: {
       width: 1.5,
       height: 16,
+      backgroundColor: mutedColor,
     },
 
     cardActionButtons: {
@@ -81,6 +83,8 @@ export function useCardStyles() {
       alignItems: "center",
       gap: 8,
     },
+
+    // Profiles
     profile: {
       flexDirection: "row",
       gap: 4,
@@ -97,12 +101,15 @@ export function useCardStyles() {
       fontFamily: "Roboto_400Regular",
       fontSize: 10,
       lineHeight: 11,
+      color,
     },
     profileText: {
       fontFamily: "Roboto_400Regular",
       fontSize: 12,
       lineHeight: 14.2,
+      color,
     },
+
     badge: {
       width: 90,
       height: 25,
@@ -122,6 +129,7 @@ export function useCardStyles() {
       lineHeight: 14.2,
       color: "#F7F7F7",
     },
+
     cardButton: {
       width: 90,
       height: 24,
@@ -136,6 +144,7 @@ export function useCardStyles() {
       lineHeight: 14.2,
       color: "#F7F7F7",
     },
+
     progressContainer: {
       gap: 5,
     },
@@ -148,12 +157,14 @@ export function useCardStyles() {
       fontFamily: "Roboto_400Regular",
       fontSize: 13,
       lineHeight: 14.2,
+      color: mutedColor,
     },
     progressPipe: {
       height: 5,
       width: "100%",
       borderRadius: 35,
       position: "relative",
+      backgroundColor: bgTertiary,
     },
     progressActivePipe: {
       position: "absolute",
