@@ -131,7 +131,7 @@ export default function RootLayout() {
 
 // Pack Set up
 // 1. Consume data for packs ✅
-// 2. Set up progess based on the pill taken and how many left.
+// 2. Set up progess based on the pill taken and how many left. ✅
 
 // Medication Card
 // 1. Some dosage meter shown undifined. Fix it. ✅

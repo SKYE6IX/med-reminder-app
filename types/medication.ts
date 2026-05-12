@@ -37,6 +37,7 @@ export interface ScheduleResponse {
   recurrenceRule: string;
   starTime: string;
   startDate: string;
+  amountTaken: string;
 }
 export interface CreateMedication {
   profileId: string;
@@ -57,8 +58,8 @@ export interface MedicationProfile {
   note: string | null;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
-  amountTaken: string;
-  amountInPack: string;
+  currentAmountInPack: string;
+  totalAmountInPack: string;
 }
 export interface MedicationSchedule {
   id: string;

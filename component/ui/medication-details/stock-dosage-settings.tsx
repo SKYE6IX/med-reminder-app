@@ -37,7 +37,7 @@ export default function StockDosageSettings({
     reminderDays: 0,
   });
 
-  const isAmountInPackAvailable = Number(medicationProfile.amountInPack) >= 1;
+  const isAmountInPackAvailable = Number(medicationProfile.totalAmountInPack) >= 1;
   const amountInPack = medicationPack.totalQuantity ? `${medicationPack.totalQuantity}` : "";
   const reminderDays = medicationPack.reminderDays ? `${medicationPack.reminderDays}` : "";
 
@@ -114,7 +114,7 @@ export default function StockDosageSettings({
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
             <Text style={[sharedStyles.cardTextContent, { color }]}>
-              {medicationProfile.amountInPack} {unitLabel()}
+              {medicationProfile.totalAmountInPack} {unitLabel()}
             </Text>
           </View>
         </View>

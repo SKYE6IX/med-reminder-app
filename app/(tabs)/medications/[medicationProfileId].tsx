@@ -123,8 +123,8 @@ export default function MedicationDetails() {
                 <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
                   <PillFilledIcon color={color} />
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
-                    {medicationProfile && Number(medicationProfile.amountTaken) >= 1
-                      ? `${medicationProfile.amountTaken} ${getDosageUnit(medicationProfile.schedule.measurement)} принято`
+                    {medicationProfile && Number(medicationProfile.schedule.amountTaken) >= 1
+                      ? `${medicationProfile.schedule.amountTaken} ${getDosageUnit(medicationProfile.schedule.measurement)} принято`
                       : "Лекарство еще не было принято"}
                   </Text>
                 </View>

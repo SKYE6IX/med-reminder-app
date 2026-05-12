@@ -12,6 +12,16 @@ type MedicationListCardProps = {
   medicationProfile: MedicationProfile;
   onSwitchToggle: (status: "active" | "inactive", id: string) => void;
 };
+const getProgressText = (medicationProfile: MedicationProfile) => {
+  const consumed =
+    Number(medicationProfile.totalAmountInPack) - Number(medicationProfile.currentAmountInPack);
+  return `${consumed} из ${medicationProfile.totalAmountInPack} принято`;
+};
+function getPercentage(medicationProfile: MedicationProfile) {
+  const consumed =
+    Number(medicationProfile.totalAmountInPack) - Number(medicationProfile.currentAmountInPack);
+  return Math.round((consumed / Number(medicationProfile.totalAmountInPack)) * 100);
+}
 
 export default function MedicationListCard({
   medicationProfile,
@@ -26,6 +36,8 @@ export default function MedicationListCard({
 
   const dosageUnit = getDosageUnit(medicationProfile.schedule.measurement);
   const startedDate = getStartedDate(medicationProfile.schedule.startDate);
+  const canShowProgress =
+    Boolean(medicationProfile.currentAmountInPack) && Boolean(medicationProfile.totalAmountInPack);
 
   const handleToggleSwitch = () => {
     const isToggle = !isActive;
@@ -85,15 +97,24 @@ export default function MedicationListCard({
       </View>
 
       {/* Progress tracker */}
-      <View style={sharedStyles.progressContainer}>
-        <View style={sharedStyles.progressHeader}>
-          <Text style={sharedStyles.progressTextValue}>25 из 60 принято</Text>
-          <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>42%</Text>
+      {canShowProgress && (
+        <View style={sharedStyles.progressContainer}>
+          <View style={sharedStyles.progressHeader}>
+            <Text style={sharedStyles.progressTextValue}>{getProgressText(medicationProfile)}</Text>
+            <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>
+              {getPercentage(medicationProfile)}%
+            </Text>
+          </View>
+          <View style={sharedStyles.progressPipe}>
+            <View
+              style={[
+                sharedStyles.progressActivePipe,
+                { backgroundColor: tintColor, width: `${getPercentage(medicationProfile)}%` },
+              ]}
+            />
+          </View>
         </View>
-        <View style={sharedStyles.progressPipe}>
-          <View style={[sharedStyles.progressActivePipe, { backgroundColor: tintColor }]} />
-        </View>
-      </View>
+      )}
     </View>
   );
 }

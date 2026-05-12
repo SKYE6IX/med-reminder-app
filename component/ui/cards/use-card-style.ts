@@ -169,7 +169,6 @@ export function useCardStyles() {
     progressActivePipe: {
       position: "absolute",
       height: 5,
-      width: "50%",
       borderRadius: 35,
       top: 0,
       left: 0,
