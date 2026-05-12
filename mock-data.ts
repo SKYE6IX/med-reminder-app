@@ -1,6 +1,6 @@
 import {
   DosageMeasurement,
-  MedicationProfileResponse,
+  MedicationProfile,
   MedicationScheduleResponse,
   MedicationUnit,
   ProfileResponse,
@@ -83,7 +83,7 @@ export const mockUser = {
   profiles: [],
 };
 
-export const mockMedications: MedicationProfileResponse[] = [
+export const mockMedications: MedicationProfile[] = [
   {
     id: "1a1f1c1a-1111-4aaa-9aaa-aaaaaaaaaaaa",
     medicationName: "Ibuprofen",

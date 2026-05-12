@@ -141,6 +141,9 @@ export const getUpcomingTime = (isoDateTime: string) => {
 
   const upcomingTime = scheduleTime.minus({ hours: now.hour, minutes: now.minute });
 
+  if (upcomingTime.hour <= 59) {
+    return upcomingTime.setLocale("ru").toFormat("' 'mm'м'");
+  }
   return upcomingTime.setLocale("ru").toFormat("H'ч 'mm'м'");
 };
 

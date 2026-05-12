@@ -3,6 +3,8 @@ import { Options, RRule } from "rrule";
 import { DateTime, getTimeZone, toLocalUtcTime } from "./luxonUtil";
 
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
+  if (!rrule) return;
+
   const rule = RRule.fromString(rrule);
 
   const ruleWithMaxCount = new RRule({
@@ -173,7 +175,9 @@ export const formatRRuleToRussian = (rrule: string | undefined) => {
 
     case RRule.DAILY: {
       const hours = options.byhour || [];
-      const minutes = options.byminute;
+      const byminute = options.byminute;
+
+      const minute = byminute[0].toString().length < 2 ? `${byminute[0]}0` : byminute[0];
 
       let baseText = "";
       if (interval === 1) {
@@ -184,7 +188,8 @@ export const formatRRuleToRussian = (rrule: string | undefined) => {
 
       if (hours.length === 1) {
         const hour = String(hours[0]).padStart(2, "0");
-        return `${baseText} в ${hour}:${minutes[0]}`;
+
+        return `${baseText} в ${hour}:${minute}`;
       }
 
       const equalInterval = calculateEqualHourInterval(hours);

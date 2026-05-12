@@ -10,13 +10,12 @@ type MedicationCardProps = {
   imageUrl: string;
   name: string;
   profile?: ProfileResponse;
-  dosage?: number;
+  dosage?: string;
   dosageUnit?: string;
   scheduleTime?: string;
   takenAt?: string;
-  freq?: string;
-  badge?: "upcoming" | "taken" | "missed";
-  upcomingValue?: string;
+  eventBadge?: "upcoming" | "taken" | "missed";
+  upcomingEventBadgeValue?: string;
   hasSwitch?: boolean;
   showProgress?: boolean;
   startedDate?: string;
@@ -36,9 +35,8 @@ export default function MedicationCard({
   dosageUnit,
   scheduleTime,
   takenAt,
-  freq,
-  badge,
-  upcomingValue,
+  eventBadge,
+  upcomingEventBadgeValue,
   hasSwitch,
   showProgress,
   startedDate,
@@ -67,7 +65,8 @@ export default function MedicationCard({
     setToggleSwitch(isToggle);
   };
 
-  const badgeBgColor = badge === "taken" ? "#009E00" : badge === "missed" ? "#DC0000" : tintColor;
+  const badgeBgColor =
+    eventBadge === "taken" ? "#009E00" : eventBadge === "missed" ? "#DC0000" : tintColor;
 
   return (
     <View style={[styles.card, { backgroundColor: bgSecondary }]}>
@@ -161,21 +160,19 @@ export default function MedicationCard({
       </View>
 
       {/* Badge */}
-      {badge && (
+      {eventBadge && (
         <View style={[styles.badge, { backgroundColor: badgeBgColor }]}>
           {/* Upcoming */}
-          {badge === "upcoming" && (
+          {eventBadge === "upcoming" && (
             <>
               <ClockIcon />
-              <Text style={styles.badgeText}>{upcomingValue}</Text>
+              <Text style={styles.badgeText}>{upcomingEventBadgeValue}</Text>
             </>
           )}
-
           {/* Taken */}
-          {badge === "taken" && <Text style={styles.badgeText}>Принятые</Text>}
-
+          {eventBadge === "taken" && <Text style={styles.badgeText}>Принятые</Text>}
           {/* Missed */}
-          {badge === "missed" && <Text style={styles.badgeText}>Пропущенно</Text>}
+          {eventBadge === "missed" && <Text style={styles.badgeText}>Пропущенно</Text>}
         </View>
       )}
 

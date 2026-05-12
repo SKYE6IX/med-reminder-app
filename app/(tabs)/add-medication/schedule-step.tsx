@@ -78,7 +78,7 @@ export default function ScheduleStepScreen() {
   const handleOnDosageSettingChange = ({
     amount,
     unit,
-  }: Partial<{ amount: number; unit: DosageMeasurement }>) => {
+  }: Partial<{ amount: string; unit: DosageMeasurement }>) => {
     setMedicatioSchedule({ dosage: amount ?? formState.schedule.dosage });
     setMedicationDetails({
       medicationMeasurement: unit ?? formState.medicationMeasurement,
@@ -109,7 +109,7 @@ export default function ScheduleStepScreen() {
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дозировка</Text>
           <DosageSettings
-            dosageAmountState={formState.schedule.dosage}
+            dosageAmountState={Number(formState.schedule.dosage)}
             dosageUnitState={formState.medicationMeasurement}
             onDasgeSettingsChange={handleOnDosageSettingChange}
           />
@@ -119,7 +119,7 @@ export default function ScheduleStepScreen() {
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Время приема</Text>
           <View style={styles.timeSettingList}>
-            {occurences.map((time, i) => (
+            {occurences?.map((time, i) => (
               <Text
                 key={time + i}
                 style={[styles.selectedTime, { backgroundColor: bGColor, color }]}

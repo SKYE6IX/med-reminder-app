@@ -85,7 +85,7 @@ export default function Home() {
   // Update schedule event
   const { isPending, mutate } = useMutation({
     mutationFn: updateScheduleEventMutaion,
-    onSuccess(data, variables) {
+    async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["schedule-events", selectedDate],
         (existingData: MedicationScheduleResponse[]) =>
@@ -93,8 +93,10 @@ export default function Home() {
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
       );
+      await queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] });
     },
-    onError(error, variables, onMutateResult, context) {
+
+    onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating schedule event -> ", error);
       } else {
@@ -194,8 +196,8 @@ export default function Home() {
                       imageUrl={item.medicationImageUrl}
                       name={item.medicationName}
                       profile={item.profile as ProfileResponse}
-                      badge={getScheduleBadge(item)}
-                      upcomingValue={getUpcomingTime(item.scheduleAt)}
+                      eventBadge={getScheduleBadge(item)}
+                      upcomingEventBadgeValue={getUpcomingTime(item.scheduleAt)}
                       dosage={item.dosage}
                       dosageUnit={getDosageUnit(item.measurement)}
                       scheduleTime={getScheduleTime(item.scheduleAt)}

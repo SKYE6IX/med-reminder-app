@@ -1,5 +1,4 @@
 import CalenderIcon from "@/component/icons/calender-icon";
-import LineChartIcon from "@/component/icons/line-chart-icon";
 import PillFilledIcon from "@/component/icons/pill-filled-icon";
 import DeleteMedicationProfile from "@/component/ui/delete-medication-profile";
 import Loader from "@/component/ui/loader";
@@ -7,11 +6,13 @@ import MedicationCard from "@/component/ui/medication-card/medication-card";
 import DetailsDosageSettings from "@/component/ui/medication-details/dosage-settings";
 import DetailsFrequencySettings from "@/component/ui/medication-details/frequency-settings";
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
+import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
+import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfileResponse } from "@/types/medication";
+import { MedicationProfile } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 // Medication profile details query
 const fetchMedicationProfileDetails = async (id: string) => {
-  const response = await api.get<MedicationProfileResponse>(`medications/${id}`);
+  const response = await api.get<MedicationProfile>(`medications/${id}`);
   return response.data;
 };
 
@@ -118,17 +119,7 @@ export default function MedicationDetails() {
                   <DetailsDosageSettings medicationProfile={medicationProfile} />
 
                   {/* STOCK DOSAGE AMOUNT */}
-                  <View
-                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                  >
-                    <View style={styles.cardHeader}>
-                      <Text style={[styles.cardTitle, { color }]}>Запас</Text>
-                    </View>
-                    <View style={styles.cardBody}>
-                      <LineChartIcon color={color} />
-                      <Text style={[styles.cardTextContent, { color }]}>30 таблеток</Text>
-                    </View>
-                  </View>
+                  <StockDosageSettings medicationProfile={medicationProfile} />
                 </View>
 
                 {/* NOTE ABOUT DOSAGE USAGE */}
@@ -138,7 +129,9 @@ export default function MedicationDetails() {
                 <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
                   <PillFilledIcon color={color} />
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
-                    20 таблеток принято
+                    {medicationProfile && Number(medicationProfile.amountTaken) >= 1
+                      ? `${medicationProfile.amountTaken} ${getDosageUnit(medicationProfile.schedule.measurement)} принято`
+                      : "Лекарство еще не было принято"}
                   </Text>
                 </View>
               </View>

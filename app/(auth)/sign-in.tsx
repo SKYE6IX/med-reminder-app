@@ -76,13 +76,13 @@ export default function SignInScreen() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: signInMutation,
-    onSuccess(data) {
+    async onSuccess(data) {
       clearTokens();
       saveTokens(data.accessToken, data.refreshToken);
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       setIsAuthenticated(true);
     },
-    onError(error, variables, onMutateResult, context) {
+    onError(error) {
       if (axios.isAxiosError(error)) {
         error.response?.status === 401 &&
           showFeedBack({

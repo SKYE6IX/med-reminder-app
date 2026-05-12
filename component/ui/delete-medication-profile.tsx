@@ -1,6 +1,6 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationProfileResponse } from "@/types/medication";
+import { MedicationProfile } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ export default function DeleteMedicationProfile({
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfileResponse[]) =>
+        (existingData: MedicationProfile[]) =>
           existingData.filter((oldData) => oldData.id !== variables),
       );
       bottomSheetRef.current?.close();

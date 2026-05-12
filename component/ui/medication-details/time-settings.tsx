@@ -3,7 +3,7 @@ import ClockIcon from "@/component/icons/clock-icon";
 import DateTimeWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfileResponse } from "@/types/medication";
+import { MedicationProfile } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
 import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
@@ -20,7 +20,7 @@ const getStartTime = (startTime: string) => {
 export default function DetailsTimeSettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfileResponse;
+  medicationProfile: MedicationProfile;
 }) {
   const [updatedRule, setUpdatedRule] = useState("");
 

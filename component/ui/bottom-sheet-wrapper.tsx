@@ -1,16 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
-import React, {
-  RefObject,
-  useCallback,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-} from "react";
+import React, { RefObject, useCallback, useImperativeHandle, useMemo, useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,10 +34,7 @@ export default function BottomSheetWrapper({
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const snapPoints = useMemo(
-    () => ["1%", snapPointPercent],
-    [snapPointPercent],
-  );
+  const snapPoints = useMemo(() => ["1%", snapPointPercent], [snapPointPercent]);
 
   const handleSheetChanges = useCallback((index: number) => {
     if (index <= 1) {
@@ -69,13 +57,7 @@ export default function BottomSheetWrapper({
 
   // Backdrops
   const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={1}
-        appearsOnIndex={2}
-      />
-    ),
+    (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     [],
   );
 
@@ -114,27 +96,17 @@ export default function BottomSheetWrapper({
           />
         )}
       >
-        <BottomSheetView style={styles.contentContainer}>
-          {children}
-        </BottomSheetView>
+        <BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
       </BottomSheet>
     </Portal>
   );
 }
 
-const Handle: React.FC<HandleProps> = ({
-  borderColor,
-  tintColor,
-  textColor,
-  close,
-  title,
-}) => {
+const Handle: React.FC<HandleProps> = ({ borderColor, tintColor, textColor, close, title }) => {
   return (
     <View style={[styles.header, { borderColor }]}>
       <Pressable style={styles.headerPressable} onPress={close}>
-        <Text style={[styles.headerPressableText, { color: tintColor }]}>
-          Отмена
-        </Text>
+        <Text style={[styles.headerPressableText, { color: tintColor }]}>Отмена</Text>
       </Pressable>
       <Text style={[styles.headerTitle, { color: textColor }]}>{title}</Text>
       <View style={styles.headerGhostView} />

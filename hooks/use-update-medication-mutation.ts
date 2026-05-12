@@ -1,5 +1,5 @@
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationProfileResponse } from "@/types/medication";
+import { MedicationProfile } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 interface UpdateMedicationProfile {
   isActive: boolean;
   recurrenceRule: string;
-  doseQuantity: number;
+  doseQuantity: string;
   note: string;
 }
 
@@ -24,7 +24,8 @@ const updateMedicationProfileMutation = async ({
     doseQuantity: data.doseQuantity ?? null,
     note: data.note ?? null,
   };
-  const response = await api.put<MedicationProfileResponse>(`medications/${id}`, updateData);
+
+  const response = await api.put<MedicationProfile>(`medications/${id}`, updateData);
   return response.data;
 };
 
@@ -35,12 +36,12 @@ export default function useUpdateMedicationMutation() {
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfileResponse[]) => {
+        (existingData: MedicationProfile[]) => {
           return existingData.map((oldData) => (oldData.id === data.id ? data : oldData));
         },
       );
-
       queryClient.setQueryData(["medication-profile", "details", variables.id], data);
+      await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
     },
     onError(error) {
       if (axios.isAxiosError(error)) {
@@ -55,7 +56,6 @@ export default function useUpdateMedicationMutation() {
       });
     },
   });
-
   return {
     mutate,
     isPending,

@@ -74,6 +74,7 @@ export default function MedicationPackPicker({
 
     if (!localValue.amountInPack) {
       setLocalValue((prv) => ({ ...prv, amountInPack: AMOUNTS_IN_PACK[0].value }));
+      onAmountInPackSet(AMOUNTS_IN_PACK[0].value);
     }
   };
 
@@ -88,8 +89,10 @@ export default function MedicationPackPicker({
     onPickerTrigger && onPickerTrigger(isRefillDaysPickerVisible);
 
     setIsRefillDaysPickerVisible(!isRefillDaysPickerVisible);
+
     if (!localValue.refillDaysReminder) {
       setLocalValue((prv) => ({ ...prv, refillDaysReminder: REMINDER_DAYS[0].value }));
+      onRefillDaysReminderSet(REMINDER_DAYS[0].value);
     }
   };
 

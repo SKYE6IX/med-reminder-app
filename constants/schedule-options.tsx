@@ -1,4 +1,11 @@
-import { DosageMeasurement } from "@/types/medication";
+import CapsuleIcon from "@/component/icons/capsule-icon";
+import Ellipsis from "@/component/icons/ellipsis";
+import EyeDropIcon from "@/component/icons/eye-drop-icon";
+import InjectionIcon from "@/component/icons/injection-icon";
+import SprayIcon from "@/component/icons/spray-icon";
+import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
+import TabletIcon from "@/component/icons/tablet-icon";
+import { DosageMeasurement, MedicationUnit } from "@/types/medication";
 
 export const DOSAGE_UNITS = [
   { label: "Таблетка", icon: "💊", value: DosageMeasurement.TABLET },
@@ -7,6 +14,16 @@ export const DOSAGE_UNITS = [
   { label: "Впрыскивание", icon: "💨", value: DosageMeasurement.SPRAY },
   { label: "Капля", icon: "💧", value: DosageMeasurement.DROPS },
   { label: "Капсула", icon: "⚪", value: DosageMeasurement.CAPSULE },
+];
+
+export const MEDICATION_UNITS = [
+  { name: "Капсулы", icon: CapsuleIcon, value: MedicationUnit.CAPSULE },
+  { name: "Таблетки", icon: TabletIcon, value: MedicationUnit.TABLET },
+  { name: "Инъекции", icon: InjectionIcon, value: MedicationUnit.INJECTION },
+  { name: "Спрей", icon: SprayIcon, value: MedicationUnit.SPRAY },
+  { name: "Капли", icon: EyeDropIcon, value: MedicationUnit.DROPS },
+  { name: "Сироп", icon: SyrupBottleIcon, value: MedicationUnit.SYRUP },
+  { name: "Другое", icon: Ellipsis, value: MedicationUnit.OTHER },
 ];
 
 export const OCCURENCES_PER_DAY = [

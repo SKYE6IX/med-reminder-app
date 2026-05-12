@@ -19,20 +19,20 @@ export enum DosageMeasurement {
   SPOON = "SPOON",
   MILLIMETERS = "MILLIMETERS",
 }
-interface MedicationPack {
-  totalQuantity: number;
-  notifyRule: string;
+export interface MedicationPackCreation {
+  medicationProfileId: string;
+  totalQuantity: string;
+  reminderDays: number;
 }
-
 interface ScheduleCreation {
-  dosage: number;
+  dosage: string;
   recurrenceRule: string;
   startDate: string;
   timeZone: string;
 }
 export interface ScheduleResponse {
   id: string;
-  dosage: number;
+  dosage: string;
   measurement: DosageMeasurement;
   recurrenceRule: string;
   starTime: string;
@@ -45,27 +45,27 @@ export interface CreateMedication {
   medicationMeasurement: DosageMeasurement;
   medicationNote: string | null;
   schedule: ScheduleCreation;
-  medicationPack: MedicationPack | null;
+  medicationPack: MedicationPackCreation | null;
 }
 
-export interface MedicationProfileResponse {
+export interface MedicationProfile {
   id: string;
   medicationName: string;
   medicationUnit: MedicationUnit;
   medicationImageUrl: string;
   status: string;
   note: string | null;
-  createdAt: string;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
+  amountTaken: string;
+  amountInPack: string;
 }
-
 export interface MedicationScheduleResponse {
   id: string;
   status: string;
   medicationName: string;
   medicationImageUrl: string;
-  dosage: number;
+  dosage: string;
   measurement: DosageMeasurement;
   scheduleAt: string;
   profile: {
@@ -75,4 +75,14 @@ export interface MedicationScheduleResponse {
     isSelf: boolean;
   };
   takenAt: string | null;
+}
+
+export interface RefillMedicationPack {
+  id: string;
+  status: string;
+  startedAt: string;
+  totalQuantity: string;
+  medicationName: string;
+  medicationImageUrl: string;
+  medicationProfileId: string;
 }

@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 export type SchedulePreset = "ONCE_A_DAY" | "TWICE_A_DAY" | "THREE_TIMES_A_DAY" | "CUSTOM";
 interface Schedule {
-  dosage: number;
+  dosage: string;
   rule: {
     recurrenceRule: string;
     preset: SchedulePreset | undefined;
@@ -13,8 +13,8 @@ interface Schedule {
   timeZone: string;
 }
 interface MedicationPack {
-  totalQuantity: number;
-  notifyRule: string;
+  totalQuantity: string;
+  reminderDays: number;
 }
 
 type FieldName = keyof AddPillStore["formState"];
@@ -53,7 +53,7 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
   medicationMeasurement: DosageMeasurement.TABLET,
   medicationNote: null,
   schedule: {
-    dosage: 1,
+    dosage: "1",
     rule: {
       recurrenceRule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
       preset: "ONCE_A_DAY",

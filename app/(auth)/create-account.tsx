@@ -79,10 +79,10 @@ export default function CreateAccountScreen() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createAccountMutation,
-    onSuccess(data) {
+    async onSuccess(data) {
       clearTokens();
       saveTokens(data.accessToken, data.refreshToken);
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       setIsAuthenticated(true);
     },
     onError(error) {

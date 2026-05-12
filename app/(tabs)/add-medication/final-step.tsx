@@ -5,7 +5,7 @@ import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
-import { CreateMedication, MedicationProfileResponse } from "@/types/medication";
+import { CreateMedication, MedicationProfile } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -24,7 +24,7 @@ const HALF_EXPAND = 197;
 const FULL_EXPAND = 417;
 
 const createMedicationMutation = async (body: CreateMedication) => {
-  const response = await api.post<MedicationProfileResponse>("medications", body);
+  const response = await api.post<MedicationProfile>("medications", body);
   return response.data;
 };
 
@@ -42,8 +42,10 @@ export default function FinalStepScreen() {
   // @platform ANDROID ONLY
   const pickersWrapperOpacity = useSharedValue(0);
 
-  const amountInPack = formState.medicationPack ? `${formState.medicationPack.totalQuantity}` : "";
-  const refillDaysReminder = formState.medicationPack ? formState.medicationPack.notifyRule : "";
+  const amountInPack = formState.medicationPack ? formState.medicationPack.totalQuantity : "";
+  const refillDaysReminder = formState.medicationPack
+    ? `${formState.medicationPack.reminderDays}`
+    : "";
   const medicationNote = formState.medicationNote ? formState.medicationNote : "";
 
   // Themes color
@@ -76,15 +78,15 @@ export default function FinalStepScreen() {
 
   const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationpack({
-      totalQuantity: Number(selectedValue),
-      notifyRule: refillDaysReminder,
+      totalQuantity: selectedValue,
+      reminderDays: Number(refillDaysReminder),
     });
   };
 
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationpack({
-      totalQuantity: Number(amountInPack),
-      notifyRule: selectedValue,
+      totalQuantity: amountInPack,
+      reminderDays: Number(selectedValue),
     });
   };
 
@@ -115,8 +117,7 @@ export default function FinalStepScreen() {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfileResponse[]) =>
-          existingData ? [...existingData, data] : [data],
+        (existingData: MedicationProfile[]) => (existingData ? [...existingData, data] : [data]),
       );
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
       clearFormState();

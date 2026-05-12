@@ -7,7 +7,7 @@ import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfileResponse } from "@/types/medication";
+import { MedicationProfile } from "@/types/medication";
 import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useFocusEffect } from "@react-navigation/native";
@@ -42,7 +42,7 @@ export default function Medications() {
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
   // Query data list
-  const { data, isLoading } = useQuery<MedicationProfileResponse[]>({
+  const { data, isLoading } = useQuery<MedicationProfile[]>({
     queryKey: ["medication-profile", "list"],
     queryFn: fetchMedicationProfiles,
     staleTime: 60 * 60 * 1000,

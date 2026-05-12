@@ -1,34 +1,17 @@
-import CapsuleIcon from "@/component/icons/capsule-icon";
-import Ellipsis from "@/component/icons/ellipsis";
-import EyeDropIcon from "@/component/icons/eye-drop-icon";
-import InjectionIcon from "@/component/icons/injection-icon";
 import PlusIcon from "@/component/icons/plus-icon";
-import SprayIcon from "@/component/icons/spray-icon";
-import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
-import TabletIcon from "@/component/icons/tablet-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import AddProfile from "@/component/ui/add-profile";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import ProfileCard from "@/component/ui/profile-card";
 import { Relation } from "@/constants/relation";
+import { MEDICATION_UNITS } from "@/constants/schedule-options";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
-import { MedicationUnit } from "@/types/medication";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-
-const medicationUnits = [
-  { name: "Капсулы", icon: CapsuleIcon, value: MedicationUnit.CAPSULE },
-  { name: "Таблетки", icon: TabletIcon, value: MedicationUnit.TABLET },
-  { name: "Инъекции", icon: InjectionIcon, value: MedicationUnit.INJECTION },
-  { name: "Спрей", icon: SprayIcon, value: MedicationUnit.SPRAY },
-  { name: "Капли", icon: EyeDropIcon, value: MedicationUnit.DROPS },
-  { name: "Сироп", icon: SyrupBottleIcon, value: MedicationUnit.SYRUP },
-  { name: "Другое", icon: Ellipsis, value: MedicationUnit.OTHER },
-];
 
 export default function DetailsStepScreen() {
   const { setMedicationDetails, formState } = useAddPillStore();
@@ -70,7 +53,7 @@ export default function DetailsStepScreen() {
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
         <View style={styles.pillFormWrapper}>
-          {medicationUnits.map((unit, i) => (
+          {MEDICATION_UNITS.map((unit, i) => (
             <View key={unit.value + i} style={styles.pillForm}>
               <Pressable
                 style={[

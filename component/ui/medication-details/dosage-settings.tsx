@@ -3,7 +3,7 @@ import PillIcon from "@/component/icons/pill-icon";
 import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { DosageMeasurement, MedicationProfileResponse } from "@/types/medication";
+import { DosageMeasurement, MedicationProfile } from "@/types/medication";
 import React, { useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
@@ -15,7 +15,7 @@ import { useSharedStyles } from "./use-shared-styles";
 export default function DetailsDosageSettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfileResponse;
+  medicationProfile: MedicationProfile;
 }) {
   const { isPending, mutate } = useUpdateMedicationMutation();
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
@@ -37,7 +37,7 @@ export default function DetailsDosageSettings({
   const handleOnDosageSettingChange = ({
     amount,
     unit,
-  }: Partial<{ amount: number; unit: DosageMeasurement }>) => {
+  }: Partial<{ amount: string; unit: DosageMeasurement }>) => {
     if (amount) {
       setDosageState((prv) => ({ ...prv, amount }));
     }
@@ -45,6 +45,7 @@ export default function DetailsDosageSettings({
 
   const habdleUpdateDosage = () => {
     mutate({ id: medicationProfile.id, data: { doseQuantity: dosageState.amount } });
+
     bottomSheetRef.current?.close();
   };
 
@@ -69,7 +70,7 @@ export default function DetailsDosageSettings({
       <BottomSheetWrapper ref={bottomSheetRef} title="Изменить дозировку" snapPointPercent="40%">
         <View style={{ gap: 16 }}>
           <DosageSettings
-            dosageAmountState={dosageState.amount}
+            dosageAmountState={Number(dosageState.amount)}
             dosageUnitState={dosageState.unit}
             onDasgeSettingsChange={handleOnDosageSettingChange}
             showUnitForm={false}

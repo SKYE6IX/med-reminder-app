@@ -9,10 +9,11 @@ type DosageSettingsProps = {
   dosageAmountState: number;
   dosageUnitState: DosageMeasurement;
   showUnitForm?: boolean;
+
   onDasgeSettingsChange: ({
     amount,
     unit,
-  }: Partial<{ amount: number; unit: DosageMeasurement }>) => void;
+  }: Partial<{ amount: string; unit: DosageMeasurement }>) => void;
 };
 
 export default function DosageSettings({
@@ -34,12 +35,12 @@ export default function DosageSettings({
 
   const increaseDosageAmount = () => {
     const amount = Math.round((dosageAmountState + 0.5) * 10) / 10;
-    onDasgeSettingsChange({ amount });
+    onDasgeSettingsChange({ amount: String(amount) });
   };
 
   const decreaseDosageAmount = () => {
     const amount = Math.max(1, Math.round((dosageAmountState - 0.5) * 10) / 10);
-    onDasgeSettingsChange({ amount });
+    onDasgeSettingsChange({ amount: String(amount) });
   };
 
   return (

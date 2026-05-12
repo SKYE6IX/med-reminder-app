@@ -3,10 +3,10 @@ import ArrowRight from "@/component/icons/arrow-right";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { SchedulePreset } from "@/stores/add-pill-store";
-import { MedicationProfileResponse } from "@/types/medication";
-import { formatRRuleToRussian } from "@/utils/rruleUtils";
+import { MedicationProfile } from "@/types/medication";
+import { formatRRuleToRussian, generateTimeOccurrences } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 import FrequencySettings from "../frequency-settings";
@@ -16,7 +16,7 @@ import { useSharedStyles } from "./use-shared-styles";
 export default function DetailsFrequencySettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfileResponse;
+  medicationProfile: MedicationProfile;
 }) {
   const { isPending, mutate } = useUpdateMedicationMutation();
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
@@ -26,6 +26,7 @@ export default function DetailsFrequencySettings({
 
   const sharedStyles = useSharedStyles();
   const color = useThemeColor({}, "textPrimary");
+  const bGColor = useThemeColor({}, "backgroundSecondary");
 
   const canUpdate = updatedRule.length > 1;
 
@@ -46,8 +47,11 @@ export default function DetailsFrequencySettings({
       mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
     }
   };
-
   const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
+
+  const occurences = generateTimeOccurrences({
+    rrule: updatedRule,
+  });
 
   return (
     <React.Fragment>
@@ -65,12 +69,23 @@ export default function DetailsFrequencySettings({
       <BottomSheetWrapper ref={bottomSheetRef} title="Изменить частоту">
         <View style={{ gap: 16 }}>
           <FrequencySettings onFreqSet={handleSetFrequency} preset={selectedPreset} />
+          <View style={styles.scheduleTimeList}>
+            {occurences?.map((time, i) => (
+              <Text
+                key={time + i}
+                style={[styles.scheduleTime, { backgroundColor: bGColor, color }]}
+              >
+                {time}
+              </Text>
+            ))}
+          </View>
           <CustomButton
             label="Применить"
             onPress={handleUpdateRules}
             disabled={!canUpdate}
             variant={canUpdate ? "filled" : "disabled"}
             textVaraint={canUpdate ? "regularText" : "mutedText"}
+            style={styles.button}
           />
         </View>
       </BottomSheetWrapper>
@@ -78,3 +93,28 @@ export default function DetailsFrequencySettings({
     </React.Fragment>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    marginTop: "auto",
+  },
+  scheduleTimeList: {
+    minHeight: 80,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 16,
+  },
+  scheduleTime: {
+    fontFamily: "Roboto_500Medium",
+    fontSize: 16,
+    lineHeight: 19.2,
+    paddingTop: 8,
+    paddingBottom: 8,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderRadius: 12,
+  },
+});

@@ -9,14 +9,14 @@ export const getScheduleBadge = (
     locale: "ru",
     setZone: true,
   });
-
   const upcoming = scheduleTime.hasSame(now, "day");
+  const isTimeReached = now >= scheduleTime;
 
   if (medicationSchedule.status === "TAKEN") {
     return "taken";
   } else if (medicationSchedule.status === "MISSED") {
     return "missed";
-  } else if (upcoming) {
+  } else if (upcoming && !isTimeReached) {
     return "upcoming";
   }
 };
