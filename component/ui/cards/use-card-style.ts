@@ -59,6 +59,7 @@ export function useCardStyles() {
       fontSize: 14,
       lineHeight: 16.2,
       textTransform: "lowercase",
+      color,
     },
 
     medicationSchedule: {

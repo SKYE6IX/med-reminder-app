@@ -7,7 +7,7 @@ import { pillNames } from "@/mock-data";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function NameStepScreen() {
   const sharedStyles = useAddPillScreenStyles();
@@ -55,72 +55,68 @@ export default function NameStepScreen() {
     }
   };
 
-  // console.log("Current form state -> ", formState);
-
   return (
-    <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
-      <View style={styles.headerWrapper}>
-        <Text style={sharedStyles.title}>Название лекарства</Text>
-        <View
-          style={[
-            styles.inputWrapper,
-            { borderColor: inputBorderColor, backgroundColor: inputBgColor },
-          ]}
-        >
-          <SearchIcon color={color} size={16} />
-          <TextInput
-            value={medicationName}
-            onChangeText={handleOnTextChange}
-            style={[styles.input, { color }]}
-            placeholder="Поиск"
-            placeholderTextColor={color}
-            returnKeyType="search"
-            keyboardType="default"
-            autoCorrect={false}
-            autoCapitalize="none"
-            clearButtonMode="while-editing"
-          />
-        </View>
-      </View>
-
-      <View style={styles.suggestionWrapper}>
-        {!isQueryFieldEmpty && !hideSuggestionBox && (
-          <Pressable
-            style={[styles.item, { borderColor: inputBorderColor }]}
-            onPress={() => handleSetPillName(medicationName)}
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
+        <View style={styles.headerWrapper}>
+          <Text style={sharedStyles.title}>Название лекарства</Text>
+          <View
+            style={[
+              styles.inputWrapper,
+              { borderColor: inputBorderColor, backgroundColor: inputBgColor },
+            ]}
           >
-            <View style={[styles.iconWrapper, { backgroundColor: tint }]}>
-              <PlusIcon />
-            </View>
-            <Text style={[styles.itemText, { color }]}>
-              Добавить «{medicationName}» как название
-            </Text>
-          </Pressable>
-        )}
+            <SearchIcon color={color} size={16} />
+            <TextInput
+              value={medicationName}
+              onChangeText={handleOnTextChange}
+              style={[styles.input, { color }]}
+              placeholder="Поиск"
+              placeholderTextColor={color}
+              returnKeyType="search"
+              keyboardType="default"
+              autoCorrect={false}
+              autoCapitalize="none"
+              clearButtonMode="while-editing"
+            />
+          </View>
+        </View>
 
-        <FlatList
-          data={!hideSuggestionBox ? results : []}
-          renderItem={({ item }) => (
+        <View style={styles.suggestionWrapper}>
+          {!isQueryFieldEmpty && !hideSuggestionBox && (
             <Pressable
               style={[styles.item, { borderColor: inputBorderColor }]}
-              onPress={() => handleSetPillName(item)}
+              onPress={() => handleSetPillName(medicationName)}
             >
-              <Text style={[styles.itemText, { color }]}>{item}</Text>
+              <View style={[styles.iconWrapper, { backgroundColor: tint }]}>
+                <PlusIcon />
+              </View>
+              <Text style={[styles.itemText, { color }]}>
+                Добавить «{medicationName}» как название
+              </Text>
             </Pressable>
           )}
-          keyExtractor={(item) => item}
+          {!hideSuggestionBox &&
+            results?.map((item) => (
+              <Pressable
+                key={item}
+                style={[styles.item, { borderColor: inputBorderColor }]}
+                onPress={() => handleSetPillName(item)}
+              >
+                <Text style={[styles.itemText, { color }]}>{item}</Text>
+              </Pressable>
+            ))}
+        </View>
+        <CustomButton
+          label="Далее"
+          style={sharedStyles.button}
+          variant={canContinue ? "filled" : "disabled"}
+          textVaraint={canContinue ? "regularText" : "mutedText"}
+          onPress={() => router.navigate("/(tabs)/add-medication/details-step")}
+          disabled={!canContinue}
         />
       </View>
-
-      <CustomButton
-        label="Далее"
-        style={sharedStyles.button}
-        variant={canContinue ? "filled" : "disabled"}
-        textVaraint={canContinue ? "regularText" : "mutedText"}
-        onPress={() => router.navigate("/(tabs)/add-medication/details-step")}
-        disabled={!canContinue}
-      />
-    </View>
+    </ScrollView>
   );
 }
 

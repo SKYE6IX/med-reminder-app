@@ -8,6 +8,7 @@ import { useUserData } from "@/hooks/use-user-data";
 import { MedicationSchedule } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -42,7 +43,6 @@ const fetchScheduleEvents = async (params: string) => {
   });
   return response.data;
 };
-
 // Update schedule events
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
   const response = await api.put<MedicationSchedule>(`medications/schedules/event/${data.id}`, {
@@ -53,7 +53,7 @@ const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
 
 export default function Home() {
   const { user } = useUserData();
-
+  const router = useRouter();
   const initialFocus = useRef(true);
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
@@ -81,8 +81,13 @@ export default function Home() {
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
       );
-      await queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["medication-profile"] }),
+        queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+      ]);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating schedule event -> ", error);
@@ -121,11 +126,16 @@ export default function Home() {
       return data?.sort((a, b) => {
         const aIsDone = a.status === "TAKEN" || a.status === "MISSED";
         const bIsDone = b.status === "TAKEN" || b.status === "MISSED";
+
         if (aIsDone && !bIsDone) return 1;
         if (!aIsDone && bIsDone) return -1;
 
-        const sortA = new Date(a.scheduleAt).getHours();
-        const sortB = new Date(b.scheduleAt).getHours();
+        const dateA = new Date(a.scheduleAt);
+        const dateB = new Date(b.scheduleAt);
+
+        const sortA = dateA.getHours() * 60 + dateA.getMinutes();
+        const sortB = dateB.getHours() * 60 + dateB.getMinutes();
+
         return sortA - sortB;
       });
     } else {

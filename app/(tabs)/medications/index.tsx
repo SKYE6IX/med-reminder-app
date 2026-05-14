@@ -91,9 +91,7 @@ export default function Medications() {
       {!isLoading && (
         <>
           {hasMedicationsProfiles ? (
-            <View
-              style={[styles.contentWrapper, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}
-            >
+            <View style={[styles.contentWrapper, { paddingTop: insets.top + 10 }]}>
               <View style={styles.tabWrapper}>
                 <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
               </View>

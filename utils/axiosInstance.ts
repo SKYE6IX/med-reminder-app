@@ -5,9 +5,13 @@ import { getValidAccessToken } from "./tokenUtils";
 const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
 
 const api = axios.create({
-  baseURL: `http://${localhost}:8080/`,
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
+// const api = axios.create({
+//   baseURL: `http://${localhost}:8080/`,
+// });
 
+// process.env.EXPO_PUBLIC_API_URL
 const MAX_RETRIES = 3;
 
 api.interceptors.request.use(async (config) => {

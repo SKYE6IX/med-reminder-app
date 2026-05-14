@@ -14,3 +14,11 @@ export interface UserResponse {
   dateOfBirth: string;
   gender: string;
 }
+
+export interface SocialAuthRequest {
+  providerId: string;
+  provider: "APPLE" | "GOOGLE";
+  jwtToken: string;
+  fullName: string;
+  email: string;
+}

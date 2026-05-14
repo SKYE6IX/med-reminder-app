@@ -120,8 +120,6 @@ export default function RootLayout() {
 // badge or missed badge down in the ALL tabs. and all the upcoming shown first. ✅
 // 4. The item need to update to re-render when the screen is focus back to
 // them to keep all events up to dates ✅
-// 5. Add a navigation to the profile on main menu, in which when user click, it will
-//  direct them to the profile in the settings.
 
 // Medication Details Page
 // 1. We need to render the right text in Russian for the rules. ✅

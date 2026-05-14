@@ -14,7 +14,7 @@ export function useLinkButtonStyles() {
     base: {
       height: 48,
       width: "100%",
-      borderRadius: 12,
+      borderRadius: 16,
       flexDirection: "row",
       gap: 10,
       justifyContent: "center",

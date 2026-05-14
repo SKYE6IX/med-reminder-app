@@ -20,7 +20,10 @@ const getScheduleTime = (scheduleTime: string) => {
   return toLocalTime(date);
 };
 
-export default function ScheduleEventCard({ scheduleEvent }: ScheduleEventCardProps) {
+export default function ScheduleEventCard({
+  scheduleEvent,
+  onActionBtnPress,
+}: ScheduleEventCardProps) {
   const sharedStyles = useCardStyles();
   const tintColor = useThemeColor({}, "tint");
 
@@ -75,15 +78,12 @@ export default function ScheduleEventCard({ scheduleEvent }: ScheduleEventCardPr
 
           {showActionBtns && (
             <View style={sharedStyles.cardActionButtons}>
-              <Pressable
-                style={sharedStyles.cardButton}
-                // onPress={() => onEventButtonPress("TAKEN")}
-              >
+              <Pressable style={sharedStyles.cardButton} onPress={() => onActionBtnPress("TAKEN")}>
                 <Text style={sharedStyles.cardButtonText}>Принять</Text>
               </Pressable>
               <Pressable
                 style={[sharedStyles.cardButton, { backgroundColor: "#DC0000" }]}
-                // onPress={() => onEventButtonPress("MISSED")}
+                onPress={() => onActionBtnPress("MISSED")}
               >
                 <Text style={sharedStyles.cardButtonText}>Пропустить</Text>
               </Pressable>

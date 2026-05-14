@@ -7,11 +7,10 @@ import DeleteAccountSheet from "@/component/ui/settings/delete-account-sheet";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRef } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Security() {
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
   const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
@@ -22,7 +21,7 @@ export default function Security() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <SettingsCard
           title="Изменить пароль"
           description="Изменить пароль профиля пользователя"

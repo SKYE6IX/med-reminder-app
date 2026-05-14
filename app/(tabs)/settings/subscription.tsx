@@ -1,10 +1,9 @@
 import CheckCircleIcon from "@/component/icons/check-circle-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Subscription() {
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
   const color = useThemeColor({}, "textPrimary");
@@ -15,7 +14,7 @@ export default function Subscription() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <View style={[styles.card, { backgroundColor: bgSecondary, borderColor }]}>
           <View style={[styles.cardCirlce, { backgroundColor: bgTertiary }]}>
             <CheckCircleIcon />

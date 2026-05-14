@@ -4,18 +4,17 @@ import PhoneIcon from "@/component/icons/phone-icon";
 import SignalIcon from "@/component/icons/signal-icon";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Notifications() {
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <SettingsCard
           title="Звук уведомления"
           description="Изменить звук уведомлений"

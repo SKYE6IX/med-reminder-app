@@ -3,11 +3,10 @@ import BellNotificationIcon from "@/component/icons/bell-notification-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Reminders() {
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
   const color = useThemeColor({}, "textPrimary");
@@ -15,7 +14,7 @@ export default function Reminders() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <SettingsCard
           title="Интервал повтора"
           description="Выберите интервал повторного напоминания"

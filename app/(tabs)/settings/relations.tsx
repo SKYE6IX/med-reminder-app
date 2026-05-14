@@ -13,7 +13,7 @@ import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRef, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const deleteRelationProfileMutation = async (profileId: string) => {
@@ -28,7 +28,6 @@ export default function Relations() {
   const addProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const deleteProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
 
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
   const relationsProfile = profiles?.filter((profile) => !profile.isSelf) ?? [];
@@ -71,7 +70,7 @@ export default function Relations() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <View style={[styles.contentCotainer, { backgroundColor: bgSecondary, borderColor }]}>
           {/* PROFILE LIST */}
           {relationsProfile.map((profile, i) => (

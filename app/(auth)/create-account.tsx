@@ -2,7 +2,7 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Platform, StyleSheet, TextInput, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
@@ -119,91 +119,93 @@ export default function CreateAccountScreen() {
   };
 
   return (
-    <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
-      <Loader visible={isPending} />
+    <ScrollView>
+      <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
+        <Loader visible={isPending} />
 
-      <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
+        <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
 
-      <View style={styles.inputsWrapper}>
-        <FormInput
-          label="Имя"
-          name="name"
-          onValueChange={handleOnValueChanges}
-          inputRef={textInputRef}
-          type="text"
-          placeholder="Введите Ваше имя"
-          hasError={createAccountState.errorsSet.has("name")}
-        />
-        <FormInput
-          label="Почта"
-          name="email"
-          onValueChange={handleOnValueChanges}
-          inputRef={emaiInputRef}
-          type="email"
-          placeholder="Введите адрес Вашей почты"
-          hasError={createAccountState.errorsSet.has("email")}
-        />
-        <FormInput
-          label="Пароль"
-          name="password"
-          onValueChange={handleOnValueChanges}
-          type="password"
-          placeholder="Придумайте пароль"
-          hasError={createAccountState.errorsSet.has("password")}
-          textContentType="newPassword"
-          autoComplete="new-password"
-        />
-      </View>
-
-      <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
-        <ThemedText style={styles.termsText}>
-          Создавая аккаунт, Вы принимаете
-          <Link href="/" style={{ color: linkColor }}>
-            {" "}
-            Условия использования
-          </Link>{" "}
-          и
-          <Link href="/" style={{ color: linkColor }}>
-            {" "}
-            Политику конфиденциальности.
-          </Link>
-        </ThemedText>
-      </View>
-
-      <View style={styles.socialButtonWrapper}>
-        <View style={styles.dividerWrapper}>
-          <View style={styles.divider} />
-          <ThemedText style={styles.dividerText}>Или</ThemedText>
-          <View style={styles.divider} />
+        <View style={styles.inputsWrapper}>
+          <FormInput
+            label="Имя"
+            name="name"
+            onValueChange={handleOnValueChanges}
+            inputRef={textInputRef}
+            type="text"
+            placeholder="Введите Ваше имя"
+            hasError={createAccountState.errorsSet.has("name")}
+          />
+          <FormInput
+            label="Почта"
+            name="email"
+            onValueChange={handleOnValueChanges}
+            inputRef={emaiInputRef}
+            type="email"
+            placeholder="Введите адрес Вашей почты"
+            hasError={createAccountState.errorsSet.has("email")}
+          />
+          <FormInput
+            label="Пароль"
+            name="password"
+            onValueChange={handleOnValueChanges}
+            type="password"
+            placeholder="Придумайте пароль"
+            hasError={createAccountState.errorsSet.has("password")}
+            textContentType="newPassword"
+            autoComplete="new-password"
+          />
         </View>
 
-        {Platform.OS === "ios" && (
+        <View style={styles.submitButtonWrapper}>
+          <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
+          <ThemedText style={styles.termsText}>
+            Создавая аккаунт, Вы принимаете
+            <Link href="/" style={{ color: linkColor }}>
+              {" "}
+              Условия использования
+            </Link>{" "}
+            и
+            <Link href="/" style={{ color: linkColor }}>
+              {" "}
+              Политику конфиденциальности.
+            </Link>
+          </ThemedText>
+        </View>
+
+        <View style={styles.socialButtonWrapper}>
+          <View style={styles.dividerWrapper}>
+            <View style={styles.divider} />
+            <ThemedText style={styles.dividerText}>Или</ThemedText>
+            <View style={styles.divider} />
+          </View>
+
+          {Platform.OS === "ios" && (
+            <CustomButton
+              label="Вход с аккаунтом Apple"
+              logoSrc={appleLogoSource}
+              variant="outline"
+              textVaraint="accentText"
+            />
+          )}
+
           <CustomButton
-            label="Вход с аккаунтом Apple"
-            logoSrc={appleLogoSource}
+            label="Вход с аккаунтом Google"
+            logoSrc={googleLogoSource}
             variant="outline"
             textVaraint="accentText"
           />
-        )}
+        </View>
 
-        <CustomButton
-          label="Вход с аккаунтом Google"
-          logoSrc={googleLogoSource}
-          variant="outline"
-          textVaraint="accentText"
-        />
+        <View style={styles.footerWrapper}>
+          <ThemedText style={styles.footerText}>
+            Уже есть аккаунт?{"  "}
+            <Link href="/sign-in" style={{ color: linkColor }}>
+              Войти
+            </Link>
+          </ThemedText>
+        </View>
       </View>
-
-      <View style={styles.footerWrapper}>
-        <ThemedText style={styles.footerText}>
-          Уже есть аккаунт?{"  "}
-          <Link href="/sign-in" style={{ color: linkColor }}>
-            Войти
-          </Link>
-        </ThemedText>
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 

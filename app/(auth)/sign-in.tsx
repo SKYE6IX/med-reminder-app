@@ -2,10 +2,11 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Platform, StyleSheet, TextInput, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
+import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -111,80 +112,69 @@ export default function SignInScreen() {
       });
       return;
     }
-
     mutate({ ...validatedInputs.data });
   };
 
   return (
-    <View style={[{ paddingBottom: Math.max(insets.bottom, 30) }, styles.container]}>
-      <Loader visible={isPending} />
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 30) }]}>
+        <Loader visible={isPending} />
 
-      <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
-      <View style={styles.inputsWrapper}>
-        <FormInput
-          label="Почта"
-          name="email"
-          onValueChange={handleOnValueChanges}
-          inputRef={emaiInputRef}
-          type="email"
-          placeholder="Введите адрес Вашей почты"
-          hasError={signInState.errorsSet.has("email")}
-        />
-        <FormInput
-          label="Пароль"
-          name="password"
-          onValueChange={handleOnValueChanges}
-          type="password"
-          placeholder="Придумайте пароль"
-          hasError={signInState.errorsSet.has("password")}
-          textContentType="password"
-          autoComplete="password"
-        />
-      </View>
-
-      <View style={styles.submitButtonWrapper}>
-        <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
-        <ThemedText style={styles.resetPasswordText}>
-          Забыли пароль?
-          <Link href="/forget-password" style={{ color: linkColor }}>
-            {" "}
-            Нажмите здесь
-          </Link>
-        </ThemedText>
-      </View>
-
-      <View style={styles.socialButtonWrapper}>
-        <View style={styles.dividerWrapper}>
-          <View style={styles.divider} />
-          <ThemedText style={styles.dividerText}>Или</ThemedText>
-          <View style={styles.divider} />
+        <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
+        <View style={styles.inputsWrapper}>
+          <FormInput
+            label="Почта"
+            name="email"
+            onValueChange={handleOnValueChanges}
+            inputRef={emaiInputRef}
+            type="email"
+            placeholder="Введите адрес Вашей почты"
+            hasError={signInState.errorsSet.has("email")}
+          />
+          <FormInput
+            label="Пароль"
+            name="password"
+            onValueChange={handleOnValueChanges}
+            type="password"
+            placeholder="Придумайте пароль"
+            hasError={signInState.errorsSet.has("password")}
+            textContentType="password"
+            autoComplete="password"
+          />
         </View>
 
-        {Platform.OS === "ios" && (
-          <CustomButton
-            label="Вход с аккаунтом Apple"
-            logoSrc={appleLogoSource}
-            variant="outline"
-            textVaraint="accentText"
-          />
-        )}
-        <CustomButton
-          label="Вход с аккаунтом Google"
-          logoSrc={googleLogoSource}
-          variant="outline"
-          textVaraint="accentText"
-        />
-      </View>
+        <View style={styles.submitButtonWrapper}>
+          <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
+          <ThemedText style={styles.resetPasswordText}>
+            Забыли пароль?
+            <Link href="/forget-password" style={{ color: linkColor }}>
+              {" "}
+              Нажмите здесь
+            </Link>
+          </ThemedText>
+        </View>
 
-      <View style={styles.footerWrapper}>
-        <ThemedText style={styles.footerText}>
-          Нет аккаунта?{"  "}
-          <Link href="/create-account" style={{ color: linkColor }}>
-            Создать аккаунт
-          </Link>
-        </ThemedText>
+        <View style={styles.socialButtonWrapper}>
+          <View style={styles.dividerWrapper}>
+            <View style={styles.divider} />
+            <ThemedText style={styles.dividerText}>Или</ThemedText>
+            <View style={styles.divider} />
+          </View>
+
+          {/* Social set up */}
+          {Platform.OS === "ios" && <AppleSignIn type="SIGN_IN" />}
+        </View>
+
+        <View style={styles.footerWrapper}>
+          <ThemedText style={styles.footerText}>
+            Нет аккаунта?{"  "}
+            <Link href="/create-account" style={{ color: linkColor }}>
+              Создать аккаунт
+            </Link>
+          </ThemedText>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
