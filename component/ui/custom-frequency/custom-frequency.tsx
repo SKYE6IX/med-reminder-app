@@ -132,7 +132,7 @@ export default function CustomFrequency({
         styles.container,
         {
           height,
-          borderWidth: isSelected ? undefined : 1,
+          borderWidth: isSelected ? 0 : 1,
           borderColor,
           backgroundColor: isSelected ? tintColor : bGColor,
         },
@@ -152,7 +152,7 @@ export default function CustomFrequency({
       </Pressable>
 
       {/* Custom settings */}
-      <Animated.View style={[sharedStyles.opitonsContainer, { opacity: optionsContainerOpacity }]}>
+      <Animated.View style={[{ opacity: optionsContainerOpacity }]}>
         {/* BASE OPTIONS  */}
         <View style={sharedStyles.opitonsItem}>
           <Text style={sharedStyles.optionsLabel}>Каждые</Text>
@@ -223,8 +223,6 @@ export default function CustomFrequency({
         )}
       </Animated.View>
 
-      {/* PIKCERS COMPONENETS */}
-
       {/* intervalValue Picker */}
       <Picker
         ref={intervalValue}
@@ -248,7 +246,7 @@ export default function CustomFrequency({
         ))}
       </Picker>
 
-      {/* Unit Picker */}
+      {/* Interval Unit Picker */}
       <Picker
         ref={intervalUnit}
         selectedValue={customState.pattern.unit}
@@ -270,7 +268,7 @@ export default function CustomFrequency({
         <Picker.Item label="Дня" value="DAILY" />
       </Picker>
 
-      {/* Occurrences Picker*/}
+      {/* OCCURENCES_PER_DAY OPTIONS */}
       <Picker
         ref={occurrencesPerDay}
         selectedValue={customState.pattern.occurrencesPerDay}
@@ -297,7 +295,7 @@ export default function CustomFrequency({
         ))}
       </Picker>
 
-      {/* Hours between occurrence Picker*/}
+      {/* HOUR_BETWEEN_OCCURENCES WHEN UNIT VALUE = "DAILY" */}
       <Picker
         ref={hoursBetweenOccurrences}
         selectedValue={

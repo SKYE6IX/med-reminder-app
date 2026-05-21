@@ -212,6 +212,27 @@ export class NotificationHelper {
     });
   }
 
+  public static handleOnForeGroundEvent() {
+    return notifee.onForegroundEvent(async ({ type, detail }) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          break;
+        case EventType.PRESS:
+          const { notification } = detail;
+          const data = notification?.data as unknown as NotificationData;
+          const snoozeIds = await readFromStorage<string[]>(data?.dueStorageKey as string);
+          const missedNoficationId = await readFromStorage<string>(
+            data?.missedStorageKey as string,
+          );
+          await Promise.all([
+            NotificationHelper.cancelNotificationWithId(snoozeIds, data.dueStorageKey),
+            NotificationHelper.cancelNotificationWithId(missedNoficationId, data.missedStorageKey),
+          ]);
+          break;
+      }
+    });
+  }
+
   public static notificationStorageKey({
     prefix,
     medProfileId,
@@ -243,6 +264,7 @@ export class NotificationHelper {
     await removeFromStorage(storageKey);
   }
 
+  // PRIVATE HELPERS
   private async registerAndroidChannel({ id, sound }: { id: string; sound: string }) {
     const channelId = await notifee.createChannel({
       id,

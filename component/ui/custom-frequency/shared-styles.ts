@@ -18,7 +18,6 @@ export function useCustomFreqStyles() {
       fontSize: 16,
       lineHeight: 19.2,
     },
-    opitonsContainer: {},
     opitonsItem: {
       marginTop: 8,
       flexDirection: "row",

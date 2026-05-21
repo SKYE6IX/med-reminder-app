@@ -80,6 +80,11 @@ export default function RootLayout() {
         console.log("Error occur in bootstrap -> ", error);
         setIsReady(true);
       });
+
+    // Susbscribe to foreground events for notifications
+    const unsubscribe = NotificationHelper.handleOnForeGroundEvent();
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -116,3 +121,15 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+// Actions related to schedule events and notifications
+// 1. Notifications are created when user add pills ✅
+// 2. When user change settings about (notification and reminder), we clear the
+//   whole notification, and create a new one. based on user settings ✅
+// 3. When user update their medication, and of the update include,
+//    occurencess or user turn off the medicine, we run the clear and create notification
+//  for all situation. ✅
+// 4. When user interact with the notification, we cancel all the next ones. ✅
+// 5. Have we cover when notification sound when user is in foreground? But what are the chances
+//   user will be in foreground when notification will come on? Regardless, I think we should
+//   handle this situation ✅

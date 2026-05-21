@@ -87,7 +87,6 @@ export default function ScheduleStepScreen() {
 
   return (
     <View
-      collapsable={false}
       style={[
         styles.container,
         sharedStyles.container,

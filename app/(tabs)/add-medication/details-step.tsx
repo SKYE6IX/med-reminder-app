@@ -12,8 +12,10 @@ import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function DetailsStepScreen() {
+  const { bottom } = useSafeAreaInsets();
   const { setMedicationDetails, formState } = useAddPillStore();
   const { profiles } = useProfilesQuery();
 
@@ -48,7 +50,10 @@ export default function DetailsStepScreen() {
   const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationUnit", "profileId"]));
 
   return (
-    <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
+    <SafeAreaView
+      style={[styles.container, sharedStyles.container, { paddingBottom: 10 }]}
+      edges={["bottom"]}
+    >
       {/* Pill Form selections */}
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
@@ -153,7 +158,7 @@ export default function DetailsStepScreen() {
         onPress={() => router.navigate("/(tabs)/add-medication/schedule-step")}
         disabled={!canContinue}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -190,7 +195,7 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
   },
   profilesWrapper: {
-    gap: 8,
+    gap: 16,
   },
   profileSelectionList: {
     gap: 8,

@@ -7,7 +7,7 @@ import { queryClient } from "@/utils/query-client";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useMutation } from "@tanstack/react-query";
 import { RefObject, startTransition, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import PeopleGroupIcon from "../icons/people-group";
 import { ThemedText } from "../themed-text/themed-text";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
@@ -99,41 +99,43 @@ export default function AddProfile({ ref }: AddProfileProps) {
 
   return (
     <BottomSheetWrapper ref={ref} title="Добавить члена семьи">
-      <Loader visible={isPending} />
-      <View style={styles.profileFormContainer}>
-        <View style={styles.profileFormInputWrapper}>
-          <ThemedText type="label">Имя</ThemedText>
-          <BottomSheetTextInput
-            value={formState.name}
-            onChangeText={handleOnTextChange}
-            style={[styles.profileFormInput, { borderColor }]}
-            autoCorrect={false}
-            autoCapitalize="sentences"
-            keyboardType="default"
-            placeholder="Введите имя"
-            placeholderTextColor="#9E9E9E"
+      <ScrollView contentContainerStyle={{ height: 700 }}>
+        <View style={styles.profileFormContainer}>
+          <View style={styles.profileFormInputWrapper}>
+            <ThemedText type="label">Имя</ThemedText>
+            <BottomSheetTextInput
+              value={formState.name}
+              onChangeText={handleOnTextChange}
+              style={[styles.profileFormInput, { borderColor, color: textColor }]}
+              autoCorrect={false}
+              autoCapitalize="sentences"
+              keyboardType="default"
+              placeholder="Введите имя"
+              placeholderTextColor="#9E9E9E"
+            />
+          </View>
+
+          <CustomPicker
+            label="Отношения"
+            selectedValue={formState.relation}
+            items={RELATION_LIST}
+            svgIcon={<PeopleGroupIcon color={textColor} />}
+            onValueSelected={handleOnRelationSelected}
+            isSelectionVisible={isPickerVisible}
+            triggerSelection={triggerSelectionPicker}
+          />
+
+          <CustomButton
+            label="Добавить нового члена"
+            variant={canSubmit ? "filled" : "disabled"}
+            textVaraint={canSubmit ? "regularText" : "mutedText"}
+            style={styles.button}
+            disabled={!canSubmit}
+            onPress={handleAddProfile}
           />
         </View>
-
-        <CustomPicker
-          label="Отношения"
-          selectedValue={formState.relation}
-          items={RELATION_LIST}
-          svgIcon={<PeopleGroupIcon color={textColor} />}
-          onValueSelected={handleOnRelationSelected}
-          isSelectionVisible={isPickerVisible}
-          triggerSelection={triggerSelectionPicker}
-        />
-
-        <CustomButton
-          label="Добавить нового члена"
-          variant={canSubmit ? "filled" : "disabled"}
-          textVaraint={canSubmit ? "regularText" : "mutedText"}
-          style={styles.button}
-          disabled={!canSubmit}
-          onPress={handleAddProfile}
-        />
-      </View>
+      </ScrollView>
+      <Loader visible={isPending} />
     </BottomSheetWrapper>
   );
 }

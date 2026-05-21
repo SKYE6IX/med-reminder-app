@@ -8,6 +8,7 @@ import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NameStepScreen() {
   const sharedStyles = useAddPillScreenStyles();
@@ -56,8 +57,8 @@ export default function NameStepScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1 }}>
-      <View style={[styles.container, sharedStyles.container, sharedStyles.bottomInset]}>
+    <SafeAreaView style={[styles.container, sharedStyles.container]} edges={["bottom"]}>
+      <ScrollView>
         <View style={styles.headerWrapper}>
           <Text style={sharedStyles.title}>Название лекарства</Text>
           <View
@@ -107,22 +108,24 @@ export default function NameStepScreen() {
               </Pressable>
             ))}
         </View>
-        <CustomButton
-          label="Далее"
-          style={sharedStyles.button}
-          variant={canContinue ? "filled" : "disabled"}
-          textVaraint={canContinue ? "regularText" : "mutedText"}
-          onPress={() => router.navigate("/(tabs)/add-medication/details-step")}
-          disabled={!canContinue}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      <CustomButton
+        label="Далее"
+        style={sharedStyles.button}
+        variant={canContinue ? "filled" : "disabled"}
+        textVaraint={canContinue ? "regularText" : "mutedText"}
+        onPress={() => router.navigate("/(tabs)/add-medication/details-step")}
+        disabled={!canContinue}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     gap: 20,
+    paddingBottom: 10,
   },
   headerWrapper: {
     gap: 16,

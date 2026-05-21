@@ -1,12 +1,8 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Platform, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
 
 export function useAddPillScreenStyles() {
-  const isIOS = Platform.OS === "ios";
-  const { bottom } = useSafeAreaInsets();
   const color = useThemeColor({}, "textPrimary");
-
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -24,9 +20,6 @@ export function useAddPillScreenStyles() {
     },
     button: {
       marginTop: "auto",
-    },
-    bottomInset: {
-      paddingBottom: isIOS ? bottom + 10 : 10,
     },
   });
 }

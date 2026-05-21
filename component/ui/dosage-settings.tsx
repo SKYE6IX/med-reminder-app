@@ -1,6 +1,7 @@
 import { DOSAGE_UNITS } from "@/constants/schedule-options";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { DosageMeasurement } from "@/types/medication";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import MinusIcon from "../icons/minus-icon";
 import PlusIcon from "../icons/plus-icon";
@@ -16,18 +17,25 @@ type DosageSettingsProps = {
   }: Partial<{ amount: string; unit: DosageMeasurement }>) => void;
 };
 
+const UNIT_PRESSABLE_PER_ROW = 3;
+const UNIT_WRAPPER_GAP = 12;
+
 export default function DosageSettings({
   dosageAmountState,
   dosageUnitState,
   onDasgeSettingsChange,
   showUnitForm = true,
 }: DosageSettingsProps) {
+  const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
+
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
+
+  const UNIT_PRESSABLE_WIDTH = (unitWrapperWidth - UNIT_WRAPPER_GAP * 2) / UNIT_PRESSABLE_PER_ROW;
 
   const handleSetDosageUnit = (unit: DosageMeasurement) => {
     onDasgeSettingsChange({ unit });
@@ -70,7 +78,12 @@ export default function DosageSettings({
       {showUnitForm && (
         <View style={styles.bodyView}>
           <Text style={[styles.label, { color }]}>Форма лекарства</Text>
-          <View style={styles.dosageUnitWrapper}>
+          <View
+            style={styles.dosageUnitWrapper}
+            onLayout={(event) => {
+              setUnitWrapperWidth(event.nativeEvent.layout.width);
+            }}
+          >
             {DOSAGE_UNITS.map((unit) => {
               const isSelected = unit.value === dosageUnitState.toUpperCase();
               return (
@@ -82,6 +95,7 @@ export default function DosageSettings({
                       borderWidth: isSelected ? undefined : 1,
                       borderColor,
                       backgroundColor: isSelected ? tintColor : undefined,
+                      width: UNIT_PRESSABLE_WIDTH,
                     },
                   ]}
                   onPress={() => handleSetDosageUnit(unit.value)}
@@ -143,10 +157,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: 8,
+    rowGap: UNIT_WRAPPER_GAP,
   },
   dosageUnitPressabale: {
-    width: 103,
     height: 75,
     justifyContent: "center",
     alignItems: "center",

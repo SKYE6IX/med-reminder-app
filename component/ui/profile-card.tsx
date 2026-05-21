@@ -42,7 +42,11 @@ export default function ProfileCard({
     <Pressable
       style={[
         styles.profilePressable,
-        { borderColor, backgroundColor: isSelected ? tintColor : bGColor },
+        {
+          borderColor,
+          backgroundColor: isSelected ? tintColor : bGColor,
+          borderWidth: isSelected ? 0 : 1,
+        },
       ]}
       onPress={() => setProfile(profileId)}
     >
@@ -77,7 +81,6 @@ const styles = StyleSheet.create({
     height: 65,
     paddingLeft: 16,
     paddingRight: 16,
-    borderWidth: 1,
     borderRadius: 16,
     flexDirection: "row",
     alignItems: "center",

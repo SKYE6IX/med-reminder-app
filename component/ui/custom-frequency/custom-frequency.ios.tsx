@@ -151,8 +151,7 @@ export default function CustomFrequency({
       </Pressable>
 
       {/* Custom settings */}
-      <View style={sharedStyles.opitonsContainer}>
-        {/* BASE OPTIONS  */}
+      <View>
         <View style={styles.optionsWrapper}>
           <View style={sharedStyles.opitonsItem}>
             <Text style={sharedStyles.optionsLabel}>Каждые</Text>
@@ -177,7 +176,7 @@ export default function CustomFrequency({
             </View>
           </View>
 
-          {/* BASE OPTIONS PICKERS */}
+          {/* INTERVAL VALUE OPTIONS */}
           {customState.showPicker === "intervalValue" && (
             <PickerIOS
               selectedValue={customState.pattern.intervalValue}
@@ -198,6 +197,8 @@ export default function CustomFrequency({
               ))}
             </PickerIOS>
           )}
+
+          {/* INTERVAL UNIT OPTION */}
           {customState.showPicker === "intervalUnit" && (
             <PickerIOS
               selectedValue={customState.pattern.unit}
@@ -272,7 +273,12 @@ export default function CustomFrequency({
 
         {/* HOUR_BETWEEN_OCCURENCES WHEN UNIT VALUE = "DAILY" */}
         {customState.pattern.unit === "DAILY" && (
-          <View style={[styles.optionsWrapper, { borderTopWidth: 1, borderColor, marginTop: 8 }]}>
+          <View
+            style={[
+              styles.optionsWrapper,
+              { borderTopWidth: 1, borderColor: "#F7F7F7", marginTop: 8 },
+            ]}
+          >
             <View style={sharedStyles.opitonsItem}>
               <Text style={sharedStyles.optionsLabel}>Интервал между приемами</Text>
               <View style={sharedStyles.optionsGroup}>
