@@ -12,6 +12,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { validateCreateAccountInputs } from "@/utils/validator";
 
+import AppleSignIn from "@/component/ui/apple-sign-in";
 import Loader from "@/component/ui/loader";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { AuthResponse } from "@/types/auth-response";
@@ -119,7 +120,7 @@ export default function CreateAccountScreen() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
       <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
         <Loader visible={isPending} />
 
@@ -179,21 +180,7 @@ export default function CreateAccountScreen() {
             <View style={styles.divider} />
           </View>
 
-          {Platform.OS === "ios" && (
-            <CustomButton
-              label="Вход с аккаунтом Apple"
-              logoSrc={appleLogoSource}
-              variant="outline"
-              textVaraint="accentText"
-            />
-          )}
-
-          <CustomButton
-            label="Вход с аккаунтом Google"
-            logoSrc={googleLogoSource}
-            variant="outline"
-            textVaraint="accentText"
-          />
+          {Platform.OS === "ios" && <AppleSignIn type="SIGN_UP" />}
         </View>
 
         <View style={styles.footerWrapper}>

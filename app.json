@@ -8,7 +8,7 @@
     "scheme": "medreminderapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.medreminderapp.MedRemindR",
       "usesAppleSignIn": true,
       "icon": {
@@ -24,7 +24,8 @@
         "backgroundColor": "#F7F7F7"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.medreminderapp.MedRemindR"
+      "package": "com.medreminderapp.MedRemindR",
+      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
     },
     "web": {
       "output": "static"
@@ -42,6 +43,26 @@
             "image": "./assets/icons/splash-icon-dark.png",
             "backgroundColor": "#1C1C1E"
           }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 35,
+            "minSdkVersion": 24
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/universfield_soft.wav",
+            "./assets/sounds/universfield_passive.wav",
+            "./assets/sounds/dragon_wavy.wav"
+          ]
         }
       ],
       "expo-secure-store",

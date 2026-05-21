@@ -9,7 +9,6 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
@@ -46,14 +45,8 @@ export default function SignInScreen() {
     errorsSet: new Set(),
   });
 
-  const scheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const emaiInputRef = useRef<TextInput>(null);
-
-  const appleLogoSource =
-    scheme === "dark"
-      ? require("@/assets/icons/apple-logo-light.png")
-      : require("@/assets/icons/apple-logo.png");
 
   const googleLogoSource = require("@/assets/icons/google-logo.png");
 

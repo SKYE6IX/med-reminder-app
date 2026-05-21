@@ -1,14 +1,11 @@
-import { MedicationSchedule } from "@/types/medication";
-import { DateTime, getTimeZone } from "@/utils/luxonUtil";
+import { DateTime } from "@/utils/luxonUtil";
 
-export const showEventActionButton = (event: MedicationSchedule) => {
-  if (!event) {
+export const showEventActionButton = (scheduleAt: string, status: string, now: DateTime) => {
+  if (!scheduleAt) {
     return false;
   }
 
-  const now = DateTime.now().setZone(getTimeZone());
-
-  const scheduleTime = DateTime.fromISO(event.scheduleAt, {
+  const scheduleTime = DateTime.fromISO(scheduleAt, {
     locale: "ru",
     setZone: true,
   });
@@ -16,7 +13,7 @@ export const showEventActionButton = (event: MedicationSchedule) => {
   const isSameDay = now.hasSame(scheduleTime, "day");
   const isTimeReached = now >= scheduleTime;
 
-  return isSameDay && isTimeReached && !["TAKEN", "MISSED"].includes(event.status);
+  return isSameDay && isTimeReached && !["TAKEN", "MISSED"].includes(status);
 };
 
 // CASE FOR UPDATING EVENTS BUTTON.

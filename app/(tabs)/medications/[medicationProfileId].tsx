@@ -1,8 +1,8 @@
 import CalenderIcon from "@/component/icons/calender-icon";
 import PillFilledIcon from "@/component/icons/pill-filled-icon";
 import MedicationDetailCard from "@/component/ui/cards/medication-detail-card";
-import DeleteMedicationProfile from "@/component/ui/delete-medication-profile";
 import Loader from "@/component/ui/loader";
+import DeleteMedication from "@/component/ui/medication-details/delete-medication";
 import DetailsDosageSettings from "@/component/ui/medication-details/dosage-settings";
 import DetailsFrequencySettings from "@/component/ui/medication-details/frequency-settings";
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
@@ -132,7 +132,7 @@ export default function MedicationDetails() {
             </View>
 
             {/* DELETE PILL BUTTON */}
-            <DeleteMedicationProfile medicationProfileId={medicationProfileId as string} />
+            <DeleteMedication medicationProfileId={medicationProfileId as string} />
           </View>
         )}
       </ScrollView>

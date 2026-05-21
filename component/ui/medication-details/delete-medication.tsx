@@ -1,3 +1,4 @@
+import { cancelNotifications } from "@/helpers/cancelNotifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
@@ -7,9 +8,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
-import CustomButton from "./custom-button/custom-button";
-import Loader from "./loader";
+import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
+import CustomButton from "../custom-button/custom-button";
+import Loader from "../loader";
 
 // Delete medication profile mutation
 const deleteMedicationProfileMutation = async (id: string) => {
@@ -17,11 +18,7 @@ const deleteMedicationProfileMutation = async (id: string) => {
   return response;
 };
 
-export default function DeleteMedicationProfile({
-  medicationProfileId,
-}: {
-  medicationProfileId: string;
-}) {
+export default function DeleteMedication({ medicationProfileId }: { medicationProfileId: string }) {
   const { showFeedBack } = useFeedBackStore();
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const mutedColor = useThemeColor({}, "textMuted");
@@ -37,7 +34,12 @@ export default function DeleteMedicationProfile({
       );
       bottomSheetRef.current?.close();
       router.back();
-      await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
+        queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+        cancelNotifications({ medProfileId: medicationProfileId }),
+      ]);
     },
 
     onError(error) {
@@ -80,6 +82,7 @@ export default function DeleteMedicationProfile({
               onPress={() => bottomSheetRef.current?.close()}
               style={{ width: "46%" }}
             />
+            {/*  */}
             <CustomButton
               label="Удалить"
               variant="danger"

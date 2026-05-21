@@ -1,8 +1,8 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { PickerIOS } from "@react-native-picker/picker";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import PlatformPicker from "../platform-picker/platform-picker.ios";
 import { CustomPickerProps } from "./custom-picker";
 
 export default function CustomPicker({
@@ -14,11 +14,8 @@ export default function CustomPicker({
   triggerSelection,
   selectedValue,
 }: CustomPickerProps) {
-  const [localValue, setLocalValue] = useState(selectedValue);
-
   // Themes color
   const textColor = useThemeColor({}, "textPrimary");
-  const borderColor = useThemeColor({}, "borderColor");
   const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
   const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
   const tintColor = useThemeColor({}, "tint");
@@ -34,7 +31,6 @@ export default function CustomPicker({
   };
 
   const handleValueChange = (value: string) => {
-    setLocalValue(value);
     onValueSelected(value);
   };
 
@@ -65,26 +61,12 @@ export default function CustomPicker({
       </View>
 
       <Animated.View style={{ opacity: isSelectionVisible ? undefined : 0 }}>
-        <PickerIOS
-          testID="picker"
-          selectedValue={localValue}
-          onValueChange={(itemValue) => handleValueChange(itemValue.toString())}
-          style={{
-            borderTopWidth: 1,
-            borderColor,
-            marginTop: -8,
-          }}
-          itemStyle={{
-            fontFamily: "Roboto_400Regular",
-            fontSize: 18,
-            lineHeight: 21.2,
-            color: textColor,
-          }}
-        >
-          {items.map((item) => (
-            <PickerIOS.Item key={item.value} label={item.label} value={item.value} />
-          ))}
-        </PickerIOS>
+        <PlatformPicker
+          selectedValue={selectedValue}
+          handleOnValueChange={handleValueChange}
+          items={items}
+          iosBorder={true}
+        />
       </Animated.View>
     </Animated.View>
   );

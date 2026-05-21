@@ -5,19 +5,19 @@ import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
-import { MedicationSchedule } from "@/types/medication";
+import { MedicationScheduleEvent } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
+import { useNotificationData } from "@/hooks/use-notification-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
-import { useFocusEffect } from "@react-navigation/native";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 type TABS_VALUE = "ALL" | "TAKEN" | "MISSED";
@@ -32,11 +32,10 @@ const TABS = [
   { label: "Принято", value: "TAKEN" },
   { label: "Пропущено", value: "MISSED" },
 ];
-const localDateString = getDateLocalString();
 
 // Fetch schedule events query
 const fetchScheduleEvents = async (params: string) => {
-  const response = await api.get<MedicationSchedule[]>("medications/schedules/event", {
+  const response = await api.get<MedicationScheduleEvent[]>("medications/schedules/event", {
     params: {
       eventDate: params,
     },
@@ -45,20 +44,23 @@ const fetchScheduleEvents = async (params: string) => {
 };
 // Update schedule events
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
-  const response = await api.put<MedicationSchedule>(`medications/schedules/event/${data.id}`, {
-    action: data.action,
-  });
+  const response = await api.put<MedicationScheduleEvent>(
+    `medications/schedules/event/${data.id}`,
+    {
+      action: data.action,
+    },
+  );
   return response.data;
 };
+
+const localDateString = getDateLocalString();
 
 export default function Home() {
   const { user } = useUserData();
   const router = useRouter();
-  const initialFocus = useRef(true);
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
-  const [onFocusTrigger, setOnFocusTrigger] = useState(0);
 
   const insets = useSafeAreaInsets();
   const { showFeedBack } = useFeedBackStore();
@@ -67,8 +69,11 @@ export default function Home() {
   const { data, isLoading } = useQuery({
     queryKey: ["schedule-events", selectedDate],
     queryFn: () => fetchScheduleEvents(selectedDate),
-    staleTime: 60 * 60 * 10000,
   });
+  // When the screen focus back, we track the data that get update
+  // base on user action from the notification data centre
+  // Right now we only focus on Schedule Events
+  useNotificationData({ selectedDate });
 
   // Update schedule event
   const { isPending, mutate } = useMutation({
@@ -76,18 +81,16 @@ export default function Home() {
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["schedule-events", selectedDate],
-        (existingData: MedicationSchedule[]) =>
+        (existingData: MedicationScheduleEvent[]) =>
           existingData.map((scheduleEvent) =>
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
       );
-
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["medication-profile"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
       ]);
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating schedule event -> ", error);
@@ -101,25 +104,7 @@ export default function Home() {
       });
     },
   });
-
   const hasScheduleEvents = data && data.length >= 1 ? true : false;
-
-  // When screen is back on focus after initial
-  // we trigger a re-render for Flatlist to keep events card up to date
-  useFocusEffect(
-    useCallback(() => {
-      if (initialFocus.current) {
-        initialFocus.current = false;
-        return;
-      }
-      setOnFocusTrigger((prv) => prv + 1);
-    }, []),
-  );
-
-  // Themes
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   const filterScheduleEvents = useMemo(() => {
     if (activeTab === "ALL") {
@@ -152,6 +137,11 @@ export default function Home() {
     const toLocalDateString = getDateLocalString(date);
     setSelectedDate(toLocalDateString);
   };
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
@@ -186,7 +176,7 @@ export default function Home() {
                 <FlatList
                   style={{ flex: 1 }}
                   data={filterScheduleEvents}
-                  extraData={onFocusTrigger}
+                  // extraData={onFocusTrigger}
                   renderItem={({ item }) => (
                     <ScheduleEventCard
                       key={item.id}
@@ -214,7 +204,11 @@ export default function Home() {
                   Если вы ещё не добавили лекарство, сделайте это сейчас.
                 </Text>
 
-                <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
+                <CustomButton
+                  label="Добавить лекарства"
+                  svgIcon={<PlusIcon size={15} />}
+                  onPress={() => router.navigate("/(tabs)/add-medication")}
+                />
               </View>
             )}
           </>

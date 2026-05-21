@@ -1,3 +1,6 @@
+import { cancelNotifications } from "@/helpers/cancelNotifications";
+import { createNotification } from "@/helpers/createNotifications";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
@@ -30,19 +33,41 @@ const updateMedicationProfileMutation = async ({
 };
 
 export default function useUpdateMedicationMutation() {
+  const { notfication, reminderPreferences } = useAppSettingsStore();
   const { showFeedBack } = useFeedBackStore();
+
   const { mutate, isPending } = useMutation({
     mutationFn: updateMedicationProfileMutation,
-    async onSuccess(data, variables) {
+    async onSuccess(incomingData, variables) {
+      const { data: variableData, id } = variables;
+
       queryClient.setQueryData(
         ["medication-profile", "list"],
         (existingData: MedicationProfile[]) => {
-          return existingData.map((oldData) => (oldData.id === data.id ? data : oldData));
+          return existingData.map((oldData) =>
+            oldData.id === incomingData.id ? incomingData : oldData,
+          );
         },
       );
-      queryClient.setQueryData(["medication-profile", "details", variables.id], data);
+      queryClient.setQueryData(["medication-profile", "details", id], incomingData);
+
+      // we want to create again when they turn on
+      if (variableData.isActive && variableData.isActive) {
+        await createNotification({ ...notfication, ...reminderPreferences });
+      } else if (variableData.isActive && !variableData.isActive) {
+        // We want to cancel all notification when user turn off
+        await cancelNotifications({ medProfileId: id });
+      }
+
+      //  we want to cancel and create when the change recurrence rule
+      if (variableData.recurrenceRule) {
+        await cancelNotifications({ medProfileId: id });
+        await createNotification({ ...notfication, ...reminderPreferences });
+      }
+
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating medication profile -> ", error);

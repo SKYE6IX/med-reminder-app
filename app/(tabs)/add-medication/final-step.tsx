@@ -3,8 +3,11 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
+import { createNotification } from "@/helpers/createNotifications";
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { CreateMedication, MedicationProfile } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -32,8 +35,9 @@ export default function FinalStepScreen() {
   const router = useRouter();
   const isIOS = Platform.OS === "ios";
 
-  const { formState, setMedicationDetails, setMedicationpack, clearFormState } = useAddPillStore();
+  const { notfication, reminderPreferences } = useAppSettingsStore();
 
+  const { formState, setMedicationDetails, setMedicationpack, clearFormState } = useAddPillStore();
   const sharedStyles = useAddPillScreenStyles();
 
   const [showRefillBox, setShowRefillBox] = useState(false);
@@ -119,11 +123,17 @@ export default function FinalStepScreen() {
         ["medication-profile", "list"],
         (existingData: MedicationProfile[]) => (existingData ? [...existingData, data] : [data]),
       );
-      await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
+
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
+        createNotification({ ...notfication, ...reminderPreferences }),
+      ]);
+
       clearFormState();
       router.dismissAll();
       router.navigate("/");
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when create a medication -> ", error);
@@ -143,6 +153,15 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
+
+    const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+    if (!notifcationAllowed) {
+      const allowed = await NotificationHelper.allowsNotificationsAsync();
+      if (!allowed) {
+        alert("Allow to notification for us to create schedules");
+        return;
+      }
+    }
     mutate(data);
   };
 

@@ -45,7 +45,6 @@ export default function DetailsDosageSettings({
 
   const habdleUpdateDosage = () => {
     mutate({ id: medicationProfile.id, data: { doseQuantity: dosageState.amount } });
-
     bottomSheetRef.current?.close();
   };
 

@@ -13,7 +13,7 @@ type SettingsCardProps = {
   toggleValue?: boolean;
   svgIcon?: React.ReactNode;
   onPress?: () => void;
-  onToggle?: () => void;
+  onToggle?: (value: boolean) => void;
 };
 
 export default function SettingsCard({
@@ -27,7 +27,7 @@ export default function SettingsCard({
   onPress,
   onToggle,
 }: SettingsCardProps) {
-  const [toggleSwitch, setToggleSwitch] = useState(false);
+  const [toggleSwitch, setToggleSwitch] = useState(toggleValue);
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
@@ -39,9 +39,10 @@ export default function SettingsCard({
   const handleToggleSwitch = () => {
     const isToggle = !toggleSwitch;
     setToggleSwitch(isToggle);
+    onToggle && onToggle(isToggle);
   };
 
-  //   Pressable
+  // Pressable
   if (interaction === "press") {
     return (
       <Pressable
@@ -72,7 +73,7 @@ export default function SettingsCard({
     );
   }
 
-  //   Toggle
+  // Toggle
   if (interaction === "toggle") {
     return (
       <View style={[styles.container, { backgroundColor: bgSecondary, borderColor }]}>
@@ -96,7 +97,7 @@ export default function SettingsCard({
     );
   }
 
-  //   None
+  // None
   return (
     <View style={[styles.container, { backgroundColor: bgSecondary, borderColor }]}>
       <View style={[styles.iconLeftWrapper, { backgroundColor: bgTertiary }]}>{svgIcon}</View>

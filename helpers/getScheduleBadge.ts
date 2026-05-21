@@ -1,20 +1,20 @@
-import { MedicationSchedule } from "@/types/medication";
-import { DateTime, getTimeZone } from "@/utils/luxonUtil";
+import { DateTime } from "@/utils/luxonUtil";
 
 export const getScheduleBadge = (
-  medicationSchedule: MedicationSchedule,
+  scheduleAt: string,
+  status: string,
+  now: DateTime,
 ): "upcoming" | "taken" | "missed" | undefined => {
-  const now = DateTime.now().setZone(getTimeZone());
-  const scheduleTime = DateTime.fromISO(medicationSchedule.scheduleAt, {
+  const scheduleTime = DateTime.fromISO(scheduleAt, {
     locale: "ru",
     setZone: true,
   });
   const upcoming = scheduleTime.hasSame(now, "day");
   const isTimeReached = now >= scheduleTime;
 
-  if (medicationSchedule.status === "TAKEN") {
+  if (status === "TAKEN") {
     return "taken";
-  } else if (medicationSchedule.status === "MISSED") {
+  } else if (status === "MISSED") {
     return "missed";
   } else if (upcoming && !isTimeReached) {
     return "upcoming";

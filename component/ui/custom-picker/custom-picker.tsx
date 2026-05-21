@@ -2,6 +2,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { Picker } from "@react-native-picker/picker";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import PlatformPicker from "../platform-picker/platform-picker";
 
 export type CustomPickerProps = {
   label: string;
@@ -20,7 +21,6 @@ export default function CustomPicker({
   onValueSelected,
   selectedValue,
 }: CustomPickerProps) {
-  const [localValue, setLocalValue] = useState(selectedValue);
   const [isSelectionVisible, setIsSelectionVisible] = useState(false);
   const pickerRef = useRef<Picker<string>>(null);
 
@@ -36,7 +36,6 @@ export default function CustomPicker({
       pickerRef.current?.focus();
       if (!selectedValue) {
         onValueSelected(items[0].value);
-        setLocalValue(items[0].value);
       }
     } else {
       pickerRef.current?.blur();
@@ -72,30 +71,18 @@ export default function CustomPicker({
           </Text>
         </Pressable>
       </View>
-      <Picker
-        testID="picker"
-        ref={pickerRef}
-        selectedValue={localValue}
-        onValueChange={(itemValue) => handleValueChange(itemValue)}
-        mode="dropdown"
-        style={{
+      <PlatformPicker
+        pickerRef={pickerRef}
+        selectedValue={selectedValue}
+        handleOnValueChange={handleValueChange}
+        setIsSelectionVisible={setIsSelectionVisible}
+        styles={{
           opacity: 0,
           height: 0,
           pointerEvents: "none",
         }}
-        onFocus={() => setIsSelectionVisible(true)}
-        onBlur={() => setIsSelectionVisible(false)}
-        itemStyle={{
-          fontFamily: "Roboto_400Regular",
-          fontSize: 16,
-          lineHeight: 19.2,
-          color: textColor,
-        }}
-      >
-        {items.map((item) => (
-          <Picker.Item key={item.value} label={item.label} value={item.value} />
-        ))}
-      </Picker>
+        items={items}
+      />
     </View>
   );
 }

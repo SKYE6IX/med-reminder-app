@@ -6,11 +6,13 @@ import ChangePasswordSheet from "@/component/ui/settings/change-password-sheet";
 import DeleteAccountSheet from "@/component/ui/settings/delete-account-sheet";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Security() {
+  const { useDeviceLock, setUseDeviceLock } = useAppSettingsStore();
   const insets = useSafeAreaInsets();
 
   const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
@@ -18,6 +20,10 @@ export default function Security() {
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
+  const toggleuseDeviceLock = (value: boolean) => {
+    setUseDeviceLock(value);
+  };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
@@ -30,11 +36,14 @@ export default function Security() {
           onPress={() => changePasswordSheetRef.current?.open()}
         />
 
+        {/* Allow to use device lock */}
         <SettingsCard
           title="Блокировка приложения"
           description="Используйте биометрию устройства для входа"
           svgIcon={<PhoneIcon color={color} />}
           interaction="toggle"
+          toggleValue={useDeviceLock}
+          onToggle={toggleuseDeviceLock}
         />
 
         <SettingsCard

@@ -10,8 +10,9 @@ import { api } from "@/utils/axiosInstance";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TABS_VALUE = "ALL" | "ACTIVE" | "IN_ACTIVE";
@@ -29,7 +30,7 @@ const fetchMedicationProfiles = async () => {
 };
 
 export default function Medications() {
-  const isIOS = Platform.OS === "ios";
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const isMounted = useRef(false);
@@ -125,7 +126,11 @@ export default function Medications() {
               <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
                 Теперь добавьте новое лекарство.
               </Text>
-              <CustomButton label="Добавить лекарства" svgIcon={<PlusIcon size={15} />} />
+              <CustomButton
+                label="Добавить лекарства"
+                svgIcon={<PlusIcon size={15} />}
+                onPress={() => router.navigate("/(tabs)/add-medication")}
+              />
             </View>
           )}
         </>
