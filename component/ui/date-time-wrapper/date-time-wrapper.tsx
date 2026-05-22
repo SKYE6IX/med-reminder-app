@@ -1,8 +1,8 @@
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { RefObject, useImperativeHandle, useRef, useState } from "react";
 import { View } from "react-native";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
-import CustomButton from "./custom-button/custom-button";
+import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
+import CustomButton from "../custom-button/custom-button";
 
 export interface DateTimeWrapperRef {
   showDateTime: () => void;

@@ -122,14 +122,14 @@ export default function RootLayout() {
   );
 }
 
-// Actions related to schedule events and notifications
-// 1. Notifications are created when user add pills ✅
-// 2. When user change settings about (notification and reminder), we clear the
-//   whole notification, and create a new one. based on user settings ✅
-// 3. When user update their medication, and of the update include,
-//    occurencess or user turn off the medicine, we run the clear and create notification
-//  for all situation. ✅
-// 4. When user interact with the notification, we cancel all the next ones. ✅
-// 5. Have we cover when notification sound when user is in foreground? But what are the chances
-//   user will be in foreground when notification will come on? Regardless, I think we should
-//   handle this situation ✅
+// TODO:
+// 1. Test on android ✅
+// 2. Set up notification for Refilled Pack
+// 3. Animate the week calender selection, make it swipeable,
+//    additionally, when user switch to new week, we should set a default,
+//    and when they go back to previous week, we set to exacly when they were,
+//    before they switch week.
+// 4. Implementation for adding image or emoji.
+// 5. bluring card when it has been set to in_active.
+// 6. Premium user flag and basic user flag feautures.
+// 7. Premimum page selections

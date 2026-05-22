@@ -3,7 +3,9 @@ import CalenderIcon from "@/component/icons/calender-icon";
 import PlusIcon from "@/component/icons/plus-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import DateTimePickerWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
+import DateTimePickerWrapper, {
+  DateTimeWrapperRef,
+} from "@/component/ui/date-time-wrapper/date-time-wrapper";
 import DosageSettings from "@/component/ui/dosage-settings";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";

@@ -2,7 +2,9 @@ import CameraIcon from "@/component/icons/camera-icon";
 import UserIcon from "@/component/icons/user-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
-import DateTimeWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
+import DateTimeWrapper, {
+  DateTimeWrapperRef,
+} from "@/component/ui/date-time-wrapper/date-time-wrapper";
 import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -23,14 +25,14 @@ const genderList = [
   { label: "Женский", value: "FEMALE" },
 ];
 
-interface UpdateData {
-  name: string;
-  email: string;
-  dateOfBirth: string;
-  gender: string;
+interface UpdateUserData {
+  name: string | null;
+  email: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
 }
 
-const updateUserMutation = async (updateData: UpdateData) => {
+const updateUserMutation = async (updateData: UpdateUserData) => {
   const response = await api.put<UserResponse>("users", updateData);
   return response.data;
 };
@@ -38,15 +40,16 @@ const updateUserMutation = async (updateData: UpdateData) => {
 export default function UserDetails() {
   const { showFeedBack } = useFeedBackStore();
   const { user } = useUserData();
+
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const scheme = useColorScheme();
 
-  const [updatedData, setUpdatedData] = useState({
-    name: "",
-    email: "",
-    dateOfBirth: "",
-    gender: "",
+  const [updateUserData, setUpdateUserData] = useState({
+    name: user?.name ?? null,
+    email: user?.email ?? null,
+    dateOfBirth: user?.dateOfBirth ?? null,
+    gender: user?.gender ?? null,
   });
 
   const datePickerRef = useRef<DateTimeWrapperRef>(null);
@@ -54,18 +57,17 @@ export default function UserDetails() {
   // @platform IOS ONLY.
   // Track the visibility of the picker for gender selection
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedGender, setSelectedGender] = useState(user?.gender || "");
 
   const canUpdate = useMemo(() => {
     const exisitngData = user;
-    const { name, email, dateOfBirth, gender } = updatedData;
+    const { name, email, dateOfBirth, gender } = updateUserData;
     return (
-      (Boolean(name.length) && name !== exisitngData?.name) ||
-      (Boolean(email.length) && email !== exisitngData?.email) ||
-      (Boolean(dateOfBirth.length) && dateOfBirth !== exisitngData?.dateOfBirth) ||
-      (Boolean(gender.length) && gender !== exisitngData?.gender)
+      name !== exisitngData?.name ||
+      email !== exisitngData?.email ||
+      dateOfBirth !== exisitngData?.dateOfBirth ||
+      gender !== exisitngData?.gender
     );
-  }, [updatedData, user]);
+  }, [updateUserData, user]);
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -86,20 +88,24 @@ export default function UserDetails() {
   const handleTriggerPicker = () => {
     setIsVisible(!isVisible);
     // Set a default on picked
-    if (!selectedGender) {
-      setSelectedGender(genderList[0].value);
-      setUpdatedData((prv) => ({ ...prv, gender: genderList[0].value }));
+    if (!updateUserData.gender) {
+      setUpdateUserData((prv) => ({ ...prv, gender: genderList[0].value }));
     }
   };
 
   // Callback function for onValueSelected on gender picker.
-  const handleOnValueSelected = (selectedValue: string) => {
-    setSelectedGender(selectedValue);
-    setUpdatedData((prv) => ({ ...prv, gender: selectedValue }));
+  const handleOnGenderValueSelected = (selectedValue: string) => {
+    setUpdateUserData((prv) => ({ ...prv, gender: selectedValue }));
   };
-  // Callback function for onValueSelected on gender picker.
+
+  // Callback function for onValueSelected on date picker
   const handleOnDateTimeSelected = (date: Date) => {
-    setUpdatedData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+    console.log(date.toLocaleDateString("ru"));
+    setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+  };
+
+  const handleOnTextInputChange = ({ name, value }: { name: string; value: string }) => {
+    setUpdateUserData((prvState) => ({ ...prvState, [name]: value }));
   };
 
   const { isPending, mutate } = useMutation({
@@ -127,7 +133,18 @@ export default function UserDetails() {
   });
 
   const handleUpdateUser = () => {
-    mutate(updatedData);
+    // We only send updated data that isn't the same as
+    // the exising one;
+    const { name, email, dateOfBirth, gender } = updateUserData;
+
+    const data: UpdateUserData = {
+      name: name !== user?.name ? name : null,
+      email: email !== user?.email ? email : null,
+      dateOfBirth: dateOfBirth !== user?.dateOfBirth ? dateOfBirth : null,
+      gender: gender !== user?.gender ? gender : null,
+    };
+
+    mutate(data);
   };
 
   return (
@@ -147,19 +164,22 @@ export default function UserDetails() {
           <View style={styles.body}>
             <FormInput
               label="Имя"
-              placeholder={user?.name}
+              placeholder=""
               type="text"
               name="name"
               hasError={false}
-              onValueChange={() => {}}
+              defaultValue={updateUserData.name ?? ""}
+              onValueChange={handleOnTextInputChange}
             />
+
             <FormInput
               label="Почта"
               placeholder={user?.email}
               type="email"
               name="email"
               hasError={false}
-              onValueChange={() => {}}
+              defaultValue={updateUserData.email ?? ""}
+              onValueChange={handleOnTextInputChange}
             />
 
             {/* DATE OF BIRTH */}
@@ -170,7 +190,7 @@ export default function UserDetails() {
                 onPress={() => datePickerRef.current?.showDateTime()}
               >
                 <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                  {updatedData.dateOfBirth || user?.dateOfBirth || "Введите дату Вашего рождения"}
+                  {updateUserData.dateOfBirth || "Введите дату Вашего рождения"}
                 </Text>
               </Pressable>
               {/* handleSetTime(date, event) */}
@@ -189,8 +209,8 @@ export default function UserDetails() {
               <CustomPicker
                 label="Пол"
                 items={genderList}
-                selectedValue={selectedGender}
-                onValueSelected={handleOnValueSelected}
+                selectedValue={updateUserData.gender ?? ""}
+                onValueSelected={handleOnGenderValueSelected}
                 triggerSelection={handleTriggerPicker}
                 isSelectionVisible={isVisible}
                 svgIcon={<UserIcon color={color} />}

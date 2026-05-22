@@ -1,6 +1,8 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import ClockIcon from "@/component/icons/clock-icon";
-import DateTimeWrapper, { DateTimeWrapperRef } from "@/component/ui/date-time-wrapper";
+import DateTimeWrapper, {
+  DateTimeWrapperRef,
+} from "@/component/ui/date-time-wrapper/date-time-wrapper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
