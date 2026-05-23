@@ -80,14 +80,11 @@ export const formatHomeScreenDate = (isoDate: string) => {
   });
 };
 
-export const getWeekDays = (date = DateTime.now()) => {
-  const current = date.setLocale("ru");
-
-  const startOfWeek = current.minus({ days: current.weekday - 1 });
-
+export const getWeekDays = (offset: number) => {
+  const anchorWeekStart = DateTime.now().setLocale("ru").startOf("week");
+  const start = anchorWeekStart.plus({ weeks: offset });
   return Array.from({ length: 7 }, (_, i) => {
-    const dt = startOfWeek.plus({ days: i });
-
+    const dt = start.plus({ days: i });
     return {
       date: dt.day,
       day: dt.toLocaleString({ weekday: "short" }),

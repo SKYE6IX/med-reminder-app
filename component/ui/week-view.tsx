@@ -5,36 +5,45 @@ import {
   getWeekDays,
   getWeekViewDescription,
 } from "@/utils/luxonUtil";
-import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import ArrowLeft from "../icons/arrow-left";
-import ArrowRight from "../icons/arrow-right";
+import { useRef, useState } from "react";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
+import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 
 type WeekViewProps = {
   showDescription: boolean;
   onDateChange: (selectedDate: string) => void;
 };
+interface WeekDay {
+  date: number;
+  day: string;
+  fullDay: string;
+  iso: string;
+  isToday: boolean;
+}
+
+const WINDOW_PADDING = 20;
+const CAROUSEL_WIDTH = Dimensions.get("window").width - WINDOW_PADDING * 2;
+const TOTAL_INDEX = 32;
+const DATA = [...new Array(TOTAL_INDEX).keys()];
+const CENTER_INDEX = TOTAL_INDEX / 2;
 
 export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
   const now = DateTime.now();
-  const [currentDate, setCurrentDate] = useState(now);
-
-  //   Default to today
+  const carouselRef = useRef<ICarouselInstance>(null);
   const [selectedISODate, setSelectedISODate] = useState(now.setLocale("ru").toISODate());
+  const [activeOffset, setActiveOffset] = useState(0);
 
-  const week = useMemo(() => getWeekDays(currentDate), [currentDate]);
-
-  const goNextWeek = () => {
-    setCurrentDate((prev) => prev.plus({ weeks: 1 }));
+  const handleOnSnapToItem = (index: number) => {
+    const offset = index - CENTER_INDEX;
+    setActiveOffset(offset);
   };
 
-  const goPrevWeek = () => {
-    setCurrentDate((prev) => prev.minus({ weeks: 1 }));
+  const scrollToCurrentWeek = () => {
+    carouselRef.current?.scrollTo({
+      index: CENTER_INDEX,
+      animated: true,
+    });
   };
-
-  // Themes
-  const color = useThemeColor({}, "textPrimary");
-  const tintColor = useThemeColor({}, "tint");
 
   const handleSetISODate = (ISODate: string) => {
     setSelectedISODate(ISODate);
@@ -42,42 +51,44 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   };
 
   const description = getWeekViewDescription(selectedISODate);
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
-      <View style={styles.weekContainer}>
-        <Pressable style={styles.weekController} onPress={goPrevWeek}>
-          <ArrowLeft size={30} color={color} />
-        </Pressable>
-
-        <View style={styles.weekWrapper}>
-          {week.map((w) => {
-            const isActive = selectedISODate === w.iso;
-            return (
-              <Pressable
-                key={w.iso}
-                style={[
-                  styles.weekPressable,
-                  { borderWidth: isActive ? 1 : 0, borderColor: tintColor },
-                ]}
-                onPress={() => handleSetISODate(w.iso)}
-              >
-                <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
-                  {w.day}
-                </Text>
-                <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
-                  {w.date}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        <Pressable style={styles.weekController} onPress={goNextWeek}>
-          <ArrowRight size={30} color={color} />
-        </Pressable>
+      <View style={styles.headerConteainer}>
+        <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
+        {activeOffset !== 0 && (
+          <Pressable onPress={scrollToCurrentWeek}>
+            <Text style={[styles.title, { color: tintColor }]}>На этой неделе!</Text>
+          </Pressable>
+        )}
       </View>
 
+      <View style={styles.weekPageContainer}>
+        <Carousel
+          ref={carouselRef}
+          loop={false}
+          defaultIndex={CENTER_INDEX}
+          data={DATA}
+          width={CAROUSEL_WIDTH}
+          height={80}
+          style={{ width: CAROUSEL_WIDTH }}
+          onSnapToItem={handleOnSnapToItem}
+          renderItem={({ index }) => {
+            const offset = index - CENTER_INDEX;
+            const weeks = getWeekDays(offset);
+            return (
+              <WeekDayRow
+                weeks={weeks}
+                selectedISODate={selectedISODate}
+                handleSetISODate={handleSetISODate}
+              />
+            );
+          }}
+        />
+      </View>
       {showDescription && (
         <Text style={[styles.weekDescription, { color }]}>Лекарства на {description}</Text>
       )}
@@ -85,26 +96,67 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   );
 }
 
+const WeekDayRow = ({
+  weeks,
+  selectedISODate,
+  handleSetISODate,
+}: {
+  weeks: WeekDay[];
+  selectedISODate: string;
+  handleSetISODate: (isoDate: string) => void;
+}) => {
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
+  return (
+    <View style={styles.weekWrapper}>
+      {weeks.map((week) => {
+        const isActive = selectedISODate === week.iso;
+        return (
+          <Pressable
+            key={week.iso}
+            style={[
+              styles.weekPressable,
+              { borderWidth: isActive ? 1 : 0, borderColor: tintColor },
+            ]}
+            onPress={() => handleSetISODate(week.iso)}
+          >
+            <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
+              {week.day}
+            </Text>
+            <Text style={[styles.weekText, { color: isActive ? tintColor : color }]}>
+              {week.date}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
-    height: 120,
     gap: 10,
+    height: "100%",
   },
+  headerConteainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  headerPressabaleText: {},
   title: {
     fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,
   },
+  weekPageContainer: {
+    flex: 1,
+  },
   weekContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-  },
-  weekController: {
-    width: 20,
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
   },
   weekWrapper: {
     flex: 1,

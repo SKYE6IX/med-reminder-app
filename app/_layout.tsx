@@ -128,7 +128,7 @@ export default function RootLayout() {
 // 3. Animate the week calender selection, make it swipeable,
 //    additionally, when user switch to new week, we should set a default,
 //    and when they go back to previous week, we set to exacly when they were,
-//    before they switch week.
+//    before they switch week. ✅
 // 4. Implementation for adding image or emoji.
 // 5. bluring card when it has been set to in_active.
 // 6. Premium user flag and basic user flag feautures.

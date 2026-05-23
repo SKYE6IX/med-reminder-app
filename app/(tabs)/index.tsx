@@ -146,6 +146,7 @@ export default function Home() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <Loader visible={isLoading || isPending} />
+
       <View style={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
@@ -252,6 +253,7 @@ const styles = StyleSheet.create({
   weekViewWrapper: {
     paddingLeft: 20,
     paddingRight: 20,
+    height: 120,
   },
   noContentWrapper: {
     flex: 1,

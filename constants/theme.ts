@@ -39,7 +39,6 @@ export const Colors = {
 
     bottomSheetBg: "#f2f2f7",
   },
-
   dark: {
     textPrimary: "#ECEDEE",
     textMuted: "#ECEDEE",
