@@ -124,7 +124,7 @@ export default function RootLayout() {
 
 // TODO:
 // 1. Test on android ✅
-// 2. Set up notification for Refilled Pack
+// 2. Set up notification for Refilled Pack ✅
 // 3. Animate the week calender selection, make it swipeable,
 //    additionally, when user switch to new week, we should set a default,
 //    and when they go back to previous week, we set to exacly when they were,
@@ -133,3 +133,9 @@ export default function RootLayout() {
 // 5. bluring card when it has been set to in_active.
 // 6. Premium user flag and basic user flag feautures.
 // 7. Premimum page selections
+
+// Considration on medication pack settings:
+// We should have a default days reminder incase user choose not to set it.
+// Another pure indication is:
+// About Amount of pill selections and dosage and days or reminder need to
+// able to work togehter.

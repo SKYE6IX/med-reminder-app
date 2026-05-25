@@ -4,7 +4,7 @@ import { api, axios } from "@/utils/axiosInstance";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { NotificationHelper } from "./notification-helper";
 
-export const createNotification = async (settings: Partial<NotificationSettings>) => {
+export const createScheduleEventNotification = async (settings: Partial<NotificationSettings>) => {
   const localDateString = getDateLocalString();
 
   try {
@@ -21,7 +21,7 @@ export const createNotification = async (settings: Partial<NotificationSettings>
       await Promise.all(
         events.map((event) =>
           notifications.scheduleDosageNotification({
-            scheduleId: event.id,
+            scheduleEventId: event.id,
             medicationName: event.medicationName,
             scheduleAt: event.scheduleAt,
             medicationProfileId: event.medicationProfileId,

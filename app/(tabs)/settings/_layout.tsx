@@ -67,6 +67,14 @@ export default function SettingsLayout() {
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Подписка</Stack.Screen.Title>
       </Stack.Screen>
 
+      <Stack.Screen name="subscription-plan">
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          Премиум-функции
+        </Stack.Screen.Title>
+      </Stack.Screen>
+
       <Stack.Screen name="about">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />

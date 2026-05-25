@@ -1,7 +1,7 @@
 import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfile, Pack } from "@/types/medication";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -12,15 +12,17 @@ type MedicationListCardProps = {
   medicationProfile: MedicationProfile;
   onSwitchToggle: (status: "active" | "inactive", id: string) => void;
 };
-const getProgressText = (medicationProfile: MedicationProfile) => {
-  const consumed =
-    Number(medicationProfile.totalAmountInPack) - Number(medicationProfile.currentAmountInPack);
-  return `${consumed} из ${medicationProfile.totalAmountInPack} принято`;
+
+const getProgressText = (pack: Pack | null) => {
+  if (!pack) return;
+  const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
+  return `${consumed} из ${pack.totalAmountInPack} принято`;
 };
-function getPercentage(medicationProfile: MedicationProfile) {
-  const consumed =
-    Number(medicationProfile.totalAmountInPack) - Number(medicationProfile.currentAmountInPack);
-  return Math.round((consumed / Number(medicationProfile.totalAmountInPack)) * 100);
+
+function getPercentage(pack: Pack | null) {
+  if (!pack) return;
+  const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
+  return Math.round((consumed / Number(pack.totalAmountInPack)) * 100);
 }
 
 export default function MedicationListCard({
@@ -36,8 +38,8 @@ export default function MedicationListCard({
 
   const dosageUnit = getDosageUnit(medicationProfile.schedule.measurement);
   const startedDate = getStartedDate(medicationProfile.schedule.startDate);
-  const canShowProgress =
-    Boolean(medicationProfile.currentAmountInPack) && Boolean(medicationProfile.totalAmountInPack);
+
+  const canShowProgress = medicationProfile.pack !== null;
 
   const handleToggleSwitch = () => {
     const isToggle = !isActive;
@@ -100,16 +102,21 @@ export default function MedicationListCard({
       {canShowProgress && (
         <View style={sharedStyles.progressContainer}>
           <View style={sharedStyles.progressHeader}>
-            <Text style={sharedStyles.progressTextValue}>{getProgressText(medicationProfile)}</Text>
+            <Text style={sharedStyles.progressTextValue}>
+              {getProgressText(medicationProfile.pack)}
+            </Text>
             <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>
-              {getPercentage(medicationProfile)}%
+              {getPercentage(medicationProfile.pack)}%
             </Text>
           </View>
           <View style={sharedStyles.progressPipe}>
             <View
               style={[
                 sharedStyles.progressActivePipe,
-                { backgroundColor: tintColor, width: `${getPercentage(medicationProfile)}%` },
+                {
+                  backgroundColor: tintColor,
+                  width: `${getPercentage(medicationProfile.pack) ?? 0}%`,
+                },
               ]}
             />
           </View>

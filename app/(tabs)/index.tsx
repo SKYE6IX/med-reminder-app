@@ -5,7 +5,7 @@ import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationProfile, MedicationScheduleEvent } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -14,7 +14,9 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
+import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -57,19 +59,23 @@ const localDateString = getDateLocalString();
 
 export default function Home() {
   const { user } = useUserData();
+
+  const insets = useSafeAreaInsets();
+
+  const { showFeedBack } = useFeedBackStore();
+  const { notfication, reminderPreferences } = useAppSettingsStore();
+
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
-
-  const insets = useSafeAreaInsets();
-  const { showFeedBack } = useFeedBackStore();
 
   // Query schedule event list
   const { data, isLoading } = useQuery({
     queryKey: ["schedule-events", selectedDate],
     queryFn: () => fetchScheduleEvents(selectedDate),
   });
+
   // When the screen focus back, we track the data that get update
   // base on user action from the notification data centre
   // Right now we only focus on Schedule Events
@@ -86,11 +92,26 @@ export default function Home() {
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
       );
+
+      // Inavlidate
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["medication-profile"] }),
+        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
       ]);
+
+      // Here we get the latest data from medication profile list
+      // we then create a notification alert for user if it exist and
+      // thier reminder days setting is near.
+      const medicationProfile = queryClient
+        .getQueryState<MedicationProfile[]>(["medication-profile", "list"])
+        ?.data?.find((profile) => profile.id === data.medicationProfileId);
+
+      await createRefillNotification({
+        medicationProfile,
+        settings: { ...notfication, ...reminderPreferences },
+      });
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating schedule event -> ", error);
@@ -104,6 +125,7 @@ export default function Home() {
       });
     },
   });
+
   const hasScheduleEvents = data && data.length >= 1 ? true : false;
 
   const filterScheduleEvents = useMemo(() => {

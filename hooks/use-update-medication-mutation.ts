@@ -1,5 +1,5 @@
-import { cancelNotifications } from "@/helpers/cancelNotifications";
-import { createNotification } from "@/helpers/createNotifications";
+import { cancelScheduleEventNotifications } from "@/helpers/cancel-schedule-event-notifications";
+import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
@@ -53,16 +53,16 @@ export default function useUpdateMedicationMutation() {
 
       // we want to create again when they turn on
       if (variableData.isActive && variableData.isActive) {
-        await createNotification({ ...notfication, ...reminderPreferences });
+        await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       } else if (variableData.isActive && !variableData.isActive) {
         // We want to cancel all notification when user turn off
-        await cancelNotifications({ medProfileId: id });
+        await cancelScheduleEventNotifications({ medProfileId: id });
       }
 
       //  we want to cancel and create when the change recurrence rule
       if (variableData.recurrenceRule) {
-        await cancelNotifications({ medProfileId: id });
-        await createNotification({ ...notfication, ...reminderPreferences });
+        await cancelScheduleEventNotifications({ medProfileId: id });
+        await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       }
 
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });

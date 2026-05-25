@@ -5,10 +5,11 @@ import {
   ScheduleAction,
   ScheduleNotificationOptions,
 } from "@/types/notification";
-import { DateTime } from "@/utils/luxonUtil";
+import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useNotificationDataStore } from "@/stores/notification-data-store";
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationProfile, MedicationScheduleEvent } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import notifee, {
   AndroidImportance,
@@ -52,14 +53,14 @@ export class NotificationHelper {
       minutesOverdue: this.settings.snoozeDuration * i,
     }));
 
-    const dueStorageKey = NotificationHelper.notificationStorageKey({
+    const dueStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "due-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
     });
 
     const earyReminder = dueReminder.minus({ minute: 20 });
-    const earlyStorageKey = NotificationHelper.notificationStorageKey({
+    const earlyStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "early-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
@@ -67,7 +68,7 @@ export class NotificationHelper {
 
     const lastSnooze = snoozeReminders[snoozeReminders.length - 1].date;
     const missedReminder = lastSnooze.plus({ minutes: 30 });
-    const missedStorageKey = NotificationHelper.notificationStorageKey({
+    const missedStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "missed-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
@@ -81,10 +82,10 @@ export class NotificationHelper {
 
     // We pre define all the notification, so as to achive the
     // snooze behavior type
+    const dueDataStoragesKeys = [dueStorageKey, missedStorageKey];
     const dueReminderData: NotificationData = {
-      scheduleId: options.scheduleId,
-      dueStorageKey,
-      missedStorageKey,
+      dosageScheduleEventId: options.scheduleEventId,
+      storageKey: JSON.stringify(dueDataStoragesKeys),
       notificationType: "due",
     };
 
@@ -107,7 +108,6 @@ export class NotificationHelper {
         });
       }),
     );
-
     // Saved all the key to storage and reused later
     await saveToStorage<string[]>(dueStorageKey, notificationsId);
 
@@ -142,6 +142,43 @@ export class NotificationHelper {
     }
   }
 
+  async scheduleRefillNotification({
+    scheduleAt,
+    medicationName,
+    medicationProfileId,
+  }: Omit<ScheduleNotificationOptions, "scheduleEventId">) {
+    const date = DateTime.fromISO(scheduleAt).toJSDate();
+
+    // @Platfrom ANDROID ONLY
+    const channelId = await this.registerAndroidChannel({
+      id: "reminder",
+      sound: "universfield_soft.wav",
+    });
+
+    const storageKey = NotificationHelper.createNotificationStorageKey({
+      prefix: "refill-reminder",
+      medProfileId: medicationProfileId,
+    });
+
+    const time = date.getTime();
+    const title = "Refill Reminder Alert";
+    const body = `${medicationName} is about to finished.`;
+
+    const notificationId = await this.createNotification({
+      time: time,
+      title,
+      body,
+      channelId,
+      showQuickActions: false,
+      customData: {
+        notificationType: "refill",
+        storageKey,
+      },
+    });
+
+    await saveToStorage(storageKey, notificationId);
+  }
+
   public static async allowsNotificationsAsync() {
     const settings = await notifee.requestPermission();
     if (
@@ -169,20 +206,8 @@ export class NotificationHelper {
 
     if (initialNotification) {
       const data = initialNotification.notification.data as unknown as NotificationData;
-      if (
-        initialNotification.pressAction.id === "default" &&
-        data &&
-        data.notificationType === "due"
-      ) {
-        //we cancelled all the snooze notification, and if user turn on
-        // missed, we cancel too
-        const snoozeIds = await readFromStorage<string[]>(data.dueStorageKey as string);
-        const missedNoficationId = await readFromStorage<string>(data.missedStorageKey as string);
-
-        await Promise.all([
-          NotificationHelper.cancelNotificationWithId(snoozeIds, data.dueStorageKey),
-          NotificationHelper.cancelNotificationWithId(missedNoficationId, data.missedStorageKey),
-        ]);
+      if (initialNotification.pressAction.id === "default" && data) {
+        await NotificationHelper.removeNotificationsWithKey(data);
       }
     }
   }
@@ -190,24 +215,23 @@ export class NotificationHelper {
   public static handleOnBackgroundEvent() {
     notifee.onBackgroundEvent(async ({ type, detail }) => {
       const { notification, pressAction } = detail;
+
       const data = notification?.data as unknown as NotificationData;
 
       if (type === EventType.ACTION_PRESS) {
         if (pressAction?.id === "taken") {
-          await NotificationHelper.updateSchdeule("TAKEN", data.scheduleId);
+          await NotificationHelper.updateSchdeuleEventsAction(
+            "TAKEN",
+            data.dosageScheduleEventId ?? "",
+          );
         } else if (pressAction?.id === "missed") {
-          await NotificationHelper.updateSchdeule("MISSED", data.scheduleId);
+          await NotificationHelper.updateSchdeuleEventsAction(
+            "MISSED",
+            data.dosageScheduleEventId ?? "",
+          );
         }
       }
-
-      const snoozeIds = await readFromStorage<string[]>(data?.dueStorageKey as string);
-      const missedNoficationId = await readFromStorage<string>(data?.missedStorageKey as string);
-
-      await Promise.all([
-        NotificationHelper.cancelNotificationWithId(snoozeIds, data.dueStorageKey),
-        NotificationHelper.cancelNotificationWithId(missedNoficationId, data.missedStorageKey),
-      ]);
-
+      await NotificationHelper.removeNotificationsWithKey(data);
       return Promise.resolve();
     });
   }
@@ -220,27 +244,20 @@ export class NotificationHelper {
         case EventType.PRESS:
           const { notification } = detail;
           const data = notification?.data as unknown as NotificationData;
-          const snoozeIds = await readFromStorage<string[]>(data?.dueStorageKey as string);
-          const missedNoficationId = await readFromStorage<string>(
-            data?.missedStorageKey as string,
-          );
-          await Promise.all([
-            NotificationHelper.cancelNotificationWithId(snoozeIds, data.dueStorageKey),
-            NotificationHelper.cancelNotificationWithId(missedNoficationId, data.missedStorageKey),
-          ]);
+          await NotificationHelper.removeNotificationsWithKey(data);
           break;
       }
     });
   }
 
-  public static notificationStorageKey({
+  public static createNotificationStorageKey({
     prefix,
     medProfileId,
     scheduleAt,
   }: {
     prefix: ReminderPrefixKey;
     medProfileId: string;
-    scheduleAt: string;
+    scheduleAt?: string;
   }) {
     return `${prefix}:${medProfileId}:${scheduleAt}`;
   }
@@ -261,6 +278,7 @@ export class NotificationHelper {
     } else {
       await notifee.cancelNotification(notificationId);
     }
+
     await removeFromStorage(storageKey);
   }
 
@@ -336,6 +354,28 @@ export class NotificationHelper {
     );
   }
 
+  private static async removeNotificationsWithKey(data: NotificationData) {
+    let storageKey: string | string[];
+
+    try {
+      storageKey = JSON.parse(data.storageKey as string);
+    } catch {
+      storageKey = data.storageKey;
+    }
+
+    if (typeof storageKey === "object") {
+      for (const key of storageKey) {
+        const notifcationId = await readFromStorage<string | string[]>(key);
+
+        await NotificationHelper.cancelNotificationWithId(notifcationId, key);
+      }
+    } else {
+      const notifcationId = await readFromStorage<string>(storageKey);
+
+      await NotificationHelper.cancelNotificationWithId(notifcationId, storageKey);
+    }
+  }
+
   private static async setCategories() {
     await notifee.setNotificationCategories([
       {
@@ -354,16 +394,51 @@ export class NotificationHelper {
     ]);
   }
 
-  private static async updateSchdeule(action: ScheduleAction, scheduleId: string) {
+  private static async updateSchdeuleEventsAction(action: ScheduleAction, scheduleId: string) {
     try {
-      const response = await api.put<MedicationScheduleEvent>(
+      const eventResponse = await api.put<MedicationScheduleEvent>(
         `medications/schedules/event/${scheduleId}`,
         {
           action,
         },
       );
-      if (response.data) {
-        useNotificationDataStore.getState().setScheduleData(response.data, scheduleId);
+      if (eventResponse.data) {
+        useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
+
+        const medicationProfilesResponse = await api.get<MedicationProfile[]>("medications");
+        if (medicationProfilesResponse.data) {
+          const medicationProfile = medicationProfilesResponse.data.find(
+            (profile) => profile.id === eventResponse.data.medicationProfileId,
+          );
+
+          if (!medicationProfile || medicationProfile.pack == null) return;
+
+          const { currentAmountInPack, reminderDays } = medicationProfile.pack;
+          const daysSupply = Math.round(
+            Number(currentAmountInPack) / Number(medicationProfile.schedule.dosage),
+          );
+
+          if (daysSupply - 1 < reminderDays) {
+            const refillDate = DateTime.now()
+              .setZone(getTimeZone())
+              .plus({ days: 1 })
+              .set({ hour: 9, minute: 0, second: 0, millisecond: 0 })
+              .toISO();
+
+            const appSettingState = useAppSettingsStore.getState();
+
+            const notifications = new NotificationHelper({
+              ...appSettingState.notfication,
+              ...appSettingState.reminderPreferences,
+            });
+
+            await notifications.scheduleRefillNotification({
+              scheduleAt: refillDate ?? "",
+              medicationName: medicationProfile.medicationName,
+              medicationProfileId: medicationProfile.id,
+            });
+          }
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

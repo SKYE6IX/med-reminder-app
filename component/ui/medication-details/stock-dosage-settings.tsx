@@ -37,7 +37,7 @@ export default function StockDosageSettings({
     reminderDays: 0,
   });
 
-  const isAmountInPackAvailable = Number(medicationProfile.totalAmountInPack) >= 1;
+  const isAmountInPackAvailable = Number(medicationProfile.pack?.totalAmountInPack) >= 1;
   const amountInPack = medicationPack.totalQuantity ? `${medicationPack.totalQuantity}` : "";
   const reminderDays = medicationPack.reminderDays ? `${medicationPack.reminderDays}` : "";
 
@@ -82,10 +82,10 @@ export default function StockDosageSettings({
         message: "Пополнение добавлено в напоминание.",
         status: "success",
       });
-
       bottomSheetRef.current?.close();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating medication profile -> ", error);
@@ -114,7 +114,7 @@ export default function StockDosageSettings({
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
             <Text style={[sharedStyles.cardTextContent, { color }]}>
-              {medicationProfile.totalAmountInPack} {unitLabel()}
+              {medicationProfile.pack?.totalAmountInPack} {unitLabel()}
             </Text>
           </View>
         </View>

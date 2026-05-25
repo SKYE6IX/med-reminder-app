@@ -1,4 +1,8 @@
-export type ReminderPrefixKey = "due-reminder" | "early-reminder" | "missed-reminder";
+export type ReminderPrefixKey =
+  | "due-reminder"
+  | "early-reminder"
+  | "missed-reminder"
+  | "refill-reminder";
 
 export type NotificationSoundMode = "enable" | "silent";
 
@@ -20,14 +24,11 @@ export interface NotificationSettings {
 export interface ScheduleNotificationOptions {
   medicationName: string;
   scheduleAt: string;
-  scheduleId: string;
+  scheduleEventId: string;
   medicationProfileId: string;
 }
-
 export interface NotificationData {
-  scheduleId: string;
-  dueStorageKey: string;
-  missedStorageKey: string;
-  earlyStorageKey?: string;
-  notificationType: "due" | "early" | "missed";
+  dosageScheduleEventId?: string;
+  storageKey: string | string[];
+  notificationType: "due" | "early" | "missed" | "refill";
 }

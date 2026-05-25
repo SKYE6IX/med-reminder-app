@@ -26,7 +26,13 @@ export interface MedicationPackCreation {
   reminderDays: number;
 }
 
-interface ScheduleCreation {
+export interface Pack {
+  totalAmountInPack: string;
+  currentAmountInPack: string;
+  reminderDays: number;
+}
+
+export interface ScheduleCreation {
   dosage: string;
   recurrenceRule: string;
   startDate: string;
@@ -60,9 +66,9 @@ export interface MedicationProfile {
   note: string | null;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
-  currentAmountInPack: string;
-  totalAmountInPack: string;
+  pack: Pack | null;
 }
+
 export interface MedicationScheduleEvent {
   id: string;
   status: string;

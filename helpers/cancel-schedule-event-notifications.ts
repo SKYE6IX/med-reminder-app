@@ -4,7 +4,7 @@ import { queryClient } from "@/utils/query-client";
 import { NotificationHelper } from "./notification-helper";
 import { readFromStorage } from "./storage-manager";
 
-export async function cancelNotifications({ medProfileId }: { medProfileId: string }) {
+export async function cancelScheduleEventNotifications({ medProfileId }: { medProfileId: string }) {
   const localDateString = getDateLocalString();
 
   //First we get the all notification schedule of the day;
@@ -33,29 +33,40 @@ export async function cancelNotifications({ medProfileId }: { medProfileId: stri
 
   const scheduleNotifications = await Promise.all(
     filterNotificationEvents.map(async (event) => {
-      const dueKey = NotificationHelper.notificationStorageKey({
+      const dueKey = NotificationHelper.createNotificationStorageKey({
         prefix: "due-reminder",
         medProfileId,
         scheduleAt: event.scheduleAt,
       });
-      const earlyKey = NotificationHelper.notificationStorageKey({
+      const earlyKey = NotificationHelper.createNotificationStorageKey({
         prefix: "early-reminder",
         medProfileId,
         scheduleAt: event.scheduleAt,
       });
-      const missedKey = NotificationHelper.notificationStorageKey({
+      const missedKey = NotificationHelper.createNotificationStorageKey({
         prefix: "missed-reminder",
         medProfileId,
         scheduleAt: event.scheduleAt,
       });
 
+      const refillKey = NotificationHelper.createNotificationStorageKey({
+        prefix: "missed-reminder",
+        medProfileId,
+      });
+
       const dueNotificationIds = await readFromStorage<string[]>(dueKey);
       const earlyNotificationId = await readFromStorage<string>(earlyKey);
       const missedNotificationId = await readFromStorage<string>(missedKey);
+      const refillNotificationId = await readFromStorage<string>(refillKey);
 
       return {
-        keys: { dueKey, earlyKey, missedKey },
-        notificationIds: { dueNotificationIds, earlyNotificationId, missedNotificationId },
+        keys: { dueKey, earlyKey, missedKey, refillKey },
+        notificationIds: {
+          dueNotificationIds,
+          earlyNotificationId,
+          missedNotificationId,
+          refillNotificationId,
+        },
       };
     }),
   );
@@ -74,6 +85,10 @@ export async function cancelNotifications({ medProfileId }: { medProfileId: stri
         NotificationHelper.cancelNotificationWithId(
           sn.notificationIds.missedNotificationId,
           sn.keys.missedKey,
+        );
+        NotificationHelper.cancelNotificationWithId(
+          sn.notificationIds.refillNotificationId,
+          sn.keys.refillKey,
         );
       }),
     );

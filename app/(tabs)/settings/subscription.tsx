@@ -1,10 +1,13 @@
 import CheckCircleIcon from "@/component/icons/check-circle-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Subscription() {
   const insets = useSafeAreaInsets();
+
+  const router = useRouter();
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
@@ -22,7 +25,10 @@ export default function Subscription() {
 
           <Text style={[styles.cardLabel, { color }]}>Базовый тариф</Text>
 
-          <Pressable style={[styles.cardPressable]}>
+          <Pressable
+            style={[styles.cardPressable]}
+            onPress={() => router.navigate("/(tabs)/settings/subscription-plan")}
+          >
             <Text style={styles.cardPressableText}>Обновить план</Text>
           </Pressable>
         </View>

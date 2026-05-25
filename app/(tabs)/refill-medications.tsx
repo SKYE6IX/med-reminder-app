@@ -48,17 +48,13 @@ export default function RefillPill() {
     [medicationPack.reminderDays, medicationPack.totalQuantity],
   );
 
+  // Query Data
   const { data, isLoading } = useQuery({
     queryKey: ["medication-refill-packs"],
     queryFn: fetchRefillMedicationPacks,
   });
 
-  const packsAvailable = data && data.length >= 1;
-
-  // Themes
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const isPacksAvailable = data && data.length >= 1;
 
   const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
@@ -91,12 +87,14 @@ export default function RefillPill() {
           return [...filterPacks, data];
         },
       );
+
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["medication-profile", "details", variables.medicationProfileId],
         }),
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
       ]);
+
       showFeedBack({
         title: "Успешно",
         message: "Пополнение добавлено в напоминание.",
@@ -105,6 +103,7 @@ export default function RefillPill() {
       bottomSheetRef.current?.close();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating medication profile -> ", error);
@@ -119,13 +118,18 @@ export default function RefillPill() {
     },
   });
 
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <Text style={[styles.headerTitle, { color }]}>Пополнение лекарств</Text>
       <Loader visible={isLoading || isPending} />
       {!isLoading && (
         <>
-          {packsAvailable ? (
+          {isPacksAvailable ? (
             <FlatList
               style={{ flex: 1 }}
               data={data}

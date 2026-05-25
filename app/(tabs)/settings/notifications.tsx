@@ -5,7 +5,7 @@ import SignalIcon from "@/component/icons/signal-icon";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import { createNotification } from "@/helpers/createNotifications";
+import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -31,7 +31,7 @@ export default function Notifications() {
   const handleSoundChange = async (value: string) => {
     setNotificationSetting({ sound: value as soundType });
     await NotificationHelper.cancelAllNotifications();
-    await createNotification({
+    await createScheduleEventNotification({
       ...notfication,
       ...reminderPreferences,
       sound: value as NotificationSoundMode,
@@ -41,7 +41,7 @@ export default function Notifications() {
   const toggleAllowNotification = async (value: boolean) => {
     setNotificationSetting({ enable: value });
     await NotificationHelper.cancelAllNotifications();
-    await createNotification({
+    await createScheduleEventNotification({
       ...notfication,
       ...reminderPreferences,
       enable: value,
@@ -51,7 +51,7 @@ export default function Notifications() {
   const toggleAllowVibration = async (value: boolean) => {
     setNotificationSetting({ vibration: value });
     await NotificationHelper.cancelAllNotifications();
-    await createNotification({
+    await createScheduleEventNotification({
       ...notfication,
       ...reminderPreferences,
       vibration: value,
@@ -61,7 +61,7 @@ export default function Notifications() {
   const toggleAllowDisplayOnLockScreen = async (value: boolean) => {
     setNotificationSetting({ showOnLockScreen: value });
     await NotificationHelper.cancelAllNotifications();
-    await createNotification({
+    await createScheduleEventNotification({
       ...notfication,
       ...reminderPreferences,
       showOnLockScreen: value,

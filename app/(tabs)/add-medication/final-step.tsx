@@ -3,7 +3,7 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
-import { createNotification } from "@/helpers/createNotifications";
+import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
@@ -77,6 +77,7 @@ export default function FinalStepScreen() {
     if (!isToggle) {
       setMedicationpack(null);
     }
+
     setShowRefillBox(isToggle);
   };
 
@@ -117,7 +118,7 @@ export default function FinalStepScreen() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createMedicationMutation,
-    async onSuccess(data) {
+    async onSuccess(data, variable) {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
         ["medication-profile", "list"],
@@ -126,7 +127,10 @@ export default function FinalStepScreen() {
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
-        createNotification({ ...notfication, ...reminderPreferences }),
+        createScheduleEventNotification({
+          ...notfication,
+          ...reminderPreferences,
+        }),
       ]);
 
       clearFormState();

@@ -100,7 +100,6 @@ export default function UserDetails() {
 
   // Callback function for onValueSelected on date picker
   const handleOnDateTimeSelected = (date: Date) => {
-    console.log(date.toLocaleDateString("ru"));
     setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
   };
 
