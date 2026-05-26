@@ -12,12 +12,11 @@ import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DetailsStepScreen() {
-  const { bottom } = useSafeAreaInsets();
   const { setMedicationDetails, formState } = useAddPillStore();
-  const { profiles } = useProfilesQuery();
+  const { selfProfile, relationProfiles } = useProfilesQuery();
 
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
@@ -31,13 +30,9 @@ export default function DetailsStepScreen() {
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
 
-  const selfProfile = profiles.find((profile) => profile.isSelf);
-
-  const selectedRelationProfile = profiles.find(
-    (profile) => profile.id === formState.profileId && !profile.isSelf,
+  const selectedRelationProfile = relationProfiles.find(
+    (profile) => profile.id === formState.profileId,
   );
-
-  const relationProfileList = profiles.filter((profile) => !profile.isSelf);
 
   const isRelationProfileSelected = selectedRelationProfile?.id === formState.profileId;
 
@@ -86,8 +81,8 @@ export default function DetailsStepScreen() {
         <View style={styles.profilesWrapper}>
           {/* Self profile selection */}
           <ProfileCard
-            isSelected={selfProfile?.id === formState.profileId}
             profileId={selfProfile?.id as string}
+            isSelected={selfProfile?.id === formState.profileId}
             isSelf
             hasActiveDot
             setProfile={handleSetProfile}
@@ -108,7 +103,7 @@ export default function DetailsStepScreen() {
           )}
 
           {/* Trigger button to show bottom sheet for profile list */}
-          {relationProfileList.length >= 1 && !isRelationProfileSelected && (
+          {relationProfiles.length >= 1 && !isRelationProfileSelected && (
             <CustomButton
               label="Выбрать члена семьи"
               variant="outline"
@@ -121,7 +116,7 @@ export default function DetailsStepScreen() {
           {/* Bottom sheet for profile list */}
           <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
             <View style={styles.profileSelectionList}>
-              {relationProfileList.map((profile) => (
+              {relationProfiles.map((profile) => (
                 <ProfileCard
                   isSelected={false} // it's part of list. // no active state on list
                   profileId={profile.id}

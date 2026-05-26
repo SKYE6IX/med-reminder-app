@@ -22,15 +22,13 @@ const deleteRelationProfileMutation = async (profileId: string) => {
 
 export default function Relations() {
   const { showFeedBack } = useFeedBackStore();
-  const { profiles } = useProfilesQuery();
+  const { relationProfiles } = useProfilesQuery();
 
   const [profileId, setProfileId] = useState("");
   const addProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const deleteProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
 
   const insets = useSafeAreaInsets();
-
-  const relationsProfile = profiles?.filter((profile) => !profile.isSelf) ?? [];
 
   //   Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -73,7 +71,7 @@ export default function Relations() {
       <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <View style={[styles.contentCotainer, { backgroundColor: bgSecondary, borderColor }]}>
           {/* PROFILE LIST */}
-          {relationsProfile.map((profile, i) => (
+          {relationProfiles.map((profile, i) => (
             <View
               key={profile.id}
               style={[
@@ -102,7 +100,7 @@ export default function Relations() {
           <Pressable
             style={[
               styles.contentItemWrapper,
-              { borderTopWidth: relationsProfile.length ? 1 : undefined, borderColor },
+              { borderTopWidth: relationProfiles.length ? 1 : undefined, borderColor },
             ]}
             onPress={() => addProfileBottomSheetRef.current?.open()}
           >

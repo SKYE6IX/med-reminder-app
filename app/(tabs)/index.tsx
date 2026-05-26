@@ -16,6 +16,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
@@ -69,6 +70,8 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
+
+  const profileImageUrl = useProfileImage();
 
   // Query schedule event list
   const { data, isLoading } = useQuery({
@@ -174,7 +177,7 @@ export default function Home() {
         <View style={styles.header}>
           <View style={styles.headerProfileContainer}>
             <Image
-              source={require("@/assets/mock-profile.jpg")}
+              source={profileImageUrl}
               style={styles.headerAvatar}
               contentFit="cover"
               contentPosition="top center"

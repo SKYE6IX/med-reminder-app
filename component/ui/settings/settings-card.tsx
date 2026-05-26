@@ -53,7 +53,7 @@ export default function SettingsCard({
         {avatarUrl ? (
           <View style={styles.avatarWrapper}>
             <Image
-              source={require("@/assets/mock-profile.jpg")}
+              source={avatarUrl}
               style={styles.avatar}
               contentFit="cover"
               contentPosition="top center"

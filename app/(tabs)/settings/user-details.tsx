@@ -1,5 +1,7 @@
 import CameraIcon from "@/component/icons/camera-icon";
 import UserIcon from "@/component/icons/user-icon";
+import AvatarPicker from "@/component/ui/avatar-picker";
+import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
 import DateTimeWrapper, {
@@ -7,7 +9,8 @@ import DateTimeWrapper, {
 } from "@/component/ui/date-time-wrapper/date-time-wrapper";
 import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useProfileImage } from "@/hooks/use-profile-image";
+import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -38,13 +41,17 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 };
 
 export default function UserDetails() {
-  const { showFeedBack } = useFeedBackStore();
-  const { user } = useUserData();
-
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
-  const scheme = useColorScheme();
 
+  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
+  const { showFeedBack } = useFeedBackStore();
+
+  const { user } = useUserData();
+  const { selfProfile } = useProfilesQuery();
+  const profileImageUrl = useProfileImage();
+
+  // Query data
   const [updateUserData, setUpdateUserData] = useState({
     name: user?.name ?? null,
     email: user?.email ?? null,
@@ -77,11 +84,6 @@ export default function UserDetails() {
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
-
-  const avatarPlaceholder =
-    scheme === "dark"
-      ? require("@/assets/images/avatar-placeholder-dark.png")
-      : require("@/assets/images/avatar-placeholder-light.png");
 
   // @platform IOS ONLY
   // Trigger gender picker
@@ -142,7 +144,6 @@ export default function UserDetails() {
       dateOfBirth: dateOfBirth !== user?.dateOfBirth ? dateOfBirth : null,
       gender: gender !== user?.gender ? gender : null,
     };
-
     mutate(data);
   };
 
@@ -150,13 +151,17 @@ export default function UserDetails() {
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <ScrollView style={{ flex: 1 }}>
         <Loader visible={isPending} />
+
         <View style={[styles.container, { paddingTop: isIOS ? undefined : insets.top + 10 }]}>
           <View style={styles.header}>
             <View style={styles.avatarWrapper}>
-              <Image source={avatarPlaceholder} style={styles.avatar} />
-              <View style={[styles.cameraIcon, { backgroundColor: bgTertiary }]}>
+              <Image source={profileImageUrl} style={styles.avatar} />
+              <Pressable
+                style={[styles.cameraIcon, { backgroundColor: bgTertiary }]}
+                onPress={() => bottomSheetRef.current?.open()}
+              >
                 <CameraIcon color={tintColor} />
-              </View>
+              </Pressable>
             </View>
           </View>
 
@@ -216,6 +221,7 @@ export default function UserDetails() {
               />
             </View>
           </View>
+
           <CustomButton
             label="Сохранить"
             style={styles.button}
@@ -226,6 +232,9 @@ export default function UserDetails() {
           />
         </View>
       </ScrollView>
+
+      {/* AVATAR PICKER */}
+      <AvatarPicker bottomSheetWrapperRef={bottomSheetRef} profileId={selfProfile?.id ?? ""} />
     </SafeAreaView>
   );
 }
@@ -255,6 +264,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: "95%",
     height: "95%",
+    borderRadius: 999,
   },
   cameraIcon: {
     position: "absolute",

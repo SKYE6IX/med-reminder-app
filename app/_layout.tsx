@@ -129,10 +129,10 @@ export default function RootLayout() {
 //    additionally, when user switch to new week, we should set a default,
 //    and when they go back to previous week, we set to exacly when they were,
 //    before they switch week. ✅
-// 4. Implementation for adding image or emoji.
+// 4. Implementation for adding image or emoji. ✅
 // 5. bluring card when it has been set to in_active.
 // 6. Premium user flag and basic user flag feautures.
-// 7. Premimum page selections
+// 7. Premimum page selections✅
 
 // Considration on medication pack settings:
 // We should have a default days reminder incase user choose not to set it.

@@ -2,6 +2,7 @@ import { Relation } from "@/constants/relation";
 
 export interface ProfileResponse {
   id: string;
+  imageUrl: string | null;
   name: string;
   relation: Relation;
   isSelf: boolean;

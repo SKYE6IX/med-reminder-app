@@ -1,4 +1,3 @@
-import { Relation } from "@/constants/relation";
 import { ProfileResponse } from "./user";
 
 export enum MedicationUnit {
@@ -79,12 +78,7 @@ export interface MedicationScheduleEvent {
   measurement: DosageMeasurement;
   scheduleAt: string;
   takenAt: string | null;
-  profile: {
-    id: string;
-    name: string;
-    relation: Relation;
-    isSelf: boolean;
-  };
+  profile: ProfileResponse;
 }
 
 export interface RefillMedicationPack {

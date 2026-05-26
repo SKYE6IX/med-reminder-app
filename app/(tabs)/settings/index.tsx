@@ -14,6 +14,7 @@ import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -25,12 +26,15 @@ const logOutMutation = async () => {
 };
 
 export default function Settings() {
-  const { user } = useUserData();
-  const { showFeedBack } = useFeedBackStore();
-
   const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const { user } = useUserData();
+
+  const profileImageUrl = useProfileImage();
+
+  const { showFeedBack } = useFeedBackStore();
 
   const { setIsAuthenticated } = useAuthStore();
 
@@ -74,7 +78,7 @@ export default function Settings() {
             title={user?.name || ""}
             description="Посмотреть профиль"
             interaction="press"
-            avatarUrl="url"
+            avatarUrl={profileImageUrl}
             onPress={() => router.navigate("/(tabs)/settings/user-details")}
           />
 

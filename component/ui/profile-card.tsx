@@ -1,7 +1,8 @@
 import { RELATION_LIST, Relation } from "@/constants/relation";
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import PersonIcon from "../icons/person-icon";
 import SelectionDot from "./selection-dot";
 
 type ProfileCardProps = {
@@ -27,11 +28,12 @@ export default function ProfileCard({
   asList,
   isSelected,
 }: ProfileCardProps) {
+  const profileImageUrl = useProfileImage(!isSelf ? profileId : "");
+
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const bGColor = useThemeColor({}, "backgroundSecondary");
-  const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
 
   const getRelationLabel = (value: string) => {
@@ -50,8 +52,8 @@ export default function ProfileCard({
       ]}
       onPress={() => setProfile(profileId)}
     >
-      <View style={[styles.profileIcon, { backgroundColor: bGTertiary }]}>
-        <PersonIcon color="#fff" />
+      <View style={[styles.profileImage]}>
+        <Image source={profileImageUrl} contentFit="cover" style={styles.image} />
       </View>
 
       <View style={styles.profileTextWrapper}>
@@ -86,12 +88,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
   },
-  profileIcon: {
+  profileImage: {
     width: 40,
     height: 40,
-    borderRadius: 40,
+    borderRadius: 999,
     justifyContent: "center",
     alignItems: "center",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 999,
   },
   profileTextWrapper: {
     gap: 4,

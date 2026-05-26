@@ -65,6 +65,12 @@
           ]
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Приложение получит доступ к вашей фотографии, чтобы вы могли выбрать аватар."
+        }
+      ],
       "expo-secure-store",
       "@react-native-community/datetimepicker",
       "expo-build-properties",

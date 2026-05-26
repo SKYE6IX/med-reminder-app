@@ -10,5 +10,6 @@ export const useUserData = () => {
       return resposne.data;
     },
   });
+
   return { user: data };
 };
