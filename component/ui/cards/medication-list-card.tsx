@@ -1,5 +1,6 @@
 import { getDosageUnit } from "@/helpers/getDosageUnit";
 import { getStartedDate } from "@/helpers/getStartedDate";
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { MedicationProfile, Pack } from "@/types/medication";
 import { Image } from "expo-image";
@@ -29,6 +30,8 @@ export default function MedicationListCard({
   medicationProfile,
   onSwitchToggle,
 }: MedicationListCardProps) {
+  const profileImageUrl = useProfileImage(medicationProfile.profile.id);
+
   const [isActive, setIsActive] = useState(medicationProfile.status.toUpperCase() === "ACTIVE");
   const router = useRouter();
 
@@ -79,9 +82,7 @@ export default function MedicationListCard({
             {!medicationProfile.profile.isSelf && (
               <View style={sharedStyles.profile}>
                 <View style={sharedStyles.profileImage}>
-                  <Text style={sharedStyles.profileImagePlaceholder}>
-                    {medicationProfile.profile.name.charAt(0)}
-                  </Text>
+                  <Image source={profileImageUrl} contentFit="cover" style={sharedStyles.image} />
                 </View>
                 <Text style={sharedStyles.profileText}>{medicationProfile.profile.name}</Text>
               </View>

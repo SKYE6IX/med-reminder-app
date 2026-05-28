@@ -3,12 +3,10 @@ import MedicationListCard from "@/component/ui/cards/medication-list-card";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import Tabs from "@/component/ui/tabs";
+import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfile } from "@/types/medication";
-import { api } from "@/utils/axiosInstance";
 import { useFocusEffect } from "@react-navigation/native";
-import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -23,12 +21,6 @@ const TABS = [
   { label: "Неактивно", value: "IN_ACTIVE" },
 ];
 
-// Fetch query
-const fetchMedicationProfiles = async () => {
-  const response = await api.get<MedicationProfile[]>("medications");
-  return response.data;
-};
-
 export default function Medications() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -37,12 +29,7 @@ export default function Medications() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
-  // Query data list
-  const { data, isLoading } = useQuery({
-    queryKey: ["medication-profile", "list"],
-    queryFn: fetchMedicationProfiles,
-    staleTime: 60 * 60 * 1000,
-  });
+  const { isLoading, data } = useMedicationProfileQuery();
 
   // Updating mutation
   const { mutate, isPending } = useUpdateMedicationMutation();

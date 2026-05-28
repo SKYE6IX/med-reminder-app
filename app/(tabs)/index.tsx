@@ -9,16 +9,20 @@ import { MedicationProfile, MedicationScheduleEvent } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
+import SubscriptionOfferBanner, {
+  SubscriptionOfferBannerRef,
+} from "@/component/ui/subscription-offer-banner";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
+import { useUserStore } from "@/stores/use-user-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -59,19 +63,29 @@ const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
 const localDateString = getDateLocalString();
 
 export default function Home() {
-  const { user } = useUserData();
-
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
+  const { user } = useUserData();
   const { showFeedBack } = useFeedBackStore();
   const { notfication, reminderPreferences } = useAppSettingsStore();
-
-  const router = useRouter();
+  const profileImageUrl = useProfileImage();
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
+  const subscriptionBannerRef = useRef<SubscriptionOfferBannerRef>(null);
 
-  const profileImageUrl = useProfileImage();
+  // Show premimum plan offer to user
+  useEffect(() => {
+    let id: number;
+    if (useUserStore.getState().displaySubscriptioOffer) {
+      id = setTimeout(() => {
+        subscriptionBannerRef.current?.toggleBanner();
+        useUserStore.getState().updateSubscriptionOffer();
+      }, 2000);
+    }
+    return () => clearTimeout(id);
+  }, []);
 
   // Query schedule event list
   const { data, isLoading } = useQuery({
@@ -171,7 +185,6 @@ export default function Home() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <Loader visible={isLoading || isPending} />
-
       <View style={styles.container}>
         {/* HEADER */}
         <View style={styles.header}>
@@ -240,6 +253,8 @@ export default function Home() {
           </>
         )}
       </View>
+
+      <SubscriptionOfferBanner ref={subscriptionBannerRef} />
     </SafeAreaView>
   );
 }

@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { api } from "@/utils/axiosInstance";
 import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
 import { queryClient } from "@/utils/query-client";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -64,11 +65,23 @@ export default function RootLayout() {
     // Check for valid token and authorized user with it.
     const token = await getValidAccessToken();
     if (token) {
+      // Prefetch Datas
+      await Promise.all([
+        queryClient.prefetchQuery({
+          queryKey: ["subscriptions-plan"],
+          queryFn: async () => (await api.get("subscriptions")).data,
+        }),
+        queryClient.prefetchQuery({
+          queryKey: ["medication-profile", "list"],
+          queryFn: async () => (await api.get("medications")).data,
+        }),
+      ]);
       getAuthorizedUser();
       useAuthStore.getState().setIsAuthenticated(true);
     } else {
       useAuthStore.getState().setIsAuthenticated(false);
     }
+
     // Handle when app is open by a notification
     await NotificationHelper.handleOnNotificationOpenApp();
   }
@@ -80,10 +93,8 @@ export default function RootLayout() {
         console.log("Error occur in bootstrap -> ", error);
         setIsReady(true);
       });
-
     // Susbscribe to foreground events for notifications
     const unsubscribe = NotificationHelper.handleOnForeGroundEvent();
-
     return () => unsubscribe();
   }, []);
 
@@ -131,7 +142,7 @@ export default function RootLayout() {
 //    before they switch week. ✅
 // 4. Implementation for adding image or emoji. ✅
 // 5. bluring card when it has been set to in_active.
-// 6. Premium user flag and basic user flag feautures.
+// 6. Premium user flag and basic user flag feautures. ✅
 // 7. Premimum page selections✅
 
 // Considration on medication pack settings:

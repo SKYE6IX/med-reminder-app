@@ -14,12 +14,17 @@ import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
+import SubscriptionOfferBanner, {
+  SubscriptionOfferBannerRef,
+} from "@/component/ui/subscription-offer-banner";
 import { useProfileImage } from "@/hooks/use-profile-image";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
+import { useRef } from "react";
 
 const logOutMutation = async () => {
   await api.post("auth/logout");
@@ -30,12 +35,12 @@ export default function Settings() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+
   const { user } = useUserData();
-
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
-
   const { showFeedBack } = useFeedBackStore();
-
   const { setIsAuthenticated } = useAuthStore();
 
   // Themes color
@@ -61,6 +66,14 @@ export default function Settings() {
       });
     },
   });
+
+  const navigateToReminderPreference = () => {
+    if (isPremiumPlan) {
+      router.navigate("/(tabs)/settings/relations");
+    } else {
+      openBannerRef.current?.toggleBanner();
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: bgPrimary }]} edges={["top"]}>
@@ -106,7 +119,7 @@ export default function Settings() {
             description="Выберите звук для напоминаний о приёме лекарств"
             interaction="press"
             svgIcon={<SoundIcon color={color} />}
-            onPress={() => router.navigate("/(tabs)/settings/reminders")}
+            onPress={navigateToReminderPreference}
           />
         </View>
 
@@ -153,6 +166,9 @@ export default function Settings() {
           onPress={() => mutate()}
         />
       </ScrollView>
+
+      {/* SUBSCRIPTION OFFER PLAN */}
+      <SubscriptionOfferBanner ref={openBannerRef} />
     </SafeAreaView>
   );
 }

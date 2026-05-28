@@ -7,7 +7,6 @@ export interface ProfileResponse {
   relation: Relation;
   isSelf: boolean;
 }
-
 export interface UserResponse {
   id: string;
   email: string;
@@ -15,11 +14,18 @@ export interface UserResponse {
   dateOfBirth: string;
   gender: string;
 }
-
 export interface SocialAuthRequest {
   providerId: string;
   provider: "APPLE" | "GOOGLE";
   jwtToken: string;
   fullName: string;
   email: string;
+}
+export interface SubscriptionPlanResponse {
+  id: string;
+  planType: "FREE" | "PRO";
+  maxMedications: number | null;
+  managedRelation: boolean;
+  refillReminders: boolean;
+  reminderPreference: boolean;
 }

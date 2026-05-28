@@ -5,6 +5,7 @@ import { getScheduleTime } from "@/helpers/getScheduleTime";
 import { getTakenAt } from "@/helpers/getTakenAt";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
 import { showEventActionButton } from "@/helpers/showEventActionButton";
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { MedicationScheduleEvent } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
@@ -23,7 +24,9 @@ export default function ScheduleEventCard({
   onActionBtnPress,
 }: ScheduleEventCardProps) {
   const [nowDate, setNowDate] = useState<DateTime>(DateTime.now().setZone(getTimeZone()));
-  const { status, measurement, takenAt, scheduleAt } = scheduleEvent;
+  const { status, measurement, takenAt, scheduleAt, profile } = scheduleEvent;
+
+  const profileImageUrl = useProfileImage(profile.id);
 
   useEffect(() => {
     let id: number;
@@ -80,9 +83,7 @@ export default function ScheduleEventCard({
           {!scheduleEvent.profile.isSelf && (
             <View style={sharedStyles.profile}>
               <View style={sharedStyles.profileImage}>
-                <Text style={sharedStyles.profileImagePlaceholder}>
-                  {scheduleEvent.profile.name.charAt(0)}
-                </Text>
+                <Image source={profileImageUrl} contentFit="cover" style={sharedStyles.image} />
               </View>
               <Text style={sharedStyles.profileText}>{scheduleEvent.profile.name}</Text>
             </View>

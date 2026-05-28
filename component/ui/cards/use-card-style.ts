@@ -85,18 +85,23 @@ export function useCardStyles() {
       gap: 8,
     },
 
-    // Profiles
     profile: {
       flexDirection: "row",
+      alignItems: "center",
       gap: 4,
     },
     profileImage: {
-      width: 15,
-      height: 15,
+      width: 18,
+      height: 18,
       borderRadius: 999,
       backgroundColor: "#90A8F06E",
       justifyContent: "center",
       alignItems: "center",
+    },
+    image: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 999,
     },
     profileImagePlaceholder: {
       fontFamily: "Roboto_400Regular",

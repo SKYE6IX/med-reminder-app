@@ -67,7 +67,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
       <BottomSheetWrapper
         ref={bottomSheetRef}
         title="Удалить это лекарство?"
-        snapPointPercent="30%"
+        snapPointPercent="25%"
       >
         <View style={styles.deleteActionBox}>
           <Text style={[styles.deleteActionDescription, { color: mutedColor }]}>

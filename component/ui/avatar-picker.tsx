@@ -58,7 +58,12 @@ const uploadImageMutation = async (uploadRequest: UploadReqeust) => {
   } as any);
 
   formData.append("profileId", uploadRequest.profileId);
-  const response = await api.post<{ url: string }>("users/profiles/images", formData);
+
+  const response = await api.post<{ url: string }>("users/profiles/images", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 
@@ -114,9 +119,12 @@ export default function AvatarPicker({ bottomSheetWrapperRef, profileId }: Avata
               ...profile,
               imageUrl: data.url,
             };
+          } else {
+            return profile;
           }
         }),
       );
+
       removeEmojiAvatar(variables.profileId);
       bottomSheetWrapperRef.current?.close();
     },

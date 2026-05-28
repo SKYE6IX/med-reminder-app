@@ -17,8 +17,8 @@ import Loader from "./loader";
 
 type AddProfileProps = {
   ref: RefObject<BottomSheetWrapperRef | null>;
+  onProfileAdded?: (profileId: string) => void;
 };
-
 interface AddProfileForm {
   name: string;
   relation: string;
@@ -29,7 +29,7 @@ const addRelationProfileMutation = async (data: AddProfileForm) => {
   return response.data;
 };
 
-export default function AddProfile({ ref }: AddProfileProps) {
+export default function AddProfile({ ref, onProfileAdded }: AddProfileProps) {
   const { showFeedBack } = useFeedBackStore();
   const [formState, setFormState] = useState<AddProfileForm>({
     name: "",
@@ -71,6 +71,7 @@ export default function AddProfile({ ref }: AddProfileProps) {
       queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
         existingData ? [...existingData, data] : [data],
       );
+      onProfileAdded && onProfileAdded(data.id);
       showFeedBack({
         title: "Добавлено отношение!",
         message: "Успешно добавлено новое отношение!",

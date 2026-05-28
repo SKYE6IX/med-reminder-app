@@ -4,14 +4,17 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 interface UserStore {
   emojiAvatar: Map<string, string>;
+  displaySubscriptioOffer: boolean;
   addEmojiAvatar: (profileId: string, avatarUri: string) => void;
   removeEmojiAvatar: (profileId: string) => void;
+  updateSubscriptionOffer: () => void;
 }
 
 export const useUserStore = create<UserStore>()(
   persist(
     (set) => ({
       emojiAvatar: new Map(),
+      displaySubscriptioOffer: true,
       addEmojiAvatar(profileId, avatarUri) {
         set((state) => ({
           ...state,
@@ -24,6 +27,9 @@ export const useUserStore = create<UserStore>()(
           next.delete(profileId);
           return { ...state, emojiAvatar: next };
         });
+      },
+      updateSubscriptionOffer() {
+        set((state) => ({ ...state, displaySubscriptioOffer: !state.displaySubscriptioOffer }));
       },
     }),
     {

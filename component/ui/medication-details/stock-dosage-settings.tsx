@@ -1,6 +1,7 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
 import { MEDICATION_UNITS } from "@/constants/schedule-options";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationProfile } from "@/types/medication";
@@ -13,6 +14,7 @@ import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapp
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
 import MedicationPackPicker from "../medication-pack-picker";
+import SubscriptionOfferBanner, { SubscriptionOfferBannerRef } from "../subscription-offer-banner";
 import { useSharedStyles } from "./use-shared-styles";
 
 interface AddMedicationPackReponse {
@@ -30,6 +32,9 @@ export default function StockDosageSettings({
   medicationProfile: MedicationProfile;
 }) {
   const { showFeedBack } = useFeedBackStore();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
+
+  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const [medicationPack, setMedicationPack] = useState<MedicationPackCreation>({
     medicationProfileId: medicationProfile.id,
@@ -100,8 +105,16 @@ export default function StockDosageSettings({
     },
   });
 
-  const handleAddMedicationPack = () => {
+  const handleAddMedicationPackMutation = () => {
     mutate(medicationPack);
+  };
+
+  const openAddMedicationPack = () => {
+    if (isPremiumPlan) {
+      bottomSheetRef.current?.open();
+    } else {
+      openBannerRef.current?.toggleBanner();
+    }
   };
 
   return (
@@ -121,7 +134,7 @@ export default function StockDosageSettings({
       ) : (
         <Pressable
           style={[sharedStyles.card, sharedStyles.detailsGroupItem]}
-          onPress={() => bottomSheetRef.current?.open()}
+          onPress={openAddMedicationPack}
         >
           <View style={sharedStyles.cardHeader}>
             <Text style={[sharedStyles.cardTitle]}>Запас</Text>
@@ -133,7 +146,6 @@ export default function StockDosageSettings({
         </Pressable>
       )}
 
-      <Loader visible={isPending} />
       <BottomSheetWrapper ref={bottomSheetRef} title="Напоминание о пополнении">
         <View style={styles.bottomSheetContainer}>
           <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
@@ -148,10 +160,16 @@ export default function StockDosageSettings({
             disabled={!canContinue || isPending}
             variant={canContinue ? "filled" : "disabled"}
             textVaraint={canContinue ? "regularText" : "mutedText"}
-            onPress={handleAddMedicationPack}
+            onPress={handleAddMedicationPackMutation}
           />
         </View>
       </BottomSheetWrapper>
+
+      {/* LOADER */}
+      <Loader visible={isPending} />
+
+      {/* SUBSCRIPTION OFFER */}
+      <SubscriptionOfferBanner ref={openBannerRef} />
     </React.Fragment>
   );
 }

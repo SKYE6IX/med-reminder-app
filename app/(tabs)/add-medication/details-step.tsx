@@ -4,9 +4,13 @@ import AddProfile from "@/component/ui/add-profile";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import ProfileCard from "@/component/ui/profile-card";
+import SubscriptionOfferBanner, {
+  SubscriptionOfferBannerRef,
+} from "@/component/ui/subscription-offer-banner";
 import { Relation } from "@/constants/relation";
 import { MEDICATION_UNITS } from "@/constants/schedule-options";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
@@ -15,8 +19,11 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DetailsStepScreen() {
+  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+
   const { setMedicationDetails, formState } = useAddPillStore();
   const { selfProfile, relationProfiles } = useProfilesQuery();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
@@ -43,6 +50,21 @@ export default function DetailsStepScreen() {
   };
 
   const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationUnit", "profileId"]));
+
+  const handleChooseRelationProfile = () => {
+    if (isPremiumPlan) {
+      chooseProfileBottomSheet.current?.open();
+    } else {
+      openBannerRef.current?.toggleBanner();
+    }
+  };
+  const handleAddNewProfile = () => {
+    if (isPremiumPlan) {
+      newProfileBottomSheet.current?.open();
+    } else {
+      openBannerRef.current?.toggleBanner();
+    }
+  };
 
   return (
     <SafeAreaView
@@ -79,7 +101,7 @@ export default function DetailsStepScreen() {
       <View style={sharedStyles.sectionContainer}>
         <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
         <View style={styles.profilesWrapper}>
-          {/* Self profile selection */}
+          {/* SELF PROFILE*/}
           <ProfileCard
             profileId={selfProfile?.id as string}
             isSelected={selfProfile?.id === formState.profileId}
@@ -88,7 +110,7 @@ export default function DetailsStepScreen() {
             setProfile={handleSetProfile}
           />
 
-          {/* Relation Profile Selection */}
+          {/* RELATION PROFILE */}
           {selectedRelationProfile && (
             <ProfileCard
               isSelected={isRelationProfileSelected}
@@ -102,18 +124,18 @@ export default function DetailsStepScreen() {
             />
           )}
 
-          {/* Trigger button to show bottom sheet for profile list */}
+          {/* TRIGGER BUTTON FOR RELATION PROFILE LIST */}
           {relationProfiles.length >= 1 && !isRelationProfileSelected && (
             <CustomButton
               label="Выбрать члена семьи"
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={12} />}
-              onPress={() => chooseProfileBottomSheet.current?.open()}
+              onPress={handleChooseRelationProfile}
             />
           )}
 
-          {/* Bottom sheet for profile list */}
+          {/* RELATION PROFILES LIST */}
           <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
             <View style={styles.profileSelectionList}>
               {relationProfiles.map((profile) => (
@@ -132,19 +154,26 @@ export default function DetailsStepScreen() {
             </View>
           </BottomSheetWrapper>
 
-          {/* Trigger button for showing bottom sheet form for adding new profile */}
+          {/* TRIGGER BUTTON FOR ADDING NEW RELATION PROFILE */}
           <CustomButton
             label="Добавить члена семьи"
             variant="outline"
             textVaraint="tintText"
             svgIcon={<PlusIcon color={tintColor} size={12} />}
-            onPress={() => newProfileBottomSheet.current?.open()}
+            onPress={handleAddNewProfile}
           />
-          {/* Bottom sheet adding new profile form  */}
-          <AddProfile ref={newProfileBottomSheet} />
+
+          {/* ADD NEW RELATION PROFILE */}
+          <AddProfile
+            ref={newProfileBottomSheet}
+            onProfileAdded={(id) => {
+              setMedicationDetails({ profileId: id });
+            }}
+          />
         </View>
       </View>
 
+      {/* CONTINUE BUTTON */}
       <CustomButton
         label="Далее"
         style={sharedStyles.button}
@@ -153,6 +182,9 @@ export default function DetailsStepScreen() {
         onPress={() => router.navigate("/(tabs)/add-medication/schedule-step")}
         disabled={!canContinue}
       />
+
+      {/* SUBSCRIPTION OFFER */}
+      <SubscriptionOfferBanner ref={openBannerRef} />
     </SafeAreaView>
   );
 }

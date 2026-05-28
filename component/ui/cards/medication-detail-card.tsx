@@ -1,3 +1,4 @@
+import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { MedicationProfile } from "@/types/medication";
 import { Image } from "expo-image";
@@ -15,6 +16,7 @@ export default function MedicationDetailCard({
   onSwitchToggle,
 }: MedicationDetailCardProps) {
   const [isActive, setIsActive] = useState(medicationProfile.status.toUpperCase() === "ACTIVE");
+  const profileImageUrl = useProfileImage(medicationProfile.profile.id);
 
   const sharedStyles = useCardStyles();
   const tintColor = useThemeColor({}, "tint");
@@ -50,9 +52,7 @@ export default function MedicationDetailCard({
           {!medicationProfile.profile.isSelf && (
             <View style={sharedStyles.profile}>
               <View style={sharedStyles.profileImage}>
-                <Text style={sharedStyles.profileImagePlaceholder}>
-                  {medicationProfile.profile.name.charAt(0)}
-                </Text>
+                <Image source={profileImageUrl} contentFit="cover" style={sharedStyles.image} />
               </View>
               <Text style={sharedStyles.profileText}>{medicationProfile.profile.name}</Text>
             </View>

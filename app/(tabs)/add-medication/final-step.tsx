@@ -3,8 +3,12 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
+import SubscriptionOfferBanner, {
+  SubscriptionOfferBannerRef,
+} from "@/component/ui/subscription-offer-banner";
 import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -13,7 +17,7 @@ import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -32,12 +36,15 @@ const createMedicationMutation = async (body: CreateMedication) => {
 };
 
 export default function FinalStepScreen() {
+  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+
   const router = useRouter();
   const isIOS = Platform.OS === "ios";
 
   const { notfication, reminderPreferences } = useAppSettingsStore();
-
   const { formState, setMedicationDetails, setMedicationpack, clearFormState } = useAddPillStore();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
+
   const sharedStyles = useAddPillScreenStyles();
 
   const [showRefillBox, setShowRefillBox] = useState(false);
@@ -61,24 +68,28 @@ export default function FinalStepScreen() {
   const tintColor = useThemeColor({}, "tint");
 
   const toggleSwitch = () => {
-    const isToggle = !showRefillBox;
+    if (!isPremiumPlan) {
+      openBannerRef.current?.toggleBanner();
+    } else {
+      const isToggle = !showRefillBox;
 
-    refillSettingHeight.value = withSpring(isToggle ? HALF_EXPAND : COLLAPSED);
+      refillSettingHeight.value = withSpring(isToggle ? HALF_EXPAND : COLLAPSED);
 
-    // @platform ANDROID ONLY
-    pickersWrapperOpacity.value = withDelay(
-      isToggle ? 200 : 0,
-      withSpring(isToggle ? 1 : 0, {
-        duration: isToggle ? 400 : 100,
-      }),
-    );
+      // @platform ANDROID ONLY
+      pickersWrapperOpacity.value = withDelay(
+        isToggle ? 200 : 0,
+        withSpring(isToggle ? 1 : 0, {
+          duration: isToggle ? 400 : 100,
+        }),
+      );
 
-    // We reset the pack state back null, if switch state is false.
-    if (!isToggle) {
-      setMedicationpack(null);
+      // We reset the pack state back null, if switch state is false.
+      if (!isToggle) {
+        setMedicationpack(null);
+      }
+
+      setShowRefillBox(isToggle);
     }
-
-    setShowRefillBox(isToggle);
   };
 
   const handleAmountInPackSet = (selectedValue: string) => {
@@ -118,11 +129,12 @@ export default function FinalStepScreen() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: createMedicationMutation,
-    async onSuccess(data, variable) {
+    async onSuccess(incomingData, variable) {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfile[]) => (existingData ? [...existingData, data] : [data]),
+        (existingData: MedicationProfile[]) =>
+          existingData ? [...existingData, incomingData] : [incomingData],
       );
 
       await Promise.all([
@@ -173,6 +185,7 @@ export default function FinalStepScreen() {
     <ScrollView>
       <View style={[styles.container, sharedStyles.container]}>
         <Loader visible={isPending} />
+
         {/* Refill setting container */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
@@ -246,6 +259,9 @@ export default function FinalStepScreen() {
         </View>
         <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
       </View>
+
+      {/* SUBSCRIPTION OFFER */}
+      <SubscriptionOfferBanner ref={openBannerRef} />
     </ScrollView>
   );
 }
