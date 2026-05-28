@@ -38,6 +38,8 @@ export const Colors = {
     feedbackErrorText: "#7F1D1D",
 
     bottomSheetBg: "#f2f2f7",
+
+    disableCard: "rgba(200, 200, 200, 0.6)",
   },
   dark: {
     textPrimary: "#ECEDEE",
@@ -73,5 +75,7 @@ export const Colors = {
     feedbackErrorText: "#FECACA",
 
     bottomSheetBg: "#1C1C1E",
+
+    disableCard: "rgba(18, 18, 18, 0.7)",
   },
 };

@@ -6,7 +6,7 @@ import { MedicationProfile, Pack } from "@/types/medication";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useCardStyles } from "./use-card-style";
 
 type MedicationListCardProps = {
@@ -38,6 +38,7 @@ export default function MedicationListCard({
   const sharedStyles = useCardStyles();
   const tintColor = useThemeColor({}, "tint");
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
+  const disableCard = useThemeColor({}, "disableCard");
 
   const dosageUnit = getDosageUnit(medicationProfile.schedule.measurement);
   const startedDate = getStartedDate(medicationProfile.schedule.startDate);
@@ -53,9 +54,20 @@ export default function MedicationListCard({
     }
     setIsActive(isToggle);
   };
-
   return (
     <View style={sharedStyles.card}>
+      {medicationProfile.status === "in_active" && (
+        <View
+          style={{
+            ...StyleSheet.absoluteFill,
+            backgroundColor: disableCard,
+            zIndex: 1,
+            borderRadius: 16,
+          }}
+          pointerEvents="none"
+        />
+      )}
+
       <View style={sharedStyles.cardInnerContainer}>
         <Pressable
           style={sharedStyles.cardContentRow}

@@ -141,7 +141,7 @@ export default function RootLayout() {
 //    and when they go back to previous week, we set to exacly when they were,
 //    before they switch week. ✅
 // 4. Implementation for adding image or emoji. ✅
-// 5. bluring card when it has been set to in_active.
+// 5. bluring card when it has been set to in_active. ✅
 // 6. Premium user flag and basic user flag feautures. ✅
 // 7. Premimum page selections✅
 
