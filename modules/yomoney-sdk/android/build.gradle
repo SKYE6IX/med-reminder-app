@@ -1,0 +1,28 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'expo.modules.yomoneysdk'
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://developer.huawei.com/repo/'}
+}
+
+android {
+  namespace "expo.modules.yomoneysdk"
+  defaultConfig {
+    versionCode 1
+    versionName "0.1.0"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+dependencies {
+  implementation 'ru.yoomoney.sdk.kassa.payments:yookassa-android-sdk:8.3.0'
+    implementation 'org.chromium.net:cronet-embedded:143.7445.0'
+}

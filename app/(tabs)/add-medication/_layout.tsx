@@ -1,7 +1,5 @@
 import Stepper from "@/component/ui/stepper";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -16,7 +14,7 @@ export const unstable_settings = {
 const ADD_PILL_SEGMENTS = ["add-medication", "details-step", "schedule-step", "final-step"];
 
 export default function AddPillLayout() {
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
   const segments = useSegments();
   const { count } = useMedicationProfileQuery();
   const { maxMedications } = useSubscriptionPlanQuery();
@@ -80,7 +78,7 @@ export default function AddPillLayout() {
       <Stepper currentStep={currentStep} />
 
       {/* Subscription Banner */}
-      <SubscriptionOfferBanner ref={openBannerRef} onModalClose={onModalDismiss} />
+      <SubscriptionBanner ref={openBannerRef} onModalClose={onModalDismiss} />
     </React.Fragment>
   );
 }

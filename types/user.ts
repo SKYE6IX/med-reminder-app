@@ -28,4 +28,7 @@ export interface SubscriptionPlanResponse {
   managedRelation: boolean;
   refillReminders: boolean;
   reminderPreference: boolean;
+  endAt: string | null;
+  billingCycle: string | null;
+  subscriptionStatus: "ACTIVE" | "CANCELED" | null;
 }

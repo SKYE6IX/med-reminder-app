@@ -1,3 +1,4 @@
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Stack } from "expo-router";
 import { ColorValue, StyleProp, StyleSheet } from "react-native";
@@ -9,6 +10,8 @@ export const unstable_settings = {
 export default function SettingsLayout() {
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const headerStyle: StyleProp<{
     backgroundColor: ColorValue;
@@ -67,13 +70,15 @@ export default function SettingsLayout() {
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Подписка</Stack.Screen.Title>
       </Stack.Screen>
 
-      <Stack.Screen name="subscription-plan">
-        <Stack.Screen.BackButton displayMode="minimal" />
-        <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
-          Премиум-функции
-        </Stack.Screen.Title>
-      </Stack.Screen>
+      <Stack.Protected guard={!isPremiumPlan}>
+        <Stack.Screen name="subscription-plan">
+          <Stack.Screen.BackButton displayMode="minimal" />
+          <Stack.Header transparent blurEffect="systemMaterial" style={headerStyle} />
+          <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+            Премиум-функции
+          </Stack.Screen.Title>
+        </Stack.Screen>
+      </Stack.Protected>
 
       <Stack.Screen name="about">
         <Stack.Screen.BackButton displayMode="minimal" />

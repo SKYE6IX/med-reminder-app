@@ -3,9 +3,7 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -36,7 +34,7 @@ const createMedicationMutation = async (body: CreateMedication) => {
 };
 
 export default function FinalStepScreen() {
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
   const router = useRouter();
   const isIOS = Platform.OS === "ios";
@@ -149,7 +147,6 @@ export default function FinalStepScreen() {
       router.dismissAll();
       router.navigate("/");
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when create a medication -> ", error);
@@ -261,7 +258,7 @@ export default function FinalStepScreen() {
       </View>
 
       {/* SUBSCRIPTION OFFER */}
-      <SubscriptionOfferBanner ref={openBannerRef} />
+      <SubscriptionBanner ref={openBannerRef} />
     </ScrollView>
   );
 }

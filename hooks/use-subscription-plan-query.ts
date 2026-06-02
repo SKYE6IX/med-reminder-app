@@ -26,5 +26,8 @@ export function useSubscriptionPlanQuery() {
   return {
     isPremiumPlan,
     maxMedications: data.maxMedications,
+    endAt: data.endAt ?? "",
+    billingCycle: data.billingCycle,
+    subscriptionStatus: data.subscriptionStatus,
   };
 }

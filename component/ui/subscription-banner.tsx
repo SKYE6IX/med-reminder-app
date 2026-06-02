@@ -10,19 +10,16 @@ import CustomButton from "./custom-button/custom-button";
 // The backdrop animation isn't working
 // Figure a wayout to trick it to work.
 
-export interface SubscriptionOfferBannerRef {
+export interface SubscriptionBannerRef {
   toggleBanner: () => void;
 }
-type SubscriptionOfferBannerProps = {
-  ref: RefObject<SubscriptionOfferBannerRef | null> | null;
+type SubscriptionBannerProps = {
+  ref: RefObject<SubscriptionBannerRef | null> | null;
   onModalClose?: () => void;
 };
 
 const DURATION = 500;
-export default function SubscriptionOfferBanner({
-  ref,
-  onModalClose,
-}: SubscriptionOfferBannerProps) {
+export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBannerProps) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [modalKey, setModalKey] = useState(0);

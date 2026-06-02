@@ -1,0 +1,2 @@
+expo.modules.yomoneysdk
+xml ym_network_security_config

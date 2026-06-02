@@ -14,9 +14,7 @@ import SoundIcon from "@/component/icons/sound-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -35,7 +33,7 @@ export default function Settings() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
   const { user } = useUserData();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
@@ -168,7 +166,7 @@ export default function Settings() {
       </ScrollView>
 
       {/* SUBSCRIPTION OFFER PLAN */}
-      <SubscriptionOfferBanner ref={openBannerRef} />
+      <SubscriptionBanner ref={openBannerRef} />
     </SafeAreaView>
   );
 }

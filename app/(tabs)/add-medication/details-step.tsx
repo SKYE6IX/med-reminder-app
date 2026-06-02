@@ -4,9 +4,7 @@ import AddProfile from "@/component/ui/add-profile";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import ProfileCard from "@/component/ui/profile-card";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { Relation } from "@/constants/relation";
 import { MEDICATION_UNITS } from "@/constants/schedule-options";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
@@ -19,7 +17,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DetailsStepScreen() {
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
   const { setMedicationDetails, formState } = useAddPillStore();
   const { selfProfile, relationProfiles } = useProfilesQuery();
@@ -184,7 +182,7 @@ export default function DetailsStepScreen() {
       />
 
       {/* SUBSCRIPTION OFFER */}
-      <SubscriptionOfferBanner ref={openBannerRef} />
+      <SubscriptionBanner ref={openBannerRef} />
     </SafeAreaView>
   );
 }

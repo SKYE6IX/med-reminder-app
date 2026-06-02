@@ -24,7 +24,7 @@ export const useFeedBackStore = create<FeebackStore>()((set) => ({
   message: "",
   showFeedBack({ title, message, status }) {
     set({ title, message, status, visible: true });
-    setTimeout(() => set({ visible: false }), 3000);
+    setTimeout(() => set({ visible: false }), 15000);
   },
   hideFeedBack() {
     set({ visible: false });

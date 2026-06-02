@@ -2,16 +2,40 @@ import CheckCircleIcon from "@/component/icons/check-circle-icon";
 import CheckIcon from "@/component/icons/check-icon";
 import StarIcon from "@/component/icons/star-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { default as YomoneySdkModule } from "@/modules/yomoney-sdk/src/YomoneySdkModule";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { SubscriptionPlanResponse } from "@/types/user";
+import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
+import { queryClient } from "@/utils/query-client";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Plan = "MONTHLY" | "ANNUAL";
 
+interface SubscriptionRequest {
+  paymentToken: string;
+  paymentMethod: string;
+  amount: string;
+  billingCycle: string;
+  zoneId: string;
+}
+
+const createPaidSubscription = async (requestBody: SubscriptionRequest) => {
+  const response = await api.post<SubscriptionPlanResponse>("subscriptions", requestBody);
+  return response.data;
+};
+
 export default function SubscriptionPlan() {
+  const { showFeedBack } = useFeedBackStore();
   const [selectedPlan, setSelectedPlan] = useState<Plan>("ANNUAL");
+  const router = useRouter();
 
   const isAndroid = Platform.OS === "android";
   const insets = useSafeAreaInsets();
@@ -27,8 +51,70 @@ export default function SubscriptionPlan() {
   const isMontly = selectedPlan === "MONTHLY";
   const isAnnual = selectedPlan === "ANNUAL";
 
+  const { isPending, mutate } = useMutation({
+    mutationFn: createPaidSubscription,
+    onSuccess(data) {
+      if (data !== null) {
+        queryClient.setQueryData(["subscriptions-plan"], () => data);
+        showFeedBack({
+          title: "Добро пожаловать Премиум план",
+          message: "Наслаждайтесь неограниченным использованием.",
+          status: "success",
+        });
+        router.navigate("/(tabs)/settings/subscription");
+      }
+    },
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "402") {
+          showFeedBack({
+            title: "Неудачный платеж.",
+            message: "Пожалуйста, обратитесь в свой банк.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Что-то пошло не так!",
+            message: "Пожалуйста, попробуйте еще раз!",
+            status: "error",
+          });
+        }
+      } else {
+        showFeedBack({
+          title: "Что-то пошло не так!",
+          message: "Пожалуйста, попробуйте еще раз!",
+          status: "error",
+        });
+      }
+    },
+  });
+
+  const createPayment = async () => {
+    const planAmount = selectedPlan === "MONTHLY" ? 299 : 3050;
+    const subtitle = selectedPlan === "MONTHLY" ? "Ежемесячная подписка" : "Годовая подписка";
+
+    const result = await YomoneySdkModule.startTokenize({
+      amount: planAmount,
+      currency: "RUB",
+      title: "Премиум план",
+      subtitle,
+      clientApplicationKey: "test_MTM2OTg2OY8_wn0XX8jtXCgpeZCe7VX2_w1m1yd9tPk",
+      shopId: "1369869",
+    });
+
+    mutate({
+      paymentToken: result.paymentToken,
+      paymentMethod: result.paymentMethod,
+      amount: String(planAmount),
+      billingCycle: selectedPlan,
+      zoneId: getTimeZone(),
+    });
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+      <Loader visible={isPending} />
+
       <ScrollView
         contentContainerStyle={[
           [styles.scrollView, { paddingTop: isAndroid ? insets.top + 10 : 0, paddingBottom: 10 }],
@@ -154,8 +240,7 @@ export default function SubscriptionPlan() {
             </View>
           </Pressable>
         </View>
-
-        <CustomButton label="Продолжить" />
+        <CustomButton label="Продолжить" onPress={createPayment} />
       </ScrollView>
     </SafeAreaView>
   );

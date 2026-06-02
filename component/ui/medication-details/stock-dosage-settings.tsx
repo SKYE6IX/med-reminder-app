@@ -14,7 +14,7 @@ import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapp
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
 import MedicationPackPicker from "../medication-pack-picker";
-import SubscriptionOfferBanner, { SubscriptionOfferBannerRef } from "../subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "../subscription-banner";
 import { useSharedStyles } from "./use-shared-styles";
 
 interface AddMedicationPackReponse {
@@ -34,7 +34,7 @@ export default function StockDosageSettings({
   const { showFeedBack } = useFeedBackStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const [medicationPack, setMedicationPack] = useState<MedicationPackCreation>({
     medicationProfileId: medicationProfile.id,
@@ -169,7 +169,7 @@ export default function StockDosageSettings({
       <Loader visible={isPending} />
 
       {/* SUBSCRIPTION OFFER */}
-      <SubscriptionOfferBanner ref={openBannerRef} />
+      <SubscriptionBanner ref={openBannerRef} />
     </React.Fragment>
   );
 }

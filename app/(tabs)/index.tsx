@@ -14,9 +14,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";
 import { useProfileImage } from "@/hooks/use-profile-image";
@@ -73,7 +71,7 @@ export default function Home() {
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
   const [selectedDate, setSelectedDate] = useState(localDateString);
-  const subscriptionBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const subscriptionBannerRef = useRef<SubscriptionBannerRef>(null);
 
   // Show premimum plan offer to user
   useEffect(() => {
@@ -254,7 +252,7 @@ export default function Home() {
         )}
       </View>
 
-      <SubscriptionOfferBanner ref={subscriptionBannerRef} />
+      <SubscriptionBanner ref={subscriptionBannerRef} />
     </SafeAreaView>
   );
 }

@@ -6,9 +6,7 @@ import AvatarPicker from "@/component/ui/avatar-picker";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
-import SubscriptionOfferBanner, {
-  SubscriptionOfferBannerRef,
-} from "@/component/ui/subscription-offer-banner";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -28,7 +26,7 @@ const deleteRelationProfileMutation = async (profileId: string) => {
 };
 
 export default function Relations() {
-  const openBannerRef = useRef<SubscriptionOfferBannerRef>(null);
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
   const { showFeedBack } = useFeedBackStore();
   const { relationProfiles } = useProfilesQuery();
@@ -114,7 +112,7 @@ export default function Relations() {
       </View>
 
       {/* Subscription Banner */}
-      <SubscriptionOfferBanner ref={openBannerRef} />
+      <SubscriptionBanner ref={openBannerRef} />
 
       {/* Add new profile Bottom sheet */}
       <AddProfile ref={addProfileBottomSheetRef} />
