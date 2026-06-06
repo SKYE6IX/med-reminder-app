@@ -67,7 +67,7 @@ export default function Settings() {
 
   const navigateToReminderPreference = () => {
     if (isPremiumPlan) {
-      router.navigate("/(tabs)/settings/relations");
+      router.navigate("/(tabs)/settings/reminders");
     } else {
       openBannerRef.current?.toggleBanner();
     }

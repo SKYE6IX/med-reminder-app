@@ -1,10 +1,10 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, create } from "axios";
 import Constants from "expo-constants";
 import { getValidAccessToken } from "./tokenUtils";
 
 const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
 
-const api = axios.create({
+const api = create({
   baseURL: `http://${localhost}:8080/`,
 });
 

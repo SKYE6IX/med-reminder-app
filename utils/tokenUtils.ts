@@ -42,9 +42,6 @@ export const getValidAccessToken = async (): Promise<string | null> => {
 
   if (!isTokenExpired(accessToken)) return accessToken;
 
-  // `http://${localhost}:8080/auth/refresh`
-  // `http://${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`;
-
   try {
     const { data } = await axios.post<AuthResponse>(`http://${localhost}:8080/auth/refresh`, {
       refreshToken,

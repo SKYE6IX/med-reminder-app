@@ -68,7 +68,6 @@ class YomoneySdkModule : Module() {
         savePaymentMethod = SavePaymentMethod.ON,
         paymentMethodTypes = setOf(
           PaymentMethodType.BANK_CARD,
-          PaymentMethodType.SBP
         ),
       )
 
