@@ -47,7 +47,6 @@ const CustomDarkTheme = {
 };
 
 export default function RootLayout() {
-  const { notfication, reminderPreferences } = useAppSettingsStore();
   const { isAuthenticated, hasCompleteOnboarding } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
 
@@ -79,8 +78,8 @@ export default function RootLayout() {
           queryFn: async () => (await api.get("medications")).data,
         }),
         createNextScheduleEventNotification({
-          ...notfication,
-          ...reminderPreferences,
+          ...useAppSettingsStore.getState().notfication,
+          ...useAppSettingsStore.getState().reminderPreferences,
         }),
       ]);
       getAuthorizedUser();
