@@ -4,8 +4,7 @@ import PhoneIcon from "@/component/icons/phone-icon";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
-import { NotificationHelper } from "@/helpers/notification-helper";
+import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
@@ -29,8 +28,7 @@ export default function Reminders() {
 
   const handleSnoozeChange = async (value: string) => {
     setReminderPreference({ snoozeDuration: Number(value) as SnoozeDuration });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       snoozeDuration: Number(value) as SnoozeDuration,
@@ -39,8 +37,7 @@ export default function Reminders() {
 
   const toggleAllowEarlyReminder = async (value: boolean) => {
     setReminderPreference({ earlyReminder: value });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       earlyReminder: value,
@@ -49,8 +46,7 @@ export default function Reminders() {
 
   const toggleAllowMissedDosage = async (value: boolean) => {
     setReminderPreference({ missedDoseAlert: value });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       missedDoseAlert: value,

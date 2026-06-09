@@ -1,5 +1,5 @@
-import { cancelScheduleEventNotifications } from "@/helpers/cancel-schedule-event-notifications";
-import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
+import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
+import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
@@ -49,25 +49,21 @@ export default function useUpdateMedicationMutation() {
           );
         },
       );
+
       queryClient.setQueryData(["medication-profile", "details", id], incomingData);
-
       // we want to create again when they turn on
-      if (variableData.isActive && variableData.isActive) {
+      if (variableData.isActive) {
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
-      } else if (variableData.isActive && !variableData.isActive) {
-        // We want to cancel all notification when user turn off
-        await cancelScheduleEventNotifications({ medProfileId: id });
+      } else if (!variableData.isActive) {
+        console.log("Ran!");
+        await cancelEventNotification({ medProfileId: id });
       }
-
-      //  we want to cancel and create when the change recurrence rule
+      //  we want to cancel and create when the chaxnge recurrence rule
       if (variableData.recurrenceRule) {
-        await cancelScheduleEventNotifications({ medProfileId: id });
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       }
-
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when updating medication profile -> ", error);

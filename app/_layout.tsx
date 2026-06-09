@@ -18,6 +18,8 @@ import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { api } from "@/utils/axiosInstance";
 import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
 import { queryClient } from "@/utils/query-client";
@@ -45,6 +47,7 @@ const CustomDarkTheme = {
 };
 
 export default function RootLayout() {
+  const { notfication, reminderPreferences } = useAppSettingsStore();
   const { isAuthenticated, hasCompleteOnboarding } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
 
@@ -75,13 +78,16 @@ export default function RootLayout() {
           queryKey: ["medication-profile", "list"],
           queryFn: async () => (await api.get("medications")).data,
         }),
+        createNextScheduleEventNotification({
+          ...notfication,
+          ...reminderPreferences,
+        }),
       ]);
       getAuthorizedUser();
       useAuthStore.getState().setIsAuthenticated(true);
     } else {
       useAuthStore.getState().setIsAuthenticated(false);
     }
-
     // Handle when app is open by a notification
     await NotificationHelper.handleOnNotificationOpenApp();
   }
@@ -133,24 +139,18 @@ export default function RootLayout() {
   );
 }
 
-// npx create-expo-module --local yokassa-sdk
 // TODO:
-// 1. Test on android ✅
-// 2. Set up notification for Refilled Pack ✅
-// 3. Animate the week calender selection, make it swipeable,
-//    additionally, when user switch to new week, we should set a default,
-//    and when they go back to previous week, we set to exacly when they were,
-//    before they switch week. ✅
-// 4. Implementation for adding image or emoji. ✅
-// 5. bluring card when it has been set to in_active. ✅
-// 6. Premium user flag and basic user flag feautures. ✅
-// 7. Premimum page selections✅
+// 1. Update the alarm sound setting, so that sound option is shown
+//  to paid plan users. ✅
 
-// Considration on medication pack settings:
-// We should have a default days reminder incase user choose not to set it.
-// Another pure indication is:
-// About Amount of pill selections and dosage and days or reminder need to
-// able to work togehter.
+// 2. Back to payment system configurations. Add all the required details,
+//  implement plug-in to add manifest data and inplist data.
+
+// 3. On Android, when user click to naviagte from paid plan modal
+//  so subscription page, it navigated back. Fix it.
+
+// 4. Refactor some of the codes that are out of order.
+//  make is easy to be manage later on.
 
 // struct TokenizeOptions : Record {
 //     @Field

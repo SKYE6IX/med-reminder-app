@@ -5,8 +5,9 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 interface AppSettingsStore {
   notfication: {
-    sound: "enable" | "silent";
     enable: boolean;
+    sound: "enable" | "silent";
+    alertSound: string;
     vibration: boolean;
     showOnLockScreen: boolean;
   };
@@ -26,6 +27,7 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
     (set) => ({
       notfication: {
         sound: "enable",
+        alertSound: "universfield_soft.wav",
         enable: true,
         vibration: true,
         showOnLockScreen: true,

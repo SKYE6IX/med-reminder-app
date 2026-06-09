@@ -1,4 +1,4 @@
-import { cancelScheduleEventNotifications } from "@/helpers/cancel-schedule-event-notifications";
+import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
@@ -38,7 +38,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
-        cancelScheduleEventNotifications({ medProfileId: medicationProfileId }),
+        cancelEventNotification({ medProfileId: medicationProfileId }),
       ]);
     },
 

@@ -4,8 +4,8 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
-import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
@@ -65,6 +65,7 @@ export default function FinalStepScreen() {
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  // Add medication pack toggle switch
   const toggleSwitch = () => {
     if (!isPremiumPlan) {
       openBannerRef.current?.toggleBanner();
@@ -80,12 +81,14 @@ export default function FinalStepScreen() {
           duration: isToggle ? 400 : 100,
         }),
       );
-
       // We reset the pack state back null, if switch state is false.
       if (!isToggle) {
         setMedicationpack(null);
       }
-
+      setMedicationpack({
+        totalQuantity: amountInPack,
+        reminderDays: 3, // Default days reminder incase user didn't choose
+      });
       setShowRefillBox(isToggle);
     }
   };

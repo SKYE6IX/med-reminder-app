@@ -1,7 +1,5 @@
 import ExpoModulesCore
 
-
-
 public class YomoneySdkModule: Module {
     
     private var pendingPromise: Promise?

@@ -59,6 +59,7 @@ export default function RefillPill() {
   const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
   };
+
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, reminderDays: Number(selectedValue) }));
   };

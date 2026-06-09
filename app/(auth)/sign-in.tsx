@@ -49,7 +49,6 @@ export default function SignInScreen() {
   const emaiInputRef = useRef<TextInput>(null);
 
   const googleLogoSource = require("@/assets/icons/google-logo.png");
-
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
 
   // Handle when each text input value changes
@@ -73,7 +72,10 @@ export default function SignInScreen() {
     async onSuccess(data) {
       clearTokens();
       saveTokens(data.accessToken, data.refreshToken);
-      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["users"] }),
+        queryClient.invalidateQueries({ queryKey: ["subscriptions-plan"] }),
+      ]);
       setIsAuthenticated(true);
     },
     onError(error) {

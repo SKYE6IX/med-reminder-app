@@ -5,53 +5,115 @@ import SignalIcon from "@/component/icons/signal-icon";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import { createScheduleEventNotification } from "@/helpers/create-schedule-event-notifications";
-import { NotificationHelper } from "@/helpers/notification-helper";
+import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { NotificationSoundMode } from "@/types/notification";
+import { useAudioPlayer } from "expo-audio";
 import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type soundType = "enable" | "silent";
 
-const soundSettings = [
+const basicSoundSettings = [
   { label: "Звук приложения по умолчанию", value: "enable" },
   { label: "Беззвучно", value: "silent" },
+];
+const proSoundSettings = [
+  { label: "Беззвучно", value: "silent" },
+  { label: "Universe Wave", value: "universfield_soft.wav" },
+  { label: "Earth Softy", value: "universfield_passive.wav" },
+  { label: "Dragon Time", value: "dragon_wavy.wav" },
 ];
 
 export default function Notifications() {
   const isAndroid = Platform.OS === "android";
   const { notfication, reminderPreferences, setNotificationSetting } = useAppSettingsStore();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
+
+  const player = useAudioPlayer();
+  const timeoutId = useRef<number>(null);
+
+  const universfieldSoft = require("@/assets/sounds/universfield_soft.wav");
+  const universfieldPassive = require("@/assets/sounds/universfield_passive.wav");
+  const dragonWavy = require("@/assets/sounds/dragon_wavy.wav");
 
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const insets = useSafeAreaInsets();
 
+  const soundListSettings = isPremiumPlan ? proSoundSettings : basicSoundSettings;
+  const soundSelectedValue =
+    isPremiumPlan && notfication.sound === "silent"
+      ? notfication.sound
+      : isPremiumPlan
+        ? notfication.alertSound
+        : notfication.sound;
+
   const handleSoundChange = async (value: string) => {
-    setNotificationSetting({ sound: value as soundType });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
-      ...notfication,
-      ...reminderPreferences,
-      sound: value as NotificationSoundMode,
-    });
+    if (!isPremiumPlan) {
+      // Setting coming from basic account
+      setNotificationSetting({ sound: value as soundType });
+      await updateScheduleEventNotifications({
+        ...notfication,
+        ...reminderPreferences,
+        sound: value as NotificationSoundMode,
+      });
+    } else {
+      // Setting coming from pro account
+      if (value === "silent") {
+        setNotificationSetting({ sound: value });
+        await updateScheduleEventNotifications({
+          ...notfication,
+          ...reminderPreferences,
+          sound: value,
+        });
+      } else {
+        if (timeoutId.current) {
+          clearTimeout(timeoutId.current);
+        }
+        if (value === "universfield_soft.wav") {
+          player.replace(universfieldSoft);
+        } else if (value === "universfield_passive.wav") {
+          player.replace(universfieldPassive);
+        } else {
+          player.replace(dragonWavy);
+        }
+        player.play();
+        setNotificationSetting({ sound: "enable", alertSound: value });
+
+        setTimeout(() => {
+          player.pause();
+        }, 5000);
+
+        // We wait atleat 15second before we recreate
+        // the new sound for user notification
+        timeoutId.current = setTimeout(async () => {
+          await updateScheduleEventNotifications({
+            ...notfication,
+            ...reminderPreferences,
+            sound: "enable",
+            alertSound: value,
+          });
+        }, 5000);
+      }
+    }
   };
 
   const toggleAllowNotification = async (value: boolean) => {
     setNotificationSetting({ enable: value });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       enable: value,
     });
   };
 
+  // @platform ANDROID ONLY
   const toggleAllowVibration = async (value: boolean) => {
     setNotificationSetting({ vibration: value });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       vibration: value,
@@ -60,8 +122,7 @@ export default function Notifications() {
 
   const toggleAllowDisplayOnLockScreen = async (value: boolean) => {
     setNotificationSetting({ showOnLockScreen: value });
-    await NotificationHelper.cancelAllNotifications();
-    await createScheduleEventNotification({
+    await updateScheduleEventNotifications({
       ...notfication,
       ...reminderPreferences,
       showOnLockScreen: value,
@@ -119,13 +180,13 @@ export default function Notifications() {
       </View>
 
       {/* Sounds Settings Bottom Sheet */}
-      <BottomSheetWrapper ref={bottomSheetRef} title="Звук уведомления" snapPointPercent="30%">
+      <BottomSheetWrapper ref={bottomSheetRef} title="Звук уведомления" snapPointPercent="35%">
         <View>
           <PlatformPicker
             pickerRef={null}
-            selectedValue={notfication.sound}
+            selectedValue={soundSelectedValue}
             handleOnValueChange={handleSoundChange}
-            items={soundSettings}
+            items={soundListSettings}
           />
         </View>
       </BottomSheetWrapper>

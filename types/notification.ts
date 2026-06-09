@@ -14,13 +14,13 @@ export type SnoozeDuration = 5 | 10 | 15;
 export interface NotificationSettings {
   enable: boolean;
   sound: NotificationSoundMode;
+  alertSound: string;
   vibration: boolean; //@Platform ANDROID ONLY
   showOnLockScreen: boolean;
   snoozeDuration: SnoozeDuration;
   earlyReminder: boolean;
   missedDoseAlert: boolean;
 }
-
 export interface ScheduleNotificationOptions {
   medicationName: string;
   scheduleAt: string;
@@ -29,6 +29,8 @@ export interface ScheduleNotificationOptions {
 }
 export interface NotificationData {
   dosageScheduleEventId?: string;
+  medicationProfileId?: string;
+  scheduleAt: string;
   storageKey: string | string[];
   notificationType: "due" | "early" | "missed" | "refill";
 }

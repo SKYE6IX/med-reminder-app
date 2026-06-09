@@ -63,7 +63,9 @@ function addCustomPod(contents: string, projectName: string): string {
     "m",
   );
 
-  return contents.replace(targetRegex, `$1\n  pod 'YooKassaPayments', '~> 10.0.1'`);
+  const podDeclaration = `pod 'YooKassaPayments', :git => 'https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git', :tag => '10.0.1'`;
+
+  return contents.replace(targetRegex, `$1\n  ${podDeclaration}`);
 }
 
 export default withYomoneySdk;

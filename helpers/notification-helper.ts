@@ -25,6 +25,7 @@ import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-man
 const DEFAULT_SETTINGS: NotificationSettings = {
   enable: true,
   sound: "enable",
+  alertSound: "universfield_soft.wav",
   vibration: true,
   showOnLockScreen: true,
   snoozeDuration: 5,
@@ -37,37 +38,38 @@ export class NotificationHelper {
 
   constructor(userSettings: Partial<NotificationSettings>) {
     this.settings = { ...DEFAULT_SETTINGS, ...userSettings };
+
+    console.log("The new settings from construction: ", this.settings);
   }
 
   async scheduleDosageNotification(options: ScheduleNotificationOptions) {
     const MAX_SNOOZE_REPEAT = 3;
+
     const now = DateTime.now();
     const dueReminder = DateTime.fromISO(options.scheduleAt);
 
-    if (!this.settings.enable || dueReminder < now) return null;
+    if (!this.settings.enable || dueReminder < now) return;
 
     await NotificationHelper.setCategories();
 
+    // Composition of all snoozes
     const snoozeReminders = Array.from({ length: MAX_SNOOZE_REPEAT }, (_, i) => ({
       date: dueReminder.plus({ minutes: this.settings.snoozeDuration * i }),
       minutesOverdue: this.settings.snoozeDuration * i,
     }));
 
+    // Storages keys
+    // Due alarm storage keys
     const dueStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "due-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
     });
-
-    const earyReminder = dueReminder.minus({ minute: 20 });
     const earlyStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "early-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
     });
-
-    const lastSnooze = snoozeReminders[snoozeReminders.length - 1].date;
-    const missedReminder = lastSnooze.plus({ minutes: 30 });
     const missedStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "missed-reminder",
       medProfileId: options.medicationProfileId,
@@ -77,18 +79,23 @@ export class NotificationHelper {
     // @Platfrom ANDROID ONLY
     const channelId = await this.registerAndroidChannel({
       id: "reminder",
-      sound: "universfield_soft.wav",
+      alertSound: this.settings.alertSound,
     });
+
+    const eventNotificationKeys = [dueStorageKey, earlyStorageKey, missedStorageKey];
+
+    // Snooozes data(due notification) hold all the keys for early and missed
+    // notifications id
+    const dueReminderData: NotificationData = {
+      dosageScheduleEventId: options.scheduleEventId,
+      medicationProfileId: options.medicationProfileId,
+      storageKey: JSON.stringify(eventNotificationKeys),
+      notificationType: "due",
+      scheduleAt: options.scheduleAt,
+    };
 
     // We pre define all the notification, so as to achive the
     // snooze behavior type
-    const dueDataStoragesKeys = [dueStorageKey, missedStorageKey];
-    const dueReminderData: NotificationData = {
-      dosageScheduleEventId: options.scheduleEventId,
-      storageKey: JSON.stringify(dueDataStoragesKeys),
-      notificationType: "due",
-    };
-
     const notificationsId = await Promise.all(
       snoozeReminders.map(async (reminder, i) => {
         const time = reminder.date.toJSDate();
@@ -108,10 +115,13 @@ export class NotificationHelper {
         });
       }),
     );
-    // Saved all the key to storage and reused later
+
+    // Saved all snoonze notification ID to storage.
     await saveToStorage<string[]>(dueStorageKey, notificationsId);
 
     // Early reminder set up, if user turn it on;
+    // An early reminder set up
+    const earyReminder = dueReminder.minus({ minute: 20 });
     if (this.settings.earlyReminder) {
       if (earyReminder > now) {
         const title = "Next Medication In 20м";
@@ -122,12 +132,20 @@ export class NotificationHelper {
           body,
           channelId,
           showQuickActions: false,
+          customData: {
+            storageKey: earlyStorageKey,
+            notificationType: "early",
+            scheduleAt: earyReminder.toISO({ precision: "minute" }) ?? "",
+          },
         });
         await saveToStorage<string>(earlyStorageKey, notificationId);
       }
     }
 
     // Missed dosage reminder set up, if user turn it on;
+    // Missed pills reminder set up
+    const lastSnooze = snoozeReminders[snoozeReminders.length - 1].date;
+    const missedReminder = lastSnooze.plus({ minutes: 30 });
     if (this.settings.missedDoseAlert) {
       const title = "Missed dose alert";
       const body = `You missed your ${getScheduleTime(options.scheduleAt)} medication. Check with your doctor if you're unsure what to do.`;
@@ -137,6 +155,11 @@ export class NotificationHelper {
         body,
         channelId,
         showQuickActions: false,
+        customData: {
+          storageKey: missedStorageKey,
+          notificationType: "missed",
+          scheduleAt: missedReminder.toISO({ precision: "minute" }) ?? "",
+        },
       });
       await saveToStorage<string>(missedStorageKey, notifcationId);
     }
@@ -148,11 +171,10 @@ export class NotificationHelper {
     medicationProfileId,
   }: Omit<ScheduleNotificationOptions, "scheduleEventId">) {
     const date = DateTime.fromISO(scheduleAt).toJSDate();
-
     // @Platfrom ANDROID ONLY
     const channelId = await this.registerAndroidChannel({
       id: "reminder",
-      sound: "universfield_soft.wav",
+      alertSound: this.settings.alertSound,
     });
 
     const storageKey = NotificationHelper.createNotificationStorageKey({
@@ -163,7 +185,6 @@ export class NotificationHelper {
     const time = date.getTime();
     const title = "Refill Reminder Alert";
     const body = `${medicationName} is about to finished.`;
-
     const notificationId = await this.createNotification({
       time: time,
       title,
@@ -173,12 +194,15 @@ export class NotificationHelper {
       customData: {
         notificationType: "refill",
         storageKey,
+        scheduleAt,
+        medicationProfileId,
       },
     });
 
     await saveToStorage(storageKey, notificationId);
   }
 
+  // REQUEST PERMISSION
   public static async allowsNotificationsAsync() {
     const settings = await notifee.requestPermission();
     if (
@@ -190,7 +214,7 @@ export class NotificationHelper {
       return false;
     }
   }
-
+  // CHECK FOR PERMISSION
   public static async checkNotificationPermission() {
     const settings = await notifee.getNotificationSettings();
     if (settings.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
@@ -200,7 +224,7 @@ export class NotificationHelper {
     }
     return false;
   }
-
+  // A CALLBACK IF NOTIFICATION OPEN THE APP
   public static async handleOnNotificationOpenApp() {
     const initialNotification = await notifee.getInitialNotification();
 
@@ -212,6 +236,8 @@ export class NotificationHelper {
     }
   }
 
+  // A CALLBACK IF NOTIFCATION OPEN THE APP OR ACTION BTN
+  // WAS CHOSE WHILE THE APP ISN'T KILLED
   public static handleOnBackgroundEvent() {
     notifee.onBackgroundEvent(async ({ type, detail }) => {
       const { notification, pressAction } = detail;
@@ -235,7 +261,8 @@ export class NotificationHelper {
       return Promise.resolve();
     });
   }
-
+  // A CALLBACK THAT HANDLE WHEN USER IS CURRENTLY USING THE APP
+  // WHEN THE NOTIFICATION COME ON.
   public static handleOnForeGroundEvent() {
     return notifee.onForegroundEvent(async ({ type, detail }) => {
       switch (type) {
@@ -249,7 +276,8 @@ export class NotificationHelper {
       }
     });
   }
-
+  // GENERATE KEY STORAGE USED TO SAVED ALL NOTIFICATION
+  // IDs
   public static createNotificationStorageKey({
     prefix,
     medProfileId,
@@ -261,11 +289,11 @@ export class NotificationHelper {
   }) {
     return `${prefix}:${medProfileId}:${scheduleAt}`;
   }
-
+  // CANCEL ALL NOTIFICATION ON THE APP
   public static async cancelAllNotifications() {
     await notifee.cancelAllNotifications();
   }
-
+  // CANCEL NOTIFICATION USING THE ID
   public static async cancelNotificationWithId(
     notificationId: string | string[] | null,
     storageKey: string,
@@ -278,12 +306,31 @@ export class NotificationHelper {
     } else {
       await notifee.cancelNotification(notificationId);
     }
-
     await removeFromStorage(storageKey);
   }
 
+  public static async removeNotificationsWithKey(data: NotificationData) {
+    let storageKey: string | string[];
+
+    try {
+      storageKey = JSON.parse(data.storageKey as string);
+    } catch {
+      storageKey = data.storageKey;
+    }
+
+    if (typeof storageKey === "object") {
+      for (const key of storageKey) {
+        const notifcationId = await readFromStorage<string | string[]>(key);
+        await NotificationHelper.cancelNotificationWithId(notifcationId, key);
+      }
+    } else {
+      const notifcationId = await readFromStorage<string>(storageKey);
+      await NotificationHelper.cancelNotificationWithId(notifcationId, storageKey);
+    }
+  }
+
   // PRIVATE HELPERS
-  private async registerAndroidChannel({ id, sound }: { id: string; sound: string }) {
+  private async registerAndroidChannel({ id, alertSound }: { id: string; alertSound: string }) {
     const channelId = await notifee.createChannel({
       id,
       name: "MedRemindR",
@@ -292,7 +339,7 @@ export class NotificationHelper {
       visibility: this.settings.showOnLockScreen
         ? AndroidVisibility.PUBLIC
         : AndroidVisibility.SECRET,
-      sound: this.settings.sound === "enable" ? sound : undefined,
+      ...(this.settings.sound === "enable" && { sound: alertSound }),
     });
     return channelId;
   }
@@ -337,11 +384,11 @@ export class NotificationHelper {
         },
         ios: {
           interruptionLevel: "timeSensitive",
-          sound: "universfield_soft.wav",
           foregroundPresentationOptions: {
             sound: this.settings.sound === "enable",
             list: this.settings.showOnLockScreen,
           },
+          ...(this.settings.sound === "enable" && { sound: this.settings.alertSound }),
           ...(showQuickActions && { categoryId: "due-reminder" }),
         },
         ...(customData && {
@@ -353,29 +400,6 @@ export class NotificationHelper {
       trigger,
     );
   }
-
-  private static async removeNotificationsWithKey(data: NotificationData) {
-    let storageKey: string | string[];
-
-    try {
-      storageKey = JSON.parse(data.storageKey as string);
-    } catch {
-      storageKey = data.storageKey;
-    }
-
-    if (typeof storageKey === "object") {
-      for (const key of storageKey) {
-        const notifcationId = await readFromStorage<string | string[]>(key);
-
-        await NotificationHelper.cancelNotificationWithId(notifcationId, key);
-      }
-    } else {
-      const notifcationId = await readFromStorage<string>(storageKey);
-
-      await NotificationHelper.cancelNotificationWithId(notifcationId, storageKey);
-    }
-  }
-
   private static async setCategories() {
     await notifee.setNotificationCategories([
       {
@@ -393,7 +417,6 @@ export class NotificationHelper {
       },
     ]);
   }
-
   private static async updateSchdeuleEventsAction(action: ScheduleAction, scheduleId: string) {
     try {
       const eventResponse = await api.put<MedicationScheduleEvent>(

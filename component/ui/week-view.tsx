@@ -89,6 +89,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
           }}
         />
       </View>
+
       {showDescription && (
         <Text style={[styles.weekDescription, { color }]}>Лекарства на {description}</Text>
       )}

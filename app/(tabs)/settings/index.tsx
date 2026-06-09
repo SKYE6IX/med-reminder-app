@@ -53,9 +53,9 @@ export default function Settings() {
     },
     onError(error) {
       if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when creating relatiion profile -> ", error);
+        console.log("An axios error occur in sign out mutation -> ", error);
       } else {
-        console.log("An unknown error occur when creating relatiion profile -> ", error);
+        console.log("An unknown error occur in sign out mutation   -> ", error);
       }
       showFeedBack({
         title: "Ошибка!",

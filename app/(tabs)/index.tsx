@@ -47,6 +47,7 @@ const fetchScheduleEvents = async (params: string) => {
   });
   return response.data;
 };
+
 // Update schedule events
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
   const response = await api.put<MedicationScheduleEvent>(
@@ -114,13 +115,13 @@ export default function Home() {
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
       ]);
 
-      // Here we get the latest data from medication profile list
-      // we then create a notification alert for user if it exist and
-      // thier reminder days setting is near.
+      // Here we get the latest data from medication profile list,
+      // we passed it down to refill notification, which will
+      // check if user has a pack to refill, and if their refill
+      // is near.
       const medicationProfile = queryClient
         .getQueryState<MedicationProfile[]>(["medication-profile", "list"])
         ?.data?.find((profile) => profile.id === data.medicationProfileId);
-
       await createRefillNotification({
         medicationProfile,
         settings: { ...notfication, ...reminderPreferences },
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
   weekViewWrapper: {
     paddingLeft: 20,
     paddingRight: 20,
-    height: 120,
+    height: 130,
   },
   noContentWrapper: {
     flex: 1,
