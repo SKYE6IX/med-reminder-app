@@ -4,9 +4,4 @@
 
     <uses-sdk android:minSdkVersion="24" />
 
-    <application
-        android:networkSecurityConfig="@xml/ym_network_security_config"
-        android:usesCleartextTraffic="true" >
-    </application>
-
 </manifest>

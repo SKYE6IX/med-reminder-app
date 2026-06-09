@@ -1,18 +1,15 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useRouter } from "expo-router";
 import { RefObject, useCallback, useImperativeHandle, useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import StarIcon from "../icons/star-icon";
 import CustomButton from "./custom-button/custom-button";
 
-// TODO:
-// The backdrop animation isn't working
-// Figure a wayout to trick it to work.
-
 export interface SubscriptionBannerRef {
   toggleBanner: () => void;
 }
+
 type SubscriptionBannerProps = {
   ref: RefObject<SubscriptionBannerRef | null> | null;
   onModalClose?: () => void;
@@ -20,6 +17,7 @@ type SubscriptionBannerProps = {
 
 const DURATION = 500;
 export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBannerProps) {
+  const isAndroid = Platform.OS === "android";
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [modalKey, setModalKey] = useState(0);
@@ -53,6 +51,15 @@ export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBa
   const navigateToSubscritionPlan = () => {
     toggleBanner();
     router.navigate("/(tabs)/settings/subscription-plan");
+
+    // On android, the navigation fall back to the index setting page
+    // we add a little delay after the initial to push the real page we
+    // want
+    if (isAndroid) {
+      setTimeout(() => {
+        router.push("/(tabs)/settings/subscription-plan");
+      }, 300);
+    }
   };
 
   const closeModal = () => {

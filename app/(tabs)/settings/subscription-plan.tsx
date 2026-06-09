@@ -5,9 +5,11 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { default as YomoneySdkModule } from "@/modules/yomoney-sdk/src/YomoneySdkModule";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { SubscriptionPlanResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -91,22 +93,22 @@ export default function SubscriptionPlan() {
     const planAmount = selectedPlan === "MONTHLY" ? 299 : 3050;
     const subtitle = selectedPlan === "MONTHLY" ? "Ежемесячная подписка" : "Годовая подписка";
 
-    // const result = await YomoneySdkModule.startTokenize({
-    //   amount: planAmount,
-    //   currency: "RUB",
-    //   title: "Премиум план",
-    //   subtitle,
-    //   clientApplicationKey: "test_MTM2OTg2OY8_wn0XX8jtXCgpeZCe7VX2_w1m1yd9tPk",
-    //   shopId: "1369869",
-    // });
+    const result = await YomoneySdkModule.startTokenize({
+      amount: planAmount,
+      currency: "RUB",
+      title: "Премиум план",
+      subtitle,
+      clientApplicationKey: "test_MTM2OTg2OY8_wn0XX8jtXCgpeZCe7VX2_w1m1yd9tPk",
+      shopId: "1369869",
+    });
 
-    // mutate({
-    //   paymentToken: result.paymentToken,
-    //   paymentMethod: result.paymentMethod,
-    //   amount: String(planAmount),
-    //   billingCycle: selectedPlan,
-    //   zoneId: getTimeZone(),
-    // });
+    mutate({
+      paymentToken: result.paymentToken,
+      paymentMethod: result.paymentMethod,
+      amount: String(planAmount),
+      billingCycle: selectedPlan,
+      zoneId: getTimeZone(),
+    });
   };
 
   return (

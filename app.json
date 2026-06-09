@@ -25,9 +25,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.medreminderapp.MedRemindR",
-      "permissions": [
-        "android.permission.SCHEDULE_EXACT_ALARM"
-      ]
+      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"]
     },
     "web": {
       "output": "static"
@@ -80,7 +78,7 @@
       "expo-image",
       "expo-web-browser",
       "expo-apple-authentication",
-      "expo-audio"
+      "./app.plugin.js"
     ],
     "experiments": {
       "typedRoutes": true,

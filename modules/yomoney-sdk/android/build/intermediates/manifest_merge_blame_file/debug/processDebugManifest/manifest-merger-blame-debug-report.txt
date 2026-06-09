@@ -4,12 +4,4 @@
 4
 5    <uses-sdk android:minSdkVersion="24" />
 6
-7    <application
-7-->/Users/azeezabiola/Documents/DevelopmentFolder/medreminder-app/modules/yomoney-sdk/android/src/main/AndroidManifest.xml:2:4-5:19
-8        android:networkSecurityConfig="@xml/ym_network_security_config"
-8-->/Users/azeezabiola/Documents/DevelopmentFolder/medreminder-app/modules/yomoney-sdk/android/src/main/AndroidManifest.xml:3:9-72
-9        android:usesCleartextTraffic="true" >
-9-->/Users/azeezabiola/Documents/DevelopmentFolder/medreminder-app/modules/yomoney-sdk/android/src/main/AndroidManifest.xml:4:9-44
-10    </application>
-11
-12</manifest>
+7</manifest>

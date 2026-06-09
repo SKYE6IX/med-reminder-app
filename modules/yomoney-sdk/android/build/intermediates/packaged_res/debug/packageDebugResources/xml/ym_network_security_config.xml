@@ -1,6 +1,0 @@
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">certs.yoomoney.ru</domain>
-    </domain-config>
-</network-security-config>

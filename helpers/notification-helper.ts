@@ -38,8 +38,6 @@ export class NotificationHelper {
 
   constructor(userSettings: Partial<NotificationSettings>) {
     this.settings = { ...DEFAULT_SETTINGS, ...userSettings };
-
-    console.log("The new settings from construction: ", this.settings);
   }
 
   async scheduleDosageNotification(options: ScheduleNotificationOptions) {

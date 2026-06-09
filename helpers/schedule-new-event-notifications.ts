@@ -35,7 +35,6 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
 
     // We cancel all the exisiting events
     if (pendings.length) {
-      console.log("This should never run !");
       // Because a due return 3 notification (snoonze), we use the only
       // single unique key, eventID to set them into map.
       const pendingMaps = new Map<string, TriggerNotification>();
@@ -53,7 +52,6 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
     }
 
     const notifications = new NotificationHelper(settings);
-    console.log("This should run with this new settings: ", settings);
 
     await Promise.all(
       newEvents.map((event) =>

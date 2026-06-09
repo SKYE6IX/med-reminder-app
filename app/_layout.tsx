@@ -144,33 +144,14 @@ export default function RootLayout() {
 //  to paid plan users. ✅
 
 // 2. Back to payment system configurations. Add all the required details,
-//  implement plug-in to add manifest data and inplist data.
+//  implement plug-in to add manifest data and inplist data. ✅
 
 // 3. On Android, when user click to naviagte from paid plan modal
-//  so subscription page, it navigated back. Fix it.
+//  so subscription page, it navigated back. Fix it. ✅
 
 // 4. Refactor some of the codes that are out of order.
 //  make is easy to be manage later on.
 
-// struct TokenizeOptions : Record {
-//     @Field
-//     var amount: Double = 0.0
-
-//     @Field
-//     var currency: String = "RUB"
-
-//     @Field
-//     var title: String = ""
-
-//     @Field
-//     var subtitle: String = ""
-
-//     @Field
-//     var clientApplicationKey: String = ""
-
-//     @Field
-//     var shopId: String = ""
-// }
 // public class YomoneySdkModule: Module {
 
 //     private var pendingPromise: Promise?

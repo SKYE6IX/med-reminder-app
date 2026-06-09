@@ -18,8 +18,6 @@ import ru.yoomoney.sdk.kassa.payments.checkoutParameters.Amount
 import ru.yoomoney.sdk.kassa.payments.checkoutParameters.TestParameters
 import java.math.BigDecimal
 import java.util.Currency
-
-
 class TokenizeOptions : Record {
   @Field val amount: Double = 0.0
   @Field val currency: String = "RUB"
@@ -79,7 +77,6 @@ class YomoneySdkModule : Module() {
         REQUEST_CODE)
     }
   }
-
   private fun handleActivityResult(data: Intent?) {
     val promise = pendingPromise ?: return
     pendingPromise = null
