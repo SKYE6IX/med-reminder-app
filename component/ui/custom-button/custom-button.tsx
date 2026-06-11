@@ -26,7 +26,7 @@ export default function CustomButton({
     <Pressable
       role="button"
       onPress={onPress}
-      // @ts-ignore the style showned type error
+      // @ts-ignore the style shown type error
       style={[buttonStyles.base, buttonStyles[variant], style]}
       {...rest}
     >

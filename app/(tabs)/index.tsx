@@ -239,7 +239,7 @@ export default function Home() {
                   На этот день лекарства не запланированы
                 </Text>
                 <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-                  Если вы ещё не добавили лекарство, сделайте это сейчас.
+                  Вы можете добавить лекарства сейчас.
                 </Text>
 
                 <CustomButton

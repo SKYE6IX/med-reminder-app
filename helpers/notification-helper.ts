@@ -146,7 +146,7 @@ export class NotificationHelper {
     const missedReminder = lastSnooze.plus({ minutes: 30 });
     if (this.settings.missedDoseAlert) {
       const title = "Missed dose alert";
-      const body = `You missed your ${getScheduleTime(options.scheduleAt)} medication. Check with your doctor if you're unsure what to do.`;
+      const body = `You missed your ${getScheduleTime(options.scheduleAt)} medication. Check with your doctor if you're unsure what to do`;
       const notifcationId = await this.createNotification({
         time: missedReminder.toJSDate().getTime(),
         title,

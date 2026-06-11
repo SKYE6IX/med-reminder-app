@@ -48,7 +48,7 @@ export default function Security() {
 
         <SettingsCard
           title="Удалить мой аккаунт и данные"
-          description="Безвозвратно удалить ваш аккаунт с лекарствами."
+          description="Безвозвратно удалить ваш аккаунт с лекарствами"
           svgIcon={<UserCloseIcon color={color} />}
           interaction="press"
           onPress={() => deleteAccountSheetRef.current?.open()}

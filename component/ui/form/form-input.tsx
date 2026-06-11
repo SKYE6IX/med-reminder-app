@@ -1,4 +1,4 @@
-import React, { useState, type RefObject } from "react";
+import { useState, type RefObject } from "react";
 import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from "react-native";
 
 import CloseIcon from "@/component/icons/close-icon";
@@ -68,7 +68,7 @@ export default function FormInput({
               color,
             },
             styles.input,
-            inputRef?.current?.isFocused() ? styles.inputFocus : undefined,
+            // inputRef?.current?.isFocused() ? styles.inputFocus : undefined,
             hasError ? styles.error : undefined,
           ]}
           placeholderTextColor={mutedColor}

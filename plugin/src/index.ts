@@ -1,30 +1,37 @@
 import {
   AndroidConfig,
   ConfigPlugin,
+  IOSConfig,
   withAndroidManifest,
   withDangerousMod,
+  withXcodeProject,
 } from "expo/config-plugins";
-
-import fs from "node:fs";
-import path from "node:path";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import * as fs from "fs/promises";
+import path from "path";
 
 const withYomoneySdk: ConfigPlugin = (config) => {
-  // config = withDangerousMod(config, [
-  //   "ios",
-  //   async (config) => {
-  //     const podfilePath = path.join(config.modRequest.platformProjectRoot, "Podfile");
-  //     try {
-  //       let contents = await fs.readFile(podfilePath, "utf8");
-  //       const projectName = IOSConfig.XcodeUtils.getProjectName(config.modRequest.projectRoot);
-  //       contents = addCustomPod(contents, projectName);
-  //       await fs.writeFile(podfilePath, contents);
-  //       console.log("✅ Successfully added custom pod to Podfile");
-  //     } catch (error) {
-  //       console.warn("⚠️ Podfile not found, skipping modification");
-  //     }
-  //     return config;
-  //   },
-  // ]);
+  config = withDangerousMod(config, [
+    "ios",
+    async (config) => {
+      const podfilePath = path.join(config.modRequest.platformProjectRoot, "Podfile");
+
+      try {
+        let contents = await fs.readFile(podfilePath, "utf8");
+        const projectName = IOSConfig.XcodeUtils.getProjectName(config.modRequest.projectRoot);
+
+        contents = addCustomPod(contents, projectName);
+
+        await fs.writeFile(podfilePath, contents);
+
+        console.log("✅ Successfully added custom pod to Podfile");
+      } catch (error) {
+        console.warn("⚠️ Podfile not found, skipping modification");
+      }
+
+      return config;
+    },
+  ]);
 
   // Config Manifest
   config = withAndroidManifest(config, (config) => {
@@ -39,8 +46,8 @@ const withYomoneySdk: ConfigPlugin = (config) => {
     "android",
     async (config) => {
       const xmlDir = path.join(config.modRequest.platformProjectRoot, "app/src/main/res/xml");
-      if (!fs.existsSync(xmlDir)) {
-        fs.mkdirSync(xmlDir, { recursive: true });
+      if (!existsSync(xmlDir)) {
+        mkdirSync(xmlDir, { recursive: true });
       }
       const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
@@ -49,39 +56,68 @@ const withYomoneySdk: ConfigPlugin = (config) => {
         <domain includeSubdomains="true">certs.yoomoney.ru</domain>
     </domain-config>
 </network-security-config>`;
-      fs.writeFileSync(path.join(xmlDir, "ym_network_security_config.xml"), xmlContent, "utf-8");
+      writeFileSync(path.join(xmlDir, "ym_network_security_config.xml"), xmlContent, "utf-8");
       return config;
     },
   ]);
 
+  // Modify Xcodebuild.
+  config = withXcodeProject(config, (config) => {
+    const project = config.modResults;
+
+    const configurations = project.pbxXCBuildConfigurationSection();
+
+    for (const key of Object.keys(configurations)) {
+      const configItem = configurations[key];
+      if (typeof configItem === "object" && configItem.buildSettings) {
+        configItem.buildSettings.SWIFT_ENABLE_EXPLICIT_MODULES = "YES";
+      }
+    }
+
+    return config;
+  });
+
   return config;
 };
 
-// function addCustomPod(contents: string, projectName: string): string {
-//   const sources = [
-//     "source 'https://github.com/CocoaPods/Specs.git'",
-//     "source 'https://git.yoomoney.ru/scm/sdk/cocoa-pod-specs.git'",
-//   ];
+function addCustomPod(contents: string, projectName: string): string {
+  const sources = [
+    "source 'https://github.com/CocoaPods/Specs.git'",
+    "source 'https://git.yoomoney.ru/scm/sdk/cocoa-pod-specs.git'",
+  ];
 
-//   for (const source of sources) {
-//     if (!contents.includes(source)) {
-//       contents = `${source}\n${contents}`;
-//     }
-//   }
+  for (const source of sources) {
+    if (!contents.includes(source)) {
+      contents = `${source}\n${contents}`;
+    }
+  }
 
-//   if (contents.includes("pod 'YooKassaPayments'")) {
-//     console.log("YooKassaPayments pod already exists, skipping");
-//     return contents;
-//   }
+  if (contents.includes("pod 'YooKassaPayments'")) {
+    console.log("YooKassaPayments pod already exists, skipping");
+    return contents;
+  }
 
-//   const targetRegex = new RegExp(
-//     `(target ['"]${projectName}['"] do[\\s\\S]*?use_expo_modules!)`,
-//     "m",
-//   );
+  const targetRegex = new RegExp(
+    `(target ['"]${projectName}['"] do[\\s\\S]*?use_expo_modules!)`,
+    "m",
+  );
 
-//   const podDeclaration = `pod 'YooKassaPayments', :git => 'https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git', :tag => '10.0.1'`;
+  const podDeclaration = `pod 'YooKassaPayments'`;
 
-//   return contents.replace(targetRegex, `$1\n  ${podDeclaration}`);
-// }
+  contents = contents.replace(targetRegex, `$1\n  ${podDeclaration}`);
+
+  if (!contents.includes("SWIFT_ENABLE_EXPLICIT_MODULES")) {
+    contents = contents.replace(
+      /post_install do \|installer\|/,
+      `post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'YES'
+    end
+  end`,
+    );
+  }
+  return contents;
+}
 
 export default withYomoneySdk;

@@ -7,13 +7,13 @@ import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { DosageMeasurement, MedicationUnit } from "@/types/medication";
 
-export const DOSAGE_UNITS = [
-  { label: "Таблетка", icon: "💊", value: DosageMeasurement.TABLET },
-  { label: "Мл", icon: "🥤", value: DosageMeasurement.MILLIMETERS },
-  { label: "Ложка", icon: "🥄", value: DosageMeasurement.SPOON },
+export const DOSAGE_MEASUREMENT = [
+  { label: "мг", icon: "🥤", value: DosageMeasurement.MILLIGRAM },
+  { label: "г", icon: "🥄", value: DosageMeasurement.GRAM },
+  { label: "мл", icon: "🥤", value: DosageMeasurement.MILLIMETERS },
   { label: "Впрыскивание", icon: "💨", value: DosageMeasurement.SPRAY },
   { label: "Капля", icon: "💧", value: DosageMeasurement.DROPS },
-  { label: "Капсула", icon: "⚪", value: DosageMeasurement.CAPSULE },
+  { label: "Шт", icon: "⚪", value: DosageMeasurement.CAPSULE },
 ];
 
 export const MEDICATION_UNITS = [

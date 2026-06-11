@@ -104,17 +104,18 @@ export default function Settings() {
 
         {/* NOTIFICATION & REMINDER SETTINGS ✅ */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>Напоминания и оповещения</Text>
+          <Text style={[styles.sectionTitle, { color }]}>Уведомления и напоминания</Text>
           <SettingsCard
             title="Настройки уведомлений"
-            description="Включите или выключите уведомления"
+            description="Измените звук и видимость уведомлений"
             interaction="press"
             svgIcon={<BellIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/notifications")}
           />
+
           <SettingsCard
             title="Настройки напоминаний"
-            description="Выберите звук для напоминаний о приёме лекарств"
+            description="Измените повторы и дополнительные напоминания"
             interaction="press"
             svgIcon={<SoundIcon color={color} />}
             onPress={navigateToReminderPreference}

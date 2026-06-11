@@ -8,7 +8,7 @@ import DetailsFrequencySettings from "@/component/ui/medication-details/frequenc
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
 import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
-import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
@@ -124,7 +124,7 @@ export default function MedicationDetails() {
                   <PillFilledIcon color={color} />
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
                     {medicationProfile && Number(medicationProfile.schedule.amountTaken) >= 1
-                      ? `${medicationProfile.schedule.amountTaken} ${getDosageUnit(medicationProfile.schedule.measurement)} принято`
+                      ? `${medicationProfile.schedule.amountTaken} ${getDosageMeasurement(medicationProfile.schedule.measurement)} принято`
                       : "Лекарство еще не было принято"}
                   </Text>
                 </View>

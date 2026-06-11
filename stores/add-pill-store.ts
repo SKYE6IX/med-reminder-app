@@ -50,10 +50,10 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
   profileId: "",
   medicationName: "",
   medicationUnit: MedicationUnit.CAPSULE,
-  medicationMeasurement: DosageMeasurement.TABLET,
+  medicationMeasurement: DosageMeasurement.MILLIGRAM,
   medicationNote: null,
   schedule: {
-    dosage: "1",
+    dosage: "10",
     rule: {
       recurrenceRule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
       preset: "ONCE_A_DAY",

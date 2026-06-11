@@ -1,7 +1,7 @@
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -131,7 +131,7 @@ export default function SignInScreen() {
             name="password"
             onValueChange={handleOnValueChanges}
             type="password"
-            placeholder="Придумайте пароль"
+            placeholder="Введите пароль"
             hasError={signInState.errorsSet.has("password")}
             textContentType="password"
             autoComplete="password"

@@ -1,5 +1,5 @@
 import ClockIcon from "@/component/icons/clock-icon";
-import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getScheduleBadge } from "@/helpers/getScheduleBadge";
 import { getScheduleTime } from "@/helpers/getScheduleTime";
 import { getTakenAt } from "@/helpers/getTakenAt";
@@ -41,7 +41,7 @@ export default function ScheduleEventCard({
   const sharedStyles = useCardStyles();
   const tintColor = useThemeColor({}, "tint");
 
-  const dosageUnit = getDosageUnit(measurement);
+  const dosageUnit = getDosageMeasurement(measurement);
   const takenAtValue = getTakenAt(takenAt);
   const scheduleTime = getScheduleTime(scheduleAt);
 

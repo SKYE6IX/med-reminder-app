@@ -1,14 +1,7 @@
+import { useLinkButtonStyles } from "@/component/shared-styles/link-button-styles";
 import { Href, Link } from "expo-router";
 import { type ComponentProps } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type ViewProps,
-} from "react-native";
-
-import { useLinkButtonStyles } from "@/component/shared-styles/link-button-styles";
+import { Pressable, StyleSheet, Text, View, type ViewProps } from "react-native";
 
 type CustomLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   href: Href & string;
@@ -28,15 +21,10 @@ export default function CustomLink({
   const linkStyles = useLinkButtonStyles();
 
   return (
-    <View
-      style={[linkStyles.base, linkStyles[variant], style]}
-      testID="custom-link-view"
-    >
+    <View style={[linkStyles.base, linkStyles[variant], style]} testID="custom-link-view">
       <Link href={href} asChild>
         <Pressable style={pressableStyles.container}>
-          <Text style={[linkStyles.text, linkStyles[textVaraint]]}>
-            {label}
-          </Text>
+          <Text style={[linkStyles.text, linkStyles[textVaraint]]}>{label}</Text>
         </Pressable>
       </Link>
     </View>

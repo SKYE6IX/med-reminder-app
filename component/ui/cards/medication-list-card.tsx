@@ -1,4 +1,4 @@
-import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -40,7 +40,7 @@ export default function MedicationListCard({
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
   const disableCard = useThemeColor({}, "disableCard");
 
-  const dosageUnit = getDosageUnit(medicationProfile.schedule.measurement);
+  const dosageUnit = getDosageMeasurement(medicationProfile.schedule.measurement);
   const startedDate = getStartedDate(medicationProfile.schedule.startDate);
 
   const canShowProgress = medicationProfile.pack !== null;

@@ -42,7 +42,7 @@ export default function DetailsNoteSettings({
     <React.Fragment>
       <Pressable style={sharedStyles.card} onPress={() => bottomSheetRef.current?.open()}>
         <View style={sharedStyles.cardHeader}>
-          <Text style={sharedStyles.cardTitle}>Заметки</Text>
+          <Text style={sharedStyles.cardTitle}>Заметка</Text>
           <ArrowRight color={color} />
         </View>
         <View style={sharedStyles.cardBody}>

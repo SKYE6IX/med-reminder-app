@@ -1,13 +1,10 @@
-import { Platform, StyleSheet, View, type ViewProps } from "react-native";
-
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type OnboardingVievProps = ViewProps;
 
 export function OnboardingView({ style, ...rest }: OnboardingVievProps) {
-  const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
 
@@ -21,7 +18,7 @@ export function OnboardingView({ style, ...rest }: OnboardingVievProps) {
       style={[
         {
           backgroundColor,
-          paddingTop: Platform.OS === "ios" ? headerHeight : 0,
+          paddingTop: Platform.OS === "ios" ? insets.top * 2 - 10 : 0,
           paddingBottom: insets.bottom + 20,
         },
         styles.container,

@@ -49,6 +49,7 @@ export default function UserDetails() {
 
   const { user } = useUserData();
   const { selfProfile } = useProfilesQuery();
+
   const profileImageUrl = useProfileImage();
 
   // Query data
@@ -146,6 +147,8 @@ export default function UserDetails() {
     };
     mutate(data);
   };
+
+  console.log(profileImageUrl);
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>

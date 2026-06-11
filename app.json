@@ -78,6 +78,10 @@
       "expo-image",
       "expo-web-browser",
       "expo-apple-authentication",
+      "./app.plugin.js",
+      "expo-audio",
+      "expo-status-bar",
+      "expo-asset",
       "./app.plugin.js"
     ],
     "experiments": {

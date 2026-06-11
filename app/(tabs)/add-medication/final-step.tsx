@@ -240,7 +240,7 @@ export default function FinalStepScreen() {
 
         {/* Note settings */}
         <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Заметки</Text>
+          <Text style={sharedStyles.title}>Заметка</Text>
           <TextInput
             value={medicationNote}
             onChangeText={(value) => handleOnTextChange(value)}

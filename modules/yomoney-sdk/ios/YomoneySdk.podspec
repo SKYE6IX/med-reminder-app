@@ -6,18 +6,19 @@ Pod::Spec.new do |s|
   s.author         = ''
   s.homepage       = 'https://docs.expo.dev/modules/'
   s.platforms      = {
-    :ios => '10.0'
+    :ios => '16.4'
   }
   s.source           = { :git => '' }
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
+  s.dependency 'YooKassaPayments'
+
 
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
   }
 
-  
    s.source_files = '**/*.{h,m,mm,swift,hpp,cpp}'
 end

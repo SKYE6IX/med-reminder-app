@@ -1,14 +1,13 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import PillIcon from "@/component/icons/pill-icon";
-import { getDosageUnit } from "@/helpers/getDosageUnit";
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { DosageMeasurement, MedicationProfile } from "@/types/medication";
-import React, { useRef, useState } from "react";
+import { MedicationProfile } from "@/types/medication";
+import React, { useRef } from "react";
 import { Pressable, Text, View } from "react-native";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
-import CustomButton from "../custom-button/custom-button";
-import DosageSettings from "../dosage-settings";
+import { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
+import DosageAmountInput from "../dosage-picker/dosage-amount-input";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
 
@@ -17,42 +16,27 @@ export default function DetailsDosageSettings({
 }: {
   medicationProfile: MedicationProfile;
 }) {
-  const { isPending, mutate } = useUpdateMedicationMutation();
-  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
-
-  const [dosageState, setDosageState] = useState({
-    amount: medicationProfile.schedule.dosage,
-    unit: medicationProfile.schedule.measurement,
-  });
-
   const sharedStyles = useSharedStyles();
-  const color = useThemeColor({}, "textPrimary");
+  const { isPending, mutate } = useUpdateMedicationMutation();
+  const showDosageAmountInputRef = useRef<BottomSheetWrapperRef>(null);
+
   const { schedule } = medicationProfile;
 
-  const shouldUpdate =
-    dosageState.amount !== schedule.dosage ||
-    dosageState.unit.toUpperCase() !== schedule.measurement.toUpperCase();
+  const handleUpdateDosage = (value: string) => {
+    const shouldUpdate = schedule.dosage !== value;
 
-  // Dosage setting
-  const handleOnDosageSettingChange = ({
-    amount,
-    unit,
-  }: Partial<{ amount: string; unit: DosageMeasurement }>) => {
-    if (amount) {
-      setDosageState((prv) => ({ ...prv, amount }));
+    if (shouldUpdate && value.length > 1) {
+      mutate({ id: medicationProfile.id, data: { doseQuantity: value } });
     }
   };
 
-  const habdleUpdateDosage = () => {
-    mutate({ id: medicationProfile.id, data: { doseQuantity: dosageState.amount } });
-    bottomSheetRef.current?.close();
-  };
+  const color = useThemeColor({}, "textPrimary");
 
   return (
     <React.Fragment>
       <Pressable
         style={[sharedStyles.card, sharedStyles.detailsGroupItem]}
-        onPress={() => bottomSheetRef.current?.open()}
+        onPress={() => showDosageAmountInputRef.current?.open()}
       >
         <View style={sharedStyles.cardHeader}>
           <Text style={sharedStyles.cardTitle}>Доза за прием</Text>
@@ -61,28 +45,11 @@ export default function DetailsDosageSettings({
         <View style={sharedStyles.cardBody}>
           <PillIcon color={color} size={16} />
           <Text style={sharedStyles.cardTextContent}>
-            {`${medicationProfile.schedule.dosage} ${getDosageUnit(medicationProfile.schedule.measurement)}`}
+            {`${medicationProfile.schedule.dosage} ${getDosageMeasurement(medicationProfile.schedule.measurement)}`}
           </Text>
         </View>
       </Pressable>
-
-      <BottomSheetWrapper ref={bottomSheetRef} title="Изменить дозировку" snapPointPercent="40%">
-        <View style={{ gap: 16 }}>
-          <DosageSettings
-            dosageAmountState={Number(dosageState.amount)}
-            dosageUnitState={dosageState.unit}
-            onDasgeSettingsChange={handleOnDosageSettingChange}
-            showUnitForm={false}
-          />
-          <CustomButton
-            label="Применить"
-            onPress={habdleUpdateDosage}
-            disabled={!shouldUpdate}
-            variant={shouldUpdate ? "filled" : "disabled"}
-            textVaraint={shouldUpdate ? "regularText" : "mutedText"}
-          />
-        </View>
-      </BottomSheetWrapper>
+      <DosageAmountInput showInputRef={showDosageAmountInputRef} onSetValue={handleUpdateDosage} />
       <Loader visible={isPending} />
     </React.Fragment>
   );

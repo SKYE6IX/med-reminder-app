@@ -6,7 +6,7 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import DateTimePickerWrapper, {
   DateTimeWrapperRef,
 } from "@/component/ui/date-time-wrapper/date-time-wrapper";
-import DosageSettings from "@/component/ui/dosage-settings";
+import DosageAmounPicker from "@/component/ui/dosage-picker/dosage-amount-picker";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
@@ -109,7 +109,7 @@ export default function ScheduleStepScreen() {
         {/* Dosage Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дозировка</Text>
-          <DosageSettings
+          <DosageAmounPicker
             dosageAmountState={Number(formState.schedule.dosage)}
             dosageUnitState={formState.medicationMeasurement}
             onDasgeSettingsChange={handleOnDosageSettingChange}

@@ -144,7 +144,7 @@ export default function SubscriptionPlan() {
 
             <SettingsCard
               title="Следите за лекарствами всей семьи"
-              description="Добавьте до трёх родственников и легко управляйте их расписанием приёма лекарств."
+              description="Добавьте до трёх родственников и легко управляйте их расписанием приёма лекарств"
               svgIcon={<CheckCircleIcon />}
               interaction="none"
             />

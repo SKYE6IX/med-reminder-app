@@ -158,11 +158,10 @@ export default function RefillPill() {
                 source={require("@/assets/images/pill-bottle.png")}
                 style={styles.noContentImage}
               />
-              <Text style={[styles.noContentTitle, { color }]}>
-                Нет необходимости пополнять лекарства
-              </Text>
+              <Text style={[styles.noContentTitle, { color }]}>Ваши запасы лекарств</Text>
+
               <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-                Здесь появятся доступные лекарства для пополнения счета.
+                Здесь появятся запасы и напоминания о пополнении.
               </Text>
             </View>
           )}

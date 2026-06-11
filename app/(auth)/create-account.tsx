@@ -1,7 +1,7 @@
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -54,10 +54,6 @@ export default function CreateAccountScreen() {
   const emaiInputRef = useRef<TextInput>(null);
   const scheme = useColorScheme();
 
-  const appleLogoSource =
-    scheme === "dark"
-      ? require("@/assets/icons/apple-logo-light.png")
-      : require("@/assets/icons/apple-logo.png");
   const googleLogoSource = require("@/assets/icons/google-logo.png");
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");

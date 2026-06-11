@@ -68,7 +68,7 @@ export default function Reminders() {
         {/* Allow early reminder */}
         <SettingsCard
           title="Предварительное напоминание"
-          description="Напоминание до приёма лекарства"
+          description="Напоминание за 20 минут до приёма"
           svgIcon={<PhoneIcon color={color} />}
           interaction="toggle"
           toggleValue={reminderPreferences.earlyReminder}
@@ -78,7 +78,7 @@ export default function Reminders() {
         {/* Allow missed dosage notiification */}
         <SettingsCard
           title="Уведомления о пропущенном приёме"
-          description="Если доза не отмечена в течение 30 минут."
+          description="Если доза не отмечена в течение 30 минут"
           svgIcon={<BellNotificationIcon color={color} />}
           interaction="toggle"
           toggleValue={reminderPreferences.missedDoseAlert}

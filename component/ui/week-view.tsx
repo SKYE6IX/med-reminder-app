@@ -61,7 +61,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
         <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
         {activeOffset !== 0 && (
           <Pressable onPress={scrollToCurrentWeek}>
-            <Text style={[styles.title, { color: tintColor }]}>На этой неделе!</Text>
+            <Text style={[styles.title, { color: tintColor }]}>К текущей неделе</Text>
           </Pressable>
         )}
       </View>

@@ -6,9 +6,8 @@ import Tabs from "@/component/ui/tabs";
 import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -109,9 +108,9 @@ export default function Medications() {
                 source={require("@/assets/images/pill-bottle.png")}
                 style={styles.noContentImage}
               />
-              <Text style={[styles.noContentTitle, { color }]}>У тебя нет никаких лекарств.</Text>
+              <Text style={[styles.noContentTitle, { color }]}>У Вас нет никаких лекарств.</Text>
               <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-                Теперь добавьте новое лекарство.
+                Вы можете добавить лекарства сейчас.
               </Text>
               <CustomButton
                 label="Добавить лекарства"

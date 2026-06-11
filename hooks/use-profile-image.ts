@@ -14,7 +14,7 @@ export function useProfileImage(profileId?: string): string {
       ? require("@/assets/images/avatar-placeholder-dark.png")
       : require("@/assets/images/avatar-placeholder-light.png");
 
-  if (profileId?.length) {
+  if (profileId) {
     const relation = relationProfiles.find((p) => p.id === profileId);
     const url = emojiAvatar.get(relation?.id ?? "") ?? relation?.imageUrl ?? avatarPlaceholder;
     return url;

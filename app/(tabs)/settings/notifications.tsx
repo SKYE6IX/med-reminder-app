@@ -160,7 +160,7 @@ export default function Notifications() {
         {isAndroid && (
           <SettingsCard
             title="Вибрация"
-            description="Устройство вибрирует, когда подходит  напоминание"
+            description="Устройство вибрирует, когда приходит уведомление"
             svgIcon={<SignalIcon color={color} />}
             interaction="toggle"
             toggleValue={notfication.vibration}
