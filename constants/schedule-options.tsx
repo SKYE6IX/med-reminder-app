@@ -1,19 +1,25 @@
+import AssayIcon from "@/component/icons/assay-icon";
 import CapsuleIcon from "@/component/icons/capsule-icon";
+import DropsIcon from "@/component/icons/drops-icon";
 import Ellipsis from "@/component/icons/ellipsis";
 import EyeDropIcon from "@/component/icons/eye-drop-icon";
 import InjectionIcon from "@/component/icons/injection-icon";
+import PillGramIcon from "@/component/icons/pill-gram-icon";
+import PillCountIcon from "@/component/icons/pills-count";
+import PillsMgIcon from "@/component/icons/pills-mg-icon";
+import SprayBottleIcon from "@/component/icons/spray-bottle-icon";
 import SprayIcon from "@/component/icons/spray-icon";
 import SyrupBottleIcon from "@/component/icons/syrup-bottle-icon";
 import TabletIcon from "@/component/icons/tablet-icon";
 import { DosageMeasurement, MedicationUnit } from "@/types/medication";
 
 export const DOSAGE_MEASUREMENT = [
-  { label: "мг", icon: "🥤", value: DosageMeasurement.MILLIGRAM },
-  { label: "г", icon: "🥄", value: DosageMeasurement.GRAM },
-  { label: "мл", icon: "🥤", value: DosageMeasurement.MILLIMETERS },
-  { label: "Впрыскивание", icon: "💨", value: DosageMeasurement.SPRAY },
-  { label: "Капля", icon: "💧", value: DosageMeasurement.DROPS },
-  { label: "Шт", icon: "⚪", value: DosageMeasurement.CAPSULE },
+  { label: "мг", icon: PillsMgIcon, value: DosageMeasurement.MILLIGRAM },
+  { label: "г", icon: PillGramIcon, value: DosageMeasurement.GRAM },
+  { label: "мл", icon: AssayIcon, value: DosageMeasurement.MILLIMETERS },
+  { label: "Впрыскивание", icon: SprayBottleIcon, value: DosageMeasurement.SPRAY },
+  { label: "Капля", icon: DropsIcon, value: DosageMeasurement.DROPS },
+  { label: "Шт", icon: PillCountIcon, value: DosageMeasurement.CAPSULE },
 ];
 
 export const MEDICATION_UNITS = [

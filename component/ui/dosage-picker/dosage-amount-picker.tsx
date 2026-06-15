@@ -85,7 +85,7 @@ export default function DosageAmounPicker({
                 ]}
                 onPress={() => handleSetDosageUnit(unit.value)}
               >
-                <Text style={styles.dosageUnitIcon}>{unit.icon}</Text>
+                <unit.icon size={30} color={isSelected ? "#F7F7F7" : color} />
                 <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
                   {unit.label}
                 </Text>
