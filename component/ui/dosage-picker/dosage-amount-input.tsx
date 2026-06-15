@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useFeedBackStore } from "@/stores/feedback-store";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { RefObject, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
@@ -12,6 +13,7 @@ type DosageAmountInputProps = {
 
 export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAmountInputProps) {
   const [value, setValue] = useState("");
+  const { showFeedBack } = useFeedBackStore();
 
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
@@ -23,6 +25,14 @@ export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAm
   };
 
   const handleSetDosageAmount = () => {
+    if (Number(value) <= 0) {
+      showFeedBack({
+        title: "Неправильная дозировка",
+        message: "Пожалуйста, установите допустимую дозировку",
+        status: "error",
+      });
+      return;
+    }
     onSetValue(value);
     showInputRef.current?.close();
     Keyboard.dismiss();

@@ -68,6 +68,7 @@ export class NotificationHelper {
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
     });
+
     const missedStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "missed-reminder",
       medProfileId: options.medicationProfileId,
@@ -97,12 +98,12 @@ export class NotificationHelper {
     const notificationsId = await Promise.all(
       snoozeReminders.map(async (reminder, i) => {
         const time = reminder.date.toJSDate();
-        const title = i === 0 ? "Time for medication" : "Reminder snoozed";
+        const title = i === 0 ? "Пора принять лекарство" : "Напоминание о приёме";
         const body =
           i === 0
-            ? `Your dose of ${options.medicationName} at ${getScheduleTime(options.scheduleAt)} is due now. Tap to log it or use the quick actions
+            ? `Сейчас время принять ${options.medicationName}, запланированное на ${getScheduleTime(options.scheduleAt)}. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.
       `
-            : `${options.medicationName} is still waiting to be taken ${reminder.minutesOverdue}м ago. Tap to log it or use the quick actions`;
+            : `Вы ещё не отметили приём ${options.medicationName}, запланированный ${reminder.minutesOverdue}мин назад. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.`;
         return await this.createNotification({
           time: time.getTime(),
           title,
@@ -122,8 +123,8 @@ export class NotificationHelper {
     const earyReminder = dueReminder.minus({ minute: 20 });
     if (this.settings.earlyReminder) {
       if (earyReminder > now) {
-        const title = "Next Medication In 20м";
-        const body = `Your next medication is ${options.medicationName}`;
+        const title = "Следующее лекарство через 20 минут";
+        const body = `Следующее лекарство: ${options.medicationName}`;
         const notificationId = await this.createNotification({
           time: earyReminder.toJSDate().getTime(),
           title,
@@ -145,8 +146,8 @@ export class NotificationHelper {
     const lastSnooze = snoozeReminders[snoozeReminders.length - 1].date;
     const missedReminder = lastSnooze.plus({ minutes: 30 });
     if (this.settings.missedDoseAlert) {
-      const title = "Missed dose alert";
-      const body = `You missed your ${getScheduleTime(options.scheduleAt)} medication. Check with your doctor if you're unsure what to do`;
+      const title = "Пропущен приём лекарства";
+      const body = `Лекарство на ${getScheduleTime(options.scheduleAt)} не было принято. Если у вас есть сомнения по поводу дальнейших действий, проконсультируйтесь с врачом.`;
       const notifcationId = await this.createNotification({
         time: missedReminder.toJSDate().getTime(),
         title,
@@ -181,8 +182,8 @@ export class NotificationHelper {
     });
 
     const time = date.getTime();
-    const title = "Refill Reminder Alert";
-    const body = `${medicationName} is about to finished.`;
+    const title = "Напоминание о пополнении";
+    const body = `${medicationName} скоро закончится.`;
     const notificationId = await this.createNotification({
       time: time,
       title,
@@ -196,7 +197,6 @@ export class NotificationHelper {
         medicationProfileId,
       },
     });
-
     await saveToStorage(storageKey, notificationId);
   }
 

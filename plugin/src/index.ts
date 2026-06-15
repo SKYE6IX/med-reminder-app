@@ -4,7 +4,6 @@ import {
   IOSConfig,
   withAndroidManifest,
   withDangerousMod,
-  withXcodeProject,
 } from "expo/config-plugins";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import * as fs from "fs/promises";
@@ -15,20 +14,15 @@ const withYomoneySdk: ConfigPlugin = (config) => {
     "ios",
     async (config) => {
       const podfilePath = path.join(config.modRequest.platformProjectRoot, "Podfile");
-
       try {
         let contents = await fs.readFile(podfilePath, "utf8");
         const projectName = IOSConfig.XcodeUtils.getProjectName(config.modRequest.projectRoot);
-
         contents = addCustomPod(contents, projectName);
-
         await fs.writeFile(podfilePath, contents);
-
         console.log("✅ Successfully added custom pod to Podfile");
       } catch (error) {
         console.warn("⚠️ Podfile not found, skipping modification");
       }
-
       return config;
     },
   ]);
@@ -41,7 +35,7 @@ const withYomoneySdk: ConfigPlugin = (config) => {
     return config;
   });
 
-  // Write yoomoney network config
+  // Write yoomoney android network config
   config = withDangerousMod(config, [
     "android",
     async (config) => {
@@ -60,22 +54,6 @@ const withYomoneySdk: ConfigPlugin = (config) => {
       return config;
     },
   ]);
-
-  // Modify Xcodebuild.
-  config = withXcodeProject(config, (config) => {
-    const project = config.modResults;
-
-    const configurations = project.pbxXCBuildConfigurationSection();
-
-    for (const key of Object.keys(configurations)) {
-      const configItem = configurations[key];
-      if (typeof configItem === "object" && configItem.buildSettings) {
-        configItem.buildSettings.SWIFT_ENABLE_EXPLICIT_MODULES = "YES";
-      }
-    }
-
-    return config;
-  });
 
   return config;
 };
@@ -97,27 +75,10 @@ function addCustomPod(contents: string, projectName: string): string {
     return contents;
   }
 
-  const targetRegex = new RegExp(
-    `(target ['"]${projectName}['"] do[\\s\\S]*?use_expo_modules!)`,
-    "m",
+  return contents.replace(
+    /use_expo_modules!/,
+    "pod 'YooKassaPayments', :build_type => :dynamic_framework\n  use_expo_modules!",
   );
-
-  const podDeclaration = `pod 'YooKassaPayments'`;
-
-  contents = contents.replace(targetRegex, `$1\n  ${podDeclaration}`);
-
-  if (!contents.includes("SWIFT_ENABLE_EXPLICIT_MODULES")) {
-    contents = contents.replace(
-      /post_install do \|installer\|/,
-      `post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['SWIFT_ENABLE_EXPLICIT_MODULES'] = 'YES'
-    end
-  end`,
-    );
-  }
-  return contents;
 }
 
 export default withYomoneySdk;

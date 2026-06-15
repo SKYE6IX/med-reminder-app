@@ -102,9 +102,11 @@ export default function SubscriptionPlan() {
       shopId: "1369869",
     });
 
+    if (!result) return;
+
     mutate({
       paymentToken: result.paymentToken,
-      paymentMethod: result.paymentMethod,
+      paymentMethod: result.paymentMethod.toLocaleUpperCase(),
       amount: String(planAmount),
       billingCycle: selectedPlan,
       zoneId: getTimeZone(),

@@ -1,5 +1,5 @@
 import { useUserStore } from "@/stores/use-user-store";
-import { useColorScheme } from "react-native";
+import { useColorScheme } from "./use-color-scheme";
 import { useProfilesQuery } from "./use-profiles-query";
 
 export function useProfileImage(profileId?: string): string {

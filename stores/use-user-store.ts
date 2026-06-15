@@ -21,6 +21,7 @@ export const useUserStore = create<UserStore>()(
           emojiAvatar: new Map(state.emojiAvatar).set(profileId, avatarUri),
         }));
       },
+
       removeEmojiAvatar(profileId) {
         set((state) => {
           const next = new Map(state.emojiAvatar);

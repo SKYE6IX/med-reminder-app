@@ -52,6 +52,9 @@
             "compileSdkVersion": 36,
             "targetSdkVersion": 35,
             "minSdkVersion": 24
+          },
+          "ios": {
+            "useFrameworks": "dynamic"
           }
         }
       ],

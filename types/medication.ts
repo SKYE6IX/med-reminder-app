@@ -51,6 +51,7 @@ export interface CreateMedication {
   medicationUnit: MedicationUnit;
   medicationMeasurement: DosageMeasurement;
   medicationNote: string | null;
+  medicationReason: string | null;
   schedule: ScheduleCreation;
   medicationPack: Omit<MedicationPackCreation, "medicationProfileId"> | null;
 }
@@ -62,6 +63,7 @@ export interface MedicationProfile {
   medicationImageUrl: string;
   status: string;
   note: string | null;
+  medicationReason: string | null;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
   pack: Pack | null;

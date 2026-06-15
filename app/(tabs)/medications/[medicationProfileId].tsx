@@ -104,6 +104,19 @@ export default function MedicationDetails() {
                 <DetailsFrequencySettings medicationProfile={medicationProfile} />
               </View>
 
+              {/* MEDICATION REASON */}
+              {medicationProfile.medicationReason && (
+                <View style={styles.detailsWrapper}>
+                  <Text style={[styles.detailsTitle, { color }]}>Причина приема лекарства</Text>
+                  <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
+                    <PillFilledIcon color={color} />
+                    <Text style={[styles.cardTextContent, { color: mutedColor }]}>
+                      {medicationProfile.medicationReason}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
               {/* Dosage Information */}
               <View style={styles.detailsWrapper}>
                 <Text style={[styles.detailsTitle, { color }]}>Дозировка</Text>

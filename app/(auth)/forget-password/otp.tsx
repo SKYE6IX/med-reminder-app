@@ -5,6 +5,7 @@ import { Link, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -19,9 +20,7 @@ export default function OTPVerificationScreen() {
   const insets = useSafeAreaInsets();
   const [token, setToken] = useState("");
   const inputRefs = useRef<TextInput[]>([]);
-  const [values, setValues] = useState<string[]>(
-    new Array(TOKEN_LENGTH).fill(""),
-  );
+  const [values, setValues] = useState<string[]>(new Array(TOKEN_LENGTH).fill(""));
 
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
@@ -68,73 +67,68 @@ export default function OTPVerificationScreen() {
   };
 
   return (
-    <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
-      <View style={styles.headerWrapper}>
-        <ThemedText type="title" style={styles.title}>
-          Введите код
-        </ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>
-          Мы отправили код подтверждения на вашу почту ivan.ivanov@gmail.com{" "}
-          <Link
-            href="/forget-password"
-            style={[styles.link, { color: tintColor }]}
-          >
-            Изменить
-          </Link>
-        </ThemedText>
-      </View>
-
-      <View style={styles.bodyWrapper}>
-        <View style={styles.inputRow}>
-          {Array.from({ length: TOKEN_LENGTH }).map((_, i) => (
-            <TextInput
-              key={i}
-              ref={(el) => {
-                if (el) {
-                  inputRefs.current[i] = el;
-                }
-              }}
-              style={[
-                {
-                  color: textColor,
-                  backgroundColor: inputBgColor,
-                  borderColor: inputRefs?.current[i]?.isFocused()
-                    ? tintColor
-                    : inputBorderColor,
-                },
-                styles.input,
-              ]}
-              value={values[i]}
-              onChangeText={(text) => handleOnChange(text, i)}
-              onKeyPress={(event) => handleOnKeyPress(event, i)}
-              autoFocus={i === 0}
-              maxLength={1}
-              textContentType="oneTimeCode"
-              keyboardType="number-pad"
-              autoComplete="sms-otp"
-              selectTextOnFocus
-            />
-          ))}
-        </View>
-
-        <View style={styles.bodyBottom}>
-          <ThemedText style={[{ color: textColor }, styles.bodyBottomText]}>
-            Не получили код?{" "}
+    <ScrollView>
+      <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
+        <View style={styles.headerWrapper}>
+          <ThemedText type="title" style={styles.title}>
+            Введите код
           </ThemedText>
-          <Pressable>
-            <Text style={[{ color: tintColor }, styles.bodyBottomText]}>
-              Отправить повторно
-            </Text>
-          </Pressable>
+          <ThemedText type="subtitle" style={styles.subtitle}>
+            Мы отправили код подтверждения на вашу почту ivan.ivanov@gmail.com{" "}
+            <Link href="/forget-password" style={[styles.link, { color: tintColor }]}>
+              Изменить
+            </Link>
+          </ThemedText>
         </View>
-      </View>
 
-      <CustomButton
-        label="Продолжить"
-        style={styles.button}
-        onPress={() => router.navigate("/forget-password/new-password")}
-      />
-    </View>
+        <View style={styles.bodyWrapper}>
+          <View style={styles.inputRow}>
+            {Array.from({ length: TOKEN_LENGTH }).map((_, i) => (
+              <TextInput
+                key={i}
+                ref={(el) => {
+                  if (el) {
+                    inputRefs.current[i] = el;
+                  }
+                }}
+                style={[
+                  {
+                    color: textColor,
+                    backgroundColor: inputBgColor,
+                    // borderColor: inputRefs?.current[i]?.isFocused() ? tintColor : inputBorderColor,
+                  },
+                  styles.input,
+                ]}
+                value={values[i]}
+                onChangeText={(text) => handleOnChange(text, i)}
+                onKeyPress={(event) => handleOnKeyPress(event, i)}
+                autoFocus={i === 0}
+                maxLength={1}
+                textContentType="oneTimeCode"
+                keyboardType="number-pad"
+                autoComplete="sms-otp"
+                selectTextOnFocus
+              />
+            ))}
+          </View>
+
+          <View style={styles.bodyBottom}>
+            <ThemedText style={[{ color: textColor }, styles.bodyBottomText]}>
+              Не получили код?{" "}
+            </ThemedText>
+            <Pressable>
+              <Text style={[{ color: tintColor }, styles.bodyBottomText]}>Отправить повторно</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <CustomButton
+          label="Продолжить"
+          style={styles.button}
+          onPress={() => router.navigate("/forget-password/new-password")}
+        />
+      </View>
+    </ScrollView>
   );
 }
 

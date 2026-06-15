@@ -13,10 +13,11 @@ import { inputProps } from "./inputProps";
 type FormInputProps = TextInputProps & {
   inputRef?: RefObject<TextInput | null>;
   name: string;
-  label: string;
+  label?: string;
   type?: "text" | "email" | "password";
   hasError: boolean;
   defaultValue?: string;
+  showLabel?: boolean;
   onValueChange: ({ name, value }: { name: string; value: string }) => void;
 };
 
@@ -28,6 +29,7 @@ export default function FormInput({
   onValueChange,
   hasError,
   name,
+  showLabel = true,
   ...rest
 }: FormInputProps) {
   const [inputValue, onInputValueChange] = useState(defaultValue ?? "");
@@ -55,7 +57,7 @@ export default function FormInput({
   const mutedColor = useThemeColor({}, "textMuted");
   return (
     <View style={styles.container}>
-      <ThemedText type="label">{label}</ThemedText>
+      {showLabel && <ThemedText type="label">{label}</ThemedText>}
       <View style={styles.inputWrapper}>
         <TextInput
           ref={inputRef}
@@ -114,7 +116,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     gap: 8,
-    minHeight: 75,
   },
   inputWrapper: {
     height: 48,

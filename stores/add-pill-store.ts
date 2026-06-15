@@ -3,6 +3,7 @@ import { getDateLocalString, getTimeZone } from "@/utils/luxonUtil";
 import { create } from "zustand";
 
 export type SchedulePreset = "ONCE_A_DAY" | "TWICE_A_DAY" | "THREE_TIMES_A_DAY" | "CUSTOM";
+
 interface Schedule {
   dosage: string;
   rule: {
@@ -12,16 +13,19 @@ interface Schedule {
   startDate: string;
   timeZone: string;
 }
+
 interface MedicationPack {
   totalQuantity: string;
   reminderDays: number;
 }
 
 type FieldName = keyof AddPillStore["formState"];
+
 const NULLABLE_FIELDS: Partial<Record<FieldName, true>> = {
   medicationPack: true,
   medicationNote: true,
 };
+
 interface AddPillStore {
   formState: {
     profileId: string;
@@ -29,6 +33,7 @@ interface AddPillStore {
     medicationUnit: MedicationUnit;
     medicationMeasurement: DosageMeasurement;
     medicationNote: string | null;
+    medicationReason: string | null;
     schedule: Schedule;
     medicationPack: MedicationPack | null;
   };
@@ -52,6 +57,7 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
   medicationUnit: MedicationUnit.CAPSULE,
   medicationMeasurement: DosageMeasurement.MILLIGRAM,
   medicationNote: null,
+  medicationReason: null,
   schedule: {
     dosage: "10",
     rule: {

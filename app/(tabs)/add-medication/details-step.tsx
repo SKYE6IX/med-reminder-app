@@ -3,6 +3,7 @@ import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-scree
 import AddProfile from "@/component/ui/add-profile";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import FormInput from "@/component/ui/form/form-input";
 import ProfileCard from "@/component/ui/profile-card";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { Relation } from "@/constants/relation";
@@ -13,7 +14,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function DetailsStepScreen() {
@@ -64,132 +65,158 @@ export default function DetailsStepScreen() {
     }
   };
 
+  const handleOnTextInputChange = ({ value }: { name: string; value: string }) => {
+    if (value.length <= 0) {
+      setMedicationDetails({ medicationReason: null });
+    } else {
+      setMedicationDetails({ medicationReason: value });
+    }
+  };
+
   return (
-    <SafeAreaView
-      style={[styles.container, sharedStyles.container, { paddingBottom: 10 }]}
-      edges={["bottom"]}
-    >
-      {/* Pill Form selections */}
-      <View style={sharedStyles.sectionContainer}>
-        <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
-        <View style={styles.pillFormWrapper}>
-          {MEDICATION_UNITS.map((unit, i) => (
-            <View key={unit.value + i} style={styles.pillForm}>
-              <Pressable
-                style={[
-                  styles.pillFormPressable,
-                  {
-                    borderWidth: unit.value === formState.medicationUnit ? undefined : 1,
-                    borderColor,
-                    backgroundColor: unit.value === formState.medicationUnit ? tintColor : bGColor,
-                  },
-                ]}
-                onPress={() => setMedicationDetails({ medicationUnit: unit.value })}
-              >
-                <unit.icon color={unit.value === formState.medicationUnit ? "#F7F7F7" : color} />
-              </Pressable>
-              <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
-            </View>
-          ))}
-          <View style={styles.ghostWrapper} />
+    <SafeAreaView edges={[]}>
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        {/* Pill Form selections */}
+        <View style={sharedStyles.sectionContainer}>
+          <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
+          <View style={styles.pillFormWrapper}>
+            {MEDICATION_UNITS.map((unit, i) => (
+              <View key={unit.value + i} style={styles.pillForm}>
+                <Pressable
+                  style={[
+                    styles.pillFormPressable,
+                    {
+                      borderWidth: unit.value === formState.medicationUnit ? undefined : 1,
+                      borderColor,
+                      backgroundColor:
+                        unit.value === formState.medicationUnit ? tintColor : bGColor,
+                    },
+                  ]}
+                  onPress={() => setMedicationDetails({ medicationUnit: unit.value })}
+                >
+                  <unit.icon color={unit.value === formState.medicationUnit ? "#F7F7F7" : color} />
+                </Pressable>
+                <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
+              </View>
+            ))}
+            <View style={styles.ghostWrapper} />
+          </View>
         </View>
-      </View>
 
-      {/* Profile selection*/}
-      <View style={sharedStyles.sectionContainer}>
-        <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
-        <View style={styles.profilesWrapper}>
-          {/* SELF PROFILE*/}
-          <ProfileCard
-            profileId={selfProfile?.id as string}
-            isSelected={selfProfile?.id === formState.profileId}
-            isSelf
-            hasActiveDot
-            setProfile={handleSetProfile}
+        {/* MEDICATION REASON */}
+        <View style={sharedStyles.sectionContainer}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={sharedStyles.title}>Причина приема лекарств </Text>
+            <Text style={[styles.optionalText, { color }]}>(Необязательный)</Text>
+          </View>
+          <FormInput
+            showLabel={false}
+            type="text"
+            hasError={false}
+            name="medicationReason"
+            onValueChange={handleOnTextInputChange}
           />
+        </View>
 
-          {/* RELATION PROFILE */}
-          {selectedRelationProfile && (
+        {/* Profile selection*/}
+        <View style={sharedStyles.sectionContainer}>
+          <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
+          <View style={styles.profilesWrapper}>
+            {/* SELF PROFILE*/}
             <ProfileCard
-              isSelected={isRelationProfileSelected}
-              profileId={selectedRelationProfile.id}
-              name={selectedRelationProfile.name}
-              relation={selectedRelationProfile.relation as Relation}
-              isSelf={false}
+              profileId={selfProfile?.id as string}
+              isSelected={selfProfile?.id === formState.profileId}
+              isSelf
               hasActiveDot
               setProfile={handleSetProfile}
-              changeProfile={() => chooseProfileBottomSheet.current?.open()}
             />
-          )}
 
-          {/* TRIGGER BUTTON FOR RELATION PROFILE LIST */}
-          {relationProfiles.length >= 1 && !isRelationProfileSelected && (
+            {/* RELATION PROFILE */}
+            {selectedRelationProfile && (
+              <ProfileCard
+                isSelected={isRelationProfileSelected}
+                profileId={selectedRelationProfile.id}
+                name={selectedRelationProfile.name}
+                relation={selectedRelationProfile.relation as Relation}
+                isSelf={false}
+                hasActiveDot
+                setProfile={handleSetProfile}
+                changeProfile={() => chooseProfileBottomSheet.current?.open()}
+              />
+            )}
+
+            {/* TRIGGER BUTTON FOR RELATION PROFILE LIST */}
+            {relationProfiles.length >= 1 && !isRelationProfileSelected && (
+              <CustomButton
+                label="Выбрать члена семьи"
+                variant="outline"
+                textVaraint="tintText"
+                svgIcon={<PlusIcon color={tintColor} size={12} />}
+                onPress={handleChooseRelationProfile}
+              />
+            )}
+
+            {/* RELATION PROFILES LIST */}
+            <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
+              <View style={styles.profileSelectionList}>
+                {relationProfiles.map((profile) => (
+                  <ProfileCard
+                    isSelected={false} // it's part of list. // no active state on list
+                    profileId={profile.id}
+                    key={profile.id}
+                    name={profile.name}
+                    relation={profile.relation as Relation}
+                    isSelf={false}
+                    hasActiveDot={false}
+                    asList
+                    setProfile={handleSetProfile}
+                  />
+                ))}
+              </View>
+            </BottomSheetWrapper>
+
+            {/* TRIGGER BUTTON FOR ADDING NEW RELATION PROFILE */}
             <CustomButton
-              label="Выбрать члена семьи"
+              label="Добавить члена семьи"
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={12} />}
-              onPress={handleChooseRelationProfile}
+              onPress={handleAddNewProfile}
             />
-          )}
 
-          {/* RELATION PROFILES LIST */}
-          <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
-            <View style={styles.profileSelectionList}>
-              {relationProfiles.map((profile) => (
-                <ProfileCard
-                  isSelected={false} // it's part of list. // no active state on list
-                  profileId={profile.id}
-                  key={profile.id}
-                  name={profile.name}
-                  relation={profile.relation as Relation}
-                  isSelf={false}
-                  hasActiveDot={false}
-                  asList
-                  setProfile={handleSetProfile}
-                />
-              ))}
-            </View>
-          </BottomSheetWrapper>
-
-          {/* TRIGGER BUTTON FOR ADDING NEW RELATION PROFILE */}
-          <CustomButton
-            label="Добавить члена семьи"
-            variant="outline"
-            textVaraint="tintText"
-            svgIcon={<PlusIcon color={tintColor} size={12} />}
-            onPress={handleAddNewProfile}
-          />
-
-          {/* ADD NEW RELATION PROFILE */}
-          <AddProfile
-            ref={newProfileBottomSheet}
-            onProfileAdded={(id) => {
-              setMedicationDetails({ profileId: id });
-            }}
-          />
+            {/* ADD NEW RELATION PROFILE */}
+            <AddProfile
+              ref={newProfileBottomSheet}
+              onProfileAdded={(id) => {
+                setMedicationDetails({ profileId: id });
+              }}
+            />
+          </View>
         </View>
-      </View>
 
-      {/* CONTINUE BUTTON */}
-      <CustomButton
-        label="Далее"
-        style={sharedStyles.button}
-        variant={canContinue ? "filled" : "disabled"}
-        textVaraint={canContinue ? "regularText" : "mutedText"}
-        onPress={() => router.navigate("/(tabs)/add-medication/schedule-step")}
-        disabled={!canContinue}
-      />
+        {/* CONTINUE BUTTON */}
+        <CustomButton
+          label="Далее"
+          style={sharedStyles.button}
+          variant={canContinue ? "filled" : "disabled"}
+          textVaraint={canContinue ? "regularText" : "mutedText"}
+          onPress={() => router.navigate("/(tabs)/add-medication/schedule-step")}
+          disabled={!canContinue}
+        />
 
-      {/* SUBSCRIPTION OFFER */}
-      <SubscriptionBanner ref={openBannerRef} />
+        {/* SUBSCRIPTION OFFER */}
+        <SubscriptionBanner ref={openBannerRef} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollViewContainer: {
     gap: 32,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 10,
   },
   pillFormWrapper: {
     flexDirection: "row",
@@ -224,5 +251,10 @@ const styles = StyleSheet.create({
   },
   profileSelectionList: {
     gap: 8,
+  },
+  optionalText: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    lineHeight: 16.2,
   },
 });

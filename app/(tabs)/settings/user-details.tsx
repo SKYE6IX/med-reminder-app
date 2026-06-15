@@ -148,8 +148,6 @@ export default function UserDetails() {
     mutate(data);
   };
 
-  console.log(profileImageUrl);
-
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <ScrollView style={{ flex: 1 }}>
