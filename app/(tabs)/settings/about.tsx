@@ -3,25 +3,52 @@ import PhoneCallIcon from "@/component/icons/phone-call-icon";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import * as Application from "expo-application";
 import { Image } from "expo-image";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import * as Linking from "expo-linking";
+import * as StoreReview from "expo-store-review";
+import { useCallback } from "react";
+import { Alert, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function About() {
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const scheme = useColorScheme();
+  const applicationVersion = Application.nativeApplicationVersion;
 
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-  const borderColor = useThemeColor({}, "borderColor");
+  const storeName = isIOS ? "App Store" : "Play Store";
 
   const source =
     scheme === "dark"
       ? require("@/assets/icons/app-logo-dark.png")
       : require("@/assets/icons/app-logo.png");
+
+  const requestAReview = useCallback(async () => {
+    const isAllowed = await StoreReview.isAvailableAsync();
+    if (!isAllowed) {
+      console.log("Unable to leave a review now");
+      return;
+    }
+    await StoreReview.requestReview();
+  }, []);
+
+  const openEmail = useCallback(async () => {
+    const url = `mailto:${process.env.EXPO_PUBLIC_DEVELOPER_EMAIL}`;
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert("Не удается открыть вашу почту.");
+    }
+  }, []);
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
+  const borderColor = useThemeColor({}, "borderColor");
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
@@ -35,15 +62,16 @@ export default function About() {
 
         <View style={[styles.versionWrapper, { backgroundColor: bgSecondary, borderColor }]}>
           <Text style={[styles.versionLabel, { color }]}>Версия</Text>
-          <Text style={[styles.versionValue, { color: mutedColor }]}>40.10.2</Text>
+          <Text style={[styles.versionValue, { color: mutedColor }]}>{applicationVersion}</Text>
         </View>
 
         <View style={styles.sectionGroup}>
           <SettingsCard
             title="Оцените приложение"
-            description="Оставьте отзыв в App Store"
+            description={`Оставьте отзыв в ${storeName}`}
             svgIcon={<ChatStartIcon color={color} />}
             interaction="press"
+            onPress={requestAReview}
           />
 
           <SettingsCard
@@ -51,6 +79,7 @@ export default function About() {
             description="Свяжитесь с нами по электронной почте"
             svgIcon={<PhoneCallIcon color={color} />}
             interaction="press"
+            onPress={openEmail}
           />
         </View>
       </View>

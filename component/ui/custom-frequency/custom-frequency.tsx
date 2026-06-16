@@ -1,4 +1,4 @@
-import { HOUR_BETWEEN_OCCURENCES, OCCURENCES_PER_DAY } from "@/constants/schedule-options";
+import { HOUR_BETWEEN_OCCURENCES, OCCURENCES_PER_DAY } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useMemo, useRef, useState } from "react";

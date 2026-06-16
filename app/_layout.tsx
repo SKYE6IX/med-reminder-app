@@ -9,6 +9,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/roboto";
 import { PortalProvider } from "@gorhom/portal";
+import * as LocalAuthentication from "expo-local-authentication";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -45,6 +46,7 @@ const CustomDarkTheme = {
 };
 
 export default function RootLayout() {
+  const { useDeviceLock } = useAppSettingsStore();
   const { isAuthenticated, hasCompleteOnboarding } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
 
@@ -77,7 +79,19 @@ export default function RootLayout() {
         }),
       ]);
       getAuthorizedUser();
-      useAuthStore.getState().setIsAuthenticated(true);
+
+      // If user set up local device lock
+      if (useDeviceLock) {
+        const localAuthenticate = await LocalAuthentication.authenticateAsync({
+          cancelLabel: "Отменить",
+          fallbackLabel: "Используйте пароль",
+        });
+        if (localAuthenticate.success) {
+          useAuthStore.getState().setIsAuthenticated(true);
+        }
+      } else {
+        useAuthStore.getState().setIsAuthenticated(true);
+      }
     } else {
       useAuthStore.getState().setIsAuthenticated(false);
     }
@@ -131,3 +145,11 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+// TODO:
+// 1. Implement versioning ✅
+// 2. Set up rating action ✅.
+// 3. set up contact us page which will include
+//  email ✅
+// 4. Set up lock screen for user that activate it. ✅
+// 5. Set up all production setting for both IOS and Android

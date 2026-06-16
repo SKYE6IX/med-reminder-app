@@ -1,6 +1,6 @@
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
-import { MEDICATION_UNITS } from "@/constants/schedule-options";
+import { MEDICATION_UNITS } from "@/constants/medication-constants";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";

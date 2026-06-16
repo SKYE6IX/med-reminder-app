@@ -1,4 +1,4 @@
-import { DOSAGE_MEASUREMENT } from "@/constants/schedule-options";
+import { DOSAGE_MEASUREMENT } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { DosageMeasurement } from "@/types/medication";
 import { useRef, useState } from "react";
