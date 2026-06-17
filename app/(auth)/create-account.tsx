@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { validateCreateAccountInputs } from "@/utils/validator";
@@ -52,9 +51,6 @@ export default function CreateAccountScreen() {
   const insets = useSafeAreaInsets();
   const textInputRef = useRef<TextInput>(null);
   const emaiInputRef = useRef<TextInput>(null);
-  const scheme = useColorScheme();
-
-  const googleLogoSource = require("@/assets/icons/google-logo.png");
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
 

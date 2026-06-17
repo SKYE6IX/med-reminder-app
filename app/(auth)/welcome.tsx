@@ -26,12 +26,8 @@ export default function WelcomeScreen() {
         </ThemedText>
       </View>
       <View style={styles.textContainer}>
-        <ThemedText type="title">
-          Контролируйте прием Ваших лекарств просто
-        </ThemedText>
-        <ThemedText type="subtitle">
-          Все ваши таблетки в одном месте.
-        </ThemedText>
+        <ThemedText type="title">Контролируйте прием Ваших лекарств просто</ThemedText>
+        <ThemedText type="subtitle">Все ваши таблетки в одном месте.</ThemedText>
       </View>
 
       <View style={styles.linkWrapper}>

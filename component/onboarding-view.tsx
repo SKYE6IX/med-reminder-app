@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Platform, StyleSheet, View, type ViewProps } from "react-native";
+import { StyleSheet, View, type ViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export type OnboardingVievProps = ViewProps;
@@ -18,7 +18,7 @@ export function OnboardingView({ style, ...rest }: OnboardingVievProps) {
       style={[
         {
           backgroundColor,
-          paddingTop: Platform.OS === "ios" ? insets.top * 2 - 10 : 0,
+          paddingTop: insets.top * 2 - 10,
           paddingBottom: insets.bottom + 20,
         },
         styles.container,

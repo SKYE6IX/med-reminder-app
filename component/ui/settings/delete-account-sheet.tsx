@@ -4,7 +4,9 @@ import { useAuthStore } from "@/stores/use-auth-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens } from "@/utils/tokenUtils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "@tanstack/react-query";
+import { deleteItemAsync } from "expo-secure-store";
 import { RefObject } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
@@ -24,12 +26,17 @@ export default function DeleteAccountSheet({ bottomSheetRef }: DeleteAccountShee
 
   const { isPending, mutate } = useMutation({
     mutationFn: deleteAccountMutation,
-    onSuccess() {
+    async onSuccess() {
       clearTokens();
       useAuthStore.getState().setIsAuthenticated(false);
       queryClient.clear();
-    },
 
+      await Promise.all([
+        AsyncStorage.multiRemove(["user-store", "notification-event-data"]),
+        deleteItemAsync("app-settings"),
+        deleteItemAsync("auth-store"),
+      ]);
+    },
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when delete account! -> ", error);

@@ -1,6 +1,5 @@
 import { MedicationScheduleEvent } from "@/types/medication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { deleteItemAsync, getItem, setItem } from "expo-secure-store";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

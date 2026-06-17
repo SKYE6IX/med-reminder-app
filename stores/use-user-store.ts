@@ -15,13 +15,13 @@ export const useUserStore = create<UserStore>()(
     (set) => ({
       emojiAvatar: new Map(),
       displaySubscriptioOffer: true,
+
       addEmojiAvatar(profileId, avatarUri) {
         set((state) => ({
           ...state,
           emojiAvatar: new Map(state.emojiAvatar).set(profileId, avatarUri),
         }));
       },
-
       removeEmojiAvatar(profileId) {
         set((state) => {
           const next = new Map(state.emojiAvatar);
@@ -29,7 +29,6 @@ export const useUserStore = create<UserStore>()(
           return { ...state, emojiAvatar: next };
         });
       },
-
       updateSubscriptionOffer() {
         set((state) => ({ ...state, displaySubscriptioOffer: false }));
       },

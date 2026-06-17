@@ -62,7 +62,7 @@ export default function RootLayout() {
     // Check for valid token and authorized user with it.
     const token = await getValidAccessToken();
     if (token) {
-      // Prefetch Datas
+      // Prefetch Applications Datas
       await Promise.all([
         queryClient.prefetchQuery({
           queryKey: ["subscriptions-plan"],
@@ -73,7 +73,7 @@ export default function RootLayout() {
           queryFn: async () => (await api.get("medications")).data,
         }),
 
-        // regerate next medicatiion schedule events
+        // Generate next medicatiion schedule events if available
         createNextScheduleEventNotification({
           ...useAppSettingsStore.getState().notfication,
           ...useAppSettingsStore.getState().reminderPreferences,
@@ -127,17 +127,30 @@ export default function RootLayout() {
           <PortalProvider>
             <StatusBar style="auto" />
             <FeedbackAlert />
+
             <Stack>
+              {/* ONBOARDING */}
               <Stack.Protected guard={!hasCompleteOnboarding}>
-                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                <Stack.Screen name="onboarding">
+                  <Stack.Header hidden />
+                  <Stack.Title></Stack.Title>
+                </Stack.Screen>
               </Stack.Protected>
 
+              {/* AUTHENTICATIONS */}
               <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)">
+                  <Stack.Header hidden />
+                  <Stack.Title></Stack.Title>
+                </Stack.Screen>
               </Stack.Protected>
 
+              {/* MAIN APPLICATION */}
               <Stack.Protected guard={isAuthenticated}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)">
+                  <Stack.Header hidden />
+                  <Stack.Title></Stack.Title>
+                </Stack.Screen>
               </Stack.Protected>
             </Stack>
           </PortalProvider>
@@ -149,3 +162,8 @@ export default function RootLayout() {
 
 // TODO:
 // Test App on Wider screen, to make sure it render properly
+// Reset all local setting back to default when user delete their account.
+// Social login issue:
+//  It's possible that when user delete their account, and if for some reason they want to sign in again,
+//  we don't have access to name or email.
+// Taken time has changed. (It get behind 3 hours time) Fix it.
