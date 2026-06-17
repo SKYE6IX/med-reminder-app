@@ -3,12 +3,63 @@ import SearchIcon from "@/component/icons/search-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { pillNames } from "@/mock-data";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+const pillNames = [
+  "Aspirin",
+  "Ibuprofen",
+  "Paracetamol",
+  "Amoxicillin",
+  "Metformin",
+  "Lisinopril",
+  "Atorvastatin",
+  "Omeprazole",
+  "Levothyroxine",
+  "Azithromycin",
+  "Losartan",
+  "Prednisone",
+  "Gabapentin",
+  "Hydrochlorothiazide",
+  "Sertraline",
+  "Citalopram",
+  "Fluoxetine",
+  "Simvastatin",
+  "Warfarin",
+  "Clopidogrel",
+  "Metoprolol",
+  "Amlodipine",
+  "Furosemide",
+  "Pantoprazole",
+  "Tramadol",
+  "Codeine",
+  "Doxycycline",
+  "Clindamycin",
+  "Cephalexin",
+  "Naproxen",
+  "Melatonin",
+  "Vitamin D",
+  "Calcium Carbonate",
+  "Magnesium",
+  "Iron Supplement",
+  "Folic Acid",
+  "Zinc",
+  "Biotin",
+  "Multivitamin",
+  "Fish Oil",
+  "Probiotic",
+  "Loratadine",
+  "Cetirizine",
+  "Diphenhydramine",
+  "Montelukast",
+  "Alprazolam",
+  "Diazepam",
+  "Insulin",
+  "Glipizide",
+  "Bupropion",
+];
 
 export default function NameStepScreen() {
   const sharedStyles = useAddPillScreenStyles();

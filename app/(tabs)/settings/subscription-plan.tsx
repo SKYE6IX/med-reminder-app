@@ -98,8 +98,8 @@ export default function SubscriptionPlan() {
       currency: "RUB",
       title: "Премиум план",
       subtitle,
-      clientApplicationKey: "test_MTM2OTg2OY8_wn0XX8jtXCgpeZCe7VX2_w1m1yd9tPk",
-      shopId: "1369869",
+      clientApplicationKey: process.env.EXPO_PUBLIC_CLIENT_KEY,
+      shopId: process.env.EXPO_PUBLIC_SHOP_ID,
     });
 
     if (!result) return;

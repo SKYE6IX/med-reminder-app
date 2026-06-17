@@ -44,12 +44,12 @@ const withYomoneySdk: ConfigPlugin = (config) => {
         mkdirSync(xmlDir, { recursive: true });
       }
       const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">certs.yoomoney.ru</domain>
-    </domain-config>
-</network-security-config>`;
+  <network-security-config>
+      <base-config cleartextTrafficPermitted="true" />
+      <domain-config cleartextTrafficPermitted="true">
+          <domain includeSubdomains="true">certs.yoomoney.ru</domain>
+      </domain-config>
+  </network-security-config>`;
       writeFileSync(path.join(xmlDir, "ym_network_security_config.xml"), xmlContent, "utf-8");
       return config;
     },
@@ -75,10 +75,7 @@ function addCustomPod(contents: string, projectName: string): string {
     return contents;
   }
 
-  return contents.replace(
-    /use_expo_modules!/,
-    "pod 'YooKassaPayments', :build_type => :dynamic_framework\n  use_expo_modules!",
-  );
+  return contents.replace(/use_expo_modules!/, "pod 'YooKassaPayments'\n  use_expo_modules!");
 }
 
 export default withYomoneySdk;

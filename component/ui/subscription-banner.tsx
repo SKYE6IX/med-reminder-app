@@ -23,6 +23,7 @@ export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBa
   const [modalKey, setModalKey] = useState(0);
 
   const progress = useDerivedValue(() => withTiming(showModal ? 0 : 1, { duration: DURATION }));
+
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: 1 - progress.value,
   }));

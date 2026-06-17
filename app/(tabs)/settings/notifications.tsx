@@ -10,8 +10,8 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { NotificationSoundMode } from "@/types/notification";
-import { useAudioPlayer } from "expo-audio";
-import { useRef } from "react";
+import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
+import { useEffect, useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -51,9 +51,18 @@ export default function Notifications() {
         ? notfication.alertSound
         : notfication.sound;
 
+  // Audio set up
+  useEffect(() => {
+    setAudioModeAsync({
+      playsInSilentMode: true,
+      allowsRecording: false,
+      shouldPlayInBackground: false,
+    });
+  }, []);
+
   const handleSoundChange = async (value: string) => {
     if (!isPremiumPlan) {
-      // Setting coming from basic account
+      // Settings for basic account
       setNotificationSetting({ sound: value as soundType });
       await updateScheduleEventNotifications({
         ...notfication,
@@ -61,7 +70,7 @@ export default function Notifications() {
         sound: value as NotificationSoundMode,
       });
     } else {
-      // Setting coming from pro account
+      // Setting for pro account
       if (value === "silent") {
         setNotificationSetting({ sound: value });
         await updateScheduleEventNotifications({
@@ -81,13 +90,14 @@ export default function Notifications() {
           player.replace(dragonWavy);
         }
         player.play();
+
         setNotificationSetting({ sound: "enable", alertSound: value });
 
         setTimeout(() => {
           player.pause();
-        }, 5000);
+        }, 6000);
 
-        // We wait atleat 15second before we recreate
+        // We wait atleat 8 second before we recreate
         // the new sound for user notification
         timeoutId.current = setTimeout(async () => {
           await updateScheduleEventNotifications({
@@ -96,7 +106,7 @@ export default function Notifications() {
             sound: "enable",
             alertSound: value,
           });
-        }, 5000);
+        }, 8000);
       }
     }
   };

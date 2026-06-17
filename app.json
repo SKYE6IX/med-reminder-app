@@ -18,6 +18,12 @@
       },
       "runtimeVersion": {
         "policy": "appVersion"
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Это приложение или один из его компонентов может запрашивать доступ к местоположению, чтобы улучшить ваш опыт",
+        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио.",
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
@@ -28,13 +34,18 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.medreminderapp.MedRemindR",
-      "permissions": ["android.permission.SCHEDULE_EXACT_ALARM"],
+      "permissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ],
       "runtimeVersion": {
         "policy": "appVersion"
       }
-    },
-    "web": {
-      "output": "static"
     },
     "plugins": [
       "expo-router",
@@ -93,7 +104,14 @@
       "expo-image",
       "expo-web-browser",
       "expo-apple-authentication",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Разрешите $(PRODUCT_NAME) получить доступ к вашему микрофону.",
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false
+        }
+      ],
       "expo-status-bar",
       "expo-asset",
       "./app.plugin.js"
@@ -101,6 +119,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4c0335b5-702e-448c-88b1-94b5970512d7"
+      }
     }
   }
 }

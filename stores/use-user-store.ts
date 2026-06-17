@@ -29,8 +29,9 @@ export const useUserStore = create<UserStore>()(
           return { ...state, emojiAvatar: next };
         });
       },
+
       updateSubscriptionOffer() {
-        set((state) => ({ ...state, displaySubscriptioOffer: !state.displaySubscriptioOffer }));
+        set((state) => ({ ...state, displaySubscriptioOffer: false }));
       },
     }),
     {

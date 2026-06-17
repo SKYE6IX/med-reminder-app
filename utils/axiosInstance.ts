@@ -1,11 +1,8 @@
 import axios, { AxiosError, create } from "axios";
-import Constants from "expo-constants";
 import { getValidAccessToken } from "./tokenUtils";
 
-const localhost = Constants.expoConfig?.hostUri?.split(":").shift();
-
 const api = create({
-  baseURL: `http://${localhost}:8080/`,
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
 
 const MAX_RETRIES = 3;

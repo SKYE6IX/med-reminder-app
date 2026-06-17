@@ -74,12 +74,12 @@ const withYomoneySdk = (config) => {
                 (0, fs_1.mkdirSync)(xmlDir, { recursive: true });
             }
             const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">certs.yoomoney.ru</domain>
-    </domain-config>
-</network-security-config>`;
+  <network-security-config>
+      <base-config cleartextTrafficPermitted="true" />
+      <domain-config cleartextTrafficPermitted="true">
+          <domain includeSubdomains="true">certs.yoomoney.ru</domain>
+      </domain-config>
+  </network-security-config>`;
             (0, fs_1.writeFileSync)(path_1.default.join(xmlDir, "ym_network_security_config.xml"), xmlContent, "utf-8");
             return config;
         },
@@ -100,6 +100,6 @@ function addCustomPod(contents, projectName) {
         console.log("YooKassaPayments pod already exists, skipping");
         return contents;
     }
-    return contents.replace(/use_expo_modules!/, "pod 'YooKassaPayments', :build_type => :dynamic_framework\n  use_expo_modules!");
+    return contents.replace(/use_expo_modules!/, "pod 'YooKassaPayments'\n  use_expo_modules!");
 }
 exports.default = withYomoneySdk;

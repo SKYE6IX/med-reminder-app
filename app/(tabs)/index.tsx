@@ -18,6 +18,7 @@ import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscr
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";
 import { useProfileImage } from "@/hooks/use-profile-image";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useUserStore } from "@/stores/use-user-store";
@@ -68,6 +69,7 @@ export default function Home() {
   const { user } = useUserData();
   const { showFeedBack } = useFeedBackStore();
   const { notfication, reminderPreferences } = useAppSettingsStore();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
@@ -77,14 +79,18 @@ export default function Home() {
   // Show premimum plan offer to user
   useEffect(() => {
     let id: number;
-    if (useUserStore.getState().displaySubscriptioOffer) {
+
+    if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
       id = setTimeout(() => {
         subscriptionBannerRef.current?.toggleBanner();
+
+        // We turn it off immediately so it doesn't show again
         useUserStore.getState().updateSubscriptionOffer();
       }, 2000);
     }
+
     return () => clearTimeout(id);
-  }, []);
+  }, [isPremiumPlan]);
 
   // Query schedule event list
   const { data, isLoading } = useQuery({

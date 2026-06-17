@@ -46,7 +46,6 @@ const CustomDarkTheme = {
 };
 
 export default function RootLayout() {
-  const { useDeviceLock } = useAppSettingsStore();
   const { isAuthenticated, hasCompleteOnboarding } = useAuthStore();
   const [isReady, setIsReady] = useState(false);
 
@@ -73,15 +72,17 @@ export default function RootLayout() {
           queryKey: ["medication-profile", "list"],
           queryFn: async () => (await api.get("medications")).data,
         }),
+
+        // regerate next medicatiion schedule events
         createNextScheduleEventNotification({
           ...useAppSettingsStore.getState().notfication,
           ...useAppSettingsStore.getState().reminderPreferences,
         }),
       ]);
-      getAuthorizedUser();
 
+      getAuthorizedUser();
       // If user set up local device lock
-      if (useDeviceLock) {
+      if (useAppSettingsStore.getState().useDeviceLock) {
         const localAuthenticate = await LocalAuthentication.authenticateAsync({
           cancelLabel: "Отменить",
           fallbackLabel: "Используйте пароль",
@@ -147,9 +148,4 @@ export default function RootLayout() {
 }
 
 // TODO:
-// 1. Implement versioning ✅
-// 2. Set up rating action ✅.
-// 3. set up contact us page which will include
-//  email ✅
-// 4. Set up lock screen for user that activate it. ✅
-// 5. Set up all production setting for both IOS and Android
+// Test App on Wider screen, to make sure it render properly
