@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
-import { OnboardingView } from "@/component/onboarding-view";
+import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 
@@ -29,7 +29,7 @@ export default function OnboardingFinalScreen() {
       : require("@/assets/images/onboarding-image-screen-3.png");
 
   return (
-    <OnboardingView>
+    <FullScreenView>
       <View style={styles.imageWrapper}>
         <Image source={source} style={styles.image} />
       </View>
@@ -44,7 +44,7 @@ export default function OnboardingFinalScreen() {
         style={styles.button}
         onPress={requestAllowNotification}
       />
-    </OnboardingView>
+    </FullScreenView>
   );
 }
 

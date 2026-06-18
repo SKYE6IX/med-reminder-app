@@ -2,9 +2,9 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { StyleSheet, View, type ViewProps } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export type OnboardingVievProps = ViewProps;
+export type FullScreenViewProps = ViewProps;
 
-export function OnboardingView({ style, ...rest }: OnboardingVievProps) {
+export function FullScreenView({ style, ...rest }: FullScreenViewProps) {
   const insets = useSafeAreaInsets();
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
 

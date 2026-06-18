@@ -5,12 +5,15 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 export default function ForgetPasswordScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
       <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
         <FormHeader title="Забыли пароль?" subTitle="Введите данные для восстановления аккаунта" />
         <FormInput
@@ -35,6 +38,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
-    gap: 30,
+    gap: 32,
   },
 });

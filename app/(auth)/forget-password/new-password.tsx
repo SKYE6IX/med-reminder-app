@@ -1,17 +1,18 @@
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function NewPasswordScreen() {
   const insets = useSafeAreaInsets();
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
 
   return (
-    <ScrollView>
-      <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
+    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
+      <View style={styles.container}>
         <FormHeader title="Новый пароль" subTitle="Введите новый пароль" />
-
         <View style={styles.inputWrapper}>
           <FormInput
             label="Новый пароль"

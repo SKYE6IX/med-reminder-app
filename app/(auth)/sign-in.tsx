@@ -48,8 +48,8 @@ export default function SignInScreen() {
   const insets = useSafeAreaInsets();
   const emaiInputRef = useRef<TextInput>(null);
 
-  const googleLogoSource = require("@/assets/icons/google-logo.png");
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
 
   // Handle when each text input value changes
   const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
@@ -111,7 +111,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1 }}>
+    <ScrollView contentContainerStyle={{ flex: 1, paddingTop: insets.top * 2, backgroundColor }}>
       <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 30) }]}>
         <Loader visible={isPending} />
 

@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
-import { OnboardingView } from "@/component/onboarding-view";
+import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -17,14 +17,14 @@ export default function WelcomeScreen() {
       : require("@/assets/icons/app-logo.png");
 
   return (
-    <OnboardingView>
+    <FullScreenView>
       <View style={styles.container}>
-        <Image source={source} style={styles.image} />
-
-        <ThemedText type="title" style={[{ color: appNameColor }, styles.text]}>
-          MedRemindR
-        </ThemedText>
+        <View style={styles.imageWrapper}>
+          <Image source={source} style={styles.image} contentFit="cover" />
+        </View>
+        <Text style={[styles.text, { color: appNameColor }]}>MedRemindR</Text>
       </View>
+
       <View style={styles.textContainer}>
         <ThemedText type="title">Контролируйте прием Ваших лекарств просто</ThemedText>
         <ThemedText type="subtitle">Все ваши таблетки в одном месте.</ThemedText>
@@ -39,7 +39,7 @@ export default function WelcomeScreen() {
           textVaraint="mutedText"
         />
       </View>
-    </OnboardingView>
+    </FullScreenView>
   );
 }
 
@@ -49,14 +49,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 60,
+    width: "100%",
   },
   text: {
+    width: "100%",
+    fontFamily: "Roboto_600SemiBold",
     fontSize: 46,
     lineHeight: 55.2,
+    textAlign: "center",
   },
-  image: {
+  imageWrapper: {
     width: 180,
     height: 180,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
   textContainer: {
     gap: 16,

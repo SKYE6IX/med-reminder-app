@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
-import { OnboardingView } from "@/component/onboarding-view";
+import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
 
@@ -16,7 +16,7 @@ export default function OnboardingThirdscreen() {
       : require("@/assets/images/onboarding-image-screen-4.png");
 
   return (
-    <OnboardingView>
+    <FullScreenView>
       <View style={styles.imageWrapper}>
         <Image source={source} style={styles.image} />
       </View>
@@ -29,7 +29,7 @@ export default function OnboardingThirdscreen() {
       </View>
 
       <CustomLink label="Дальше" href="/onboarding/final" style={styles.link} />
-    </OnboardingView>
+    </FullScreenView>
   );
 }
 

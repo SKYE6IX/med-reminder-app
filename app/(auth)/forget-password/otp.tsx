@@ -18,11 +18,14 @@ export default function OTPVerificationScreen() {
   const router = useRouter();
   const TOKEN_LENGTH = 5;
   const insets = useSafeAreaInsets();
-  const [token, setToken] = useState("");
   const inputRefs = useRef<TextInput[]>([]);
+
+  const [token, setToken] = useState("");
   const [values, setValues] = useState<string[]>(new Array(TOKEN_LENGTH).fill(""));
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "textPrimary");
@@ -48,7 +51,6 @@ export default function OTPVerificationScreen() {
       setValues(newValues);
       const token = newValues.join("");
       setToken(token);
-
       if (digit && index < TOKEN_LENGTH - 1) {
         inputRefs.current[index + 1]?.focus();
       }
@@ -67,7 +69,7 @@ export default function OTPVerificationScreen() {
   };
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
       <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
         <View style={styles.headerWrapper}>
           <ThemedText type="title" style={styles.title}>
@@ -92,12 +94,12 @@ export default function OTPVerificationScreen() {
                   }
                 }}
                 style={[
+                  styles.input,
                   {
                     color: textColor,
                     backgroundColor: inputBgColor,
-                    // borderColor: inputRefs?.current[i]?.isFocused() ? tintColor : inputBorderColor,
+                    borderColor: focusedIndex === i ? tintColor : inputBorderColor,
                   },
-                  styles.input,
                 ]}
                 value={values[i]}
                 onChangeText={(text) => handleOnChange(text, i)}
@@ -108,6 +110,10 @@ export default function OTPVerificationScreen() {
                 keyboardType="number-pad"
                 autoComplete="sms-otp"
                 selectTextOnFocus
+                onFocus={() => setFocusedIndex(i)}
+                onBlur={() => {
+                  setFocusedIndex(null);
+                }}
               />
             ))}
           </View>

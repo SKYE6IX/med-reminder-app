@@ -53,6 +53,7 @@ export default function CreateAccountScreen() {
   const emaiInputRef = useRef<TextInput>(null);
 
   const linkColor = useThemeColor({}, "buttonPrimaryBg");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
 
   // Handle when each text input value changes
   const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
@@ -112,8 +113,8 @@ export default function CreateAccountScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1 }}>
-      <View style={[{ paddingBottom: Math.max(insets.bottom, 20) }, styles.container]}>
+    <ScrollView contentContainerStyle={{ flex: 1, paddingTop: insets.top * 2, backgroundColor }}>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) }]}>
         <Loader visible={isPending} />
 
         <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />

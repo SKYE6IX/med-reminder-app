@@ -1,13 +1,13 @@
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 
-import { OnboardingView } from "@/component/onboarding-view";
+import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
 
 export default function OnboardingSecondScreen() {
   return (
-    <OnboardingView>
+    <FullScreenView>
       <Image
         source={require("@/assets/images/onboarding-image-screen-2.png")}
         style={styles.image}
@@ -20,7 +20,7 @@ export default function OnboardingSecondScreen() {
         </ThemedText>
       </View>
       <CustomLink label="Дальше" href="/onboarding/third" style={styles.link} />
-    </OnboardingView>
+    </FullScreenView>
   );
 }
 

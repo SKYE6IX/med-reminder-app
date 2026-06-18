@@ -1,34 +1,46 @@
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { Stack } from "expo-router";
+import { ColorValue, StyleProp } from "react-native";
 
 export default function AuthLayout() {
-  const backgroundColor = useThemeColor({}, "backgroundPrimary");
+  const headerStyle: StyleProp<{
+    backgroundColor: ColorValue;
+    shadowColor: "transparent";
+  }> = {
+    shadowColor: "transparent",
+    backgroundColor: "transparent",
+  };
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: {
-          backgroundColor,
-        },
-        headerShadowVisible: false,
-        headerTitle: "",
-        headerBackButtonDisplayMode: "minimal",
-      }}
-    >
-      <Stack.Screen name="welcome" />
+    <Stack>
+      <Stack.Screen name="welcome">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
 
-      <Stack.Screen name="create-account" options={{ contentStyle: { backgroundColor } }} />
+      <Stack.Screen name="create-account">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
 
-      <Stack.Screen name="sign-in" options={{ contentStyle: { backgroundColor } }} />
+      <Stack.Screen name="sign-in">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
 
-      <Stack.Screen name="forget-password/index" options={{ contentStyle: { backgroundColor } }} />
+      <Stack.Screen name="forget-password/index">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
 
-      <Stack.Screen name="forget-password/otp" options={{ contentStyle: { backgroundColor } }} />
+      <Stack.Screen name="forget-password/otp">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
 
-      <Stack.Screen
-        name="forget-password/new-password"
-        options={{ contentStyle: { backgroundColor } }}
-      />
+      <Stack.Screen name="forget-password/new-password">
+        <Stack.Header style={headerStyle} />
+        <Stack.Title></Stack.Title>
+      </Stack.Screen>
     </Stack>
   );
 }

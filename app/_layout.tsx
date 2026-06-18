@@ -167,3 +167,6 @@ export default function RootLayout() {
 //  It's possible that when user delete their account, and if for some reason they want to sign in again,
 //  we don't have access to name or email.
 // Taken time has changed. (It get behind 3 hours time) Fix it.
+// When sign out and sign in, data are not sync immdiately with the current user.
+// Clear all data if user sign out also.
+// Confirm data are fresh when user sign in again
