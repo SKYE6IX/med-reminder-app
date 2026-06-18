@@ -169,14 +169,10 @@ export default function RootLayout() {
 // Social login issue:
 //  It's possible that when user delete their account, and if for some reason they want to sign in again,
 //  we don't have access to name or email.
-// Taken time has changed. (It get behind 3 hours time) Fix it.
-// When sign out and sign in, data are not sync immdiately with the current user.
-// Clear all data if user sign out also.
-// Confirm data are fresh when user sign in again
 
-// End time for how long to take the pill
-// A value to represent how long user can take the pill for.
-// Indicating usage that represt how long the schedule shoulkd be created.
+// When sign out and sign in, data are not sync immdiately with the current user. ✅
+// Clear all data if user sign out also. ✅
+// Confirm data are fresh when user sign in again ✅
 
 // When adding pills on custom selection, user should able to close when they click outside of the application
 // Also the buttons on the custom arew very small.

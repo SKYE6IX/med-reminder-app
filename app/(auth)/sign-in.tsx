@@ -9,12 +9,13 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
+import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
 import { api, axios } from "@/utils/axiosInstance";
-import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateSignInInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
@@ -72,11 +73,12 @@ export default function SignInScreen() {
     async onSuccess(data) {
       clearTokens();
       saveTokens(data.accessToken, data.refreshToken);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["users"] }),
-        queryClient.invalidateQueries({ queryKey: ["subscriptions-plan"] }),
-      ]);
+
       setIsAuthenticated(true);
+      await createNextScheduleEventNotification({
+        ...useAppSettingsStore.getState().notfication,
+        ...useAppSettingsStore.getState().reminderPreferences,
+      });
     },
     onError(error) {
       if (axios.isAxiosError(error)) {

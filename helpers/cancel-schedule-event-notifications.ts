@@ -35,11 +35,12 @@ export async function cancelEventNotification({ medProfileId }: { medProfileId: 
       }),
     );
 
-    // Check if user has a refill remider set up fro the medication profile
+    // Check if user has a refill reminder set up for the medication profile
     const refillKey = NotificationHelper.createNotificationStorageKey({
       prefix: "missed-reminder",
       medProfileId,
     });
+
     const refillNotificationId = await readFromStorage<string>(refillKey);
     if (refillNotificationId) {
       await NotificationHelper.cancelNotificationWithId(refillNotificationId, refillKey);

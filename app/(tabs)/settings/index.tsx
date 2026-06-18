@@ -15,12 +15,14 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 
@@ -39,15 +41,21 @@ export default function Settings() {
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
   const { showFeedBack } = useFeedBackStore();
+
   const { setIsAuthenticated } = useAuthStore();
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
+  // SIGN OUT MUTATIONS
   const { isPending, mutate } = useMutation({
     mutationFn: logOutMutation,
-    onSuccess() {
+    async onSuccess() {
+      // Clear out all notifications.
+      // At the moment, only medication notifications we target
+      await NotificationHelper.cancelAllNotifications();
+      queryClient.clear();
       clearTokens();
       setIsAuthenticated(false);
     },

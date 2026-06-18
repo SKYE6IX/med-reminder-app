@@ -13,12 +13,21 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const UNIT_PRESSABLE_PER_ROW = 4;
+const UNIT_WRAPPER_GAP = 16;
+
 export default function DetailsStepScreen() {
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
+
+  const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
+  const [unitItemHeight, setUnitItemHeight] = useState(0);
+
+  const UNIT_PRESSABLE_WIDTH = (unitWrapperWidth - UNIT_WRAPPER_GAP * 2) / UNIT_PRESSABLE_PER_ROW;
+  const UNIT_WRAPPER_HEIGHT = unitItemHeight * 2 + UNIT_WRAPPER_GAP;
 
   const { setMedicationDetails, formState } = useAddPillStore();
   const { selfProfile, relationProfiles } = useProfilesQuery();
@@ -79,14 +88,27 @@ export default function DetailsStepScreen() {
         {/* Pill Form selections */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
-          <View style={styles.pillFormWrapper}>
+          <View
+            style={[styles.pillFormWrapper, { height: UNIT_WRAPPER_HEIGHT }]}
+            onLayout={(event) => {
+              setUnitWrapperWidth(event.nativeEvent.layout.width);
+            }}
+          >
             {MEDICATION_UNITS.map((unit, i) => (
-              <View key={unit.value + i} style={styles.pillForm}>
+              <View
+                key={unit.value + i}
+                style={[styles.pillForm, { width: UNIT_PRESSABLE_WIDTH }]}
+                onLayout={(event) => {
+                  if (i === 0) {
+                    setUnitItemHeight(event.nativeEvent.layout.height);
+                  }
+                }}
+              >
                 <Pressable
                   style={[
                     styles.pillFormPressable,
                     {
-                      borderWidth: unit.value === formState.medicationUnit ? undefined : 1,
+                      borderWidth: unit.value === formState.medicationUnit ? 0 : 1,
                       borderColor,
                       backgroundColor:
                         unit.value === formState.medicationUnit ? tintColor : bGColor,
@@ -99,7 +121,7 @@ export default function DetailsStepScreen() {
                 <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
               </View>
             ))}
-            <View style={styles.ghostWrapper} />
+            <View style={[styles.ghostWrapper, { width: UNIT_PRESSABLE_WIDTH }]} />
           </View>
         </View>
 
@@ -222,24 +244,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: 16,
+    rowGap: UNIT_WRAPPER_GAP,
   },
   ghostWrapper: {
-    width: 78,
-    height: 105,
+    height: "auto",
+    aspectRatio: 1 / 1,
   },
   pillForm: {
-    width: 78,
-    height: 105,
+    height: "auto",
+    aspectRatio: 1 / 1,
     alignItems: "center",
     gap: 8,
   },
   pillFormPressable: {
+    height: "100%",
+    width: "100%",
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
-    height: 78,
   },
   pillFormName: {
     fontFamily: "Roboto_400Regular",

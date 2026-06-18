@@ -287,10 +287,12 @@ export class NotificationHelper {
   }) {
     return `${prefix}:${medProfileId}:${scheduleAt}`;
   }
+
   // CANCEL ALL NOTIFICATION ON THE APP
   public static async cancelAllNotifications() {
     await notifee.cancelAllNotifications();
   }
+
   // CANCEL NOTIFICATION USING THE ID
   public static async cancelNotificationWithId(
     notificationId: string | string[] | null,
