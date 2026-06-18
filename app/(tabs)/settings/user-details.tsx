@@ -173,7 +173,7 @@ export default function UserDetails() {
               type="text"
               name="name"
               hasError={false}
-              defaultValue={updateUserData.name ?? ""}
+              defaultState={updateUserData.name ?? ""}
               onValueChange={handleOnTextInputChange}
             />
 
@@ -183,7 +183,7 @@ export default function UserDetails() {
               type="email"
               name="email"
               hasError={false}
-              defaultValue={updateUserData.email ?? ""}
+              defaultState={updateUserData.email ?? ""}
               onValueChange={handleOnTextInputChange}
             />
 

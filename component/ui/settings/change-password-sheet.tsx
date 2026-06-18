@@ -2,7 +2,7 @@ import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { clearTokens } from "@/utils/tokenUtils";
-import { validateResetPasswordInputs } from "@/utils/validator";
+import { validateChangePasswordInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
 import { RefObject, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -107,7 +107,7 @@ export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSh
   });
 
   const handleResetPassword = () => {
-    const validatedInputs = validateResetPasswordInputs(changePasswordState.formState);
+    const validatedInputs = validateChangePasswordInputs(changePasswordState.formState);
     if (validatedInputs.error) {
       validatedInputs.error.issues.forEach((issue) => {
         setChangePasswordState((prvState) => {

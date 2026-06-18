@@ -7,6 +7,7 @@ interface AuthStore {
   isAuthenticated: boolean;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   completeOnaboarding: () => void;
+  resetOnaboarding: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -19,6 +20,9 @@ export const useAuthStore = create<AuthStore>()(
       },
       completeOnaboarding() {
         set((state) => ({ ...state, hasCompleteOnboarding: true }));
+      },
+      resetOnaboarding() {
+        set((state) => ({ ...state, hasCompleteOnboarding: false }));
       },
     }),
     {

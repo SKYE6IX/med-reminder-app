@@ -7,12 +7,15 @@ import DeleteAccountSheet from "@/component/ui/settings/delete-account-sheet";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import * as LocalAuthentication from "expo-local-authentication";
 import { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Security() {
   const { useDeviceLock, setUseDeviceLock } = useAppSettingsStore();
+  const { showFeedBack } = useFeedBackStore();
   const insets = useSafeAreaInsets();
 
   const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
@@ -21,7 +24,16 @@ export default function Security() {
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const toggleuseDeviceLock = (value: boolean) => {
+  const toggleuseDeviceLock = async (value: boolean) => {
+    const isAvailable = await LocalAuthentication.hasHardwareAsync();
+    if (!isAvailable) {
+      showFeedBack({
+        title: "не допускается",
+        message: "Ваше устройство не поддерживает блокировку устройств.",
+        status: "error",
+      });
+      return;
+    }
     setUseDeviceLock(value);
   };
 

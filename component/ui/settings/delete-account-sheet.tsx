@@ -1,12 +1,13 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
+import { useNotificationDataStore } from "@/stores/notification-data-store";
 import { useAuthStore } from "@/stores/use-auth-store";
+import { useUserStore } from "@/stores/use-user-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens } from "@/utils/tokenUtils";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "@tanstack/react-query";
-import { deleteItemAsync } from "expo-secure-store";
 import { RefObject } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
@@ -26,16 +27,15 @@ export default function DeleteAccountSheet({ bottomSheetRef }: DeleteAccountShee
 
   const { isPending, mutate } = useMutation({
     mutationFn: deleteAccountMutation,
-    async onSuccess() {
+    onSuccess() {
+      // Reset ALL
+      useUserStore.getState().resetUserData();
+      useNotificationDataStore.getState().clearScheduleData();
+      useAppSettingsStore.getState().resetAppSetting();
+      useAuthStore.getState().resetOnaboarding();
       clearTokens();
-      useAuthStore.getState().setIsAuthenticated(false);
       queryClient.clear();
-
-      await Promise.all([
-        AsyncStorage.multiRemove(["user-store", "notification-event-data"]),
-        deleteItemAsync("app-settings"),
-        deleteItemAsync("auth-store"),
-      ]);
+      useAuthStore.getState().setIsAuthenticated(false);
     },
     onError(error) {
       if (axios.isAxiosError(error)) {

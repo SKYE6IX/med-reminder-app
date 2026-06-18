@@ -16,7 +16,7 @@ type FormInputProps = TextInputProps & {
   label?: string;
   type?: "text" | "email" | "password";
   hasError: boolean;
-  defaultValue?: string;
+  defaultState?: string;
   showLabel?: boolean;
   onValueChange: ({ name, value }: { name: string; value: string }) => void;
 };
@@ -25,14 +25,14 @@ export default function FormInput({
   type = "text",
   label,
   inputRef,
-  defaultValue,
+  defaultState,
   onValueChange,
   hasError,
   name,
   showLabel = true,
   ...rest
 }: FormInputProps) {
-  const [inputValue, onInputValueChange] = useState(defaultValue ?? "");
+  const [inputValue, onInputValueChange] = useState(defaultState ?? "");
   const [hidePassword, setHidePassword] = useState(false);
 
   const isPassword = type === "password";

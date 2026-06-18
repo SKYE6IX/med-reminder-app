@@ -1,8 +1,9 @@
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import { readFromStorage } from "@/helpers/storage-manager";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Link, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -14,15 +15,28 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+const STORAGE_KEY = "password:reset:email";
+
 export default function OTPVerificationScreen() {
   const router = useRouter();
   const TOKEN_LENGTH = 5;
   const insets = useSafeAreaInsets();
   const inputRefs = useRef<TextInput[]>([]);
+  const [useEmail, setUserEmail] = useState("");
 
   const [token, setToken] = useState("");
   const [values, setValues] = useState<string[]>(new Array(TOKEN_LENGTH).fill(""));
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const readValueFromStorage = async () => {
+      const email = await readFromStorage<string>(STORAGE_KEY);
+      if (email) {
+        setUserEmail(email);
+      }
+    };
+    readValueFromStorage();
+  }, []);
 
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
@@ -76,7 +90,7 @@ export default function OTPVerificationScreen() {
             Введите код
           </ThemedText>
           <ThemedText type="subtitle" style={styles.subtitle}>
-            Мы отправили код подтверждения на вашу почту ivan.ivanov@gmail.com{" "}
+            Мы отправили код подтверждения на вашу почту {useEmail}{" "}
             <Link href="/forget-password" style={[styles.link, { color: tintColor }]}>
               Изменить
             </Link>

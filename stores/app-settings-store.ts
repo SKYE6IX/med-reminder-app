@@ -20,6 +20,7 @@ interface AppSettingsStore {
   setNotificationSetting: (options: Partial<AppSettingsStore["notfication"]>) => void;
   setReminderPreference: (options: Partial<AppSettingsStore["reminderPreferences"]>) => void;
   setUseDeviceLock: (value: boolean) => void;
+  resetAppSetting: () => void;
 }
 
 export const useAppSettingsStore = create<AppSettingsStore>()(
@@ -49,6 +50,23 @@ export const useAppSettingsStore = create<AppSettingsStore>()(
       },
       setUseDeviceLock(value) {
         set((state) => ({ ...state, useDeviceLock: value }));
+      },
+      resetAppSetting() {
+        set({
+          notfication: {
+            sound: "enable",
+            alertSound: "universfield_soft.wav",
+            enable: true,
+            vibration: true,
+            showOnLockScreen: true,
+          },
+          reminderPreferences: {
+            snoozeDuration: 5,
+            earlyReminder: false,
+            missedDoseAlert: false,
+          },
+          useDeviceLock: false,
+        });
       },
     }),
     {

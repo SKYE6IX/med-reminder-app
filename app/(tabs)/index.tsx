@@ -85,7 +85,7 @@ export default function Home() {
         subscriptionBannerRef.current?.toggleBanner();
 
         // We turn it off immediately so it doesn't show again
-        useUserStore.getState().updateSubscriptionOffer();
+        useUserStore.getState().disabledShowSubscriptionOffer();
       }, 2000);
     }
 

@@ -7,7 +7,8 @@ interface UserStore {
   displaySubscriptioOffer: boolean;
   addEmojiAvatar: (profileId: string, avatarUri: string) => void;
   removeEmojiAvatar: (profileId: string) => void;
-  updateSubscriptionOffer: () => void;
+  disabledShowSubscriptionOffer: () => void;
+  resetUserData: () => void;
 }
 
 export const useUserStore = create<UserStore>()(
@@ -15,7 +16,6 @@ export const useUserStore = create<UserStore>()(
     (set) => ({
       emojiAvatar: new Map(),
       displaySubscriptioOffer: true,
-
       addEmojiAvatar(profileId, avatarUri) {
         set((state) => ({
           ...state,
@@ -29,8 +29,14 @@ export const useUserStore = create<UserStore>()(
           return { ...state, emojiAvatar: next };
         });
       },
-      updateSubscriptionOffer() {
+      disabledShowSubscriptionOffer() {
         set((state) => ({ ...state, displaySubscriptioOffer: false }));
+      },
+      resetUserData() {
+        set({
+          emojiAvatar: new Map(),
+          displaySubscriptioOffer: true,
+        });
       },
     }),
     {

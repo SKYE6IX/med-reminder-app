@@ -5,6 +5,12 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+// Todo:
+// 1. Cheeck to make sure backend email service is ready.
+// 2. Set up the reset password
+// 3. Handle Error and clear all neccessary details
+// 4. Reset any data we stroe inside AsyncStorage and SecureStorage.
+
 export default function NewPasswordScreen() {
   const insets = useSafeAreaInsets();
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
