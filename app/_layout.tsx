@@ -37,6 +37,7 @@ const CustomLightTheme = {
     background: "#F7F7F7",
   },
 };
+
 const CustomDarkTheme = {
   ...DarkTheme,
   colors: {
@@ -164,7 +165,7 @@ export default function RootLayout() {
 }
 
 // TODO:
-// Test App on Wider screen, to make sure it render properly
+// Test App on Wider screen, to make sure it render properly.
 // Reset all local setting back to default when user delete their account. ✅
 // Social login issue:
 //  It's possible that when user delete their account, and if for some reason they want to sign in again,
@@ -173,7 +174,3 @@ export default function RootLayout() {
 // When sign out and sign in, data are not sync immdiately with the current user. ✅
 // Clear all data if user sign out also. ✅
 // Confirm data are fresh when user sign in again ✅
-
-// When adding pills on custom selection, user should able to close when they click outside of the application
-// Also the buttons on the custom arew very small.
-// The form selection in add pills, should be arrage based on the width of the screen.

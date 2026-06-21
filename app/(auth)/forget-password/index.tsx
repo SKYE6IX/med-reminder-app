@@ -5,28 +5,49 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
+import { saveToStorage } from "@/helpers/storage-manager";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { api, axios } from "@/utils/axiosInstance";
 import { validateResetPasswordInputs } from "@/utils/validator";
-import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
-const STORAGE_KEY = "password:reset:email";
+const STORAGE_KEY_EMAIL = "password:reset:email";
+
+const requestPasswordResetTokenMutation = async ({ email }: { email: string }) => {
+  const reponse = await api.post<{ status: string }>("auth/forget-password/token", { email });
+  return reponse.data;
+};
 
 export default function ForgetPasswordScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { showFeedBack } = useFeedBackStore();
+
   const [email, setEmail] = useState("");
   const [showError, setShowError] = useState(false);
 
-  useEffect(() => {
-    const readValueFromStorage = async () => {
-      const defaultValue = await readFromStorage<string>(STORAGE_KEY);
-      if (defaultValue) {
-        setEmail(defaultValue);
+  const { mutate } = useMutation({
+    mutationFn: requestPasswordResetTokenMutation,
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        error.response?.status === 401 &&
+          showFeedBack({
+            title: "Не удалось авторизовать!",
+            message: "Пользователь с таким адресом электронной почты не существует!",
+            status: "error",
+          });
+      } else {
+        showFeedBack({
+          title: "Ошибка!",
+          message: "Что-то пошло не так. Пробовать снова.",
+          status: "error",
+        });
+        console.log("An unknown error occur in sign in mutation", error);
       }
-    };
-    readValueFromStorage();
-  }, []);
+    },
+  });
 
   const handleContinueToOTP = async () => {
     const validInputEmail = validateResetPasswordInputs({ email });
@@ -34,8 +55,11 @@ export default function ForgetPasswordScreen() {
       setShowError(true);
       return;
     }
-    await saveToStorage(STORAGE_KEY, email);
+
+    await saveToStorage(STORAGE_KEY_EMAIL, email);
     router.navigate("/forget-password/otp");
+    setEmail("");
+    mutate({ email });
   };
 
   // Themes

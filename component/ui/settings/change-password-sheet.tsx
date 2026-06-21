@@ -26,7 +26,7 @@ type ChangePasswordState = {
 };
 
 const resetPasswordMutation = async (resetData: FormState) => {
-  const response = await api.post("auth/reset-password", resetData);
+  const response = await api.post("auth/change-password", resetData);
   return response.data;
 };
 

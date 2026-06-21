@@ -1,8 +1,12 @@
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import { readFromStorage } from "@/helpers/storage-manager";
+import Loader from "@/component/ui/loader";
+import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { Link, useRouter } from "expo-router";
+import { useFeedBackStore } from "@/stores/feedback-store";
+import { api } from "@/utils/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Pressable,
@@ -15,22 +19,42 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const STORAGE_KEY = "password:reset:email";
+const STORAGE_KEY_TOKEN = "password:reset:token";
+const STORAGE_KEY_EMAIL = "password:reset:email";
+
+const maskEmailAddress = (email: string) => {
+  if (email) {
+    const masked = email.replace(/^(.)([^@]*)(@.*)$/, (_, first, middle, domain) => {
+      return first + "*".repeat(middle.length) + domain;
+    });
+    return masked;
+  }
+  return "";
+};
+
+const verifyPasswordResetToken = async ({ email, token }: { email: string; token: number }) => {
+  const response = await api.get<{ status: string }>("auth/forget-password/token", {
+    params: { email, token },
+  });
+  return response.data;
+};
 
 export default function OTPVerificationScreen() {
   const router = useRouter();
-  const TOKEN_LENGTH = 5;
+  const TOKEN_LENGTH = 6;
   const insets = useSafeAreaInsets();
   const inputRefs = useRef<TextInput[]>([]);
-  const [useEmail, setUserEmail] = useState("");
 
+  const { showFeedBack } = useFeedBackStore();
+
+  const [userEmail, setUserEmail] = useState("");
   const [token, setToken] = useState("");
   const [values, setValues] = useState<string[]>(new Array(TOKEN_LENGTH).fill(""));
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const readValueFromStorage = async () => {
-      const email = await readFromStorage<string>(STORAGE_KEY);
+      const email = await readFromStorage<string>(STORAGE_KEY_EMAIL);
       if (email) {
         setUserEmail(email);
       }
@@ -38,11 +62,14 @@ export default function OTPVerificationScreen() {
     readValueFromStorage();
   }, []);
 
+  const isTokenFilled = token.length === TOKEN_LENGTH;
+
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
   const textColor = useThemeColor({}, "textPrimary");
+  const filledBorderColor = useThemeColor({}, "feedbackSuccess");
 
   const handleOnChange = (text: string, index: number) => {
     // Let check if user paste the token
@@ -54,6 +81,7 @@ export default function OTPVerificationScreen() {
           newValues[i] = d;
         }
       });
+
       setValues(newValues);
       setToken(newValues.join(""));
       inputRefs.current[TOKEN_LENGTH - 1].focus();
@@ -82,18 +110,45 @@ export default function OTPVerificationScreen() {
     }
   };
 
+  const { refetch, isLoading } = useQuery({
+    queryKey: ["token-verification"],
+
+    queryFn: () => {
+      return verifyPasswordResetToken({ email: userEmail, token: Number(token) });
+    },
+
+    enabled: false,
+  });
+
+  const handleVerifyToken = () => {
+    refetch({ throwOnError: true })
+      .then(async () => {
+        router.navigate("/forget-password/new-password");
+        await saveToStorage(STORAGE_KEY_TOKEN, token);
+        setValues((prvState) => new Array(TOKEN_LENGTH).fill(""));
+      })
+      .catch(() => {
+        showFeedBack({
+          title: "Не удалось авторизовать!",
+          message: "Просроченный или недействительный код.",
+          status: "error",
+        });
+      });
+  };
+
   return (
     <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
+      <Loader visible={isLoading} />
       <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
         <View style={styles.headerWrapper}>
           <ThemedText type="title" style={styles.title}>
             Введите код
           </ThemedText>
           <ThemedText type="subtitle" style={styles.subtitle}>
-            Мы отправили код подтверждения на вашу почту {useEmail}{" "}
-            <Link href="/forget-password" style={[styles.link, { color: tintColor }]}>
+            Мы отправили код подтверждения на вашу почту {maskEmailAddress(userEmail)}{" "}
+            <Text onPress={() => router.back()} style={[styles.link, { color: tintColor }]}>
               Изменить
-            </Link>
+            </Text>
           </ThemedText>
         </View>
 
@@ -112,14 +167,17 @@ export default function OTPVerificationScreen() {
                   {
                     color: textColor,
                     backgroundColor: inputBgColor,
-                    borderColor: focusedIndex === i ? tintColor : inputBorderColor,
+                    borderColor: isTokenFilled
+                      ? filledBorderColor
+                      : focusedIndex === i
+                        ? tintColor
+                        : inputBorderColor,
                   },
                 ]}
                 value={values[i]}
                 onChangeText={(text) => handleOnChange(text, i)}
                 onKeyPress={(event) => handleOnKeyPress(event, i)}
                 autoFocus={i === 0}
-                maxLength={1}
                 textContentType="oneTimeCode"
                 keyboardType="number-pad"
                 autoComplete="sms-otp"
@@ -145,7 +203,10 @@ export default function OTPVerificationScreen() {
         <CustomButton
           label="Продолжить"
           style={styles.button}
-          onPress={() => router.navigate("/forget-password/new-password")}
+          onPress={handleVerifyToken}
+          disabled={!isTokenFilled}
+          variant={isTokenFilled ? "filled" : "disabled"}
+          textVaraint={isTokenFilled ? "mutedText" : "regularText"}
         />
       </View>
     </ScrollView>
@@ -174,6 +235,8 @@ const styles = StyleSheet.create({
   },
   link: {
     fontFamily: "Roboto_500Medium",
+    borderWidth: 1,
+    borderColor: "red",
   },
   bodyWrapper: {
     gap: 16,
