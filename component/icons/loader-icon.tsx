@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -20,33 +20,33 @@ export default function LoaderIcon({
   pillRightColor,
 }: LoaderIconProps) {
   const ringRotation = useSharedValue(0);
-  const pillRotaiton = useSharedValue(0);
+  const pillRotation = useSharedValue(0);
 
   useEffect(() => {
     ringRotation.value = withRepeat(
-      withTiming(1, {
+      withTiming(360, {
         duration: 3000,
         easing: Easing.linear,
       }),
       -1,
       false,
     );
-
-    pillRotaiton.value = withRepeat(
-      withTiming(1, {
+    pillRotation.value = withRepeat(
+      withTiming(360, {
         duration: 3300,
         easing: Easing.linear,
       }),
       -1,
       false,
     );
-  }, [pillRotaiton, ringRotation]);
+  }, [pillRotation, ringRotation]);
 
   const ringStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `-${ringRotation.value * 360}deg` }],
+    transform: [{ rotate: `-${ringRotation.value}deg` }],
   }));
+
   const pillStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${ringRotation.value * 360}deg` }],
+    transform: [{ rotate: `${ringRotation.value}deg` }],
   }));
 
   return (

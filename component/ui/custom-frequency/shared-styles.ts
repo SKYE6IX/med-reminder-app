@@ -36,17 +36,17 @@ export function useCustomFreqStyles() {
       gap: 8,
     },
     optionsGroupItem: {
-      width: 70,
+      width: 80,
       alignItems: "center",
-      paddingTop: 4,
-      paddingBottom: 4,
-      borderRadius: 8,
+      paddingTop: 5,
+      paddingBottom: 5,
+      borderRadius: 16,
       backgroundColor: "#FFFFFF33",
     },
     groupItemValue: {
       fontFamily: "Roboto_400Regular",
-      fontSize: 14,
-      lineHeight: 16.2,
+      fontSize: 18,
+      lineHeight: 22.2,
       color: "#F7F7F7",
     },
   });

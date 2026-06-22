@@ -23,13 +23,8 @@ export default function CustomFrequency({
   });
 
   const isDailyUnit = customState.pattern.unit === "DAILY";
-  const height = useSharedValue(HEIGHT.COLLAPSED);
 
-  //   Themes
-  const color = useThemeColor({}, "textPrimary");
-  const bGColor = useThemeColor({}, "backgroundSecondary");
-  const borderColor = useThemeColor({}, "borderColor");
-  const tintColor = useThemeColor({}, "tint");
+  const height = useSharedValue(HEIGHT.COLLAPSED);
 
   const newHeight = useMemo(() => {
     if (isSelected) {
@@ -46,10 +41,6 @@ export default function CustomFrequency({
       return HEIGHT.COLLAPSED;
     }
   }, [customState.showPicker, isDailyUnit, isSelected]);
-
-  useEffect(() => {
-    setCustomState({ showPicker: undefined, pattern: DEFAULT_PATTERN });
-  }, [isSelected]);
 
   useEffect(() => {
     height.value = withSpring(newHeight);
@@ -124,6 +115,18 @@ export default function CustomFrequency({
     }
   };
 
+  // Choose custom option
+  const handleChooseCustom = () => {
+    handleSelection(defaultvalue);
+    setCustomState({ showPicker: undefined, pattern: DEFAULT_PATTERN });
+  };
+
+  //   Themes
+  const color = useThemeColor({}, "textPrimary");
+  const bGColor = useThemeColor({}, "backgroundSecondary");
+  const borderColor = useThemeColor({}, "borderColor");
+  const tintColor = useThemeColor({}, "tint");
+
   return (
     <Animated.View
       style={[
@@ -138,10 +141,7 @@ export default function CustomFrequency({
       ]}
     >
       {/* Button trigger */}
-      <Pressable
-        style={sharedStyles.frequencyPressable}
-        onPress={() => handleSelection(defaultvalue)}
-      >
+      <Pressable style={sharedStyles.frequencyPressable} onPress={handleChooseCustom}>
         <Text
           style={[sharedStyles.frequencyPressableText, { color: isSelected ? "#F7F7F7" : color }]}
         >
@@ -153,11 +153,13 @@ export default function CustomFrequency({
       {/* Custom settings */}
       <View>
         <View style={styles.optionsWrapper}>
+          {/* LABEL AND VALUE */}
           <View style={sharedStyles.opitonsItem}>
             <Text style={sharedStyles.optionsLabel}>Каждые</Text>
+
             <View style={sharedStyles.optionsGroup}>
               <Pressable
-                style={[sharedStyles.optionsGroupItem, { width: 50 }]}
+                style={[sharedStyles.optionsGroupItem, { width: 60 }]}
                 onPress={() => handleShowPicker("intervalValue")}
               >
                 <Text style={sharedStyles.groupItemValue}>{customState.pattern.intervalValue}</Text>

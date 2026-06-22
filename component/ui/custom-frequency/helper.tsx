@@ -1,5 +1,7 @@
+import { Platform } from "react-native";
 import { CustomPattern, Unit } from "./types";
 
+const isAndroid = Platform.OS === "android";
 export const DEFAULT_PATTERN: CustomPattern = {
   unit: "HOURLY",
   intervalValue: 3,
@@ -9,10 +11,10 @@ export const DEFAULT_PATTERN: CustomPattern = {
 export const HEIGHT = {
   COLLAPSED: 60,
   EXPANDED: {
-    BASE: 150, // Without extra option.
-    EXTRA: 190, // With extra opiton when user pick "DAILY".
-    PICKER: 375, // Full height if extra option isn't included.
-    EXTRA_WITH_PICKER: 415, // Full height if extra option is included.
+    BASE: isAndroid ? 170 : 165, // Without extra option.
+    EXTRA: isAndroid ? 220 : 210, // With extra opiton when user pick "DAILY".
+    PICKER: 390, // Full height if extra option isn't included. (IOS ONLY)
+    EXTRA_WITH_PICKER: 430, // Full height if extra option is included. (IOS ONLY)
   },
 };
 
@@ -35,6 +37,7 @@ export const getUnitValueLabel = (unit: Unit, value: number) => {
       return "дней";
     }
   }
+
   if (unit === "HOURLY") {
     if (num === 1) {
       return "час";
