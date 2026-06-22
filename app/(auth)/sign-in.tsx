@@ -2,7 +2,7 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
@@ -142,13 +142,14 @@ export default function SignInScreen() {
 
         <View style={styles.submitButtonWrapper}>
           <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
-          <ThemedText style={styles.resetPasswordText}>
-            Забыли пароль?
-            <Link href="/forget-password" style={{ color: linkColor }}>
-              {" "}
-              Нажмите здесь
+          <View style={styles.resetPassword}>
+            <ThemedText style={styles.resetPasswordText}>Забыли пароль?</ThemedText>
+            <Link href="/forget-password" asChild>
+              <Pressable>
+                <Text style={[styles.resetPasswordText, { color: linkColor }]}>Нажмите здесь</Text>
+              </Pressable>
             </Link>
-          </ThemedText>
+          </View>
         </View>
 
         <View style={styles.socialButtonWrapper}>
@@ -163,12 +164,12 @@ export default function SignInScreen() {
         </View>
 
         <View style={styles.footerWrapper}>
-          <ThemedText style={styles.footerText}>
-            Нет аккаунта?{"  "}
-            <Link href="/create-account" style={{ color: linkColor }}>
-              Создать аккаунт
-            </Link>
-          </ThemedText>
+          <ThemedText style={styles.footerText}>Нет аккаунта?</ThemedText>
+          <Link href="/create-account" asChild>
+            <Pressable>
+              <Text style={[styles.footerText, { color: linkColor }]}>Создать аккаунт</Text>
+            </Pressable>
+          </Link>
         </View>
       </View>
     </ScrollView>
@@ -188,12 +189,19 @@ const styles = StyleSheet.create({
   submitButtonWrapper: {
     gap: 16,
   },
+  resetPassword: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    gap: 2,
+  },
   resetPasswordText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 12,
-    lineHeight: 14.5,
+    fontFamily: "Roboto_500Medium",
+    fontSize: 14,
+    lineHeight: 18.2,
     textAlign: "center",
   },
+
   socialButtonWrapper: {
     gap: 12,
   },
@@ -216,14 +224,15 @@ const styles = StyleSheet.create({
   footerWrapper: {
     marginTop: "auto",
     width: "100%",
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
   },
   footerText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 12,
-    lineHeight: 14.4,
-  },
-  footerLink: {
     fontFamily: "Roboto_500Medium",
+    fontSize: 14,
+    lineHeight: 18.2,
+    textAlign: "center",
   },
 });

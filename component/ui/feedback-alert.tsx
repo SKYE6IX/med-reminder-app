@@ -6,8 +6,6 @@ import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,38 +15,43 @@ import ShieldCheckIcon from "../icons/shield-check-icon";
 
 export default function FeedbackAlert() {
   const insets = useSafeAreaInsets();
-  const { visible, status, title, message } = useFeedBackStore();
+  const { visible, status, title, message, hideFeedBack } = useFeedBackStore();
 
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(-80);
-
   const top = insets.top;
+
+  // Handle Animations
   useEffect(() => {
+    const DURATION = 250;
     if (visible) {
-      opacity.value = withSequence(
-        withTiming(1, {
-          duration: 250,
-          easing: Easing.out(Easing.ease),
-        }),
-
-        withDelay(2350, withTiming(0, { duration: 250 })),
-      );
-
-      translateY.value = withSequence(
-        withTiming(top, {
-          duration: 350,
-          easing: Easing.out(Easing.back(1.4)),
-        }),
-        withDelay(
-          2000,
-          withTiming(-80, {
-            duration: 300,
-            easing: Easing.in(Easing.ease),
-          }),
-        ),
-      );
+      opacity.value = withTiming(1, {
+        duration: DURATION,
+        easing: Easing.out(Easing.ease),
+      });
+      translateY.value = withTiming(top, {
+        duration: 350,
+        easing: Easing.out(Easing.back(1.4)),
+      });
+    } else if (!visible) {
+      opacity.value = withTiming(0, { duration: DURATION, easing: Easing.out(Easing.ease) });
+      translateY.value = withTiming(-80, {
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+      });
     }
   }, [opacity, top, translateY, visible]);
+
+  // Auto hide the animation if user doesn't react to it
+  useEffect(() => {
+    let timeout: number;
+    if (visible) {
+      timeout = setTimeout(() => {
+        useFeedBackStore.getState().hideFeedBack();
+      }, 4000);
+    }
+    return () => clearTimeout(timeout);
+  }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -74,37 +77,18 @@ export default function FeedbackAlert() {
           },
         ]}
       >
-        <View
-          style={[
-            styles.icon,
-            { backgroundColor: isSuccess ? successColor : errorColor },
-          ]}
-        >
-          {isSuccess ? (
-            <ShieldCheckIcon />
-          ) : (
-            <ExclamationCircleIcon color="#fff" />
-          )}
+        <View style={[styles.icon, { backgroundColor: isSuccess ? successColor : errorColor }]}>
+          {isSuccess ? <ShieldCheckIcon /> : <ExclamationCircleIcon color="#fff" />}
         </View>
         <View style={styles.textWrapper}>
-          <Text
-            style={[
-              styles.title,
-              { color: isSuccess ? successColorText : errorColorText },
-            ]}
-          >
+          <Text style={[styles.title, { color: isSuccess ? successColorText : errorColorText }]}>
             {title}
           </Text>
-          <Text
-            style={[
-              styles.message,
-              { color: isSuccess ? successColorText : errorColorText },
-            ]}
-          >
+          <Text style={[styles.message, { color: isSuccess ? successColorText : errorColorText }]}>
             {message}
           </Text>
         </View>
-        <Pressable style={styles.closeIcon}>
+        <Pressable style={styles.closeIcon} onPress={hideFeedBack}>
           <CloseIcon color={isSuccess ? successColorText : errorColorText} />
         </Pressable>
       </View>

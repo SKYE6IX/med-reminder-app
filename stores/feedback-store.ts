@@ -22,9 +22,9 @@ export const useFeedBackStore = create<FeebackStore>()((set) => ({
   status: "success",
   title: "",
   message: "",
+
   showFeedBack({ title, message, status }) {
     set({ title, message, status, visible: true });
-    setTimeout(() => set({ visible: false }), 15000);
   },
   hideFeedBack() {
     set({ visible: false });

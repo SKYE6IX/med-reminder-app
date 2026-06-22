@@ -34,7 +34,6 @@ export default function NewPasswordScreen() {
   const { showFeedBack } = useFeedBackStore();
 
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
-
   const [resetPassword, setResetPassword] = useState({ newPassword: "", repeatPassword: "" });
   const [inputErrorList, setInputErrorList] = useState([""]);
 
@@ -72,20 +71,16 @@ export default function NewPasswordScreen() {
 
   const handleResetPassword = async () => {
     const validInputEmail = validateResetPasswordInputs({ newPassword: resetPassword.newPassword });
-
     if (validInputEmail.error) {
       setInputErrorList((prvState) => [...prvState, "newPassword"]);
       return;
     }
-
     if (resetPassword.newPassword !== resetPassword.repeatPassword) {
       setInputErrorList((prvState) => [...prvState, "repeatPassword"]);
       return;
     }
-
     const email = await readFromStorage<string>(STORAGE_KEY_EMAIL);
     const token = await readFromStorage<string>(STORAGE_KEY_TOKEN);
-
     if (email && token) {
       mutate({ email, token: Number(token), newPassword: resetPassword.newPassword });
     }

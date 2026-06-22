@@ -2,7 +2,7 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, TextInput, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
@@ -172,17 +172,16 @@ export default function CreateAccountScreen() {
             <ThemedText style={styles.dividerText}>Или</ThemedText>
             <View style={styles.divider} />
           </View>
-
           {Platform.OS === "ios" && <AppleSignIn type="SIGN_UP" />}
         </View>
 
         <View style={styles.footerWrapper}>
-          <ThemedText style={styles.footerText}>
-            Уже есть аккаунт?{"  "}
-            <Link href="/sign-in" style={{ color: linkColor }}>
-              Войти
-            </Link>
-          </ThemedText>
+          <ThemedText style={styles.footerText}>Уже есть аккаунт?</ThemedText>
+          <Link href="/sign-in" asChild>
+            <Pressable>
+              <Text style={[styles.footerText, { color: linkColor }]}>Войти</Text>
+            </Pressable>
+          </Link>
         </View>
       </View>
     </ScrollView>
@@ -230,14 +229,15 @@ const styles = StyleSheet.create({
   footerWrapper: {
     marginTop: "auto",
     width: "100%",
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
   },
   footerText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 12,
-    lineHeight: 14.4,
-  },
-  footerLink: {
     fontFamily: "Roboto_500Medium",
+    fontSize: 14,
+    lineHeight: 18.2,
+    textAlign: "center",
   },
 });

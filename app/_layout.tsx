@@ -164,13 +164,15 @@ export default function RootLayout() {
   );
 }
 
-// TODO:
-// Test App on Wider screen, to make sure it render properly.
-// Reset all local setting back to default when user delete their account. ✅
-// Social login issue:
-//  It's possible that when user delete their account, and if for some reason they want to sign in again,
-//  we don't have access to name or email.
+// NOTE:
+// We have a situation, when user doesn't allow notification to our app,
+// whhic mean we can't set a notification for them. What shall we do:
+// 1. Allow them to create a medication, but alert them that they won't receive a
+//  notifications for this particular medications.
 
-// When sign out and sign in, data are not sync immdiately with the current user. ✅
-// Clear all data if user sign out also. ✅
-// Confirm data are fresh when user sign in again ✅
+// 2. Prevent them from creating a medication, since after a creation of medication
+//  we are creating a notification, and this will throw an error if the user does
+//  not allow our app to acess notification.
+
+// In both cases, we need to handle all situation so that our app won't break
+// or cause an error whcih user won't like.

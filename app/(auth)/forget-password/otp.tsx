@@ -2,6 +2,7 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
+import { useRequestResetPasswordToken } from "@/hooks/use-request-reset-password-token";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api } from "@/utils/axiosInstance";
@@ -18,6 +19,14 @@ import {
   type TextInputKeyPressEvent,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+interface OTPState {
+  userEmail: string;
+  token: string;
+  inputValues: string[];
+  focusedIndex: number | null;
+  retryAfter: number;
+}
 
 const STORAGE_KEY_TOKEN = "password:reset:token";
 const STORAGE_KEY_EMAIL = "password:reset:email";
@@ -39,38 +48,51 @@ const verifyPasswordResetToken = async ({ email, token }: { email: string; token
   return response.data;
 };
 
+const TOKEN_LENGTH = 6;
+const RETRY_AFTER_SECONDS = 60;
+
 export default function OTPVerificationScreen() {
   const router = useRouter();
-  const TOKEN_LENGTH = 6;
   const insets = useSafeAreaInsets();
+
   const inputRefs = useRef<TextInput[]>([]);
 
   const { showFeedBack } = useFeedBackStore();
+  const { requestResetPasswordToken } = useRequestResetPasswordToken({ onSuccessAction() {} });
 
-  const [userEmail, setUserEmail] = useState("");
-  const [token, setToken] = useState("");
-  const [values, setValues] = useState<string[]>(new Array(TOKEN_LENGTH).fill(""));
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const [otpState, setOtpState] = useState<OTPState>({
+    userEmail: "",
+    token: "",
+    inputValues: new Array(TOKEN_LENGTH).fill(""),
+    focusedIndex: null,
+    retryAfter: RETRY_AFTER_SECONDS,
+  });
 
+  // Consumed the user email from an Async local storage for
+  // consumptions
   useEffect(() => {
     const readValueFromStorage = async () => {
       const email = await readFromStorage<string>(STORAGE_KEY_EMAIL);
       if (email) {
-        setUserEmail(email);
+        setOtpState((state) => ({ ...state, userEmail: email }));
       }
     };
     readValueFromStorage();
   }, []);
 
-  const isTokenFilled = token.length === TOKEN_LENGTH;
+  // Implement timer for rate limit, which user need to wait
+  // before they can request for a new token in case the
+  //  previuos sent isn't available
+  useEffect(() => {
+    if (otpState.retryAfter <= 0) return;
+    const t = setInterval(
+      () => setOtpState((state) => ({ ...state, retryAfter: state.retryAfter - 1 })),
+      1000,
+    );
+    return () => clearInterval(t);
+  }, [otpState.retryAfter]);
 
-  const inputBgColor = useThemeColor({}, "backgroundSecondary");
-  const backgroundColor = useThemeColor({}, "backgroundPrimary");
-  const inputBorderColor = useThemeColor({}, "borderColor");
-  const tintColor = useThemeColor({}, "tint");
-  const textColor = useThemeColor({}, "textPrimary");
-  const filledBorderColor = useThemeColor({}, "feedbackSuccess");
-
+  const isTokenFilled = otpState.token.length === TOKEN_LENGTH;
   const handleOnChange = (text: string, index: number) => {
     // Let check if user paste the token
     if (text.replace(/\D/g, "").length === TOKEN_LENGTH) {
@@ -81,18 +103,17 @@ export default function OTPVerificationScreen() {
           newValues[i] = d;
         }
       });
-
-      setValues(newValues);
-      setToken(newValues.join(""));
+      setOtpState((state) => ({ ...state, inputValues: newValues }));
+      setOtpState((state) => ({ ...state, token: newValues.join("") }));
       inputRefs.current[TOKEN_LENGTH - 1].focus();
     } else {
       // It's single digit
       const digit = text.replace(/\D/g, "");
-      const newValues = [...values];
+      const newValues = [...otpState.inputValues];
       newValues[index] = digit;
-      setValues(newValues);
+      setOtpState((state) => ({ ...state, inputValues: newValues }));
       const token = newValues.join("");
-      setToken(token);
+      setOtpState((state) => ({ ...state, token }));
       if (digit && index < TOKEN_LENGTH - 1) {
         inputRefs.current[index + 1]?.focus();
       }
@@ -101,22 +122,20 @@ export default function OTPVerificationScreen() {
 
   const handleOnKeyPress = (event: TextInputKeyPressEvent, index: number) => {
     if (event.nativeEvent.key === "Backspace") {
-      const newValues = [...values];
+      const newValues = [...otpState.inputValues];
       newValues[index] = "";
-      setValues(newValues);
+      setOtpState((state) => ({ ...state, inputValues: newValues }));
       const token = newValues.join("");
-      setToken(token);
+      setOtpState((state) => ({ ...state, token }));
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const { refetch, isLoading } = useQuery({
     queryKey: ["token-verification"],
-
     queryFn: () => {
-      return verifyPasswordResetToken({ email: userEmail, token: Number(token) });
+      return verifyPasswordResetToken({ email: otpState.userEmail, token: Number(otpState.token) });
     },
-
     enabled: false,
   });
 
@@ -124,8 +143,8 @@ export default function OTPVerificationScreen() {
     refetch({ throwOnError: true })
       .then(async () => {
         router.navigate("/forget-password/new-password");
-        await saveToStorage(STORAGE_KEY_TOKEN, token);
-        setValues((prvState) => new Array(TOKEN_LENGTH).fill(""));
+        await saveToStorage(STORAGE_KEY_TOKEN, otpState.token);
+        setOtpState((state) => ({ ...state, inputValues: new Array(TOKEN_LENGTH).fill("") }));
       })
       .catch(() => {
         showFeedBack({
@@ -136,6 +155,14 @@ export default function OTPVerificationScreen() {
       });
   };
 
+  // Themes
+  const inputBgColor = useThemeColor({}, "backgroundSecondary");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
+  const inputBorderColor = useThemeColor({}, "borderColor");
+  const tintColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "textPrimary");
+  const filledBorderColor = useThemeColor({}, "feedbackSuccess");
+
   return (
     <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
       <Loader visible={isLoading} />
@@ -145,8 +172,12 @@ export default function OTPVerificationScreen() {
             Введите код
           </ThemedText>
           <ThemedText type="subtitle" style={styles.subtitle}>
-            Мы отправили код подтверждения на вашу почту {maskEmailAddress(userEmail)}{" "}
-            <Text onPress={() => router.back()} style={[styles.link, { color: tintColor }]}>
+            Мы отправили код подтверждения на вашу почту {maskEmailAddress(otpState.userEmail)}.{" "}
+            <Text
+              onPress={() => router.back()}
+              style={[styles.changeEmaiAction, { color: tintColor }]}
+              suppressHighlighting
+            >
               Изменить
             </Text>
           </ThemedText>
@@ -169,12 +200,12 @@ export default function OTPVerificationScreen() {
                     backgroundColor: inputBgColor,
                     borderColor: isTokenFilled
                       ? filledBorderColor
-                      : focusedIndex === i
+                      : otpState.focusedIndex === i
                         ? tintColor
                         : inputBorderColor,
                   },
                 ]}
-                value={values[i]}
+                value={otpState.inputValues[i]}
                 onChangeText={(text) => handleOnChange(text, i)}
                 onKeyPress={(event) => handleOnKeyPress(event, i)}
                 autoFocus={i === 0}
@@ -182,21 +213,33 @@ export default function OTPVerificationScreen() {
                 keyboardType="number-pad"
                 autoComplete="sms-otp"
                 selectTextOnFocus
-                onFocus={() => setFocusedIndex(i)}
+                onFocus={() => setOtpState((state) => ({ ...state, focusedIndex: i }))}
                 onBlur={() => {
-                  setFocusedIndex(null);
+                  setOtpState((state) => ({ ...state, focusedIndex: null }));
                 }}
               />
             ))}
           </View>
 
           <View style={styles.bodyBottom}>
-            <ThemedText style={[{ color: textColor }, styles.bodyBottomText]}>
+            <ThemedText style={[styles.bodyBottomText, { color: textColor }]}>
               Не получили код?{" "}
             </ThemedText>
-            <Pressable>
-              <Text style={[{ color: tintColor }, styles.bodyBottomText]}>Отправить повторно</Text>
-            </Pressable>
+            {otpState.retryAfter <= 0 ? (
+              <Pressable
+                onPress={() => {
+                  requestResetPasswordToken({ email: otpState.userEmail });
+                }}
+              >
+                <Text style={[styles.bodyBottomText, { color: tintColor }]}>
+                  Отправить повторно
+                </Text>
+              </Pressable>
+            ) : (
+              <Text style={[styles.bodyBottomText, { color: textColor }]}>
+                Ещё раз {`через 00:${String(otpState.retryAfter).padStart(2, "0")}`}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -233,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 17.2,
   },
-  link: {
+  changeEmaiAction: {
     fontFamily: "Roboto_500Medium",
     borderWidth: 1,
     borderColor: "red",
@@ -260,14 +303,15 @@ const styles = StyleSheet.create({
   },
   bodyBottom: {
     flexDirection: "row",
-    gap: 4,
     alignItems: "center",
     justifyContent: "center",
+    gap: 2,
   },
   bodyBottomText: {
-    fontFamily: "Roboto_400Regular",
-    fontSize: 12,
-    lineHeight: 14.4,
+    fontFamily: "Roboto_500Medium",
+    fontSize: 14,
+    lineHeight: 18.2,
+    textAlign: "center",
   },
   button: {
     marginTop: 32,
