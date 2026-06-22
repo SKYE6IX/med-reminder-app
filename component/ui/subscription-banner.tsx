@@ -1,58 +1,75 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useUserStore } from "@/stores/use-user-store";
 import { useRouter } from "expo-router";
-import { RefObject, useCallback, useImperativeHandle, useState } from "react";
+import { RefObject, useCallback, useEffect, useImperativeHandle, useState } from "react";
 import { Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import StarIcon from "../icons/star-icon";
 import CustomButton from "./custom-button/custom-button";
 
 export interface SubscriptionBannerRef {
-  toggleBanner: () => void;
+  openModal: () => void;
+  closeModal: () => void;
 }
 
 type SubscriptionBannerProps = {
   ref: RefObject<SubscriptionBannerRef | null> | null;
-  onModalClose?: () => void;
 };
 
-const DURATION = 500;
-export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBannerProps) {
+export default function SubscriptionBanner({ ref }: SubscriptionBannerProps) {
   const isAndroid = Platform.OS === "android";
   const router = useRouter();
+
   const [showModal, setShowModal] = useState(false);
   const [modalKey, setModalKey] = useState(0);
 
-  const progress = useDerivedValue(() => withTiming(showModal ? 0 : 1, { duration: DURATION }));
+  const opacity = useSharedValue(0);
 
-  const backdropStyle = useAnimatedStyle(() => ({
-    opacity: 1 - progress.value,
-  }));
+  useEffect(() => {
+    if (showModal) {
+      opacity.value = withDelay(370, withTiming(1, { easing: Easing.out(Easing.ease) }));
+    } else if (!showModal) {
+      opacity.value = 0;
+    }
+  }, [opacity, showModal]);
 
-  const color = useThemeColor({}, "textPrimary");
-  const tintColor = useThemeColor({}, "tint");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-  const bgTertiary = useThemeColor({}, "backgroundTertiary");
-
-  const toggleBanner = useCallback(() => {
+  const openModal = useCallback(() => {
     setModalKey((prev) => prev + 1);
-    setShowModal((prv) => !prv);
+    setShowModal(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalKey((prev) => prev + 1);
+    setShowModal(false);
+    // Track if auto show modal is active
+    // turn it of once user click away from it.
+    if (useUserStore.getState().displaySubscriptioOffer) {
+      useUserStore.getState().disabledShowSubscriptionOffer();
+    }
   }, []);
 
   useImperativeHandle(
     ref,
     () => ({
-      toggleBanner() {
-        toggleBanner();
+      openModal() {
+        openModal();
+      },
+      closeModal() {
+        closeModal();
       },
     }),
-    [toggleBanner],
+    [closeModal, openModal],
   );
 
   const navigateToSubscritionPlan = () => {
-    toggleBanner();
+    closeModal();
     router.navigate("/(tabs)/settings/subscription-plan");
-
     // On android, the navigation fall back to the index setting page
     // we add a little delay after the initial to push the real page we
     // want
@@ -63,10 +80,16 @@ export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBa
     }
   };
 
-  const closeModal = () => {
-    toggleBanner();
-    onModalClose && onModalClose();
-  };
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
+  const bgTertiary = useThemeColor({}, "backgroundTertiary");
+
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   return (
     <Modal
@@ -76,6 +99,7 @@ export default function SubscriptionBanner({ ref, onModalClose }: SubscriptionBa
       transparent={true}
       presentationStyle="overFullScreen"
       onRequestClose={() => setShowModal(false)}
+      hardwareAccelerated
     >
       <View style={styles.container}>
         <Animated.View style={[styles.backdrop, backdropStyle]}>

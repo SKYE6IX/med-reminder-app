@@ -36,18 +36,26 @@ export const formatRegularDate = (isoDate: string) => {
     locale: "ru-RU",
     setZone: true,
   });
+
   const today = DateTime.now();
   const tomorrow = today.plus({ days: 1 });
+
+  const toLocaleOptions: DateTimeFormatOptions = {
+    month: "long",
+    day: "2-digit",
+  };
 
   if (date.hasSame(today, "day")) {
     return "Сегодня";
   }
-
   if (date.hasSame(tomorrow, "day")) {
     return "Завтра";
   }
 
-  return date.toFormat("MMMM d", { locale: "ru" });
+  return date.toLocaleString({
+    ...toLocaleOptions,
+    weekday: "short",
+  });
 };
 
 export const formatHomeScreenDate = (isoDate: string) => {
@@ -74,6 +82,7 @@ export const formatHomeScreenDate = (isoDate: string) => {
   if (date.hasSame(yesterday, "day")) {
     return `вчера, ${yesterday.toLocaleString(toLocaleOptions)}`;
   }
+
   return date.toLocaleString({
     ...toLocaleOptions,
     weekday: "long",

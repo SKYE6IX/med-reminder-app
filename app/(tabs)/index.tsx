@@ -76,20 +76,15 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(localDateString);
   const subscriptionBannerRef = useRef<SubscriptionBannerRef>(null);
 
-  // Show premimum plan offer to user
+  // Show premimum plan offer once to newly user.
   useEffect(() => {
-    let id: number;
-
+    let timeout: number;
     if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
-      id = setTimeout(() => {
-        subscriptionBannerRef.current?.toggleBanner();
-
-        // We turn it off immediately so it doesn't show again
-        useUserStore.getState().disabledShowSubscriptionOffer();
+      timeout = setTimeout(() => {
+        subscriptionBannerRef.current?.openModal();
       }, 2000);
     }
-
-    return () => clearTimeout(id);
+    return () => clearTimeout(timeout);
   }, [isPremiumPlan]);
 
   // Query schedule event list

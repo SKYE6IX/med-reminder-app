@@ -113,7 +113,7 @@ export default function StockDosageSettings({
     if (isPremiumPlan) {
       bottomSheetRef.current?.open();
     } else {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   };
 

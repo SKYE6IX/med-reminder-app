@@ -77,7 +77,7 @@ export default function Settings() {
     if (isPremiumPlan) {
       router.navigate("/(tabs)/settings/reminders");
     } else {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   };
 

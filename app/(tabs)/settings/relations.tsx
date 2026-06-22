@@ -54,7 +54,7 @@ export default function Relations() {
     if (isPremiumPlan) {
       addProfileBottomSheetRef.current?.open();
     } else {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   };
 

@@ -41,7 +41,7 @@ export default function AddPillLayout() {
   // Guard expect a boolean
   useEffect(() => {
     if (isPageActive && !canCreateMedicationProfile) {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   }, [canCreateMedicationProfile, isPageActive]);
 

@@ -68,7 +68,7 @@ export default function FinalStepScreen() {
   // Add medication pack toggle switch
   const toggleSwitch = () => {
     if (!isPremiumPlan) {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     } else {
       const isToggle = !showRefillBox;
 

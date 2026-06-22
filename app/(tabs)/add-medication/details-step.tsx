@@ -63,14 +63,14 @@ export default function DetailsStepScreen() {
     if (isPremiumPlan) {
       chooseProfileBottomSheet.current?.open();
     } else {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   };
   const handleAddNewProfile = () => {
     if (isPremiumPlan) {
       newProfileBottomSheet.current?.open();
     } else {
-      openBannerRef.current?.toggleBanner();
+      openBannerRef.current?.openModal();
     }
   };
 
