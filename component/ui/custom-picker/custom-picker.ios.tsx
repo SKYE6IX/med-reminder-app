@@ -38,7 +38,11 @@ export default function CustomPicker({
     <Animated.View
       style={[
         styles.customPickerWrapper,
-        { backgroundColor: bGColorSecondary, height, overflow: "hidden" },
+        {
+          backgroundColor: bGColorSecondary,
+          height,
+          overflow: "hidden",
+        },
       ]}
     >
       <View style={styles.customPickerHeader}>

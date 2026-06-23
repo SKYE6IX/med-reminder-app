@@ -1,4 +1,4 @@
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { RefObject, useImperativeHandle, useRef, useState } from "react";
 import { View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
@@ -14,26 +14,26 @@ export type DateTimeWrapperProps = {
   mode: "date" | "time";
   bottomSheetTitle?: string;
   disabledDate?: boolean;
-
+  onDateTimeChange: (dateTime: Date) => void;
   // @platform IOS ONLY
   showUpdateButton?: boolean;
   onUpdateButtonPress?: () => void;
-  // The event is only used with Android.
-  onDateTimeSelected: (dateTime: Date, event?: DateTimePickerEvent["type"]) => void;
 };
+
+const getNow = () => Date.now();
 
 export default function DateTimeWrapper({
   ref,
   mode,
   bottomSheetTitle,
-  onDateTimeSelected,
+  onDateTimeChange,
   showUpdateButton,
   onUpdateButtonPress,
   disabledDate = true,
 }: DateTimeWrapperProps) {
-  const now = Date.now();
   const bottomSheetWrapperRef = useRef<BottomSheetWrapperRef>(null);
-  const [date, setDate] = useState(new Date(now));
+
+  const [date, setDate] = useState(new Date(getNow()));
 
   useImperativeHandle(ref, () => ({
     showDateTime() {
@@ -47,7 +47,7 @@ export default function DateTimeWrapper({
   const handleSetDateTime = (date?: Date) => {
     if (date) {
       setDate(date);
-      onDateTimeSelected(date);
+      onDateTimeChange(date);
     }
   };
 
@@ -55,7 +55,7 @@ export default function DateTimeWrapper({
     <BottomSheetWrapper
       ref={bottomSheetWrapperRef}
       title={bottomSheetTitle || ""}
-      snapPointPercent={showUpdateButton ? "50%" : "45%"}
+      snapPointPercent={showUpdateButton ? "45%" : "40%"}
     >
       <View
         style={{
@@ -68,10 +68,10 @@ export default function DateTimeWrapper({
         <DateTimePicker
           value={date}
           mode={mode}
-          onChange={(event, date) => handleSetDateTime(date)}
+          onValueChange={(event, date) => handleSetDateTime(date)}
           display={mode === "date" ? "inline" : "spinner"}
           locale="ru-RU"
-          minimumDate={disabledDate && mode === "date" ? new Date(now) : undefined}
+          minimumDate={disabledDate && mode === "date" ? new Date(getNow()) : undefined}
         />
         {showUpdateButton && <CustomButton label="Применить" onPress={onUpdateButtonPress} />}
       </View>

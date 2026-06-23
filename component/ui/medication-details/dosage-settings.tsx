@@ -49,7 +49,12 @@ export default function DetailsDosageSettings({
           </Text>
         </View>
       </Pressable>
-      <DosageAmountInput showInputRef={showDosageAmountInputRef} onSetValue={handleUpdateDosage} />
+
+      <DosageAmountInput
+        measurementValue={medicationProfile.schedule.measurement}
+        showInputRef={showDosageAmountInputRef}
+        onSetValue={handleUpdateDosage}
+      />
       <Loader visible={isPending} />
     </React.Fragment>
   );

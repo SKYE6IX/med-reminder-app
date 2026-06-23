@@ -1,32 +1,32 @@
 import { DOSAGE_MEASUREMENT } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import DosageAmountInput from "./dosage-amount-input";
 
-type DosageSettingsProps = {
-  dosageAmountState: number;
-  dosageUnitState: DosageMeasurement;
-  onDasgeSettingsChange: ({
-    amount,
-    unit,
-  }: Partial<{ amount: string; unit: DosageMeasurement }>) => void;
-};
-
 const UNIT_PRESSABLE_PER_ROW = 3;
-
 const UNIT_WRAPPER_GAP = 12;
 
-export default function DosageAmounPicker({
-  dosageAmountState,
-  dosageUnitState,
-  onDasgeSettingsChange,
-}: DosageSettingsProps) {
+export default function DosageAmounPicker() {
   const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
 
   const showDosageAmountInputRef = useRef<BottomSheetWrapperRef>(null);
+  const { formState, setMedicatioSchedule, setMedicationDetails } = useAddPillStore();
+
+  const dosageAmountState = Number(formState.schedule.dosage);
+  const dosageMeasurements = formState.medicationMeasurement;
+
+  const UNIT_PRESSABLE_WIDTH = (unitWrapperWidth - UNIT_WRAPPER_GAP * 2) / UNIT_PRESSABLE_PER_ROW;
+
+  const handleSetDosageUnit = (measurement: DosageMeasurement) => {
+    setMedicationDetails({ medicationMeasurement: measurement });
+  };
+  const handleSetDosageAmount = (amount: string) => {
+    setMedicatioSchedule({ dosage: amount });
+  };
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
@@ -34,16 +34,6 @@ export default function DosageAmounPicker({
   const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
-
-  const UNIT_PRESSABLE_WIDTH = (unitWrapperWidth - UNIT_WRAPPER_GAP * 2) / UNIT_PRESSABLE_PER_ROW;
-
-  const handleSetDosageUnit = (unit: DosageMeasurement) => {
-    onDasgeSettingsChange({ unit });
-  };
-
-  const handleSetDosageAmount = (amount: string) => {
-    onDasgeSettingsChange({ amount });
-  };
 
   return (
     <View style={[styles.container, { borderColor, backgroundColor: bGColor }]}>
@@ -71,7 +61,7 @@ export default function DosageAmounPicker({
           }}
         >
           {DOSAGE_MEASUREMENT.map((unit) => {
-            const isSelected = unit.value === dosageUnitState.toUpperCase();
+            const isSelected = unit.value === dosageMeasurements.toUpperCase();
             return (
               <Pressable
                 key={unit.value}
@@ -98,6 +88,7 @@ export default function DosageAmounPicker({
 
       {/* DOSAGE AMOUNT INPUT */}
       <DosageAmountInput
+        measurementValue={dosageMeasurements}
         showInputRef={showDosageAmountInputRef}
         onSetValue={handleSetDosageAmount}
       />

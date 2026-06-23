@@ -26,8 +26,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 const COLLAPSED = 75;
-const HALF_EXPAND = 170;
-const FULL_EXPAND = 390;
+const HALF_EXPAND = 200;
+const FULL_EXPAND = 400;
 
 const createMedicationMutation = async (body: CreateMedication) => {
   const response = await api.post<MedicationProfile>("medications", body);

@@ -3,9 +3,9 @@ import NoteIcon from "@/component/icons/note-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
-import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
@@ -34,8 +34,10 @@ export default function DetailsNoteSettings({
   const borderColor = useThemeColor({}, "borderColor");
 
   const handleUpdateNote = () => {
-    mutate({ id: medicationProfile.id, data: { note: updatedNote } });
+    const note = updatedNote.length > 1 ? updatedNote : "";
+    mutate({ id: medicationProfile.id, data: { note } });
     bottomSheetRef.current?.close();
+    Keyboard.dismiss();
   };
 
   return (
@@ -53,13 +55,13 @@ export default function DetailsNoteSettings({
         </View>
 
         <BottomSheetWrapper ref={bottomSheetRef} title="Изменить заметку">
-          <View style={{ gap: 16 }}>
+          <BottomSheetScrollView contentContainerStyle={{ gap: 32, height: 500 }}>
             <BottomSheetTextInput
               value={updatedNote}
               onChangeText={(value) => setUpdateNote(value)}
               autoCorrect={true}
               multiline={true}
-              numberOfLines={4}
+              numberOfLines={5}
               textAlignVertical="top"
               scrollEnabled={true}
               returnKeyType="default"
@@ -69,7 +71,6 @@ export default function DetailsNoteSettings({
               maxLength={500}
               style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
             />
-
             <CustomButton
               label="Применить"
               onPress={handleUpdateNote}
@@ -77,7 +78,7 @@ export default function DetailsNoteSettings({
               variant={canUpdate ? "filled" : "disabled"}
               textVaraint={canUpdate ? "regularText" : "mutedText"}
             />
-          </View>
+          </BottomSheetScrollView>
         </BottomSheetWrapper>
       </Pressable>
 

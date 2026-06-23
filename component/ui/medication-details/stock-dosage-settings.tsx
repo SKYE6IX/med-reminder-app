@@ -5,11 +5,12 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationProfile } from "@/types/medication";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import React, { useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
@@ -31,11 +32,20 @@ export default function StockDosageSettings({
 }: {
   medicationProfile: MedicationProfile;
 }) {
+  const isAndroid = Platform.OS === "android";
+  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+  const inset = useSafeAreaInsets();
   const { showFeedBack } = useFeedBackStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
+  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
+  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
+
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
+
   const [medicationPack, setMedicationPack] = useState<MedicationPackCreation>({
     medicationProfileId: medicationProfile.id,
     totalQuantity: "",
@@ -57,7 +67,6 @@ export default function StockDosageSettings({
   const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
   };
-
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, reminderDays: Number(selectedValue) }));
   };
@@ -76,12 +85,10 @@ export default function StockDosageSettings({
           amountInPack: data.amountInPack,
         }),
       );
-
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
       ]);
-
       showFeedBack({
         title: "Успешно",
         message: "Пополнение добавлено в напоминание.",
@@ -90,13 +97,7 @@ export default function StockDosageSettings({
       bottomSheetRef.current?.close();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
-
     onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when updating medication profile -> ", error);
-      } else {
-        console.log("An Unknown error occur when updating medication profile -> ", error);
-      }
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
@@ -106,6 +107,14 @@ export default function StockDosageSettings({
   });
 
   const handleAddMedicationPackMutation = () => {
+    if (medicationPack.reminderDays <= 0) {
+      showFeedBack({
+        title: "Неверный ввод",
+        message: "Пожалуйста, добавьте напоминание о приеме лекарств.",
+        status: "error",
+      });
+      return;
+    }
     mutate(medicationPack);
   };
 
@@ -147,27 +156,30 @@ export default function StockDosageSettings({
       )}
 
       <BottomSheetWrapper ref={bottomSheetRef} title="Напоминание о пополнении">
-        <View style={styles.bottomSheetContainer}>
+        <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
           <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
           <MedicationPackPicker
             amountInPack={amountInPack}
             refillDaysReminder={reminderDays}
             onAmountInPackSet={handleAmountInPackSet}
             onRefillDaysReminderSet={handleRefillDaysSet}
+            dosageAmount={medicationProfile.schedule.dosage}
+            measurementValue={medicationProfile.schedule.measurement}
           />
+
           <CustomButton
             label="Добавить"
             disabled={!canContinue || isPending}
             variant={canContinue ? "filled" : "disabled"}
             textVaraint={canContinue ? "regularText" : "mutedText"}
             onPress={handleAddMedicationPackMutation}
+            style={{ marginTop: "auto" }}
           />
         </View>
       </BottomSheetWrapper>
 
       {/* LOADER */}
       <Loader visible={isPending} />
-
       {/* SUBSCRIPTION OFFER */}
       <SubscriptionBanner ref={openBannerRef} />
     </React.Fragment>

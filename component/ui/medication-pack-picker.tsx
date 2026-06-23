@@ -89,12 +89,12 @@ export default function MedicationPackPicker({
   //   Theme color
   const color = useThemeColor({}, "textPrimary");
   const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
-  const inputBgColor = useThemeColor({}, "backgroundSecondary");
+  const bgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
 
   return (
     <React.Fragment>
-      <View style={styles.packAmountContainer}>
+      <View style={[styles.packAmountContainer, { backgroundColor: bgColor }]}>
         <Text style={[styles.packAmountLabel, { color }]}>Общее количество</Text>
         <Pressable
           style={[styles.packAmountPressable, { backgroundColor: bGColorTertiary }]}
@@ -105,6 +105,7 @@ export default function MedicationPackPicker({
           </Text>
         </Pressable>
       </View>
+
       <CustomPicker
         label="Напомнить за срок (дни)"
         items={REMINDER_DAYS}
@@ -123,7 +124,7 @@ export default function MedicationPackPicker({
               style={[
                 styles.bottomSheetInput,
                 {
-                  backgroundColor: inputBgColor,
+                  backgroundColor: bgColor,
                   borderColor: inputBorderColor,
                   color,
                 },
@@ -139,7 +140,6 @@ export default function MedicationPackPicker({
               Введите общую сумму в «{measurement}»
             </Text>
           </View>
-
           <CustomButton
             label="Задать"
             style={{ marginTop: "auto" }}
@@ -153,12 +153,14 @@ export default function MedicationPackPicker({
 
 const styles = StyleSheet.create({
   packAmountContainer: {
+    height: 60,
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingLeft: 16,
     paddingRight: 16,
+    borderRadius: 16,
   },
   packAmountLabel: {
     fontFamily: "Roboto_400Regular",

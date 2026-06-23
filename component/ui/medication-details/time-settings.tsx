@@ -8,9 +8,8 @@ import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation"
 import { MedicationProfile } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
 import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import React, { useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
 
@@ -24,6 +23,8 @@ export default function DetailsTimeSettings({
 }: {
   medicationProfile: MedicationProfile;
 }) {
+  const isAndroid = Platform.OS === "android";
+
   const [updatedRule, setUpdatedRule] = useState("");
 
   const { mutate, isPending } = useUpdateMedicationMutation();
@@ -33,8 +34,9 @@ export default function DetailsTimeSettings({
   const sharedStyles = useSharedStyles();
   const color = useThemeColor({}, "textPrimary");
 
-  // Events are only used on ANDROID!!!
-  const handleSetTime = (date: Date, event?: DateTimePickerEvent["type"]) => {
+  const handleOnDateTimeChange = (date: Date) => {
+    console.log("Value change: ");
+
     const newRules = updateTimeOcurrencesRule({
       rrule: medicationProfile.schedule.recurrenceRule,
       date,
@@ -42,7 +44,7 @@ export default function DetailsTimeSettings({
     setUpdatedRule(newRules);
 
     // @platform ANDROID ONLY
-    if (event && event === "set" && medicationProfile.schedule.recurrenceRule !== newRules) {
+    if (isAndroid && medicationProfile.schedule.recurrenceRule !== newRules) {
       mutate({ id: medicationProfile.id, data: { recurrenceRule: newRules } });
     }
   };
@@ -77,7 +79,7 @@ export default function DetailsTimeSettings({
         </View>
       </Pressable>
       <DateTimeWrapper
-        onDateTimeSelected={(date, event) => handleSetTime(date, event)}
+        onDateTimeChange={(date) => handleOnDateTimeChange(date)}
         ref={timeRef}
         mode="time"
         bottomSheetTitle="Время начала"

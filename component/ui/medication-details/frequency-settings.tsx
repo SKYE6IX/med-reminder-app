@@ -6,7 +6,8 @@ import { SchedulePreset } from "@/stores/add-pill-store";
 import { MedicationProfile } from "@/types/medication";
 import { formatRRuleToRussian, generateTimeOccurrences } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 import FrequencySettings from "../frequency-settings";
@@ -18,8 +19,17 @@ export default function DetailsFrequencySettings({
 }: {
   medicationProfile: MedicationProfile;
 }) {
+  const isAndroid = Platform.OS === "android";
+  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+
+  const inset = useSafeAreaInsets();
   const { isPending, mutate } = useUpdateMedicationMutation();
   const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
+
+  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
+
+  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
 
   const [selectedPreset, setSelectedPreset] = useState<SchedulePreset | undefined>(undefined);
   const [updatedRule, setUpdatedRule] = useState("");
@@ -41,17 +51,17 @@ export default function DetailsFrequencySettings({
     setUpdatedRule(rrule);
   };
 
+  const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
+  const occurences = generateTimeOccurrences({
+    rrule: updatedRule,
+  });
+
   const handleUpdateRules = () => {
     bottomSheetRef.current?.close();
     if (updatedRule && updatedRule !== medicationProfile.schedule.recurrenceRule) {
       mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
     }
   };
-  const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
-
-  const occurences = generateTimeOccurrences({
-    rrule: updatedRule,
-  });
 
   return (
     <React.Fragment>
@@ -67,7 +77,7 @@ export default function DetailsFrequencySettings({
       </Pressable>
 
       <BottomSheetWrapper ref={bottomSheetRef} title="Изменить частоту">
-        <View style={{ gap: 16 }}>
+        <View style={{ gap: 16, height: contentHeight }}>
           <FrequencySettings onFreqSet={handleSetFrequency} preset={selectedPreset} />
           <View style={styles.scheduleTimeList}>
             {occurences?.map((time, i) => (

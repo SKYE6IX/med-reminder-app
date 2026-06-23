@@ -200,7 +200,7 @@ export default function UserDetails() {
               </Pressable>
               {/* handleSetTime(date, event) */}
               <DateTimeWrapper
-                onDateTimeSelected={handleOnDateTimeSelected}
+                onDateTimeChange={handleOnDateTimeSelected}
                 ref={datePickerRef}
                 mode="date"
                 bottomSheetTitle="Дата рождения"

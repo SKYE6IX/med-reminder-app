@@ -10,7 +10,6 @@ import DosageAmounPicker from "@/component/ui/dosage-picker/dosage-amount-picker
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
-import { DosageMeasurement } from "@/types/medication";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import { useRouter } from "expo-router";
@@ -18,7 +17,7 @@ import { useRef } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function ScheduleStepScreen() {
-  const { formState, setMedicatioSchedule, setMedicationDetails } = useAddPillStore();
+  const { formState, setMedicatioSchedule } = useAddPillStore();
 
   const timeRef = useRef<DateTimeWrapperRef>(null);
   const dateRef = useRef<DateTimeWrapperRef>(null);
@@ -76,17 +75,6 @@ export default function ScheduleStepScreen() {
     setMedicatioSchedule({ startDate: startingDate });
   };
 
-  // Dosage setting
-  const handleOnDosageSettingChange = ({
-    amount,
-    unit,
-  }: Partial<{ amount: string; unit: DosageMeasurement }>) => {
-    setMedicatioSchedule({ dosage: amount ?? formState.schedule.dosage });
-    setMedicationDetails({
-      medicationMeasurement: unit ?? formState.medicationMeasurement,
-    });
-  };
-
   return (
     <View
       style={[
@@ -109,11 +97,7 @@ export default function ScheduleStepScreen() {
         {/* Dosage Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дозировка</Text>
-          <DosageAmounPicker
-            dosageAmountState={Number(formState.schedule.dosage)}
-            dosageUnitState={formState.medicationMeasurement}
-            onDasgeSettingsChange={handleOnDosageSettingChange}
-          />
+          <DosageAmounPicker />
         </View>
 
         {/* Time Settings */}
@@ -138,7 +122,7 @@ export default function ScheduleStepScreen() {
           />
           {/* TIME PICKER */}
           <DateTimePickerWrapper
-            onDateTimeSelected={handleSetTime}
+            onDateTimeChange={handleSetTime}
             ref={timeRef}
             mode="time"
             bottomSheetTitle="Время начала"
@@ -165,7 +149,7 @@ export default function ScheduleStepScreen() {
           </Pressable>
 
           <DateTimePickerWrapper
-            onDateTimeSelected={handleSetDate}
+            onDateTimeChange={handleSetDate}
             ref={dateRef}
             mode="date"
             bottomSheetTitle="Дата начала"

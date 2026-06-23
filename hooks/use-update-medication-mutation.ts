@@ -39,8 +39,13 @@ export default function useUpdateMedicationMutation() {
   const { mutate, isPending } = useMutation({
     mutationFn: updateMedicationProfileMutation,
     async onSuccess(incomingData, variables) {
-      const { data: variableData, id } = variables;
+      showFeedBack({
+        title: "Обновлено!",
+        message: "Данные о ваших лекарствах обновлены.",
+        status: "success",
+      });
 
+      const { data: variableData, id } = variables;
       queryClient.setQueryData(
         ["medication-profile", "list"],
         (existingData: MedicationProfile[]) => {
@@ -49,7 +54,6 @@ export default function useUpdateMedicationMutation() {
           );
         },
       );
-
       queryClient.setQueryData(["medication-profile", "details", id], incomingData);
       // we want to create again when they turn on
       if (variableData.isActive) {

@@ -1,4 +1,4 @@
-import { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { useImperativeHandle, useState } from "react";
 import { View } from "react-native";
 import { DateTimeWrapperProps } from "./date-time-wrapper";
@@ -7,31 +7,32 @@ export interface DateTimeWrapperRef {
   showDateTime: () => void;
 }
 
+const getNow = () => Date.now();
+
 export default function DateTimeWrapper({
   ref,
   mode,
-  onDateTimeSelected,
+  onDateTimeChange: onDateTimeSelected,
   disabledDate,
 }: DateTimeWrapperProps) {
-  const now = Date.now();
-  const [date, setDate] = useState(new Date(now));
+  const [date, setDate] = useState(new Date(getNow()));
 
-  const handleSetDateTime = (date?: Date, event?: DateTimePickerEvent["type"]) => {
+  const handleSetDateTime = (date?: Date) => {
     if (date) {
       setDate(date);
-      onDateTimeSelected(date, event);
+      onDateTimeSelected(date);
     }
   };
 
   const showMode = (currentMode: DateTimeWrapperProps["mode"]) => {
     DateTimePickerAndroid.open({
       value: date,
-      onChange(event, date) {
-        handleSetDateTime(date, event.type);
+      onValueChange(event, date) {
+        handleSetDateTime(date);
       },
       mode: currentMode,
       is24Hour: true,
-      minimumDate: disabledDate && mode === "date" ? new Date(now) : undefined,
+      minimumDate: disabledDate && mode === "date" ? new Date(getNow()) : undefined,
     });
   };
 
