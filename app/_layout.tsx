@@ -62,6 +62,7 @@ export default function RootLayout() {
   async function bootstrap() {
     // Check for valid token and authorized user with it.
     const token = await getValidAccessToken();
+
     if (token) {
       // Prefetch Applications Datas
       await Promise.all([
@@ -69,6 +70,7 @@ export default function RootLayout() {
           queryKey: ["subscriptions-plan"],
           queryFn: async () => (await api.get("subscriptions")).data,
         }),
+
         queryClient.prefetchQuery({
           queryKey: ["medication-profile", "list"],
           queryFn: async () => (await api.get("medications")).data,
@@ -82,6 +84,7 @@ export default function RootLayout() {
       ]);
 
       getAuthorizedUser();
+
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
       // If user set up local device lock

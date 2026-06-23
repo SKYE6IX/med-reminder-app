@@ -10,8 +10,9 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
+import { useFeedBackStore } from "@/stores/feedback-store";
 import { CreateMedication, MedicationProfile } from "@/types/medication";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -25,8 +26,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 const COLLAPSED = 75;
-const HALF_EXPAND = 197;
-const FULL_EXPAND = 417;
+const HALF_EXPAND = 170;
+const FULL_EXPAND = 390;
 
 const createMedicationMutation = async (body: CreateMedication) => {
   const response = await api.post<MedicationProfile>("medications", body);
@@ -34,36 +35,29 @@ const createMedicationMutation = async (body: CreateMedication) => {
 };
 
 export default function FinalStepScreen() {
-  const openBannerRef = useRef<SubscriptionBannerRef>(null);
+  const sharedStyles = useAddPillScreenStyles();
+  const isIOS = Platform.OS === "ios";
 
   const router = useRouter();
-  const isIOS = Platform.OS === "ios";
+  const openBannerRef = useRef<SubscriptionBannerRef>(null);
+  const { showFeedBack } = useFeedBackStore();
 
   const { notfication, reminderPreferences } = useAppSettingsStore();
   const { formState, setMedicationDetails, setMedicationpack, clearFormState } = useAddPillStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
-  const sharedStyles = useAddPillScreenStyles();
-
   const [showRefillBox, setShowRefillBox] = useState(false);
+  const [version, setVersion] = useState(0);
   const refillSettingHeight = useSharedValue(COLLAPSED);
-
-  // @platform ANDROID ONLY
-  const pickersWrapperOpacity = useSharedValue(0);
 
   const amountInPack = formState.medicationPack ? formState.medicationPack.totalQuantity : "";
   const refillDaysReminder = formState.medicationPack
-    ? `${formState.medicationPack.reminderDays}`
+    ? String(formState.medicationPack.reminderDays)
     : "";
   const medicationNote = formState.medicationNote ? formState.medicationNote : "";
 
-  // Themes color
-  const color = useThemeColor({}, "textPrimary");
-  const colorMuted = useThemeColor({}, "textMuted");
-  const bGColor = useThemeColor({}, "backgroundSecondary");
-  const bGTertiary = useThemeColor({}, "backgroundTertiary");
-  const borderColor = useThemeColor({}, "borderColor");
-  const tintColor = useThemeColor({}, "tint");
+  // @platform ANDROID ONLY
+  const pickersWrapperOpacity = useSharedValue(0);
 
   // Add medication pack toggle switch
   const toggleSwitch = () => {
@@ -73,7 +67,6 @@ export default function FinalStepScreen() {
       const isToggle = !showRefillBox;
 
       refillSettingHeight.value = withSpring(isToggle ? HALF_EXPAND : COLLAPSED);
-
       // @platform ANDROID ONLY
       pickersWrapperOpacity.value = withDelay(
         isToggle ? 200 : 0,
@@ -81,15 +74,13 @@ export default function FinalStepScreen() {
           duration: isToggle ? 400 : 100,
         }),
       );
-      // We reset the pack state back null, if switch state is false.
+      setShowRefillBox(isToggle);
+      // We reset the pack state back null,
+      //  if switch state is false.
       if (!isToggle) {
         setMedicationpack(null);
+        setVersion(version + 1);
       }
-      setMedicationpack({
-        totalQuantity: amountInPack,
-        reminderDays: 3, // Default days reminder incase user didn't choose
-      });
-      setShowRefillBox(isToggle);
     }
   };
 
@@ -99,7 +90,6 @@ export default function FinalStepScreen() {
       reminderDays: Number(refillDaysReminder),
     });
   };
-
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationpack({
       totalQuantity: amountInPack,
@@ -107,6 +97,7 @@ export default function FinalStepScreen() {
     });
   };
 
+  // Note text on change fn value
   const handleOnTextChange = (text: string) => {
     if (text.length < 1) {
       setMedicationDetails({ medicationNote: null });
@@ -114,14 +105,11 @@ export default function FinalStepScreen() {
       setMedicationDetails({ medicationNote: text });
     }
   };
-
   // @platform IOS ONLY
-  // It control the height for the container when the pickers are trriger.
-  // it goes from HALF_EXPAND to FULL_EXPAND.
+  // It control the height for the container when
+  //  days reminder picker trigger it goes from HALF_EXPAND to FULL_EXPAND.
   const controlFullExpand = (isPicker: boolean) => {
-    const isActive = !isPicker;
-    if (isActive && refillSettingHeight.value === FULL_EXPAND) return;
-    refillSettingHeight.value = withSpring(isActive ? FULL_EXPAND : HALF_EXPAND);
+    refillSettingHeight.value = withSpring(isPicker ? FULL_EXPAND : HALF_EXPAND);
   };
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -137,7 +125,6 @@ export default function FinalStepScreen() {
         (existingData: MedicationProfile[]) =>
           existingData ? [...existingData, incomingData] : [incomingData],
       );
-
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
         createScheduleEventNotification({
@@ -145,21 +132,32 @@ export default function FinalStepScreen() {
           ...reminderPreferences,
         }),
       ]);
-
       clearFormState();
       router.dismissAll();
       router.navigate("/");
     },
-    onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when create a medication -> ", error);
-      } else {
-        console.log("Unknow error occur when create a medication -> ", error);
-      }
+    onError() {
+      showFeedBack({
+        title: "Что-то пошло не так!",
+        message: "Пожалуйста, проверьте, попробуйте еще раз!",
+        status: "error",
+      });
     },
   });
 
   const createMedicationSchedule = async () => {
+    // Just incase, use choose to add pack,
+    // but they forget to selecte the day reminder,
+    // we remind them about it, by showing and
+    // error feedback with message about it.
+    if (formState.medicationPack && !formState.medicationPack.reminderDays) {
+      showFeedBack({
+        title: "Неверный ввод",
+        message: "Пожалуйста, добавьте напоминание о приеме лекарств.",
+        status: "error",
+      });
+      return;
+    }
     const data: CreateMedication = {
       ...formState,
       schedule: {
@@ -169,7 +167,6 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
-
     const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
     if (!notifcationAllowed) {
       const allowed = await NotificationHelper.allowsNotificationsAsync();
@@ -180,6 +177,14 @@ export default function FinalStepScreen() {
     }
     mutate(data);
   };
+
+  // Themes color
+  const color = useThemeColor({}, "textPrimary");
+  const colorMuted = useThemeColor({}, "textMuted");
+  const bGColor = useThemeColor({}, "backgroundSecondary");
+  const bGTertiary = useThemeColor({}, "backgroundTertiary");
+  const borderColor = useThemeColor({}, "borderColor");
+  const tintColor = useThemeColor({}, "tint");
 
   return (
     <ScrollView>
@@ -227,12 +232,14 @@ export default function FinalStepScreen() {
               }}
             >
               <MedicationPackPicker
+                key={version}
                 amountInPack={amountInPack}
                 refillDaysReminder={refillDaysReminder}
                 onAmountInPackSet={handleAmountInPackSet}
                 onRefillDaysReminderSet={handleRefillDaysSet}
                 onPickerTrigger={controlFullExpand}
-                isToggle={showRefillBox}
+                dosageAmount={formState.schedule.dosage}
+                measurementValue={formState.medicationMeasurement}
               />
             </Animated.View>
           </Animated.View>

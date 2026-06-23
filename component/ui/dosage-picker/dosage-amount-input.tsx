@@ -15,10 +15,6 @@ export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAm
   const [value, setValue] = useState("");
   const { showFeedBack } = useFeedBackStore();
 
-  const inputBgColor = useThemeColor({}, "backgroundSecondary");
-  const inputBorderColor = useThemeColor({}, "borderColor");
-  const color = useThemeColor({}, "textPrimary");
-
   const handleOnChangeText = (text: string) => {
     const normalized = text.replace(",", ".");
     setValue(normalized);
@@ -28,7 +24,7 @@ export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAm
     if (Number(value) <= 0) {
       showFeedBack({
         title: "Неправильная дозировка",
-        message: "Пожалуйста, установите допустимую дозировку",
+        message: "Пожалуйста, установите допустимую дозировку.",
         status: "error",
       });
       return;
@@ -38,6 +34,10 @@ export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAm
     Keyboard.dismiss();
   };
 
+  // Themes color
+  const inputBgColor = useThemeColor({}, "backgroundSecondary");
+  const inputBorderColor = useThemeColor({}, "borderColor");
+  const color = useThemeColor({}, "textPrimary");
   return (
     <BottomSheetWrapper ref={showInputRef} title="Количество дозировки" snapPointPercent="50%">
       <View style={styles.container}>
@@ -60,7 +60,7 @@ export default function DosageAmountInput({ showInputRef, onSetValue }: DosageAm
             onChangeText={handleOnChangeText}
           />
         </View>
-        <CustomButton label="Набор" onPress={handleSetDosageAmount} />
+        <CustomButton label="Задать" onPress={handleSetDosageAmount} />
       </View>
     </BottomSheetWrapper>
   );

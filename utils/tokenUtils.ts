@@ -38,8 +38,10 @@ export const getValidAccessToken = async (): Promise<string | null> => {
   if (!accessToken || !refreshToken) return null;
 
   if (!isTokenExpired(accessToken)) return accessToken;
+
   //   `${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`,
   const localHost = Constants.expoConfig?.hostUri?.split(":")[0];
+
   try {
     const { data } = await axios.post<AuthResponse>(
       `http://${localHost}:8080/api/v1/auth/refresh`,

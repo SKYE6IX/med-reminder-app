@@ -40,6 +40,7 @@ export default function DosageAmounPicker({
   const handleSetDosageUnit = (unit: DosageMeasurement) => {
     onDasgeSettingsChange({ unit });
   };
+
   const handleSetDosageAmount = (amount: string) => {
     onDasgeSettingsChange({ amount });
   };
@@ -119,8 +120,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    lineHeight: 16.2,
+    fontSize: 16,
+    lineHeight: 19.2,
   },
   dosageAmountWrapper: {
     width: "100%",

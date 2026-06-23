@@ -21,8 +21,8 @@ interface HandleProps {
   borderColor: string;
   tintColor: string;
   textColor: string;
-  close: () => void;
   title: string;
+  close: () => void;
 }
 
 export default function BottomSheetWrapper({
@@ -81,6 +81,7 @@ export default function BottomSheetWrapper({
         onChange={handleSheetChanges}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
+        keyboardBlurBehavior="restore"
         backgroundStyle={{
           backgroundColor,
           borderTopLeftRadius: 24,

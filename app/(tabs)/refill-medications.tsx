@@ -177,6 +177,8 @@ export default function RefillPill() {
             refillDaysReminder={reminderDays}
             onAmountInPackSet={handleAmountInPackSet}
             onRefillDaysReminderSet={handleRefillDaysSet}
+            dosageAmount=""
+            measurementValue="VALUE"
           />
           <CustomButton
             label="Добавить"
