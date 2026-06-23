@@ -90,4 +90,6 @@ export interface RefillMedicationPack {
   medicationName: string;
   medicationImageUrl: string;
   medicationProfileId: string;
+  dosageAmount: string;
+  dosageMeasurement: string;
 }

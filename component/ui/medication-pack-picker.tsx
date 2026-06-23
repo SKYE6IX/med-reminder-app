@@ -81,9 +81,9 @@ export default function MedicationPackPicker({
       });
       return;
     }
-    Keyboard.dismiss();
     onAmountInPackSet(localValue.amountInPack);
     bottomSheetRef.current?.close();
+    Keyboard.dismiss();
   };
 
   //   Theme color
@@ -136,6 +136,7 @@ export default function MedicationPackPicker({
               value={localValue.amountInPack}
               onChangeText={handleOnTextChange}
             />
+
             <Text style={[styles.bottomSheetText, { color }]}>
               Введите общую сумму в «{measurement}»
             </Text>

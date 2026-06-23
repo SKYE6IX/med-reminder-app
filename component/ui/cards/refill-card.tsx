@@ -8,10 +8,12 @@ type RefillCardProps = {
   pack: RefillMedicationPack;
   onRefillButtonPress: () => void;
 };
+
 const getStartedDate = (isoString: string) => {
   if (!isoString) return;
   const date = new Date(isoString);
   const convertedString = getDateLocalString(date).replaceAll(".", " ");
+
   return formatRegularDate(convertedString);
 };
 
@@ -69,7 +71,7 @@ export default function RefillCard({ pack, onRefillButtonPress }: RefillCardProp
       {/* Badge will be shown for a pending pack, to indicate a pack as been added! */}
       {isRefilled && (
         <View style={[sharedStyles.badge, { backgroundColor: "#009E00" }]}>
-          <Text style={sharedStyles.badgeText}>Принятые</Text>
+          <Text style={sharedStyles.badgeText}>Пополненный</Text>
         </View>
       )}
     </View>
