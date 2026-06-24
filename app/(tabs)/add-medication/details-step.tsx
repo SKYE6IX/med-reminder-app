@@ -129,7 +129,7 @@ export default function DetailsStepScreen() {
         <View style={sharedStyles.sectionContainer}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={sharedStyles.title}>Причина приема лекарств </Text>
-            <Text style={[styles.optionalText, { color }]}>(Необязательный)</Text>
+            <Text style={[styles.optionalText, { color }]}>«Необязательный»</Text>
           </View>
           <FormInput
             showLabel={false}

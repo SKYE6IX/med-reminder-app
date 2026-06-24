@@ -66,6 +66,7 @@ export default function MedicationDetails() {
         ]}
       >
         <Loader visible={isLoading || isPending} />
+
         {medicationProfile && (
           <View style={styles.contentContainer}>
             <MedicationDetailCard
@@ -79,26 +80,75 @@ export default function MedicationDetails() {
               <View style={styles.detailsWrapper}>
                 <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
 
-                {/* GROUP */}
-                <View style={styles.detailsGroup}>
-                  {/* DATE STARTED */}
-                  <View
-                    style={[styles.card, styles.detailsGroupItem, { backgroundColor: bgSecondary }]}
-                  >
-                    <View style={styles.cardHeader}>
-                      <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
-                    </View>
-                    <View style={styles.cardBody}>
-                      <CalenderIcon color={color} />
-                      <Text style={[styles.cardTextContent, { color }]}>
-                        {getStartedDate(medicationProfile.schedule.startDate)}
-                      </Text>
-                    </View>
-                  </View>
+                {medicationProfile.schedule.endDate ? (
+                  <>
+                    <View style={styles.detailsGroup}>
+                      {/* DATE STARTED */}
+                      <View
+                        style={[
+                          styles.card,
+                          styles.detailsGroupItem,
+                          { backgroundColor: bgSecondary },
+                        ]}
+                      >
+                        <View style={styles.cardHeader}>
+                          <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+                        </View>
+                        <View style={styles.cardBody}>
+                          <CalenderIcon color={color} />
+                          <Text style={[styles.cardTextContent, { color }]}>
+                            {getStartedDate(medicationProfile.schedule.startDate)}
+                          </Text>
+                        </View>
+                      </View>
 
-                  {/* TIME STARTED */}
-                  <DetailsTimeSettings medicationProfile={medicationProfile} />
-                </View>
+                      {/* DATE END*/}
+                      <View
+                        style={[
+                          styles.card,
+                          styles.detailsGroupItem,
+                          { backgroundColor: bgSecondary },
+                        ]}
+                      >
+                        <View style={styles.cardHeader}>
+                          <Text style={[styles.cardTitle, { color }]}>Конец</Text>
+                        </View>
+                        <View style={styles.cardBody}>
+                          <CalenderIcon color={color} />
+                          <Text style={[styles.cardTextContent, { color }]}>
+                            {getStartedDate(medicationProfile.schedule.endDate ?? "")}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* TIME STARTED */}
+                    <DetailsTimeSettings medicationProfile={medicationProfile} fullWidth />
+                  </>
+                ) : (
+                  <View style={styles.detailsGroup}>
+                    <View
+                      style={[
+                        styles.card,
+                        styles.detailsGroupItem,
+                        { backgroundColor: bgSecondary },
+                      ]}
+                    >
+                      <View style={styles.cardHeader}>
+                        <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+                      </View>
+                      <View style={styles.cardBody}>
+                        <CalenderIcon color={color} />
+                        <Text style={[styles.cardTextContent, { color }]}>
+                          {getStartedDate(medicationProfile.schedule.startDate)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* TIME STARTED */}
+                    <DetailsTimeSettings medicationProfile={medicationProfile} fullWidth={false} />
+                  </View>
+                )}
 
                 {/* FREQUENCY RRULE */}
                 <DetailsFrequencySettings medicationProfile={medicationProfile} />
@@ -143,7 +193,6 @@ export default function MedicationDetails() {
                 </View>
               </View>
             </View>
-
             {/* DELETE PILL BUTTON */}
             <DeleteMedication medicationProfileId={medicationProfileId as string} />
           </View>

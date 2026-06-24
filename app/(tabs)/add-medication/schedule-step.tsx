@@ -10,14 +10,28 @@ import DosageAmounPicker from "@/component/ui/dosage-picker/dosage-amount-picker
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
-import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
+import { DateTime, formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+
+const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
   const { formState, setMedicatioSchedule } = useAddPillStore();
+
+  const [durarions, setDuration] = useState("");
+  const [fromDate, setFromDate] = useState<Date>(getNow());
 
   const timeRef = useRef<DateTimeWrapperRef>(null);
   const dateRef = useRef<DateTimeWrapperRef>(null);
@@ -30,14 +44,6 @@ export default function ScheduleStepScreen() {
   const occurences = generateTimeOccurrences({
     rrule: formState.schedule.rule.recurrenceRule,
   });
-
-  // Themes color
-  const color = useThemeColor({}, "textPrimary");
-  const colorMuted = useThemeColor({}, "textMuted");
-  const bGColor = useThemeColor({}, "backgroundSecondary");
-  const bGTertiary = useThemeColor({}, "backgroundTertiary");
-  const borderColor = useThemeColor({}, "borderColor");
-  const tintColor = useThemeColor({}, "tint");
 
   // Frequency settings
   const handleSetFrequency = ({
@@ -71,12 +77,47 @@ export default function ScheduleStepScreen() {
 
   // Date settings
   const handleSetDate = (date: Date) => {
-    const startingDate = getDateLocalString(date);
-    setMedicatioSchedule({ startDate: startingDate });
+    setFromDate(date);
+    if (durarions.length >= 1) {
+      const startDate = DateTime.fromJSDate(date);
+      const endDate = startDate.plus({ days: Number(durarions) - 1 });
+
+      setMedicatioSchedule({
+        startDate: getDateLocalString(startDate.toJSDate()),
+        endDate: getDateLocalString(endDate.toJSDate()),
+      });
+    } else {
+      const startingDate = getDateLocalString(date);
+      setMedicatioSchedule({ startDate: startingDate });
+    }
   };
 
+  const handleOnTextInputChange = (text: string) => {
+    setDuration(text);
+    if (text.length <= 0) {
+      setMedicatioSchedule({ endDate: null });
+    } else {
+      const startDate = DateTime.fromJSDate(fromDate);
+      const endDate = startDate.plus({ days: Number(text) - 1 });
+
+      setMedicatioSchedule({
+        startDate: getDateLocalString(startDate.toJSDate()),
+        endDate: getDateLocalString(endDate.toJSDate()),
+      });
+    }
+  };
+
+  // Themes color
+  const color = useThemeColor({}, "textPrimary");
+  const colorMuted = useThemeColor({}, "textMuted");
+  const bGColor = useThemeColor({}, "backgroundSecondary");
+  const bGTertiary = useThemeColor({}, "backgroundTertiary");
+  const borderColor = useThemeColor({}, "borderColor");
+  const tintColor = useThemeColor({}, "tint");
+
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "position" : "height"}
       style={[
         styles.container,
         sharedStyles.container,
@@ -84,7 +125,10 @@ export default function ScheduleStepScreen() {
         { paddingLeft: 0, paddingRight: 0 },
       ]}
     >
-      <ScrollView contentContainerStyle={[styles.contentContainer]}>
+      <ScrollView
+        contentContainerStyle={[styles.contentContainer]}
+        // keyboardShouldPersistTaps="handled"
+      >
         {/* Frequency Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
@@ -129,6 +173,29 @@ export default function ScheduleStepScreen() {
           />
         </View>
 
+        {/* Duration days settings. (Optional) */}
+        <View style={sharedStyles.sectionContainer}>
+          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+            <Text style={sharedStyles.title}>Период</Text>
+            <Text style={[styles.durationOptionalText, { color }]}>«Необязательный»</Text>
+          </View>
+          <TextInput
+            value={durarions}
+            onChangeText={handleOnTextInputChange}
+            keyboardType="number-pad"
+            inputMode="numeric"
+            placeholder="Сколько дней..."
+            style={[
+              styles.durationInput,
+              {
+                color,
+                borderColor,
+                backgroundColor: bGColor,
+              },
+            ]}
+          />
+        </View>
+
         {/* Date Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Дата начала</Text>
@@ -164,7 +231,7 @@ export default function ScheduleStepScreen() {
           onPress={() => router.navigate("/(tabs)/add-medication/final-step")}
         />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -229,5 +296,22 @@ const styles = StyleSheet.create({
   },
   dateSettingRightIcon: {
     marginLeft: "auto",
+  },
+  durationOptionalText: {
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    lineHeight: 16,
+    marginLeft: 2,
+  },
+  durationInput: {
+    width: "100%",
+    height: 60,
+    paddingLeft: 16,
+    paddingRight: 16,
+    borderWidth: 1,
+    borderRadius: 16,
+    fontFamily: "Roboto_500Medium",
+    fontSize: 18,
+    lineHeight: 22,
   },
 });

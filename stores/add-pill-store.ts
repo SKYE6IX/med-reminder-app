@@ -11,6 +11,7 @@ interface Schedule {
     preset: SchedulePreset | undefined;
   };
   startDate: string;
+  endDate: string | null;
   timeZone: string;
 }
 
@@ -65,6 +66,7 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
       preset: "ONCE_A_DAY",
     },
     startDate: getDateLocalString(),
+    endDate: null,
     timeZone: getTimeZone(),
   },
   medicationPack: null,

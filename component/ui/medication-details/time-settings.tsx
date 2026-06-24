@@ -20,8 +20,10 @@ const getStartTime = (startTime: string) => {
 
 export default function DetailsTimeSettings({
   medicationProfile,
+  fullWidth,
 }: {
   medicationProfile: MedicationProfile;
+  fullWidth: boolean;
 }) {
   const isAndroid = Platform.OS === "android";
 
@@ -64,7 +66,7 @@ export default function DetailsTimeSettings({
   return (
     <React.Fragment>
       <Pressable
-        style={[sharedStyles.card, sharedStyles.detailsGroupItem]}
+        style={[sharedStyles.card, fullWidth ? undefined : sharedStyles.detailsGroupItem]}
         onPress={() => timeRef.current?.showDateTime()}
       >
         <View style={sharedStyles.cardHeader}>

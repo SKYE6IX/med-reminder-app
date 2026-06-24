@@ -158,12 +158,16 @@ export default function FinalStepScreen() {
       });
       return;
     }
+
+    const endDate = formState.schedule.endDate ? formState.schedule.endDate : null;
+
     const data: CreateMedication = {
       ...formState,
       schedule: {
         dosage: formState.schedule.dosage,
         recurrenceRule: formState.schedule.rule.recurrenceRule,
         startDate: formState.schedule.startDate,
+        endDate,
         timeZone: formState.schedule.timeZone,
       },
     };

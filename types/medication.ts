@@ -34,8 +34,10 @@ export interface ScheduleCreation {
   dosage: string;
   recurrenceRule: string;
   startDate: string;
+  endDate: string | null;
   timeZone: string;
 }
+
 export interface ScheduleResponse {
   id: string;
   dosage: string;
@@ -43,6 +45,7 @@ export interface ScheduleResponse {
   recurrenceRule: string;
   starTime: string;
   startDate: string;
+  endDate: string | null;
   amountTaken: string;
 }
 export interface CreateMedication {
