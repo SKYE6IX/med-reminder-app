@@ -1,7 +1,7 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import PlusIcon from "@/component/icons/plus-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import AddProfile from "@/component/ui/add-profile";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import FormInput from "@/component/ui/form/form-input";
 import ProfileCard from "@/component/ui/profile-card";
@@ -12,6 +12,7 @@ import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
+import { ProfileResponse } from "@/types/user";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -22,6 +23,8 @@ const UNIT_WRAPPER_GAP = 16;
 
 export default function DetailsStepScreen() {
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
+
+  const { openSheet, closeSheet } = useBottomSheet();
 
   const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
   const [unitItemHeight, setUnitItemHeight] = useState(0);
@@ -35,9 +38,6 @@ export default function DetailsStepScreen() {
 
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
-
-  const newProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
-  const chooseProfileBottomSheet = useRef<BottomSheetWrapperRef>(null);
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -53,32 +53,50 @@ export default function DetailsStepScreen() {
 
   const handleSetProfile = (profileId: string) => {
     setMedicationDetails({ profileId });
-    // Close the bottomsheeet after selection
-    chooseProfileBottomSheet.current?.close();
+    closeSheet();
   };
 
   const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationUnit", "profileId"]));
-
-  const handleChooseRelationProfile = () => {
-    if (isPremiumPlan) {
-      chooseProfileBottomSheet.current?.open();
-    } else {
-      openBannerRef.current?.openModal();
-    }
-  };
-  const handleAddNewProfile = () => {
-    if (isPremiumPlan) {
-      newProfileBottomSheet.current?.open();
-    } else {
-      openBannerRef.current?.openModal();
-    }
-  };
 
   const handleOnTextInputChange = ({ value }: { name: string; value: string }) => {
     if (value.length <= 0) {
       setMedicationDetails({ medicationReason: null });
     } else {
       setMedicationDetails({ medicationReason: value });
+    }
+  };
+
+  const openAddNewProfileSheet = () => {
+    if (isPremiumPlan) {
+      openSheet({
+        title: "Добавить члена семьи",
+        content: (
+          <AddProfile
+            onProfileAdded={(id) => {
+              setMedicationDetails({ profileId: id });
+              closeSheet();
+            }}
+          />
+        ),
+      });
+    } else {
+      openBannerRef.current?.openModal();
+    }
+  };
+
+  const openRelationProfileListSheet = () => {
+    if (isPremiumPlan) {
+      openSheet({
+        title: "Выбрать члена семьи",
+        content: (
+          <RelationProfileListSheet
+            relationProfiles={relationProfiles}
+            handleSetProfile={handleSetProfile}
+          />
+        ),
+      });
+    } else {
+      openBannerRef.current?.openModal();
     }
   };
 
@@ -163,7 +181,7 @@ export default function DetailsStepScreen() {
                 isSelf={false}
                 hasActiveDot
                 setProfile={handleSetProfile}
-                changeProfile={() => chooseProfileBottomSheet.current?.open()}
+                changeProfile={openRelationProfileListSheet}
               />
             )}
 
@@ -174,28 +192,9 @@ export default function DetailsStepScreen() {
                 variant="outline"
                 textVaraint="tintText"
                 svgIcon={<PlusIcon color={tintColor} size={12} />}
-                onPress={handleChooseRelationProfile}
+                onPress={openRelationProfileListSheet}
               />
             )}
-
-            {/* RELATION PROFILES LIST */}
-            <BottomSheetWrapper ref={chooseProfileBottomSheet} title="Выбрать члена семьи">
-              <View style={styles.profileSelectionList}>
-                {relationProfiles.map((profile) => (
-                  <ProfileCard
-                    isSelected={false} // it's part of list. // no active state on list
-                    profileId={profile.id}
-                    key={profile.id}
-                    name={profile.name}
-                    relation={profile.relation as Relation}
-                    isSelf={false}
-                    hasActiveDot={false}
-                    asList
-                    setProfile={handleSetProfile}
-                  />
-                ))}
-              </View>
-            </BottomSheetWrapper>
 
             {/* TRIGGER BUTTON FOR ADDING NEW RELATION PROFILE */}
             <CustomButton
@@ -203,15 +202,7 @@ export default function DetailsStepScreen() {
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={12} />}
-              onPress={handleAddNewProfile}
-            />
-
-            {/* ADD NEW RELATION PROFILE */}
-            <AddProfile
-              ref={newProfileBottomSheet}
-              onProfileAdded={(id) => {
-                setMedicationDetails({ profileId: id });
-              }}
+              onPress={openAddNewProfileSheet}
             />
           </View>
         </View>
@@ -232,6 +223,32 @@ export default function DetailsStepScreen() {
     </SafeAreaView>
   );
 }
+
+const RelationProfileListSheet = ({
+  relationProfiles,
+  handleSetProfile,
+}: {
+  relationProfiles: ProfileResponse[];
+  handleSetProfile: (profileId: string) => void;
+}) => {
+  return (
+    <View style={styles.profileSelectionList}>
+      {relationProfiles.map((profile) => (
+        <ProfileCard
+          isSelected={false} // They are list. No active state on list
+          profileId={profile.id}
+          key={profile.id}
+          name={profile.name}
+          relation={profile.relation as Relation}
+          isSelf={false}
+          hasActiveDot={false}
+          asList
+          setProfile={handleSetProfile}
+        />
+      ))}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   scrollViewContainer: {

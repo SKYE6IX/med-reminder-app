@@ -26,8 +26,8 @@ import Animated, {
 } from "react-native-reanimated";
 
 const COLLAPSED = 75;
-const HALF_EXPAND = 200;
-const FULL_EXPAND = 400;
+const HALF_EXPAND = 260;
+const FULL_EXPAND = 460;
 
 const createMedicationMutation = async (body: CreateMedication) => {
   const response = await api.post<MedicationProfile>("medications", body);
@@ -105,6 +105,7 @@ export default function FinalStepScreen() {
       setMedicationDetails({ medicationNote: text });
     }
   };
+
   // @platform IOS ONLY
   // It control the height for the container when
   //  days reminder picker trigger it goes from HALF_EXPAND to FULL_EXPAND.
@@ -146,19 +147,22 @@ export default function FinalStepScreen() {
   });
 
   const createMedicationSchedule = async () => {
-    // Just incase, use choose to add pack,
-    // but they forget to selecte the day reminder,
+    // Just incase, user choose to add pack,
+    // but they forget to select the day reminder,
     // we remind them about it, by showing and
     // error feedback with message about it.
-    if (formState.medicationPack && !formState.medicationPack.reminderDays) {
+    if (
+      formState.medicationPack &&
+      (!formState.medicationPack.reminderDays ||
+        Number(formState.medicationPack.totalQuantity) <= Number(formState.schedule.dosage))
+    ) {
       showFeedBack({
         title: "Неверный ввод",
-        message: "Пожалуйста, добавьте напоминание о приеме лекарств.",
+        message: "Пожалуйста, введите все данные о вашей упаковке с лекарствами.",
         status: "error",
       });
       return;
     }
-
     const endDate = formState.schedule.endDate ? formState.schedule.endDate : null;
 
     const data: CreateMedication = {
@@ -171,7 +175,9 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
+
     const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+
     if (!notifcationAllowed) {
       const allowed = await NotificationHelper.allowsNotificationsAsync();
       if (!allowed) {
@@ -242,7 +248,6 @@ export default function FinalStepScreen() {
                 onAmountInPackSet={handleAmountInPackSet}
                 onRefillDaysReminderSet={handleRefillDaysSet}
                 onPickerTrigger={controlFullExpand}
-                dosageAmount={formState.schedule.dosage}
                 measurementValue={formState.medicationMeasurement}
               />
             </Animated.View>

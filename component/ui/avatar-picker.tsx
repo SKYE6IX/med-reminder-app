@@ -2,15 +2,14 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useUserStore } from "@/stores/use-user-store";
 import { ProfileResponse } from "@/types/user";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { RefObject, useState } from "react";
+import { useState } from "react";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 import CameraIcon from "../icons/camera-icon";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "./bottom-sheet-wrapper";
 import CustomButton from "./custom-button/custom-button";
 import Loader from "./loader";
 
@@ -30,7 +29,7 @@ const avatarList = [
 
 type AvatarPickerProps = {
   profileId: string;
-  bottomSheetWrapperRef: RefObject<BottomSheetWrapperRef | null>;
+  onActionComplete: () => void;
 };
 
 interface PickerState {
@@ -67,7 +66,7 @@ const uploadImageMutation = async (uploadRequest: UploadReqeust) => {
   return response.data;
 };
 
-export default function AvatarPicker({ bottomSheetWrapperRef, profileId }: AvatarPickerProps) {
+export default function AvatarPicker({ profileId, onActionComplete }: AvatarPickerProps) {
   const { showFeedBack } = useFeedBackStore();
   const { addEmojiAvatar, removeEmojiAvatar } = useUserStore();
   const [listWidth, setListWidth] = useState(0);
@@ -126,14 +125,9 @@ export default function AvatarPicker({ bottomSheetWrapperRef, profileId }: Avata
       );
 
       removeEmojiAvatar(variables.profileId);
-      bottomSheetWrapperRef.current?.close();
+      onActionComplete();
     },
-    onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when uploading image -> ", error);
-      } else {
-        console.log("An unknown error occur when uploading image  -> ", error);
-      }
+    onError() {
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
@@ -146,7 +140,7 @@ export default function AvatarPicker({ bottomSheetWrapperRef, profileId }: Avata
     // We save emoji image to local storage
     if (pickerState.emojiAvatar) {
       addEmojiAvatar(profileId, pickerState.emojiAvatar);
-      bottomSheetWrapperRef.current?.close();
+      onActionComplete();
 
       // When user decided to use emoji image
       // we silently delete the image from object and update
@@ -160,69 +154,62 @@ export default function AvatarPicker({ bottomSheetWrapperRef, profileId }: Avata
   };
 
   return (
-    <BottomSheetWrapper
-      ref={bottomSheetWrapperRef}
-      title="Выберите фотографию"
-      snapPointPercent="57%"
-    >
-      <View style={styles.container}>
-        <Loader visible={isPending} />
-        <View
-          style={styles.avatarList}
-          onLayout={(event) => {
-            setListWidth(event.nativeEvent.layout.width);
-          }}
+    <View style={styles.container}>
+      <Loader visible={isPending} />
+      <View
+        style={styles.avatarList}
+        onLayout={(event) => {
+          setListWidth(event.nativeEvent.layout.width);
+        }}
+      >
+        <Pressable
+          style={[
+            styles.avatarItem,
+            {
+              backgroundColor: bgTertiary,
+              width: avatarItemSize,
+              height: avatarItemSize,
+              borderWidth: "image-avatar" === pickerState.key ? 2 : 0,
+              borderColor: tintColor,
+            },
+          ]}
+          onPress={pickImage}
         >
+          {pickerState.imageAvatar ? (
+            <Image source={pickerState.imageAvatar} contentFit="cover" style={styles.image} />
+          ) : (
+            <CameraIcon color={tintColor} size={30} />
+          )}
+        </Pressable>
+
+        {avatarList.map((avatar) => (
           <Pressable
+            key={avatar.key}
             style={[
               styles.avatarItem,
               {
                 backgroundColor: bgTertiary,
                 width: avatarItemSize,
                 height: avatarItemSize,
-                borderWidth: "image-avatar" === pickerState.key ? 2 : 0,
+                borderWidth: avatar.key === pickerState.key ? 2 : 0,
                 borderColor: tintColor,
               },
             ]}
-            onPress={pickImage}
+            onPress={() => {
+              setPickerState((prv) => ({
+                ...prv,
+                key: avatar.key,
+                emojiAvatar: avatar.url,
+                imageAvatar: null,
+              }));
+            }}
           >
-            {pickerState.imageAvatar ? (
-              <Image source={pickerState.imageAvatar} contentFit="cover" style={styles.image} />
-            ) : (
-              <CameraIcon color={tintColor} size={30} />
-            )}
+            <Image source={avatar.url} contentFit="cover" style={styles.image} />
           </Pressable>
-
-          {avatarList.map((avatar) => (
-            <Pressable
-              key={avatar.key}
-              style={[
-                styles.avatarItem,
-                {
-                  backgroundColor: bgTertiary,
-                  width: avatarItemSize,
-                  height: avatarItemSize,
-                  borderWidth: avatar.key === pickerState.key ? 2 : 0,
-                  borderColor: tintColor,
-                },
-              ]}
-              onPress={() => {
-                setPickerState((prv) => ({
-                  ...prv,
-                  key: avatar.key,
-                  emojiAvatar: avatar.url,
-                  imageAvatar: null,
-                }));
-              }}
-            >
-              <Image source={avatar.url} contentFit="cover" style={styles.image} />
-            </Pressable>
-          ))}
-        </View>
-
-        <CustomButton label="Сохранить" onPress={saveChoosenAvatar} />
+        ))}
       </View>
-    </BottomSheetWrapper>
+      <CustomButton label="Сохранить" onPress={saveChoosenAvatar} />
+    </View>
   );
 }
 

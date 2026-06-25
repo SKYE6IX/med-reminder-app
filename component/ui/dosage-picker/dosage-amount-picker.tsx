@@ -1,19 +1,20 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { DOSAGE_MEASUREMENT } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import DosageAmountInput from "./dosage-amount-input";
 
 const UNIT_PRESSABLE_PER_ROW = 3;
 const UNIT_WRAPPER_GAP = 12;
 
 export default function DosageAmounPicker() {
+  const { openSheet, closeSheet } = useBottomSheet();
+
   const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
 
-  const showDosageAmountInputRef = useRef<BottomSheetWrapperRef>(null);
   const { formState, setMedicatioSchedule, setMedicationDetails } = useAddPillStore();
 
   const dosageAmountState = Number(formState.schedule.dosage);
@@ -26,6 +27,20 @@ export default function DosageAmounPicker() {
   };
   const handleSetDosageAmount = (amount: string) => {
     setMedicatioSchedule({ dosage: amount });
+  };
+
+  const openDosageAmountInputSheet = () => {
+    openSheet({
+      title: "Количество дозировки",
+      snapPointPercent: "40%",
+      content: (
+        <DosageAmountInput
+          measurementValue={dosageMeasurements}
+          onSetValue={handleSetDosageAmount}
+          closeSheet={closeSheet}
+        />
+      ),
+    });
   };
 
   // Themes color
@@ -43,7 +58,7 @@ export default function DosageAmounPicker() {
         <View style={styles.dosageAmountWrapper}>
           <Pressable
             style={[styles.dosageAmountPressable, { backgroundColor: bGTertiary }]}
-            onPress={() => showDosageAmountInputRef.current?.open()}
+            onPress={openDosageAmountInputSheet}
           >
             <Text style={[styles.dosageAmountValue, { color: tintColor }]}>
               {dosageAmountState % 1 === 0 ? dosageAmountState : dosageAmountState.toFixed(1)}
@@ -85,13 +100,6 @@ export default function DosageAmounPicker() {
           })}
         </View>
       </View>
-
-      {/* DOSAGE AMOUNT INPUT */}
-      <DosageAmountInput
-        measurementValue={dosageMeasurements}
-        showInputRef={showDosageAmountInputRef}
-        onSetValue={handleSetDosageAmount}
-      />
     </View>
   );
 }

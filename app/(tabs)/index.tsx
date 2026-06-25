@@ -1,6 +1,5 @@
 import PlusIcon from "@/component/icons/plus-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import Loader from "@/component/ui/loader";
 import Tabs from "@/component/ui/tabs";
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -14,6 +13,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ScheduleEventCard from "@/component/ui/cards/schedule-event-card";
+import Loader from "@/component/ui/loader";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { useNotificationData } from "@/hooks/use-notification-data";

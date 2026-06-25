@@ -16,6 +16,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -136,31 +137,33 @@ export default function RootLayout() {
             <StatusBar style="auto" />
             <FeedbackAlert />
 
-            <Stack>
-              {/* ONBOARDING */}
-              <Stack.Protected guard={!hasCompleteOnboarding}>
-                <Stack.Screen name="onboarding">
-                  <Stack.Header hidden />
-                  <Stack.Title></Stack.Title>
-                </Stack.Screen>
-              </Stack.Protected>
+            <BottomSheetProvider>
+              <Stack>
+                {/* ONBOARDING */}
+                <Stack.Protected guard={!hasCompleteOnboarding}>
+                  <Stack.Screen name="onboarding">
+                    <Stack.Header hidden />
+                    <Stack.Title></Stack.Title>
+                  </Stack.Screen>
+                </Stack.Protected>
 
-              {/* AUTHENTICATIONS */}
-              <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
-                <Stack.Screen name="(auth)">
-                  <Stack.Header hidden />
-                  <Stack.Title></Stack.Title>
-                </Stack.Screen>
-              </Stack.Protected>
+                {/* AUTHENTICATIONS */}
+                <Stack.Protected guard={!isAuthenticated && hasCompleteOnboarding}>
+                  <Stack.Screen name="(auth)">
+                    <Stack.Header hidden />
+                    <Stack.Title></Stack.Title>
+                  </Stack.Screen>
+                </Stack.Protected>
 
-              {/* MAIN APPLICATION */}
-              <Stack.Protected guard={isAuthenticated}>
-                <Stack.Screen name="(tabs)">
-                  <Stack.Header hidden />
-                  <Stack.Title></Stack.Title>
-                </Stack.Screen>
-              </Stack.Protected>
-            </Stack>
+                {/* MAIN APPLICATION */}
+                <Stack.Protected guard={isAuthenticated}>
+                  <Stack.Screen name="(tabs)">
+                    <Stack.Header hidden />
+                    <Stack.Title></Stack.Title>
+                  </Stack.Screen>
+                </Stack.Protected>
+              </Stack>
+            </BottomSheetProvider>
           </PortalProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

@@ -1,17 +1,20 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowDown from "@/component/icons/arrow-down";
 import CalenderIcon from "@/component/icons/calender-icon";
 import PlusIcon from "@/component/icons/plus-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import DateTimePickerWrapper, {
+import AndroidDateTimeWrapper, {
   DateTimeWrapperRef,
-} from "@/component/ui/date-time-wrapper/date-time-wrapper";
+} from "@/component/ui/date-time-wrapper/date-time-wrapper.android";
+import IOSDateTimeWrapper from "@/component/ui/date-time-wrapper/date-time-wrapper.ios";
 import DosageAmounPicker from "@/component/ui/dosage-picker/dosage-amount-picker";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
 import { DateTime, formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
+
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -28,18 +31,19 @@ import {
 const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
+  const sharedStyles = useAddPillScreenStyles();
+  const isAndroid = Platform.OS === "android";
+
+  const { openSheet } = useBottomSheet();
   const { formState, setMedicatioSchedule } = useAddPillStore();
+  const router = useRouter();
 
-  const [durarions, setDuration] = useState("");
+  const [durations, setDurations] = useState("");
   const [fromDate, setFromDate] = useState<Date>(getNow());
-
-  const timeRef = useRef<DateTimeWrapperRef>(null);
-  const dateRef = useRef<DateTimeWrapperRef>(null);
-
   const displayStartDate = formatRegularDate(formState.schedule.startDate.replaceAll(".", " "));
 
-  const sharedStyles = useAddPillScreenStyles();
-  const router = useRouter();
+  const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
+  const androidDateRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
 
   const occurences = generateTimeOccurrences({
     rrule: formState.schedule.rule.recurrenceRule,
@@ -62,7 +66,7 @@ export default function ScheduleStepScreen() {
   };
 
   // Time settings
-  const handleSetTime = (date: Date) => {
+  const handleOnTimeChange = (date: Date) => {
     const newRules = updateTimeOcurrencesRule({
       rrule: formState.schedule.rule.recurrenceRule,
       date,
@@ -76,12 +80,11 @@ export default function ScheduleStepScreen() {
   };
 
   // Date settings
-  const handleSetDate = (date: Date) => {
+  const handleOnDateChange = (date: Date) => {
     setFromDate(date);
-    if (durarions.length >= 1) {
+    if (durations.length >= 1) {
       const startDate = DateTime.fromJSDate(date);
-      const endDate = startDate.plus({ days: Number(durarions) - 1 });
-
+      const endDate = startDate.plus({ days: Number(durations) - 1 });
       setMedicatioSchedule({
         startDate: getDateLocalString(startDate.toJSDate()),
         endDate: getDateLocalString(endDate.toJSDate()),
@@ -92,17 +95,53 @@ export default function ScheduleStepScreen() {
     }
   };
 
-  const handleOnTextInputChange = (text: string) => {
-    setDuration(text);
+  const handleOnDurationInputChange = (text: string) => {
+    setDurations(text);
     if (text.length <= 0) {
       setMedicatioSchedule({ endDate: null });
     } else {
       const startDate = DateTime.fromJSDate(fromDate);
       const endDate = startDate.plus({ days: Number(text) - 1 });
-
       setMedicatioSchedule({
         startDate: getDateLocalString(startDate.toJSDate()),
         endDate: getDateLocalString(endDate.toJSDate()),
+      });
+    }
+  };
+
+  const showTimeSetting = () => {
+    if (isAndroid) {
+      androidTimeRef.current?.showDateTime();
+    } else {
+      openSheet({
+        title: "Время начала",
+        snapPointPercent: "40%",
+        content: (
+          <IOSDateTimeWrapper
+            mode="time"
+            onDateTimeChange={handleOnTimeChange}
+            showUpdateButton={false}
+          />
+        ),
+      });
+    }
+  };
+
+  const showDateSetting = () => {
+    if (isAndroid) {
+      androidDateRef.current?.showDateTime();
+    } else {
+      openSheet({
+        title: "Дата начала",
+        snapPointPercent: "40%",
+        content: (
+          <IOSDateTimeWrapper
+            mode="date"
+            onDateTimeChange={handleOnDateChange}
+            showUpdateButton={false}
+            disabledDate
+          />
+        ),
       });
     }
   };
@@ -121,14 +160,12 @@ export default function ScheduleStepScreen() {
       style={[
         styles.container,
         sharedStyles.container,
-        // Needed to reset the padding and transfer it to the scrollView
+        // Needed to reset the padding and transfer it to
+        //  the scrollView.
         { paddingLeft: 0, paddingRight: 0 },
       ]}
     >
-      <ScrollView
-        contentContainerStyle={[styles.contentContainer]}
-        // keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={[styles.contentContainer]}>
         {/* Frequency Settings */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Частота</Text>
@@ -157,20 +194,22 @@ export default function ScheduleStepScreen() {
               </Text>
             ))}
           </View>
+
           <CustomButton
             label="Установить время начала"
             variant="outline"
             textVaraint="tintText"
             svgIcon={<PlusIcon color={tintColor} size={14} />}
-            onPress={() => timeRef.current?.showDateTime()}
+            onPress={showTimeSetting}
           />
-          {/* TIME PICKER */}
-          <DateTimePickerWrapper
-            onDateTimeChange={handleSetTime}
-            ref={timeRef}
-            mode="time"
-            bottomSheetTitle="Время начала"
-          />
+          {/* ONLY FOR ANDROID */}
+          {isAndroid && (
+            <AndroidDateTimeWrapper
+              ref={androidTimeRef}
+              onDateTimeChange={handleOnTimeChange}
+              mode="time"
+            />
+          )}
         </View>
 
         {/* Duration days settings. (Optional) */}
@@ -180,8 +219,8 @@ export default function ScheduleStepScreen() {
             <Text style={[styles.durationOptionalText, { color }]}>«Необязательный»</Text>
           </View>
           <TextInput
-            value={durarions}
-            onChangeText={handleOnTextInputChange}
+            value={durations}
+            onChangeText={handleOnDurationInputChange}
             keyboardType="number-pad"
             inputMode="numeric"
             placeholder="Сколько дней..."
@@ -201,7 +240,7 @@ export default function ScheduleStepScreen() {
           <Text style={sharedStyles.title}>Дата начала</Text>
           <Pressable
             style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
-            onPress={() => dateRef.current?.showDateTime()}
+            onPress={showDateSetting}
           >
             <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
               <CalenderIcon color={tintColor} />
@@ -214,13 +253,14 @@ export default function ScheduleStepScreen() {
               <ArrowDown />
             </View>
           </Pressable>
-
-          <DateTimePickerWrapper
-            onDateTimeChange={handleSetDate}
-            ref={dateRef}
-            mode="date"
-            bottomSheetTitle="Дата начала"
-          />
+          {/* ONLY FOR ANDROID */}
+          {isAndroid && (
+            <AndroidDateTimeWrapper
+              ref={androidDateRef}
+              onDateTimeChange={handleOnDateChange}
+              mode="date"
+            />
+          )}
         </View>
 
         <CustomButton

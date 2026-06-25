@@ -1,5 +1,5 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import CheckCircleIcon from "@/component/icons/check-circle-icon";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -10,7 +10,6 @@ import { getDateLocalString } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useRef } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -26,12 +25,11 @@ const cancelSubscriptionPlan = async () => {
 };
 
 export default function Subscription() {
-  const { showFeedBack } = useFeedBackStore();
-
-  const bottomSheetRef = useRef<BottomSheetWrapperRef | null>(null);
-
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  const { showFeedBack } = useFeedBackStore();
+  const { openSheet, closeSheet } = useBottomSheet();
 
   const { isPremiumPlan, endAt, billingCycle, subscriptionStatus } = useSubscriptionPlanQuery();
 
@@ -45,17 +43,6 @@ export default function Subscription() {
 
   const hideCancelButton = isPremiumPlan && !activePaidSubscription;
 
-  const handleOnPress = () => {
-    // When is premium true, user will allow to cancel their
-    // plan
-    if (isPremiumPlan) {
-      bottomSheetRef.current?.open();
-    } else {
-      // Else they will navigate to subscription page
-      router.navigate("/(tabs)/settings/subscription-plan");
-    }
-  };
-
   const { isPending, mutate } = useMutation({
     mutationFn: cancelSubscriptionPlan,
     async onSuccess() {
@@ -65,7 +52,9 @@ export default function Subscription() {
         message: "Вы отменили свою подписку.",
         status: "success",
       });
+      closeSheet();
     },
+
     onError(error) {
       showFeedBack({
         title: "Что-то пошло не так!",
@@ -74,6 +63,21 @@ export default function Subscription() {
       });
     },
   });
+
+  const handleOnPress = () => {
+    // When is premium true, user will allow to cancel their
+    // plan
+    if (isPremiumPlan) {
+      openSheet({
+        title: "Отменить план?",
+        snapPointPercent: "30%",
+        content: <CancelSubscriptionSheet cancelAction={mutate} closeSheet={closeSheet} />,
+      });
+    } else {
+      // Else they will navigate to subscription page
+      router.navigate("/(tabs)/settings/subscription-plan");
+    }
+  };
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -122,39 +126,43 @@ export default function Subscription() {
           </View>
         )}
       </View>
-
       <Loader visible={isPending} />
-
-      {/* Cancel Plan Sheet */}
-      <BottomSheetWrapper ref={bottomSheetRef} title="Отменить план?" snapPointPercent="30%">
-        <View style={styles.cancelActionBox}>
-          <Text style={[styles.cancelActionText, { color: mutedColor }]}>
-            Вы потеряете доступ ко всем преимуществам этого тарифного плана после окончания текущего
-            периода.
-          </Text>
-          <View style={styles.cancelActionBtnWrapper}>
-            <CustomButton
-              label="Отмена"
-              variant="outline"
-              textVaraint="mutedText"
-              style={styles.cancelActionBtn}
-              onPress={() => bottomSheetRef.current?.close()}
-            />
-            <CustomButton
-              label="Отменить план"
-              variant="danger"
-              style={styles.cancelActionBtn}
-              onPress={() => {
-                mutate();
-                bottomSheetRef.current?.close();
-              }}
-            />
-          </View>
-        </View>
-      </BottomSheetWrapper>
     </SafeAreaView>
   );
 }
+
+const CancelSubscriptionSheet = ({
+  cancelAction,
+  closeSheet,
+}: {
+  cancelAction: () => void;
+  closeSheet: () => void;
+}) => {
+  const mutedColor = useThemeColor({}, "textMuted");
+  return (
+    <View style={styles.cancelActionBox}>
+      <Text style={[styles.cancelActionText, { color: mutedColor }]}>
+        Вы потеряете доступ ко всем преимуществам этого тарифного плана после окончания текущего
+        периода.
+      </Text>
+      <View style={styles.cancelActionBtnWrapper}>
+        <CustomButton
+          label="Отмена"
+          variant="outline"
+          textVaraint="mutedText"
+          style={styles.cancelActionBtn}
+          onPress={closeSheet}
+        />
+        <CustomButton
+          label="Отменить план"
+          variant="danger"
+          style={styles.cancelActionBtn}
+          onPress={cancelAction}
+        />
+      </View>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {

@@ -1,69 +1,67 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
-import { Portal } from "@gorhom/portal";
-import React, { RefObject, useCallback, useImperativeHandle, useMemo, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export interface BottomSheetWrapperRef {
-  open: () => void;
-  close: () => void;
+interface OpenOptions {
+  title?: string;
+  snapPointPercent?: string;
+  content: React.ReactNode;
 }
 
-type BottomSheetWrapperProps = {
-  children: React.ReactNode;
-  ref: RefObject<BottomSheetWrapperRef | null>;
-  title: string;
-  snapPointPercent?: string;
-};
+interface BottomSheetContextValue {
+  openSheet: (options: OpenOptions) => void;
+  closeSheet: () => void;
+}
 
 interface HandleProps {
   borderColor: string;
   tintColor: string;
   textColor: string;
-  title: string;
+  title?: string;
   close: () => void;
 }
 
-export default function BottomSheetWrapper({
-  children,
-  ref,
-  title,
-  snapPointPercent = "100%",
-}: BottomSheetWrapperProps) {
+const BottomSheetContext = createContext<BottomSheetContextValue>({
+  openSheet: () => {},
+  closeSheet: () => {},
+});
+
+export function BottomSheetProvider({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
+
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const [title, setTitle] = useState<string | undefined>();
+  const [snapPointPercent, setSnapPointPercent] = useState("100%");
+  const [content, setContent] = useState<React.ReactNode>(null);
 
   const snapPoints = useMemo(() => ["1%", snapPointPercent], [snapPointPercent]);
 
+  const openSheet = useCallback(({ title, snapPointPercent = "100%", content }: OpenOptions) => {
+    setTitle(title);
+    setSnapPointPercent(snapPointPercent);
+    setContent(content);
+
+    bottomSheetRef.current?.expand();
+  }, []);
+
+  const closeSheet = useCallback(() => {
+    bottomSheetRef.current?.close();
+  }, []);
+
   const handleSheetChanges = useCallback((index: number) => {
     if (index <= 1) {
+      Keyboard.dismiss();
       bottomSheetRef.current?.close();
     }
   }, []);
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      open() {
-        bottomSheetRef.current?.expand();
-      },
-      close() {
-        bottomSheetRef.current?.close();
-      },
-    }),
-    [],
-  );
-
-  // Backdrops
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     [],
   );
-
-  const closeBottomSheet = () => {
-    bottomSheetRef.current?.close();
-  };
 
   // Themes colors
   const backgroundColor = useThemeColor({}, "bottomSheetBg");
@@ -72,7 +70,8 @@ export default function BottomSheetWrapper({
   const tint = useThemeColor({}, "tint");
 
   return (
-    <Portal>
+    <BottomSheetContext.Provider value={{ openSheet, closeSheet }}>
+      {children}
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
@@ -92,14 +91,14 @@ export default function BottomSheetWrapper({
             borderColor={borderColor}
             tintColor={tint}
             textColor={color}
-            close={closeBottomSheet}
+            close={closeSheet}
             title={title}
           />
         )}
       >
-        <BottomSheetView style={styles.contentContainer}>{children}</BottomSheetView>
+        <BottomSheetView style={styles.contentContainer}>{content}</BottomSheetView>
       </BottomSheet>
-    </Portal>
+    </BottomSheetContext.Provider>
   );
 }
 
@@ -146,3 +145,5 @@ const styles = StyleSheet.create({
     width: 55,
   },
 });
+
+export const useBottomSheet = () => useContext(BottomSheetContext);

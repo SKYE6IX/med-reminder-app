@@ -46,7 +46,7 @@ export default function AddPillLayout() {
   }, [canCreateMedicationProfile, isPageActive]);
 
   const onModalDismiss = () => {
-    router.navigate("/(tabs)/medications");
+    // router.navigate("/(tabs)/medications");
   };
 
   return (
@@ -78,7 +78,7 @@ export default function AddPillLayout() {
       <Stepper currentStep={currentStep} />
 
       {/* Subscription Banner */}
-      <SubscriptionBanner ref={openBannerRef} onModalClose={onModalDismiss} />
+      <SubscriptionBanner ref={openBannerRef} />
     </React.Fragment>
   );
 }

@@ -1,14 +1,13 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import AlarmClockIcon from "@/component/icons/alarm-clock-icon";
 import BellNotificationIcon from "@/component/icons/bell-notification-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
-import { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -19,8 +18,9 @@ const snoozes = [
 ];
 
 export default function Reminders() {
+  const { openSheet } = useBottomSheet();
+
   const { reminderPreferences, notfication, setReminderPreference } = useAppSettingsStore();
-  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
   const insets = useSafeAreaInsets();
 
   const color = useThemeColor({}, "textPrimary");
@@ -53,6 +53,21 @@ export default function Reminders() {
     });
   };
 
+  const showSnoozeOptioonSheet = () => {
+    openSheet({
+      title: "Интервал повтора",
+      snapPointPercent: "30%",
+      content: (
+        <PlatformPicker
+          pickerRef={null}
+          selectedValue={String(reminderPreferences.snoozeDuration)}
+          handleOnValueChange={handleSnoozeChange}
+          items={snoozes}
+        />
+      ),
+    });
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
       <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
@@ -62,7 +77,7 @@ export default function Reminders() {
           description="Выберите интервал повторного напоминания"
           svgIcon={<AlarmClockIcon color={color} />}
           interaction="press"
-          onPress={() => bottomSheetRef.current?.open()}
+          onPress={showSnoozeOptioonSheet}
         />
 
         {/* Allow early reminder */}
@@ -85,17 +100,6 @@ export default function Reminders() {
           onToggle={toggleAllowMissedDosage}
         />
       </View>
-      {/* Sounds Settings Bottom Sheet */}
-      <BottomSheetWrapper ref={bottomSheetRef} title="Интервал повтора" snapPointPercent="30%">
-        <View>
-          <PlatformPicker
-            pickerRef={null}
-            selectedValue={String(reminderPreferences.snoozeDuration)}
-            handleOnValueChange={handleSnoozeChange}
-            items={snoozes}
-          />
-        </View>
-      </BottomSheetWrapper>
     </SafeAreaView>
   );
 }

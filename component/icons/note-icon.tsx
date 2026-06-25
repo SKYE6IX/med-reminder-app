@@ -6,7 +6,7 @@ type Props = {
   height?: number;
 };
 
-export default function NoteIcon({ color = "#353535", width = 19, height = 15 }: Props) {
+export default function NoteIcon({ color = "#353535" }: Props) {
   return (
     <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <Path

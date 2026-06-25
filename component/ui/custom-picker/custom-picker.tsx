@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   customPickerLabel: {
-    fontFamily: "Roboto_400Regular",
+    fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,
   },

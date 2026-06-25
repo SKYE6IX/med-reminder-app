@@ -1,7 +1,6 @@
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import RefillCard from "@/component/ui/cards/refill-card";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -10,7 +9,7 @@ import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Dimensions, FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -29,37 +28,9 @@ const refillMedicationPackMutation = async (body: RefillMedicationPackForm) => {
 };
 
 export default function RefillPill() {
-  const isAndroid = Platform.OS === "android";
-  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
-
-  const { showFeedBack } = useFeedBackStore();
   const inset = useSafeAreaInsets();
-  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
 
-  const [medicationPack, setMedicationPack] = useState<RefillMedicationPackForm>({
-    medicationPackId: "",
-    medicationProfileId: "",
-    totalQuantity: "",
-    reminderDays: 0,
-  });
-
-  const [medicationDetails, setMedicationDetails] = useState({
-    dosageAmount: "",
-    measurementValue: "",
-  });
-
-  const amountInPack = medicationPack.totalQuantity ? `${medicationPack.totalQuantity}` : "";
-  const reminderDays = medicationPack.reminderDays ? `${medicationPack.reminderDays}` : "";
-
-  // Bottom sheet height calculations
-  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
-  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
-
-  const canContinue = useMemo(
-    () => Boolean(medicationPack.totalQuantity) && Boolean(medicationPack.reminderDays),
-    [medicationPack.reminderDays, medicationPack.totalQuantity],
-  );
+  const { openSheet, closeSheet } = useBottomSheet();
 
   // Query Data
   const { data, isLoading } = useQuery({
@@ -69,66 +40,27 @@ export default function RefillPill() {
 
   const isPacksAvailable = data && data.length >= 1;
 
-  const handleAmountInPackSet = (selectedValue: string) => {
-    setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
-  };
-
-  const handleRefillDaysSet = (selectedValue: string) => {
-    setMedicationPack((prv) => ({ ...prv, reminderDays: Number(selectedValue) }));
-  };
-
-  const handleOpenBottomSheet = ({
+  const openAddMedicationPackSheet = ({
     medicationPackId,
     medicationProfileId,
-    dosageAmount,
     measurementValue,
   }: {
     medicationPackId: string;
     medicationProfileId: string;
-    dosageAmount: string;
     measurementValue: string;
   }) => {
-    setMedicationDetails({ dosageAmount, measurementValue });
-    setMedicationPack((prv) => ({ ...prv, medicationPackId, medicationProfileId }));
-    bottomSheetRef.current?.open();
+    openSheet({
+      title: "Напоминание о пополнении",
+      content: (
+        <AddMedicationPackPickerSheet
+          medicationPackId={medicationPackId}
+          medicationProfileId={medicationProfileId}
+          measurementValue={measurementValue}
+          closeSheet={closeSheet}
+        />
+      ),
+    });
   };
-
-  const { isPending, mutate } = useMutation({
-    mutationFn: refillMedicationPackMutation,
-    async onSuccess(data, variables) {
-      // Remove the refill pack from cache and add the newly added one there;
-      queryClient.setQueryData(
-        ["medication-refill-packs"],
-        (existingPacks: RefillMedicationPack[]) => {
-          const filterPacks = existingPacks.filter(
-            (pack) => pack.id !== variables.medicationPackId,
-          );
-          return [...filterPacks, data];
-        },
-      );
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["medication-profile", "details", variables.medicationProfileId],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
-      ]);
-
-      showFeedBack({
-        title: "Успешно",
-        message: "Пополнение добавлено в напоминание.",
-        status: "success",
-      });
-      bottomSheetRef.current?.close();
-      setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
-    },
-    onError(error) {
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
-        status: "error",
-      });
-    },
-  });
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -138,7 +70,7 @@ export default function RefillPill() {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
       <Text style={[styles.headerTitle, { color }]}>Пополнение лекарств</Text>
-      <Loader visible={isLoading || isPending} />
+      {/* <Loader visible={isLoading || isPending} /> */}
       {!isLoading && (
         <>
           {isPacksAvailable ? (
@@ -150,10 +82,9 @@ export default function RefillPill() {
                   key={item.id}
                   pack={item}
                   onRefillButtonPress={() =>
-                    handleOpenBottomSheet({
+                    openAddMedicationPackSheet({
                       medicationPackId: item.id,
                       medicationProfileId: item.medicationProfileId,
-                      dosageAmount: item.dosageAmount,
                       measurementValue: item.dosageMeasurement,
                     })
                   }
@@ -172,7 +103,6 @@ export default function RefillPill() {
                 style={styles.noContentImage}
               />
               <Text style={[styles.noContentTitle, { color }]}>Ваши запасы лекарств</Text>
-
               <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
                 Здесь появятся запасы и напоминания о пополнении.
               </Text>
@@ -180,33 +110,116 @@ export default function RefillPill() {
           )}
         </>
       )}
-
-      {/* Refill Bottom Sheet */}
-      <BottomSheetWrapper ref={bottomSheetRef} title="Напоминание о пополнении">
-        <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
-          <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
-          <MedicationPackPicker
-            amountInPack={amountInPack}
-            refillDaysReminder={reminderDays}
-            onAmountInPackSet={handleAmountInPackSet}
-            onRefillDaysReminderSet={handleRefillDaysSet}
-            dosageAmount={medicationDetails.dosageAmount}
-            measurementValue={medicationDetails.measurementValue}
-          />
-
-          <CustomButton
-            label="Добавить"
-            disabled={!canContinue || isPending}
-            variant={canContinue ? "filled" : "disabled"}
-            textVaraint={canContinue ? "regularText" : "mutedText"}
-            onPress={() => mutate(medicationPack)}
-            style={{ marginTop: "auto" }}
-          />
-        </View>
-      </BottomSheetWrapper>
     </SafeAreaView>
   );
 }
+
+const AddMedicationPackPickerSheet = ({
+  medicationPackId,
+  medicationProfileId,
+  measurementValue,
+  closeSheet,
+}: {
+  medicationPackId: string;
+  medicationProfileId: string;
+  measurementValue: string;
+  closeSheet: () => void;
+}) => {
+  const inset = useSafeAreaInsets();
+
+  const isAndroid = Platform.OS === "android";
+  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
+  const SCREEN_HEIGHT = Dimensions.get("window").height;
+  // Bottom sheet height calculations
+  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
+  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
+
+  const { showFeedBack } = useFeedBackStore();
+
+  const [medicationPack, setMedicationPack] = useState<RefillMedicationPackForm>({
+    medicationPackId,
+    medicationProfileId,
+    totalQuantity: "",
+    reminderDays: 0,
+  });
+
+  const amountInPack = medicationPack.totalQuantity ? `${medicationPack.totalQuantity}` : "";
+  const reminderDays = medicationPack.reminderDays ? `${medicationPack.reminderDays}` : "";
+
+  const canContinue = useMemo(
+    () => Boolean(medicationPack.totalQuantity) && Boolean(medicationPack.reminderDays),
+    [medicationPack.reminderDays, medicationPack.totalQuantity],
+  );
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: refillMedicationPackMutation,
+    async onSuccess(data, variables) {
+      queryClient.setQueryData(
+        ["medication-refill-packs"],
+        (existingPacks: RefillMedicationPack[]) => {
+          const filterPacks = existingPacks.filter(
+            (pack) => pack.id !== variables.medicationPackId,
+          );
+          return [...filterPacks, data];
+        },
+      );
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["medication-profile", "details", variables.medicationProfileId],
+        }),
+        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
+      ]);
+      showFeedBack({
+        title: "Успешно",
+        message: "Пополнение добавлено в напоминание.",
+        status: "success",
+      });
+
+      closeSheet();
+      setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
+    },
+
+    onError(error) {
+      showFeedBack({
+        title: "Ошибка!",
+        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+        status: "error",
+      });
+    },
+  });
+
+  const handleAmountInPackSet = (selectedValue: string) => {
+    setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
+  };
+  const handleRefillDaysSet = (selectedValue: string) => {
+    setMedicationPack((prv) => ({ ...prv, reminderDays: Number(selectedValue) }));
+  };
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  return (
+    <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
+      <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
+      <MedicationPackPicker
+        amountInPack={amountInPack}
+        refillDaysReminder={reminderDays}
+        onAmountInPackSet={handleAmountInPackSet}
+        onRefillDaysReminderSet={handleRefillDaysSet}
+        measurementValue={measurementValue}
+      />
+
+      <CustomButton
+        label="Добавить"
+        disabled={!canContinue || isPending}
+        variant={canContinue ? "filled" : "disabled"}
+        textVaraint={canContinue ? "regularText" : "mutedText"}
+        onPress={() => mutate(medicationPack)}
+        style={{ marginTop: "auto" }}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   safeArea: {

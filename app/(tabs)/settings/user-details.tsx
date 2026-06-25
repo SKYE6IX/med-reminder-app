@@ -1,21 +1,23 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import CameraIcon from "@/component/icons/camera-icon";
 import UserIcon from "@/component/icons/user-icon";
 import AvatarPicker from "@/component/ui/avatar-picker";
-import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import CustomPicker from "@/component/ui/custom-picker/custom-picker";
-import DateTimeWrapper, {
+import AndroidDateTimeWrapper, {
   DateTimeWrapperRef,
-} from "@/component/ui/date-time-wrapper/date-time-wrapper";
+} from "@/component/ui/date-time-wrapper/date-time-wrapper.android";
+import IOSDateTimeWrapper from "@/component/ui/date-time-wrapper/date-time-wrapper.ios";
 import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
+
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { UserResponse } from "@/types/user";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -41,15 +43,19 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 };
 
 export default function UserDetails() {
+  const isAndroid = Platform.OS === "android";
+
+  const { openSheet, closeSheet } = useBottomSheet();
+
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
 
-  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
+  const androidDateRef = useRef<DateTimeWrapperRef>(null);
+
   const { showFeedBack } = useFeedBackStore();
 
   const { user } = useUserData();
   const { selfProfile } = useProfilesQuery();
-
   const profileImageUrl = useProfileImage();
 
   // Query data
@@ -60,11 +66,8 @@ export default function UserDetails() {
     gender: user?.gender ?? null,
   });
 
-  const datePickerRef = useRef<DateTimeWrapperRef>(null);
-
-  // @platform IOS ONLY.
   // Track the visibility of the picker for gender selection
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false); // @platform IOS ONLY.
 
   const canUpdate = useMemo(() => {
     const exisitngData = user;
@@ -76,15 +79,6 @@ export default function UserDetails() {
       gender !== exisitngData?.gender
     );
   }, [updateUserData, user]);
-
-  // Themes color
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const tintColor = useThemeColor({}, "tint");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
-  const bgTertiary = useThemeColor({}, "backgroundTertiary");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-  const borderColor = useThemeColor({}, "borderColor");
 
   // @platform IOS ONLY
   // Trigger gender picker
@@ -102,7 +96,7 @@ export default function UserDetails() {
   };
 
   // Callback function for onValueSelected on date picker
-  const handleOnDateTimeSelected = (date: Date) => {
+  const handleOnDateChange = (date: Date) => {
     setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
   };
 
@@ -120,12 +114,8 @@ export default function UserDetails() {
         status: "success",
       });
     },
-    onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when update user -> ", error);
-      } else {
-        console.log("An unknown error occur when update user -> ", error);
-      }
+
+    onError() {
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
@@ -138,7 +128,6 @@ export default function UserDetails() {
     // We only send updated data that isn't the same as
     // the exising one;
     const { name, email, dateOfBirth, gender } = updateUserData;
-
     const data: UpdateUserData = {
       name: name !== user?.name ? name : null,
       email: email !== user?.email ? email : null,
@@ -147,6 +136,41 @@ export default function UserDetails() {
     };
     mutate(data);
   };
+
+  const openAvatarPickerSheet = () => {
+    openSheet({
+      title: "Выберите фотографию",
+      snapPointPercent: "55%",
+      content: <AvatarPicker profileId={selfProfile?.id ?? ""} onActionComplete={closeSheet} />,
+    });
+  };
+
+  const openDatePicker = () => {
+    if (isAndroid) {
+      androidDateRef.current?.showDateTime();
+    } else {
+      openSheet({
+        title: "Дата рождения",
+        snapPointPercent: "40%",
+        content: (
+          <IOSDateTimeWrapper
+            mode="date"
+            onDateTimeChange={handleOnDateChange}
+            disabledDate={false}
+          />
+        ),
+      });
+    }
+  };
+
+  // Themes color
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const tintColor = useThemeColor({}, "tint");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const bgTertiary = useThemeColor({}, "backgroundTertiary");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
+  const borderColor = useThemeColor({}, "borderColor");
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
@@ -159,7 +183,7 @@ export default function UserDetails() {
               <Image source={profileImageUrl} style={styles.avatar} />
               <Pressable
                 style={[styles.cameraIcon, { backgroundColor: bgTertiary }]}
-                onPress={() => bottomSheetRef.current?.open()}
+                onPress={openAvatarPickerSheet}
               >
                 <CameraIcon color={tintColor} />
               </Pressable>
@@ -192,21 +216,21 @@ export default function UserDetails() {
               <Text style={[styles.bodyItemLabel, { color }]}>Дата рождения</Text>
               <Pressable
                 style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
-                onPress={() => datePickerRef.current?.showDateTime()}
+                onPress={openDatePicker}
               >
                 <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
                   {updateUserData.dateOfBirth || "Введите дату Вашего рождения"}
                 </Text>
               </Pressable>
-              {/* handleSetTime(date, event) */}
-              <DateTimeWrapper
-                onDateTimeChange={handleOnDateTimeSelected}
-                ref={datePickerRef}
-                mode="date"
-                bottomSheetTitle="Дата рождения"
-                showUpdateButton={false}
-                disabledDate={false}
-              />
+
+              {/* ONLY FOR ANDROID */}
+              {isAndroid && (
+                <AndroidDateTimeWrapper
+                  ref={androidDateRef}
+                  onDateTimeChange={handleOnDateChange}
+                  mode="date"
+                />
+              )}
             </View>
 
             {/* GENDER */}
@@ -233,9 +257,6 @@ export default function UserDetails() {
           />
         </View>
       </ScrollView>
-
-      {/* AVATAR PICKER */}
-      <AvatarPicker bottomSheetWrapperRef={bottomSheetRef} profileId={selfProfile?.id ?? ""} />
     </SafeAreaView>
   );
 }

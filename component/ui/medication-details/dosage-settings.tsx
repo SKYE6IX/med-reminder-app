@@ -1,12 +1,12 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import PillIcon from "@/component/icons/pill-icon";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
-import React, { useRef } from "react";
+import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import DosageAmountInput from "../dosage-picker/dosage-amount-input";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
@@ -17,26 +17,37 @@ export default function DetailsDosageSettings({
   medicationProfile: MedicationProfile;
 }) {
   const sharedStyles = useSharedStyles();
-  const { isPending, mutate } = useUpdateMedicationMutation();
-  const showDosageAmountInputRef = useRef<BottomSheetWrapperRef>(null);
 
-  const { schedule } = medicationProfile;
+  const { openSheet, closeSheet } = useBottomSheet();
+  const { isPending, mutate } = useUpdateMedicationMutation();
 
   const handleUpdateDosage = (value: string) => {
-    const shouldUpdate = schedule.dosage !== value;
-
+    const shouldUpdate = medicationProfile.schedule.dosage !== value;
     if (shouldUpdate && value.length > 1) {
       mutate({ id: medicationProfile.id, data: { doseQuantity: value } });
     }
   };
 
-  const color = useThemeColor({}, "textPrimary");
+  const openDosageSettingSheet = () => {
+    openSheet({
+      title: "Количество дозировки",
+      snapPointPercent: "40%",
+      content: (
+        <DosageAmountInput
+          measurementValue={medicationProfile.schedule.measurement}
+          onSetValue={handleUpdateDosage}
+          closeSheet={closeSheet}
+        />
+      ),
+    });
+  };
 
+  const color = useThemeColor({}, "textPrimary");
   return (
     <React.Fragment>
       <Pressable
         style={[sharedStyles.card, sharedStyles.detailsGroupItem]}
-        onPress={() => showDosageAmountInputRef.current?.open()}
+        onPress={openDosageSettingSheet}
       >
         <View style={sharedStyles.cardHeader}>
           <Text style={sharedStyles.cardTitle}>Доза за прием</Text>
@@ -49,12 +60,6 @@ export default function DetailsDosageSettings({
           </Text>
         </View>
       </Pressable>
-
-      <DosageAmountInput
-        measurementValue={medicationProfile.schedule.measurement}
-        showInputRef={showDosageAmountInputRef}
-        onSetValue={handleUpdateDosage}
-      />
       <Loader visible={isPending} />
     </React.Fragment>
   );

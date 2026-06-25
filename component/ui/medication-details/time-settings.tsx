@@ -1,8 +1,6 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import ClockIcon from "@/component/icons/clock-icon";
-import DateTimeWrapper, {
-  DateTimeWrapperRef,
-} from "@/component/ui/date-time-wrapper/date-time-wrapper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
@@ -10,6 +8,10 @@ import { toLocalTime } from "@/utils/luxonUtil";
 import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
+import AndroidDateTimeWrapper, {
+  DateTimeWrapperRef,
+} from "../date-time-wrapper/date-time-wrapper.android";
+import IOSDateTimeWrapper from "../date-time-wrapper/date-time-wrapper.ios";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
 
@@ -25,20 +27,20 @@ export default function DetailsTimeSettings({
   medicationProfile: MedicationProfile;
   fullWidth: boolean;
 }) {
+  const sharedStyles = useSharedStyles();
   const isAndroid = Platform.OS === "android";
+
+  const { openSheet, closeSheet } = useBottomSheet();
 
   const [updatedRule, setUpdatedRule] = useState("");
 
   const { mutate, isPending } = useUpdateMedicationMutation();
 
-  const timeRef = useRef<DateTimeWrapperRef>(null);
+  const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
 
-  const sharedStyles = useSharedStyles();
   const color = useThemeColor({}, "textPrimary");
 
   const handleOnDateTimeChange = (date: Date) => {
-    console.log("Value change: ");
-
     const newRules = updateTimeOcurrencesRule({
       rrule: medicationProfile.schedule.recurrenceRule,
       date,
@@ -56,10 +58,29 @@ export default function DetailsTimeSettings({
   // update the time if it's diffrent from the current one.
   const handleOnButtonPress = () => {
     if (updatedRule !== medicationProfile.schedule.recurrenceRule) {
-      timeRef.current?.closeDateTime();
       mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
+      closeSheet();
     } else {
-      timeRef.current?.closeDateTime();
+      closeSheet();
+    }
+  };
+
+  const openDateTime = () => {
+    if (isAndroid) {
+      androidTimeRef.current?.showDateTime();
+    } else {
+      openSheet({
+        title: "Время начала",
+        snapPointPercent: "45%",
+        content: (
+          <IOSDateTimeWrapper
+            mode="time"
+            onDateTimeChange={(date) => handleOnDateTimeChange(date)}
+            showUpdateButton
+            onUpdateButtonPress={handleOnButtonPress}
+          />
+        ),
+      });
     }
   };
 
@@ -67,7 +88,7 @@ export default function DetailsTimeSettings({
     <React.Fragment>
       <Pressable
         style={[sharedStyles.card, fullWidth ? undefined : sharedStyles.detailsGroupItem]}
-        onPress={() => timeRef.current?.showDateTime()}
+        onPress={openDateTime}
       >
         <View style={sharedStyles.cardHeader}>
           <Text style={sharedStyles.cardTitle}>Время начала</Text>
@@ -80,15 +101,16 @@ export default function DetailsTimeSettings({
           </Text>
         </View>
       </Pressable>
-      <DateTimeWrapper
-        onDateTimeChange={(date) => handleOnDateTimeChange(date)}
-        ref={timeRef}
-        mode="time"
-        bottomSheetTitle="Время начала"
-        showUpdateButton
-        onUpdateButtonPress={handleOnButtonPress}
-      />
       <Loader visible={isPending} />
+
+      {/* ONLY FOR ANDROID */}
+      {isAndroid && (
+        <AndroidDateTimeWrapper
+          ref={androidTimeRef}
+          onDateTimeChange={(date) => handleOnDateTimeChange(date)}
+          mode="time"
+        />
+      )}
     </React.Fragment>
   );
 }

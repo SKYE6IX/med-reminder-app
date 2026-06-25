@@ -1,8 +1,8 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import BellOnIcon from "@/component/icons/bell-on-icon";
 import LockverifiedIcon from "@/component/icons/lock-verified-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
 import SignalIcon from "@/component/icons/signal-icon";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
@@ -29,7 +29,11 @@ const proSoundSettings = [
 ];
 
 export default function Notifications() {
+  const insets = useSafeAreaInsets();
+  const { openSheet } = useBottomSheet();
+
   const isAndroid = Platform.OS === "android";
+
   const { notfication, reminderPreferences, setNotificationSetting } = useAppSettingsStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
@@ -39,9 +43,6 @@ export default function Notifications() {
   const universfieldSoft = require("@/assets/sounds/universfield_soft.wav");
   const universfieldPassive = require("@/assets/sounds/universfield_passive.wav");
   const dragonWavy = require("@/assets/sounds/dragon_wavy.wav");
-
-  const bottomSheetRef = useRef<BottomSheetWrapperRef>(null);
-  const insets = useSafeAreaInsets();
 
   const soundListSettings = isPremiumPlan ? proSoundSettings : basicSoundSettings;
   const soundSelectedValue =
@@ -139,6 +140,21 @@ export default function Notifications() {
     });
   };
 
+  const showNotificationSoundListSheet = () => {
+    openSheet({
+      title: "Звук уведомления",
+      snapPointPercent: "35%",
+      content: (
+        <PlatformPicker
+          pickerRef={null}
+          selectedValue={soundSelectedValue}
+          handleOnValueChange={handleSoundChange}
+          items={soundListSettings}
+        />
+      ),
+    });
+  };
+
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
@@ -152,7 +168,7 @@ export default function Notifications() {
           description="Изменить звук уведомлений"
           svgIcon={<BellOnIcon color={color} />}
           interaction="press"
-          onPress={() => bottomSheetRef.current?.open()}
+          onPress={showNotificationSoundListSheet}
         />
 
         {/* Allow Notification */}
@@ -188,18 +204,6 @@ export default function Notifications() {
           onToggle={toggleAllowDisplayOnLockScreen}
         />
       </View>
-
-      {/* Sounds Settings Bottom Sheet */}
-      <BottomSheetWrapper ref={bottomSheetRef} title="Звук уведомления" snapPointPercent="35%">
-        <View>
-          <PlatformPicker
-            pickerRef={null}
-            selectedValue={soundSelectedValue}
-            handleOnValueChange={handleSoundChange}
-            items={soundListSettings}
-          />
-        </View>
-      </BottomSheetWrapper>
     </SafeAreaView>
   );
 }

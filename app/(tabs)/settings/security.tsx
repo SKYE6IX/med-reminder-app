@@ -1,25 +1,23 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import PhoneIcon from "@/component/icons/phone-icon";
 import UserCloseIcon from "@/component/icons/user-close-icon";
 import UserLockIcon from "@/component/icons/user-lock-icon";
-import { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
-import ChangePasswordSheet from "@/component/ui/settings/change-password-sheet";
-import DeleteAccountSheet from "@/component/ui/settings/delete-account-sheet";
+import ChangePassword from "@/component/ui/settings/change-password";
+import DeleteAccount from "@/component/ui/settings/delete-account";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import * as LocalAuthentication from "expo-local-authentication";
-import { useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Security() {
+  const { openSheet, closeSheet } = useBottomSheet();
+
   const { useDeviceLock, setUseDeviceLock } = useAppSettingsStore();
   const { showFeedBack } = useFeedBackStore();
   const insets = useSafeAreaInsets();
-
-  const changePasswordSheetRef = useRef<BottomSheetWrapperRef>(null);
-  const deleteAccountSheetRef = useRef<BottomSheetWrapperRef>(null);
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
@@ -37,6 +35,21 @@ export default function Security() {
     setUseDeviceLock(value);
   };
 
+  const showChangePasswordSheet = () => {
+    openSheet({
+      title: "Изменить пароль",
+      content: <ChangePassword />,
+    });
+  };
+
+  const showDeleteAccountSheet = () => {
+    openSheet({
+      title: "Удалить аккаунт?",
+      snapPointPercent: "25%",
+      content: <DeleteAccount closeSheet={closeSheet} />,
+    });
+  };
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
       <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
@@ -45,7 +58,7 @@ export default function Security() {
           description="Изменить пароль профиля пользователя"
           svgIcon={<UserLockIcon color={color} />}
           interaction="press"
-          onPress={() => changePasswordSheetRef.current?.open()}
+          onPress={showChangePasswordSheet}
         />
 
         {/* Allow to use device lock */}
@@ -63,13 +76,9 @@ export default function Security() {
           description="Безвозвратно удалить ваш аккаунт с лекарствами"
           svgIcon={<UserCloseIcon color={color} />}
           interaction="press"
-          onPress={() => deleteAccountSheetRef.current?.open()}
+          onPress={showDeleteAccountSheet}
         />
       </View>
-
-      {/* Bottom Sheets */}
-      <ChangePasswordSheet bottomSheetRef={changePasswordSheetRef} />
-      <DeleteAccountSheet bottomSheetRef={deleteAccountSheetRef} />
     </SafeAreaView>
   );
 }

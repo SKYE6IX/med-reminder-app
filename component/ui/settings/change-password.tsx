@@ -4,16 +4,11 @@ import { api, axios } from "@/utils/axiosInstance";
 import { clearTokens } from "@/utils/tokenUtils";
 import { validateChangePasswordInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
-import { RefObject, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 import FormInput from "../form/form-input";
 import Loader from "../loader";
-
-type ChangePasswordSheetProps = {
-  bottomSheetRef: RefObject<BottomSheetWrapperRef | null>;
-};
 
 interface FormState {
   oldPassword: string;
@@ -30,8 +25,9 @@ const resetPasswordMutation = async (resetData: FormState) => {
   return response.data;
 };
 
-export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSheetProps) {
+export default function ChangePassword() {
   const { showFeedBack } = useFeedBackStore();
+
   const [changePasswordState, setChangePasswordState] = useState<ChangePasswordState>({
     formState: {
       oldPassword: "",
@@ -60,6 +56,7 @@ export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSh
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
+
       timerRef.current = setTimeout(() => {
         if (value !== changePasswordState.formState.newPassword) {
           setChangePasswordState((prvState) => ({
@@ -91,6 +88,7 @@ export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSh
       clearTokens();
       useAuthStore.getState().setIsAuthenticated(false);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
@@ -121,11 +119,12 @@ export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSh
     } else if (changePasswordState.errorsSet.has("repeatPassword")) {
       return;
     }
+
     mutate(validatedInputs.data);
   };
 
   return (
-    <BottomSheetWrapper ref={bottomSheetRef} title="Изменить пароль">
+    <React.Fragment>
       <Loader visible={isPending} />
       <View style={styles.container}>
         <FormInput
@@ -162,7 +161,7 @@ export default function ChangePasswordSheet({ bottomSheetRef }: ChangePasswordSh
 
         <CustomButton label="Изменить пароль" disabled={isPending} onPress={handleResetPassword} />
       </View>
-    </BottomSheetWrapper>
+    </React.Fragment>
   );
 }
 

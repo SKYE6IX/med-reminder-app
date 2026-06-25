@@ -1,11 +1,17 @@
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import { useImperativeHandle, useState } from "react";
+import { RefObject, useImperativeHandle, useState } from "react";
 import { View } from "react-native";
-import { DateTimeWrapperProps } from "./date-time-wrapper";
 
 export interface DateTimeWrapperRef {
   showDateTime: () => void;
 }
+
+type DateTimeWrapperProps = {
+  ref: RefObject<DateTimeWrapperRef | null>;
+  mode: "date" | "time";
+  disabledDate?: boolean;
+  onDateTimeChange: (dateTime: Date) => void;
+};
 
 const getNow = () => Date.now();
 
@@ -17,7 +23,7 @@ export default function DateTimeWrapper({
 }: DateTimeWrapperProps) {
   const [date, setDate] = useState(new Date(getNow()));
 
-  const handleSetDateTime = (date?: Date) => {
+  const handleSetDateTime = (date: Date) => {
     if (date) {
       setDate(date);
       onDateTimeSelected(date);
@@ -40,7 +46,6 @@ export default function DateTimeWrapper({
     showDateTime() {
       showMode(mode);
     },
-    closeDateTime() {},
   }));
 
   return <View style={{ display: "none" }} />;

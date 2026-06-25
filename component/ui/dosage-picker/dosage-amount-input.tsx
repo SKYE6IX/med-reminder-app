@@ -2,21 +2,20 @@ import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { RefObject, useState } from "react";
+import { useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "../bottom-sheet-wrapper";
 import CustomButton from "../custom-button/custom-button";
 
 type DosageAmountInputProps = {
-  showInputRef: RefObject<BottomSheetWrapperRef | null>;
   measurementValue: string;
   onSetValue: (value: string) => void;
+  closeSheet: () => void;
 };
 
 export default function DosageAmountInput({
-  showInputRef,
   onSetValue,
   measurementValue,
+  closeSheet,
 }: DosageAmountInputProps) {
   const [value, setValue] = useState("");
 
@@ -39,45 +38,37 @@ export default function DosageAmountInput({
     }
     onSetValue(value);
     Keyboard.dismiss();
-    showInputRef.current?.close();
+    closeSheet();
   };
 
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
-
   return (
-    <BottomSheetWrapper ref={showInputRef} title="Количество дозировки" snapPointPercent="40%">
-      <View style={styles.container}>
-        <Text style={[styles.label, { color }]}>Доза за приём</Text>
-        <View style={styles.innerWrapper}>
-          <BottomSheetTextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: inputBgColor,
-                borderColor: inputBorderColor,
-                color,
-              },
-            ]}
-            keyboardType="decimal-pad"
-            inputMode="decimal"
-            returnKeyType="done"
-            maxLength={10}
-            value={value}
-            onChangeText={handleOnChangeText}
-          />
-          <Text style={[styles.text, { color }]}>Введите общую сумму в «{measurement}»</Text>
-        </View>
-
-        <CustomButton
-          label="Задать"
-          onPress={handleSetDosageAmount}
-          style={{ marginTop: "auto" }}
+    <View style={styles.container}>
+      <Text style={[styles.label, { color }]}>Доза за приём</Text>
+      <View style={styles.innerWrapper}>
+        <BottomSheetTextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: inputBgColor,
+              borderColor: inputBorderColor,
+              color,
+            },
+          ]}
+          keyboardType="decimal-pad"
+          inputMode="decimal"
+          returnKeyType="done"
+          maxLength={10}
+          value={value}
+          onChangeText={handleOnChangeText}
         />
+        <Text style={[styles.text, { color }]}>Введите общую сумму в «{measurement}»</Text>
       </View>
-    </BottomSheetWrapper>
+      <CustomButton label="Задать" onPress={handleSetDosageAmount} style={{ marginTop: "auto" }} />
+    </View>
   );
 }
 

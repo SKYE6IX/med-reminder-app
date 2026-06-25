@@ -1,9 +1,9 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import CameraIcon from "@/component/icons/camera-icon";
 import DeleteIcon from "@/component/icons/delete-icon";
 import PlusIcon from "@/component/icons/plus-icon";
 import AddProfile from "@/component/ui/add-profile";
 import AvatarPicker from "@/component/ui/avatar-picker";
-import BottomSheetWrapper, { BottomSheetWrapperRef } from "@/component/ui/bottom-sheet-wrapper";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
@@ -21,42 +21,33 @@ import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+interface RelationProfileProps {
+  profile: ProfileResponse;
+  index: number;
+  openDeleteBottomSheet: (id: string) => void;
+}
+
+interface DeleteRelationProfileProps {
+  color: string;
+  deleteFn: () => void;
+  closeSheet: () => void;
+}
+
 const deleteRelationProfileMutation = async (profileId: string) => {
   await api.delete(`users/profiles/${profileId}`);
 };
 
 export default function Relations() {
+  const insets = useSafeAreaInsets();
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
+
+  const { openSheet, closeSheet } = useBottomSheet();
 
   const { showFeedBack } = useFeedBackStore();
   const { relationProfiles } = useProfilesQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const [profileId, setProfileId] = useState("");
-  const addProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
-  const deleteProfileBottomSheetRef = useRef<BottomSheetWrapperRef>(null);
-  const insets = useSafeAreaInsets();
-
-  //   Themes color
-  const color = useThemeColor({}, "textPrimary");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-  const bgTertiary = useThemeColor({}, "backgroundTertiary");
-  const borderColor = useThemeColor({}, "borderColor");
-
-  const openDeleteBottomSheet = (id: string) => {
-    setProfileId(id);
-    deleteProfileBottomSheetRef.current?.open();
-  };
-
-  const handleOpenAddProfile = () => {
-    if (isPremiumPlan) {
-      addProfileBottomSheetRef.current?.open();
-    } else {
-      openBannerRef.current?.openModal();
-    }
-  };
 
   const { isPending, mutate } = useMutation({
     mutationFn: deleteRelationProfileMutation,
@@ -64,8 +55,9 @@ export default function Relations() {
       queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
         existingData.filter((profile) => profile.id !== variables),
       );
-      deleteProfileBottomSheetRef.current?.close();
+      closeSheet();
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur when creating relatiion profile -> ", error);
@@ -77,12 +69,48 @@ export default function Relations() {
         message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
         status: "error",
       });
-      deleteProfileBottomSheetRef.current?.close();
+      closeSheet();
     },
   });
 
+  const openAddNewProfileSheet = () => {
+    if (isPremiumPlan) {
+      openSheet({
+        title: "Добавить члена семьи",
+        content: <AddProfile onProfileAdded={closeSheet} />,
+      });
+    } else {
+      openBannerRef.current?.openModal();
+    }
+  };
+
+  const openDeleteProfileSheet = (id: string) => {
+    setProfileId(id);
+    openSheet({
+      title: "Удалить пользователя?",
+      snapPointPercent: "25%",
+      content: (
+        <DeleteRelationProfile
+          color={mutedColor}
+          deleteFn={() => mutate(profileId)}
+          closeSheet={closeSheet}
+        />
+      ),
+    });
+  };
+
+  //   Themes color
+  const color = useThemeColor({}, "textPrimary");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
+  const bgTertiary = useThemeColor({}, "backgroundTertiary");
+  const borderColor = useThemeColor({}, "borderColor");
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
+      <Loader visible={isPending} />
+
       <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
         <View style={[styles.contentCotainer, { backgroundColor: bgSecondary, borderColor }]}>
           {/* PROFILE LIST */}
@@ -91,7 +119,7 @@ export default function Relations() {
               key={profile.id}
               profile={profile}
               index={i}
-              openDeleteBottomSheet={openDeleteBottomSheet}
+              openDeleteBottomSheet={openDeleteProfileSheet}
             />
           ))}
 
@@ -101,7 +129,7 @@ export default function Relations() {
               styles.contentItemWrapper,
               { borderTopWidth: relationProfiles.length ? 1 : undefined, borderColor },
             ]}
-            onPress={handleOpenAddProfile}
+            onPress={openAddNewProfileSheet}
           >
             <View style={[styles.profileImage, { backgroundColor: bgTertiary }]}>
               <PlusIcon color={color} size={15} />
@@ -111,61 +139,28 @@ export default function Relations() {
         </View>
       </View>
 
-      {/* Subscription Banner */}
       <SubscriptionBanner ref={openBannerRef} />
-
-      {/* Add new profile Bottom sheet */}
-      <AddProfile ref={addProfileBottomSheetRef} />
-
-      {/* Delete Prfoile Bottom Sheet */}
-      <BottomSheetWrapper
-        ref={deleteProfileBottomSheetRef}
-        title="Удалить пользователя?"
-        snapPointPercent="30%"
-      >
-        <View style={styles.deleteActionBox}>
-          <Text style={[styles.deletActionText, { color: mutedColor }]}>
-            Все данные, связанные с этим пользователем, будут удалены.
-          </Text>
-          <View style={styles.deleActionBtnWrapper}>
-            <CustomButton
-              label="Отмена"
-              variant="outline"
-              textVaraint="mutedText"
-              style={styles.deleteActionBtn}
-              onPress={() => deleteProfileBottomSheetRef.current?.close()}
-            />
-            <CustomButton
-              label="Удалить"
-              variant="danger"
-              style={styles.deleteActionBtn}
-              onPress={() => mutate(profileId)}
-            />
-          </View>
-        </View>
-      </BottomSheetWrapper>
-
-      {/* Loader */}
-      <Loader visible={isPending} />
     </SafeAreaView>
   );
 }
 
-const RelationProfile = ({
-  profile,
-  index,
-  openDeleteBottomSheet,
-}: {
-  profile: ProfileResponse;
-  index: number;
-  openDeleteBottomSheet: (id: string) => void;
-}) => {
+const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProfileProps) => {
   const profileImageUrl = useProfileImage(profile.id);
-  const addProfileImage = useRef<BottomSheetWrapperRef>(null);
+  const { openSheet, closeSheet } = useBottomSheet();
+
   //   Themes color
   const color = useThemeColor({}, "textPrimary");
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
+
+  const openAvatarPickerSheet = () => {
+    openSheet({
+      title: "Выберите фотографию",
+      snapPointPercent: "55%",
+      content: <AvatarPicker profileId={profile.id} onActionComplete={closeSheet} />,
+    });
+  };
+
   return (
     <>
       <View
@@ -175,13 +170,12 @@ const RelationProfile = ({
           { borderTopWidth: index !== 0 ? 1 : undefined, borderColor },
         ]}
       >
-        <Pressable style={styles.profileImage} onPress={() => addProfileImage.current?.open()}>
+        <Pressable style={styles.profileImage} onPress={openAvatarPickerSheet}>
           <Image
             source={profileImageUrl}
             style={styles.relationAvatar}
             contentPosition="top center"
           />
-
           <View style={styles.cameraIcon}>
             <CameraIcon />
           </View>
@@ -194,10 +188,33 @@ const RelationProfile = ({
           <DeleteIcon color={color} />
         </Pressable>
       </View>
-
-      {/* AVATAR PICKER */}
-      <AvatarPicker bottomSheetWrapperRef={addProfileImage} profileId={profile.id} />
     </>
+  );
+};
+
+const DeleteRelationProfile = ({ color, closeSheet, deleteFn }: DeleteRelationProfileProps) => {
+  return (
+    <View style={styles.deleteActionBox}>
+      <Text style={[styles.deletActionText, { color }]}>
+        Все данные, связанные с этим пользователем, будут удалены.
+      </Text>
+
+      <View style={styles.deleActionBtnWrapper}>
+        <CustomButton
+          label="Отмена"
+          variant="outline"
+          textVaraint="mutedText"
+          style={styles.deleteActionBtn}
+          onPress={closeSheet}
+        />
+        <CustomButton
+          label="Удалить"
+          variant="danger"
+          style={styles.deleteActionBtn}
+          onPress={deleteFn}
+        />
+      </View>
+    </View>
   );
 };
 
