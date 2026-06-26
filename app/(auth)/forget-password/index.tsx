@@ -2,7 +2,7 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
@@ -45,24 +45,29 @@ export default function ForgetPasswordScreen() {
   // Themes
   const backgroundColor = useThemeColor({}, "backgroundPrimary");
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
-      <Loader visible={isPending} />
-      <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
-        <FormHeader title="Забыли пароль?" subTitle="Введите данные для восстановления аккаунта" />
-        <FormInput
-          label="Почта"
-          onValueChange={({ value }) => {
-            setEmail(value);
-            setShowError(false);
-          }}
-          type="email"
-          name="email"
-          placeholder="Введите Вашу почту"
-          hasError={showError}
-        />
-        <CustomButton label="Восстановить пароль" onPress={handleContinueToOTP} />
-      </View>
-    </ScrollView>
+    <SafeAreaView style={{ paddingTop: insets.top + 10, backgroundColor, flex: 1 }}>
+      <ScrollView>
+        <Loader visible={isPending} />
+        <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
+          <FormHeader
+            title="Забыли пароль?"
+            subTitle="Введите данные для восстановления аккаунта"
+          />
+          <FormInput
+            label="Почта"
+            onValueChange={({ value }) => {
+              setEmail(value);
+              setShowError(false);
+            }}
+            type="email"
+            name="email"
+            placeholder="Введите Вашу почту"
+            hasError={showError}
+          />
+          <CustomButton label="Восстановить пароль" onPress={handleContinueToOTP} />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

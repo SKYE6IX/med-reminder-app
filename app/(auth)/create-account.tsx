@@ -3,7 +3,7 @@ import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
@@ -108,83 +108,84 @@ export default function CreateAccountScreen() {
       });
       return;
     }
-
     mutate({ ...validatedInputs.data });
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1, paddingTop: insets.top * 2, backgroundColor }}>
-      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) }]}>
-        <Loader visible={isPending} />
-
-        <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
-
-        <View style={styles.inputsWrapper}>
-          <FormInput
-            label="Имя"
-            name="name"
-            onValueChange={handleOnValueChanges}
-            inputRef={textInputRef}
-            type="text"
-            placeholder="Введите Ваше имя"
-            hasError={createAccountState.errorsSet.has("name")}
-          />
-          <FormInput
-            label="Почта"
-            name="email"
-            onValueChange={handleOnValueChanges}
-            inputRef={emaiInputRef}
-            type="email"
-            placeholder="Введите адрес Вашей почты"
-            hasError={createAccountState.errorsSet.has("email")}
-          />
-          <FormInput
-            label="Пароль"
-            name="password"
-            onValueChange={handleOnValueChanges}
-            type="password"
-            placeholder="Придумайте пароль"
-            hasError={createAccountState.errorsSet.has("password")}
-            textContentType="newPassword"
-            autoComplete="new-password"
-          />
-        </View>
-
-        <View style={styles.submitButtonWrapper}>
-          <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
-          <ThemedText style={styles.termsText}>
-            Создавая аккаунт, Вы принимаете
-            <Link href="/" style={{ color: linkColor }}>
-              {" "}
-              Условия использования
-            </Link>{" "}
-            и
-            <Link href="/" style={{ color: linkColor }}>
-              {" "}
-              Политику конфиденциальности.
-            </Link>
-          </ThemedText>
-        </View>
-
-        <View style={styles.socialButtonWrapper}>
-          <View style={styles.dividerWrapper}>
-            <View style={styles.divider} />
-            <ThemedText style={styles.dividerText}>Или</ThemedText>
-            <View style={styles.divider} />
+    <SafeAreaView
+      style={{ paddingTop: insets.top + 10, paddingBottom: 10, backgroundColor, flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <View style={styles.container}>
+          <Loader visible={isPending} />
+          <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
+          <View style={styles.inputsWrapper}>
+            <FormInput
+              label="Имя"
+              name="name"
+              onValueChange={handleOnValueChanges}
+              inputRef={textInputRef}
+              type="text"
+              placeholder="Введите Ваше имя"
+              hasError={createAccountState.errorsSet.has("name")}
+            />
+            <FormInput
+              label="Почта"
+              name="email"
+              onValueChange={handleOnValueChanges}
+              inputRef={emaiInputRef}
+              type="email"
+              placeholder="Введите адрес Вашей почты"
+              hasError={createAccountState.errorsSet.has("email")}
+            />
+            <FormInput
+              label="Пароль"
+              name="password"
+              onValueChange={handleOnValueChanges}
+              type="password"
+              placeholder="Придумайте пароль"
+              hasError={createAccountState.errorsSet.has("password")}
+              textContentType="newPassword"
+              autoComplete="new-password"
+            />
           </View>
-          {Platform.OS === "ios" && <AppleSignIn type="SIGN_UP" />}
-        </View>
 
-        <View style={styles.footerWrapper}>
-          <ThemedText style={styles.footerText}>Уже есть аккаунт?</ThemedText>
-          <Link href="/sign-in" asChild>
-            <Pressable>
-              <Text style={[styles.footerText, { color: linkColor }]}>Войти</Text>
-            </Pressable>
-          </Link>
+          <View style={styles.submitButtonWrapper}>
+            <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
+            <ThemedText style={styles.termsText}>
+              Создавая аккаунт, Вы принимаете
+              <Link href="/" style={{ color: linkColor }}>
+                {" "}
+                Условия использования
+              </Link>{" "}
+              и
+              <Link href="/" style={{ color: linkColor }}>
+                {" "}
+                Политику конфиденциальности.
+              </Link>
+            </ThemedText>
+          </View>
+
+          <View style={styles.socialButtonWrapper}>
+            <View style={styles.dividerWrapper}>
+              <View style={styles.divider} />
+              <ThemedText style={styles.dividerText}>Или</ThemedText>
+              <View style={styles.divider} />
+            </View>
+            {Platform.OS === "ios" && <AppleSignIn type="SIGN_UP" />}
+          </View>
+
+          <View style={styles.footerWrapper}>
+            <ThemedText style={styles.footerText}>Уже есть аккаунт?</ThemedText>
+            <Link href="/sign-in" asChild>
+              <Pressable>
+                <Text style={[styles.footerText, { color: linkColor }]}>Войти</Text>
+              </Pressable>
+            </Link>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -113,15 +113,12 @@ export default function SubscriptionPlan() {
     });
   };
 
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <Loader visible={isPending} />
+  const top = isAndroid ? insets.top + 20 : 0;
 
-      <ScrollView
-        contentContainerStyle={[
-          [styles.scrollView, { paddingTop: isAndroid ? insets.top + 10 : 0, paddingBottom: 10 }],
-        ]}
-      >
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
+      <Loader visible={isPending} />
+      <ScrollView contentContainerStyle={styles.contentStyle}>
         {/* HEADERS */}
         <View style={styles.headerContainer}>
           <View style={[styles.headerIcon, { backgroundColor: bgTertiary }]}>
@@ -249,12 +246,10 @@ export default function SubscriptionPlan() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  scrollView: {
+  contentStyle: {
     paddingLeft: 20,
     paddingRight: 20,
+    paddingBottom: 10,
     gap: 32,
   },
   headerContainer: {

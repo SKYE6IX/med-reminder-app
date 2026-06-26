@@ -159,9 +159,11 @@ export default function Notifications() {
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
+  const top = isAndroid ? insets.top + 20 : insets.top + 10;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }}>
+      <View style={styles.container}>
         {/* Allow Sounds */}
         <SettingsCard
           title="Звук уведомления"
@@ -209,9 +211,6 @@ export default function Notifications() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     paddingLeft: 20,
     paddingRight: 20,

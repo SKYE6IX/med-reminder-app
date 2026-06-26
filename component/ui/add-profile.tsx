@@ -92,42 +92,44 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ height: 700 }}>
-      <View style={styles.profileFormContainer}>
-        <View style={styles.profileFormInputWrapper}>
-          <ThemedText type="label">Имя</ThemedText>
-          <BottomSheetTextInput
-            value={formState.name}
-            onChangeText={handleOnTextChange}
-            style={[styles.profileFormInput, { borderColor, color: textColor }]}
-            autoCorrect={false}
-            autoCapitalize="sentences"
-            keyboardType="default"
-            placeholder="Введите имя"
-            placeholderTextColor="#9E9E9E"
+    <View style={{ height: 600 }}>
+      <ScrollView>
+        <View style={styles.profileFormContainer}>
+          <View style={styles.profileFormInputWrapper}>
+            <ThemedText type="label">Имя</ThemedText>
+            <BottomSheetTextInput
+              value={formState.name}
+              onChangeText={handleOnTextChange}
+              style={[styles.profileFormInput, { borderColor, color: textColor }]}
+              autoCorrect={false}
+              autoCapitalize="sentences"
+              keyboardType="default"
+              placeholder="Введите имя"
+              placeholderTextColor="#9E9E9E"
+            />
+          </View>
+          <CustomPicker
+            label="Отношения"
+            selectedValue={formState.relation}
+            items={RELATION_LIST}
+            svgIcon={<PeopleGroupIcon color={textColor} />}
+            onValueSelected={handleOnRelationSelected}
+            isSelectionVisible={isPickerVisible}
+            triggerSelection={triggerSelectionPicker}
+          />
+
+          <CustomButton
+            label="Добавить нового члена"
+            variant={canSubmit ? "filled" : "disabled"}
+            textVaraint={canSubmit ? "regularText" : "mutedText"}
+            style={styles.button}
+            disabled={!canSubmit}
+            onPress={handleAddProfile}
           />
         </View>
-        <CustomPicker
-          label="Отношения"
-          selectedValue={formState.relation}
-          items={RELATION_LIST}
-          svgIcon={<PeopleGroupIcon color={textColor} />}
-          onValueSelected={handleOnRelationSelected}
-          isSelectionVisible={isPickerVisible}
-          triggerSelection={triggerSelectionPicker}
-        />
-
-        <CustomButton
-          label="Добавить нового члена"
-          variant={canSubmit ? "filled" : "disabled"}
-          textVaraint={canSubmit ? "regularText" : "mutedText"}
-          style={styles.button}
-          disabled={!canSubmit}
-          onPress={handleAddProfile}
-        />
-      </View>
-      <Loader visible={isPending} />
-    </ScrollView>
+        <Loader visible={isPending} />
+      </ScrollView>
+    </View>
   );
 }
 

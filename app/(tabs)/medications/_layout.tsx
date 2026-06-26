@@ -8,27 +8,19 @@ export const unstable_settings = {
 
 export default function PillsLayout() {
   const color = useThemeColor({}, "textPrimary");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   return (
     <Stack>
       <Stack.Screen name="index">
-        <Stack.Header
-          transparent
-          blurEffect="systemMaterial"
-          style={{ shadowColor: "transparent", backgroundColor: bgPrimary }}
-        />
+        <Stack.Header transparent style={{ shadowColor: "transparent" }} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
           Мои лекарства
         </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Screen name="[medicationProfileId]">
-        <Stack.Header
-          transparent
-          blurEffect="systemMaterial"
-          style={{ shadowColor: "transparent", backgroundColor: bgPrimary }}
-        />
+        <Stack.Screen.BackButton displayMode="minimal" />
+        <Stack.Header transparent style={{ shadowColor: "transparent" }} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
           Информация о лекарстве
         </Stack.Screen.Title>

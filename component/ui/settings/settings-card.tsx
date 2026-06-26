@@ -62,10 +62,12 @@ export default function SettingsCard({
         ) : (
           <View style={[styles.iconLeftWrapper, { backgroundColor: bgTertiary }]}>{svgIcon}</View>
         )}
+
         <View style={styles.textWrapper}>
           <Text style={[styles.title, { color }]}>{title}</Text>
           <Text style={[styles.description, { color: mutedColor }]}>{description}</Text>
         </View>
+
         <View style={styles.rightElement}>
           <ArrowRight size={30} color={color} />
         </View>
@@ -143,6 +145,7 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
   },
   textWrapper: {
+    width: 200,
     gap: 4,
   },
   title: {

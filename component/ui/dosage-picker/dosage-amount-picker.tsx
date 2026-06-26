@@ -4,7 +4,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import DosageAmountInput from "./dosage-amount-input";
 
 const UNIT_PRESSABLE_PER_ROW = 3;
@@ -29,10 +29,12 @@ export default function DosageAmounPicker() {
     setMedicatioSchedule({ dosage: amount });
   };
 
+  const snapPoint = Platform.OS === "android" ? "50%" : "45%";
+
   const openDosageAmountInputSheet = () => {
     openSheet({
       title: "Количество дозировки",
-      snapPointPercent: "40%",
+      snapPointPercent: snapPoint,
       content: (
         <DosageAmountInput
           measurementValue={dosageMeasurements}
@@ -160,6 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 14.2,
     textAlign: "center",
+    maxWidth: 75,
   },
   dosageUnitIcon: {
     fontSize: 20,

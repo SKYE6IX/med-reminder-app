@@ -2,10 +2,11 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface OpenOptions {
-  title?: string;
+  title: string;
   snapPointPercent?: string;
   content: React.ReactNode;
 }
@@ -19,8 +20,9 @@ interface HandleProps {
   borderColor: string;
   tintColor: string;
   textColor: string;
-  title?: string;
+  title: string;
   close: () => void;
+  animatedIndex: SharedValue<number>;
 }
 
 const BottomSheetContext = createContext<BottomSheetContextValue>({
@@ -33,18 +35,24 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const [title, setTitle] = useState<string | undefined>();
+  const timeoutId = useRef<number>(null);
+
+  const [title, setTitle] = useState<string>("");
   const [snapPointPercent, setSnapPointPercent] = useState("100%");
   const [content, setContent] = useState<React.ReactNode>(null);
 
   const snapPoints = useMemo(() => ["1%", snapPointPercent], [snapPointPercent]);
 
   const openSheet = useCallback(({ title, snapPointPercent = "100%", content }: OpenOptions) => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+
     setTitle(title);
     setSnapPointPercent(snapPointPercent);
     setContent(content);
 
-    bottomSheetRef.current?.expand();
+    timeoutId.current = setTimeout(() => bottomSheetRef.current?.expand(), 150);
   }, []);
 
   const closeSheet = useCallback(() => {
@@ -86,13 +94,14 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
         }}
-        handleComponent={() => (
+        handleComponent={(variables) => (
           <Handle
             borderColor={borderColor}
             tintColor={tint}
             textColor={color}
             close={closeSheet}
             title={title}
+            animatedIndex={variables.animatedIndex}
           />
         )}
       >
@@ -102,15 +111,27 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
   );
 }
 
-const Handle: React.FC<HandleProps> = ({ borderColor, tintColor, textColor, close, title }) => {
+const Handle: React.FC<HandleProps> = ({
+  borderColor,
+  tintColor,
+  textColor,
+  close,
+  title,
+  animatedIndex,
+}) => {
+  const animatedStyles = useAnimatedStyle(() => {
+    return {
+      opacity: animatedIndex.value < 1 ? 0 : 1,
+    };
+  });
   return (
-    <View style={[styles.header, { borderColor }]}>
+    <Animated.View style={[styles.header, { borderColor }, animatedStyles]}>
       <Pressable style={styles.headerPressable} onPress={close}>
         <Text style={[styles.headerPressableText, { color: tintColor }]}>Отмена</Text>
       </Pressable>
       <Text style={[styles.headerTitle, { color: textColor }]}>{title}</Text>
       <View style={styles.headerGhostView} />
-    </View>
+    </Animated.View>
   );
 };
 

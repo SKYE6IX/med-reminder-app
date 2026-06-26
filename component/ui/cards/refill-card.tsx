@@ -1,3 +1,4 @@
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { RefillMedicationPack } from "@/types/medication";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -54,7 +55,7 @@ export default function RefillCard({ pack, onRefillButtonPress }: RefillCardProp
               </Text>
               {/* Information about how many of the pack was added */}
               <Text style={sharedStyles.cardTextLarge}>
-                Добавлено {pack.totalQuantity} таблеток.
+                Добавлено {pack.totalQuantity} {getDosageMeasurement(pack.dosageMeasurement)}.
               </Text>
             </>
           )}

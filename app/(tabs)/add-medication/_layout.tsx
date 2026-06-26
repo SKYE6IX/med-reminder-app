@@ -2,10 +2,8 @@ import Stepper from "@/component/ui/stepper";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { Stack, useRouter, useSegments } from "expo-router";
 import React, { useEffect, useRef } from "react";
-import { ColorValue, StyleProp } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: "index",
@@ -23,17 +21,8 @@ export default function AddPillLayout() {
 
   const currentScreen = segments[segments.length - 1];
   const currentStep = ADD_PILL_SEGMENTS.indexOf(currentScreen);
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   const isPageActive = currentScreen === ADD_PILL_SEGMENTS[0];
-
-  const headerStyle: StyleProp<{
-    backgroundColor: ColorValue;
-    shadowColor: "transparent";
-  }> = {
-    shadowColor: "transparent",
-    backgroundColor: bgPrimary,
-  };
 
   const canCreateMedicationProfile =
     maxMedications === null ? true : count < maxMedications ? true : false;
@@ -45,40 +34,41 @@ export default function AddPillLayout() {
     }
   }, [canCreateMedicationProfile, isPageActive]);
 
-  const onModalDismiss = () => {
-    // router.navigate("/(tabs)/medications");
-  };
-
   return (
     <React.Fragment>
       <Stack>
         <Stack.Screen name="index">
-          <Stack.Header style={headerStyle} />
+          <Stack.Header transparent style={{ shadowColor: "transparent" }} />
           <Stack.Screen.Title asChild />
         </Stack.Screen>
 
         <Stack.Screen name="details-step">
           <Stack.Screen.BackButton displayMode="minimal" />
-          <Stack.Header style={headerStyle} />
+          <Stack.Header transparent style={{}} />
           <Stack.Screen.Title asChild />
         </Stack.Screen>
 
         <Stack.Screen name="schedule-step">
           <Stack.Screen.BackButton displayMode="minimal" />
-          <Stack.Header style={headerStyle} />
+          <Stack.Header transparent style={{ shadowColor: "transparent" }} />
           <Stack.Screen.Title asChild />
         </Stack.Screen>
 
         <Stack.Screen name="final-step">
           <Stack.Screen.BackButton displayMode="minimal" />
-          <Stack.Header style={headerStyle} />
+          <Stack.Header transparent style={{ shadowColor: "transparent" }} />
           <Stack.Screen.Title asChild />
         </Stack.Screen>
       </Stack>
-      <Stepper currentStep={currentStep} />
 
+      <Stepper currentStep={currentStep} />
       {/* Subscription Banner */}
-      <SubscriptionBanner ref={openBannerRef} />
+      <SubscriptionBanner
+        ref={openBannerRef}
+        onBannerClose={() => {
+          router.navigate("/(tabs)/medications");
+        }}
+      />
     </React.Fragment>
   );
 }

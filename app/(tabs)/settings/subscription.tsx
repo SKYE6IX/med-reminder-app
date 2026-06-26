@@ -10,7 +10,7 @@ import { getDateLocalString } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const formatDate = (isoDate: string | undefined) => {
@@ -25,6 +25,8 @@ const cancelSubscriptionPlan = async () => {
 };
 
 export default function Subscription() {
+  const isAndroid = Platform.OS === "android";
+
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -64,13 +66,14 @@ export default function Subscription() {
     },
   });
 
+  const snapPoint = isAndroid ? "35%" : "30%";
   const handleOnPress = () => {
     // When is premium true, user will allow to cancel their
     // plan
     if (isPremiumPlan) {
       openSheet({
         title: "Отменить план?",
-        snapPointPercent: "30%",
+        snapPointPercent: snapPoint,
         content: <CancelSubscriptionSheet cancelAction={mutate} closeSheet={closeSheet} />,
       });
     } else {
@@ -87,9 +90,11 @@ export default function Subscription() {
   const borderColor = useThemeColor({}, "borderColor");
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
 
+  const top = isAndroid ? insets.top + 20 : insets.top + 10;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }}>
+      <View style={styles.container}>
         <View style={[styles.card, { backgroundColor: bgSecondary, borderColor }]}>
           <View style={[styles.cardCirlce, { backgroundColor: bgTertiary }]}>
             <CheckCircleIcon />
@@ -199,6 +204,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardLabel: {
+    width: 130,
     fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,

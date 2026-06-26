@@ -81,14 +81,14 @@ export default function Settings() {
     }
   };
 
+  const top = isIOS ? 0 : insets.top + 20;
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <ScrollView
-        contentContainerStyle={[
-          styles.contentStyle,
-          { paddingTop: !isIOS ? insets.top : undefined, paddingBottom: 10 },
-        ]}
-      >
+    <SafeAreaView
+      style={[{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }]}
+      edges={["top"]}
+    >
+      <ScrollView contentContainerStyle={styles.contentStyle}>
         <Loader visible={isPending} />
         {/* PROFILE SETTINGS ✅ */}
         <View style={styles.section}>
@@ -165,6 +165,7 @@ export default function Settings() {
             onPress={() => router.navigate("/(tabs)/settings/about")}
           />
         </View>
+
         {/* SIGN OUT BUTTON */}
         <CustomButton
           label="Выйти"
@@ -187,6 +188,7 @@ const styles = StyleSheet.create({
   contentStyle: {
     paddingLeft: 20,
     paddingRight: 20,
+    paddingBottom: 10,
     gap: 24,
   },
   section: {

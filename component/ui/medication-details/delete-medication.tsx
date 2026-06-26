@@ -8,7 +8,7 @@ import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
 
@@ -59,10 +59,12 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
     mutate(medicationProfileId);
   };
 
+  const snapPoint = Platform.OS === "android" ? "35%" : "30%";
+
   const openDeleteMedicationSheet = () => {
     openSheet({
       title: "Удалить это лекарство?",
-      snapPointPercent: "25%",
+      snapPointPercent: snapPoint,
       content: <DeleteMedicationSheet deleteAction={handleDeleteAction} closeSheet={closeSheet} />,
     });
   };

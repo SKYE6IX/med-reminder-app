@@ -9,10 +9,11 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import * as LocalAuthentication from "expo-local-authentication";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Security() {
+  const isAdnroid = Platform.OS === "android";
   const { openSheet, closeSheet } = useBottomSheet();
 
   const { useDeviceLock, setUseDeviceLock } = useAppSettingsStore();
@@ -42,17 +43,20 @@ export default function Security() {
     });
   };
 
+  const snapPoint = isAdnroid ? "35%" : "30%";
   const showDeleteAccountSheet = () => {
     openSheet({
       title: "Удалить аккаунт?",
-      snapPointPercent: "25%",
+      snapPointPercent: snapPoint,
       content: <DeleteAccount closeSheet={closeSheet} />,
     });
   };
 
+  const top = isAdnroid ? insets.top + 20 : insets.top + 10;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }}>
+      <View style={styles.container}>
         <SettingsCard
           title="Изменить пароль"
           description="Изменить пароль профиля пользователя"

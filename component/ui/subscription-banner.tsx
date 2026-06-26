@@ -20,9 +20,10 @@ export interface SubscriptionBannerRef {
 
 type SubscriptionBannerProps = {
   ref: RefObject<SubscriptionBannerRef | null> | null;
+  onBannerClose?: () => void;
 };
 
-export default function SubscriptionBanner({ ref }: SubscriptionBannerProps) {
+export default function SubscriptionBanner({ ref, onBannerClose }: SubscriptionBannerProps) {
   const isAndroid = Platform.OS === "android";
   const router = useRouter();
 
@@ -52,7 +53,9 @@ export default function SubscriptionBanner({ ref }: SubscriptionBannerProps) {
     if (useUserStore.getState().displaySubscriptioOffer) {
       useUserStore.getState().disabledShowSubscriptionOffer();
     }
-  }, []);
+
+    onBannerClose && onBannerClose();
+  }, [onBannerClose]);
 
   useImperativeHandle(
     ref,

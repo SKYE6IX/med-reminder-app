@@ -26,7 +26,6 @@ const fetchMedicationProfileDetails = async (id: string) => {
 };
 
 export default function MedicationDetails() {
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const { medicationProfileId } = useLocalSearchParams();
 
@@ -55,31 +54,23 @@ export default function MedicationDetails() {
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
 
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <ScrollView
-        automaticallyAdjustContentInsets={false}
-        contentInsetAdjustmentBehavior="never"
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: isIOS ? undefined : insets.top + 10, paddingBottom: 10 },
-        ]}
-      >
-        <Loader visible={isLoading || isPending} />
+  const top = Platform.OS === "android" ? insets.top + 20 : insets.top;
 
+  return (
+    <SafeAreaView style={{ paddingTop: top, backgroundColor: bgPrimary, flex: 1 }} edges={["top"]}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: 10 }]}>
+        <Loader visible={isLoading || isPending} />
         {medicationProfile && (
-          <View style={styles.contentContainer}>
+          <>
             <MedicationDetailCard
               medicationProfile={medicationProfile}
               onSwitchToggle={handleOnSwitchToggle}
             />
-
             {/* Details Wrapper */}
             <View style={styles.detailsContainer}>
               {/* Schedule Information Wrapper */}
               <View style={styles.detailsWrapper}>
                 <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
-
                 {medicationProfile.schedule.endDate ? (
                   <>
                     <View style={styles.detailsGroup}>
@@ -102,7 +93,7 @@ export default function MedicationDetails() {
                         </View>
                       </View>
 
-                      {/* DATE END*/}
+                      {/* DATE END */}
                       <View
                         style={[
                           styles.card,
@@ -149,7 +140,6 @@ export default function MedicationDetails() {
                     <DetailsTimeSettings medicationProfile={medicationProfile} fullWidth={false} />
                   </View>
                 )}
-
                 {/* FREQUENCY RRULE */}
                 <DetailsFrequencySettings medicationProfile={medicationProfile} />
               </View>
@@ -193,9 +183,10 @@ export default function MedicationDetails() {
                 </View>
               </View>
             </View>
+
             {/* DELETE PILL BUTTON */}
             <DeleteMedication medicationProfileId={medicationProfileId as string} />
-          </View>
+          </>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -203,13 +194,11 @@ export default function MedicationDetails() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   scrollContent: {
+    // flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
-    gap: 32,
+    gap: 16,
   },
   headerTitle: {
     fontFamily: "Roboto_500Medium",
@@ -220,8 +209,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   contentContainer: {
-    flex: 1,
-    gap: 16,
+    // flex: 1,
+    // gap: 16,
   },
   detailsContainer: {
     gap: 16,

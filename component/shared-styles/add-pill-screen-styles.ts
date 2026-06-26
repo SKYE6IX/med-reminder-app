@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export function useAddPillScreenStyles() {
   const color = useThemeColor({}, "textPrimary");
@@ -11,7 +11,7 @@ export function useAddPillScreenStyles() {
     },
     title: {
       fontFamily: "Roboto_500Medium",
-      fontSize: 18,
+      fontSize: Platform.OS === "android" ? 16 : 18,
       lineHeight: 21,
       color,
     },

@@ -8,7 +8,7 @@ import { updateScheduleEventNotifications } from "@/helpers/update-schedule-even
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const snoozes = [
@@ -68,9 +68,11 @@ export default function Reminders() {
     });
   };
 
+  const top = Platform.OS === "android" ? insets.top + 20 : insets.top + 10;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }}>
+      <View style={styles.container}>
         {/* Snooze Settings */}
         <SettingsCard
           title="Интервал повтора"
@@ -105,9 +107,6 @@ export default function Reminders() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     paddingLeft: 20,
     paddingRight: 20,

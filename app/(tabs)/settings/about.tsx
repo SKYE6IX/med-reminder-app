@@ -50,9 +50,11 @@ export default function About() {
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
 
+  const top = isIOS ? insets.top + 10 : insets.top + 20;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
-      <View style={[styles.container, { paddingTop: isIOS ? insets.top : insets.top + 10 }]}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary, paddingTop: top }]}>
+      <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.appLogoWrapper}>
             <Image source={source} style={styles.appLogo} />

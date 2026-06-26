@@ -3,7 +3,7 @@ import FormInput from "@/component/ui/form/form-input";
 import { Link } from "expo-router";
 import { useRef, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
@@ -113,66 +113,71 @@ export default function SignInScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1, paddingTop: insets.top * 2, backgroundColor }}>
-      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 30) }]}>
-        <Loader visible={isPending} />
+    <SafeAreaView
+      style={{ paddingTop: insets.top + 10, paddingBottom: 10, backgroundColor, flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <View style={styles.container}>
+          <Loader visible={isPending} />
+          <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
+          <View style={styles.inputsWrapper}>
+            <FormInput
+              label="Почта"
+              name="email"
+              onValueChange={handleOnValueChanges}
+              inputRef={emaiInputRef}
+              type="email"
+              placeholder="Введите адрес Вашей почты"
+              hasError={signInState.errorsSet.has("email")}
+            />
+            <FormInput
+              label="Пароль"
+              name="password"
+              onValueChange={handleOnValueChanges}
+              type="password"
+              placeholder="Введите пароль"
+              hasError={signInState.errorsSet.has("password")}
+              textContentType="password"
+              autoComplete="password"
+            />
+          </View>
 
-        <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
-        <View style={styles.inputsWrapper}>
-          <FormInput
-            label="Почта"
-            name="email"
-            onValueChange={handleOnValueChanges}
-            inputRef={emaiInputRef}
-            type="email"
-            placeholder="Введите адрес Вашей почты"
-            hasError={signInState.errorsSet.has("email")}
-          />
-          <FormInput
-            label="Пароль"
-            name="password"
-            onValueChange={handleOnValueChanges}
-            type="password"
-            placeholder="Введите пароль"
-            hasError={signInState.errorsSet.has("password")}
-            textContentType="password"
-            autoComplete="password"
-          />
-        </View>
+          <View style={styles.submitButtonWrapper}>
+            <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
+            <View style={styles.resetPassword}>
+              <ThemedText style={styles.resetPasswordText}>Забыли пароль?</ThemedText>
+              <Link href="/forget-password" asChild>
+                <Pressable>
+                  <Text style={[styles.resetPasswordText, { color: linkColor }]}>
+                    Нажмите здесь
+                  </Text>
+                </Pressable>
+              </Link>
+            </View>
+          </View>
 
-        <View style={styles.submitButtonWrapper}>
-          <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
-          <View style={styles.resetPassword}>
-            <ThemedText style={styles.resetPasswordText}>Забыли пароль?</ThemedText>
-            <Link href="/forget-password" asChild>
+          <View style={styles.socialButtonWrapper}>
+            <View style={styles.dividerWrapper}>
+              <View style={styles.divider} />
+              <ThemedText style={styles.dividerText}>Или</ThemedText>
+              <View style={styles.divider} />
+            </View>
+
+            {/* Social set up */}
+            {Platform.OS === "ios" && <AppleSignIn type="SIGN_IN" />}
+          </View>
+
+          <View style={styles.footerWrapper}>
+            <ThemedText style={styles.footerText}>Нет аккаунта?</ThemedText>
+            <Link href="/create-account" asChild>
               <Pressable>
-                <Text style={[styles.resetPasswordText, { color: linkColor }]}>Нажмите здесь</Text>
+                <Text style={[styles.footerText, { color: linkColor }]}>Создать аккаунт</Text>
               </Pressable>
             </Link>
           </View>
         </View>
-
-        <View style={styles.socialButtonWrapper}>
-          <View style={styles.dividerWrapper}>
-            <View style={styles.divider} />
-            <ThemedText style={styles.dividerText}>Или</ThemedText>
-            <View style={styles.divider} />
-          </View>
-
-          {/* Social set up */}
-          {Platform.OS === "ios" && <AppleSignIn type="SIGN_IN" />}
-        </View>
-
-        <View style={styles.footerWrapper}>
-          <ThemedText style={styles.footerText}>Нет аккаунта?</ThemedText>
-          <Link href="/create-account" asChild>
-            <Pressable>
-              <Text style={[styles.footerText, { color: linkColor }]}>Создать аккаунт</Text>
-            </Pressable>
-          </Link>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

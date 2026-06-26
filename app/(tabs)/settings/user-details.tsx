@@ -44,12 +44,11 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 
 export default function UserDetails() {
   const isAndroid = Platform.OS === "android";
+  const isIOS = Platform.OS === "ios";
 
   const { openSheet, closeSheet } = useBottomSheet();
 
-  const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
-
   const androidDateRef = useRef<DateTimeWrapperRef>(null);
 
   const { showFeedBack } = useFeedBackStore();
@@ -137,10 +136,11 @@ export default function UserDetails() {
     mutate(data);
   };
 
+  const snapPoint = isAndroid ? "60%" : "55%";
   const openAvatarPickerSheet = () => {
     openSheet({
       title: "Выберите фотографию",
-      snapPointPercent: "55%",
+      snapPointPercent: snapPoint,
       content: <AvatarPicker profileId={selfProfile?.id ?? ""} onActionComplete={closeSheet} />,
     });
   };
@@ -172,101 +172,99 @@ export default function UserDetails() {
   const bgSecondary = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
 
+  const top = isAndroid ? insets.top + 20 : 0;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
-      <ScrollView style={{ flex: 1 }}>
+    <SafeAreaView
+      style={[{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }]}
+      edges={["top"]}
+    >
+      <ScrollView contentContainerStyle={styles.contentStyle}>
         <Loader visible={isPending} />
-
-        <View style={[styles.container, { paddingTop: isIOS ? undefined : insets.top + 10 }]}>
-          <View style={styles.header}>
-            <View style={styles.avatarWrapper}>
-              <Image source={profileImageUrl} style={styles.avatar} />
-              <Pressable
-                style={[styles.cameraIcon, { backgroundColor: bgTertiary }]}
-                onPress={openAvatarPickerSheet}
-              >
-                <CameraIcon color={tintColor} />
-              </Pressable>
-            </View>
+        <View style={styles.header}>
+          <View style={styles.avatarWrapper}>
+            <Image source={profileImageUrl} style={styles.avatar} />
+            <Pressable
+              style={[styles.cameraIcon, { backgroundColor: bgTertiary }]}
+              onPress={openAvatarPickerSheet}
+            >
+              <CameraIcon color={tintColor} />
+            </Pressable>
           </View>
-
-          <View style={styles.body}>
-            <FormInput
-              label="Имя"
-              placeholder=""
-              type="text"
-              name="name"
-              hasError={false}
-              defaultState={updateUserData.name ?? ""}
-              onValueChange={handleOnTextInputChange}
-            />
-
-            <FormInput
-              label="Почта"
-              placeholder={user?.email}
-              type="email"
-              name="email"
-              hasError={false}
-              defaultState={updateUserData.email ?? ""}
-              onValueChange={handleOnTextInputChange}
-            />
-
-            {/* DATE OF BIRTH */}
-            <View style={styles.bodyItem}>
-              <Text style={[styles.bodyItemLabel, { color }]}>Дата рождения</Text>
-              <Pressable
-                style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
-                onPress={openDatePicker}
-              >
-                <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                  {updateUserData.dateOfBirth || "Введите дату Вашего рождения"}
-                </Text>
-              </Pressable>
-
-              {/* ONLY FOR ANDROID */}
-              {isAndroid && (
-                <AndroidDateTimeWrapper
-                  ref={androidDateRef}
-                  onDateTimeChange={handleOnDateChange}
-                  mode="date"
-                />
-              )}
-            </View>
-
-            {/* GENDER */}
-            <View style={[styles.bodyItem, { borderWidth: 1, borderRadius: 16, borderColor }]}>
-              <CustomPicker
-                label="Пол"
-                items={genderList}
-                selectedValue={updateUserData.gender ?? ""}
-                onValueSelected={handleOnGenderValueSelected}
-                triggerSelection={handleTriggerPicker}
-                isSelectionVisible={isVisible}
-                svgIcon={<UserIcon color={color} />}
-              />
-            </View>
-          </View>
-
-          <CustomButton
-            label="Сохранить"
-            style={styles.button}
-            disabled={!canUpdate}
-            variant={canUpdate ? "filled" : "disabled"}
-            textVaraint={canUpdate ? "regularText" : "mutedText"}
-            onPress={handleUpdateUser}
-          />
         </View>
+
+        <View style={styles.body}>
+          <FormInput
+            label="Имя"
+            placeholder=""
+            type="text"
+            name="name"
+            hasError={false}
+            defaultState={updateUserData.name ?? ""}
+            onValueChange={handleOnTextInputChange}
+          />
+
+          <FormInput
+            label="Почта"
+            placeholder={user?.email}
+            type="email"
+            name="email"
+            hasError={false}
+            defaultState={updateUserData.email ?? ""}
+            onValueChange={handleOnTextInputChange}
+          />
+
+          {/* DATE OF BIRTH */}
+          <View style={styles.bodyItem}>
+            <Text style={[styles.bodyItemLabel, { color }]}>Дата рождения</Text>
+            <Pressable
+              style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
+              onPress={openDatePicker}
+            >
+              <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
+                {updateUserData.dateOfBirth || "Введите дату Вашего рождения"}
+              </Text>
+            </Pressable>
+
+            {/* ONLY FOR ANDROID */}
+            {isAndroid && (
+              <AndroidDateTimeWrapper
+                ref={androidDateRef}
+                onDateTimeChange={handleOnDateChange}
+                mode="date"
+              />
+            )}
+          </View>
+
+          {/* GENDER */}
+          <View style={[styles.bodyItem, { borderWidth: 1, borderRadius: 16, borderColor }]}>
+            <CustomPicker
+              label="Пол"
+              items={genderList}
+              selectedValue={updateUserData.gender ?? ""}
+              onValueSelected={handleOnGenderValueSelected}
+              triggerSelection={handleTriggerPicker}
+              isSelectionVisible={isVisible}
+              svgIcon={<UserIcon color={color} />}
+            />
+          </View>
+        </View>
+
+        <CustomButton
+          label="Сохранить"
+          style={styles.button}
+          disabled={!canUpdate}
+          variant={canUpdate ? "filled" : "disabled"}
+          textVaraint={canUpdate ? "regularText" : "mutedText"}
+          onPress={handleUpdateUser}
+        />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
+  contentStyle: {
     paddingLeft: 20,
     paddingRight: 20,
     paddingBottom: 10,

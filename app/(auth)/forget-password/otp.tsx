@@ -18,7 +18,7 @@ import {
   View,
   type TextInputKeyPressEvent,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface OTPState {
   userEmail: string;
@@ -164,95 +164,97 @@ export default function OTPVerificationScreen() {
   const filledBorderColor = useThemeColor({}, "feedbackSuccess");
 
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
-      <Loader visible={isLoading} />
-      <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
-        <View style={styles.headerWrapper}>
-          <ThemedText type="title" style={styles.title}>
-            Введите код
-          </ThemedText>
-          <ThemedText type="subtitle" style={styles.subtitle}>
-            Мы отправили код подтверждения на вашу почту {maskEmailAddress(otpState.userEmail)}.{" "}
-            <Text
-              onPress={() => router.back()}
-              style={[styles.changeEmaiAction, { color: tintColor }]}
-              suppressHighlighting
-            >
-              Изменить
-            </Text>
-          </ThemedText>
-        </View>
-
-        <View style={styles.bodyWrapper}>
-          <View style={styles.inputRow}>
-            {Array.from({ length: TOKEN_LENGTH }).map((_, i) => (
-              <TextInput
-                key={i}
-                ref={(el) => {
-                  if (el) {
-                    inputRefs.current[i] = el;
-                  }
-                }}
-                style={[
-                  styles.input,
-                  {
-                    color: textColor,
-                    backgroundColor: inputBgColor,
-                    borderColor: isTokenFilled
-                      ? filledBorderColor
-                      : otpState.focusedIndex === i
-                        ? tintColor
-                        : inputBorderColor,
-                  },
-                ]}
-                value={otpState.inputValues[i]}
-                onChangeText={(text) => handleOnChange(text, i)}
-                onKeyPress={(event) => handleOnKeyPress(event, i)}
-                autoFocus={i === 0}
-                textContentType="oneTimeCode"
-                keyboardType="number-pad"
-                autoComplete="sms-otp"
-                selectTextOnFocus
-                onFocus={() => setOtpState((state) => ({ ...state, focusedIndex: i }))}
-                onBlur={() => {
-                  setOtpState((state) => ({ ...state, focusedIndex: null }));
-                }}
-              />
-            ))}
-          </View>
-
-          <View style={styles.bodyBottom}>
-            <ThemedText style={[styles.bodyBottomText, { color: textColor }]}>
-              Не получили код?{" "}
+    <SafeAreaView style={{ paddingTop: insets.top + 10, backgroundColor, flex: 1 }}>
+      <ScrollView>
+        <View style={styles.container}>
+          <Loader visible={isLoading} />
+          <View style={styles.headerWrapper}>
+            <ThemedText type="title" style={styles.title}>
+              Введите код
             </ThemedText>
-            {otpState.retryAfter <= 0 ? (
-              <Pressable
-                onPress={() => {
-                  requestResetPasswordToken({ email: otpState.userEmail });
-                }}
+            <ThemedText type="subtitle" style={styles.subtitle}>
+              Мы отправили код подтверждения на вашу почту {maskEmailAddress(otpState.userEmail)}{" "}
+              <Text
+                onPress={() => router.back()}
+                style={[styles.changeEmaiAction, { color: tintColor }]}
+                suppressHighlighting
               >
-                <Text style={[styles.bodyBottomText, { color: tintColor }]}>
-                  Отправить повторно
-                </Text>
-              </Pressable>
-            ) : (
-              <Text style={[styles.bodyBottomText, { color: textColor }]}>
-                Ещё раз {`через 00:${String(otpState.retryAfter).padStart(2, "0")}`}
+                Изменить
               </Text>
-            )}
+            </ThemedText>
           </View>
-        </View>
 
-        <CustomButton
-          label="Продолжить"
-          style={styles.button}
-          onPress={handleVerifyToken}
-          disabled={!isTokenFilled}
-          variant={isTokenFilled ? "filled" : "disabled"}
-          textVaraint={isTokenFilled ? "mutedText" : "regularText"}
-        />
-      </View>
-    </ScrollView>
+          <View style={styles.bodyWrapper}>
+            <View style={styles.inputRow}>
+              {Array.from({ length: TOKEN_LENGTH }).map((_, i) => (
+                <TextInput
+                  key={i}
+                  ref={(el) => {
+                    if (el) {
+                      inputRefs.current[i] = el;
+                    }
+                  }}
+                  style={[
+                    styles.input,
+                    {
+                      color: textColor,
+                      backgroundColor: inputBgColor,
+                      borderColor: isTokenFilled
+                        ? filledBorderColor
+                        : otpState.focusedIndex === i
+                          ? tintColor
+                          : inputBorderColor,
+                    },
+                  ]}
+                  value={otpState.inputValues[i]}
+                  onChangeText={(text) => handleOnChange(text, i)}
+                  onKeyPress={(event) => handleOnKeyPress(event, i)}
+                  autoFocus={i === 0}
+                  textContentType="oneTimeCode"
+                  keyboardType="number-pad"
+                  autoComplete="sms-otp"
+                  selectTextOnFocus
+                  onFocus={() => setOtpState((state) => ({ ...state, focusedIndex: i }))}
+                  onBlur={() => {
+                    setOtpState((state) => ({ ...state, focusedIndex: null }));
+                  }}
+                />
+              ))}
+            </View>
+
+            <View style={styles.bodyBottom}>
+              <ThemedText style={[styles.bodyBottomText, { color: textColor }]}>
+                Не получили код?{" "}
+              </ThemedText>
+              {otpState.retryAfter <= 0 ? (
+                <Pressable
+                  onPress={() => {
+                    requestResetPasswordToken({ email: otpState.userEmail });
+                  }}
+                >
+                  <Text style={[styles.bodyBottomText, { color: tintColor }]}>
+                    Отправить повторно
+                  </Text>
+                </Pressable>
+              ) : (
+                <Text style={[styles.bodyBottomText, { color: textColor }]}>
+                  Ещё раз {`через 00:${String(otpState.retryAfter).padStart(2, "0")}`}
+                </Text>
+              )}
+            </View>
+          </View>
+
+          <CustomButton
+            label="Продолжить"
+            style={styles.button}
+            onPress={handleVerifyToken}
+            disabled={!isTokenFilled}
+            variant={isTokenFilled ? "filled" : "disabled"}
+            textVaraint={isTokenFilled ? "mutedText" : "regularText"}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

@@ -27,10 +27,13 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
+  const insets = useSafeAreaInsets();
+
   const sharedStyles = useAddPillScreenStyles();
   const isAndroid = Platform.OS === "android";
 
@@ -149,129 +152,130 @@ export default function ScheduleStepScreen() {
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const colorMuted = useThemeColor({}, "textMuted");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  const top = isAndroid ? insets.top + 10 : 0;
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "position" : "height"}
-      style={[
-        styles.container,
-        sharedStyles.container,
-        // Needed to reset the padding and transfer it to
-        //  the scrollView.
-        { paddingLeft: 0, paddingRight: 0 },
-      ]}
-    >
-      <ScrollView contentContainerStyle={[styles.contentContainer]}>
-        {/* Frequency Settings */}
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Частота</Text>
-          <FrequencySettings
-            onFreqSet={handleSetFrequency}
-            preset={formState.schedule.rule.preset}
-          />
-        </View>
+    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }} edges={["top"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "position" : "height"}
+        style={[styles.container]}
+      >
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          {/* Frequency Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Частота</Text>
+            <FrequencySettings
+              onFreqSet={handleSetFrequency}
+              preset={formState.schedule.rule.preset}
+            />
+          </View>
 
-        {/* Dosage Settings */}
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Дозировка</Text>
-          <DosageAmounPicker />
-        </View>
+          {/* Dosage Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Дозировка</Text>
+            <DosageAmounPicker />
+          </View>
 
-        {/* Time Settings */}
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Время приема</Text>
-          <View style={styles.timeSettingList}>
-            {occurences?.map((time, i) => (
-              <Text
-                key={time + i}
-                style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
-              >
-                {time}
-              </Text>
-            ))}
+          {/* Time Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Время приема</Text>
+            <View style={styles.timeSettingList}>
+              {occurences?.map((time, i) => (
+                <Text
+                  key={time + i}
+                  style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
+                >
+                  {time}
+                </Text>
+              ))}
+            </View>
+
+            <CustomButton
+              label="Установить время начала"
+              variant="outline"
+              textVaraint="tintText"
+              svgIcon={<PlusIcon color={tintColor} size={14} />}
+              onPress={showTimeSetting}
+            />
+
+            {/* ONLY FOR ANDROID */}
+            {isAndroid && (
+              <AndroidDateTimeWrapper
+                ref={androidTimeRef}
+                onDateTimeChange={handleOnTimeChange}
+                mode="time"
+              />
+            )}
+          </View>
+
+          {/* Duration days settings. (Optional) */}
+          <View style={sharedStyles.sectionContainer}>
+            <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+              <Text style={sharedStyles.title}>Период</Text>
+              <Text style={[styles.durationOptionalText, { color }]}>«Необязательно»</Text>
+            </View>
+            <TextInput
+              value={durations}
+              onChangeText={handleOnDurationInputChange}
+              keyboardType="number-pad"
+              inputMode="numeric"
+              placeholder="Сколько дней..."
+              style={[
+                styles.durationInput,
+                {
+                  color,
+                  borderColor,
+                  backgroundColor: bGColor,
+                },
+              ]}
+            />
+          </View>
+
+          {/* Date Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Дата начала</Text>
+            <Pressable
+              style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
+              onPress={showDateSetting}
+            >
+              <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
+                <CalenderIcon color={tintColor} />
+              </View>
+              <View style={styles.dateSettingTextWrapper}>
+                <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>Начало</Text>
+                <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
+              </View>
+              <View style={styles.dateSettingRightIcon}>
+                <ArrowDown />
+              </View>
+            </Pressable>
+
+            {/* ONLY FOR ANDROID */}
+            {isAndroid && (
+              <AndroidDateTimeWrapper
+                ref={androidDateRef}
+                onDateTimeChange={handleOnDateChange}
+                mode="date"
+              />
+            )}
           </View>
 
           <CustomButton
-            label="Установить время начала"
-            variant="outline"
-            textVaraint="tintText"
-            svgIcon={<PlusIcon color={tintColor} size={14} />}
-            onPress={showTimeSetting}
+            label="Далее"
+            style={sharedStyles.button}
+            variant="filled"
+            textVaraint="regularText"
+            onPress={() => router.navigate("/(tabs)/add-medication/final-step")}
           />
-          {/* ONLY FOR ANDROID */}
-          {isAndroid && (
-            <AndroidDateTimeWrapper
-              ref={androidTimeRef}
-              onDateTimeChange={handleOnTimeChange}
-              mode="time"
-            />
-          )}
-        </View>
-
-        {/* Duration days settings. (Optional) */}
-        <View style={sharedStyles.sectionContainer}>
-          <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-            <Text style={sharedStyles.title}>Период</Text>
-            <Text style={[styles.durationOptionalText, { color }]}>«Необязательный»</Text>
-          </View>
-          <TextInput
-            value={durations}
-            onChangeText={handleOnDurationInputChange}
-            keyboardType="number-pad"
-            inputMode="numeric"
-            placeholder="Сколько дней..."
-            style={[
-              styles.durationInput,
-              {
-                color,
-                borderColor,
-                backgroundColor: bGColor,
-              },
-            ]}
-          />
-        </View>
-
-        {/* Date Settings */}
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Дата начала</Text>
-          <Pressable
-            style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
-            onPress={showDateSetting}
-          >
-            <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
-              <CalenderIcon color={tintColor} />
-            </View>
-            <View style={styles.dateSettingTextWrapper}>
-              <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>Начало</Text>
-              <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
-            </View>
-            <View style={styles.dateSettingRightIcon}>
-              <ArrowDown />
-            </View>
-          </Pressable>
-          {/* ONLY FOR ANDROID */}
-          {isAndroid && (
-            <AndroidDateTimeWrapper
-              ref={androidDateRef}
-              onDateTimeChange={handleOnDateChange}
-              mode="date"
-            />
-          )}
-        </View>
-
-        <CustomButton
-          label="Далее"
-          style={sharedStyles.button}
-          variant="filled"
-          textVaraint="regularText"
-          onPress={() => router.navigate("/(tabs)/add-medication/final-step")}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

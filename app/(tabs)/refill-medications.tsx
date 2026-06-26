@@ -1,6 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import RefillCard from "@/component/ui/cards/refill-card";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -10,7 +11,7 @@ import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useMemo, useState } from "react";
-import { Dimensions, FlatList, Platform, StyleSheet, Text, View } from "react-native";
+import { Dimensions, FlatList, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface RefillMedicationPackForm extends MedicationPackCreation {
@@ -67,10 +68,12 @@ export default function RefillPill() {
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
+  const top = Platform.OS === "android" ? inset.top : 0;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
       <Text style={[styles.headerTitle, { color }]}>Пополнение лекарств</Text>
-      {/* <Loader visible={isLoading || isPending} /> */}
+      <Loader visible={isLoading} />
       {!isLoading && (
         <>
           {isPacksAvailable ? (
@@ -192,6 +195,7 @@ const AddMedicationPackPickerSheet = ({
   const handleAmountInPackSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, totalQuantity: selectedValue }));
   };
+
   const handleRefillDaysSet = (selectedValue: string) => {
     setMedicationPack((prv) => ({ ...prv, reminderDays: Number(selectedValue) }));
   };
@@ -199,25 +203,29 @@ const AddMedicationPackPickerSheet = ({
   // Themes
   const color = useThemeColor({}, "textPrimary");
   return (
-    <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
-      <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
-      <MedicationPackPicker
-        amountInPack={amountInPack}
-        refillDaysReminder={reminderDays}
-        onAmountInPackSet={handleAmountInPackSet}
-        onRefillDaysReminderSet={handleRefillDaysSet}
-        measurementValue={measurementValue}
-      />
+    <ScrollView>
+      <Loader visible={isPending} />
 
-      <CustomButton
-        label="Добавить"
-        disabled={!canContinue || isPending}
-        variant={canContinue ? "filled" : "disabled"}
-        textVaraint={canContinue ? "regularText" : "mutedText"}
-        onPress={() => mutate(medicationPack)}
-        style={{ marginTop: "auto" }}
-      />
-    </View>
+      <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
+        <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
+        <MedicationPackPicker
+          amountInPack={amountInPack}
+          refillDaysReminder={reminderDays}
+          onAmountInPackSet={handleAmountInPackSet}
+          onRefillDaysReminderSet={handleRefillDaysSet}
+          measurementValue={measurementValue}
+        />
+
+        <CustomButton
+          label="Добавить"
+          disabled={!canContinue || isPending}
+          variant={canContinue ? "filled" : "disabled"}
+          textVaraint={canContinue ? "regularText" : "mutedText"}
+          onPress={() => mutate(medicationPack)}
+          style={{ marginTop: 16 }}
+        />
+      </View>
+    </ScrollView>
   );
 };
 

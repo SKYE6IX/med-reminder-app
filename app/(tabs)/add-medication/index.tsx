@@ -6,8 +6,8 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const pillNames = [
   "Aspirin",
@@ -63,6 +63,7 @@ const pillNames = [
 ];
 
 export default function NameStepScreen() {
+  const insets = useSafeAreaInsets();
   const sharedStyles = useAddPillScreenStyles();
   const { setMedicationDetails, formState } = useAddPillStore();
 
@@ -74,6 +75,7 @@ export default function NameStepScreen() {
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
   const tint = useThemeColor({}, "tint");
@@ -108,8 +110,21 @@ export default function NameStepScreen() {
     }
   };
 
+  const top = Platform.OS === "android" ? insets.top : 0;
+  const bottom = Platform.OS === "ios" ? insets.bottom + 10 : 10;
+
   return (
-    <SafeAreaView style={[styles.container, sharedStyles.container]} edges={["bottom"]}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: top,
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: bottom,
+        backgroundColor,
+      }}
+      edges={["top"]}
+    >
       <ScrollView>
         <View style={styles.headerWrapper}>
           <Text style={sharedStyles.title}>Название лекарства</Text>
@@ -175,10 +190,6 @@ export default function NameStepScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    paddingBottom: 10,
-  },
   headerWrapper: {
     gap: 16,
     width: "100%",

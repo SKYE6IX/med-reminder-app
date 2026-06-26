@@ -18,7 +18,7 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
   }));
 
   return (
-    <View style={[styles.container, { top: insets.top }]}>
+    <View style={[styles.container, { top: insets.top + 10 }]}>
       <View style={styles.wrapper}>
         <Animated.View
           style={[styles.stepProgress, { backgroundColor: tintColor }, animatedStyle]}

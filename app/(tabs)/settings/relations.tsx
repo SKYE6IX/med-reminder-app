@@ -13,12 +13,12 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface RelationProfileProps {
@@ -38,6 +38,8 @@ const deleteRelationProfileMutation = async (profileId: string) => {
 };
 
 export default function Relations() {
+  const isAndroid = Platform.OS === "android";
+
   const insets = useSafeAreaInsets();
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
@@ -59,11 +61,6 @@ export default function Relations() {
     },
 
     onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when creating relatiion profile -> ", error);
-      } else {
-        console.log("An unknown error occur when creating relatiion profile -> ", error);
-      }
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
@@ -84,11 +81,12 @@ export default function Relations() {
     }
   };
 
+  const snapPoint = isAndroid ? "35%" : "30%";
   const openDeleteProfileSheet = (id: string) => {
     setProfileId(id);
     openSheet({
       title: "Удалить пользователя?",
-      snapPointPercent: "25%",
+      snapPointPercent: snapPoint,
       content: (
         <DeleteRelationProfile
           color={mutedColor}
@@ -107,11 +105,11 @@ export default function Relations() {
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
 
+  const top = isAndroid ? insets.top + 20 : insets.top + 10;
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]}>
+    <SafeAreaView style={[{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }]}>
       <Loader visible={isPending} />
-
-      <View style={[styles.container, { paddingTop: insets.top + 10 }]}>
+      <View style={styles.container}>
         <View style={[styles.contentCotainer, { backgroundColor: bgSecondary, borderColor }]}>
           {/* PROFILE LIST */}
           {relationProfiles.map((profile, i) => (
@@ -122,7 +120,6 @@ export default function Relations() {
               openDeleteBottomSheet={openDeleteProfileSheet}
             />
           ))}
-
           {/* ADD NEW PROFILE */}
           <Pressable
             style={[
@@ -138,7 +135,6 @@ export default function Relations() {
           </Pressable>
         </View>
       </View>
-
       <SubscriptionBanner ref={openBannerRef} />
     </SafeAreaView>
   );
@@ -153,10 +149,11 @@ const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProf
   const bgTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
 
+  const snapPoint = Platform.OS === "android" ? "60%" : "55%";
   const openAvatarPickerSheet = () => {
     openSheet({
       title: "Выберите фотографию",
-      snapPointPercent: "55%",
+      snapPointPercent: snapPoint,
       content: <AvatarPicker profileId={profile.id} onActionComplete={closeSheet} />,
     });
   };
@@ -219,9 +216,6 @@ const DeleteRelationProfile = ({ color, closeSheet, deleteFn }: DeleteRelationPr
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   container: {
     paddingLeft: 20,
     paddingRight: 20,

@@ -1,7 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
-import { MEDICATION_UNITS } from "@/constants/medication-constants";
+import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -46,10 +46,6 @@ export default function StockDosageSettings({
 
   const sharedStyles = useSharedStyles();
 
-  const unitLabel = () => {
-    return MEDICATION_UNITS.find((item) => item.value === medicationProfile.medicationUnit)?.name;
-  };
-
   const openAddMedicationPack = () => {
     if (isPremiumPlan) {
       openSheet({
@@ -74,7 +70,8 @@ export default function StockDosageSettings({
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
             <Text style={[sharedStyles.cardTextContent, { color }]}>
-              {medicationProfile.pack?.totalAmountInPack} {unitLabel()}
+              {medicationProfile.pack?.totalAmountInPack}{" "}
+              {getDosageMeasurement(medicationProfile.schedule.measurement)}
             </Text>
           </View>
         </View>
@@ -132,18 +129,13 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
 
   const { isPending, mutate } = useMutation({
     mutationFn: addMedicationPackMutation,
-    async onSuccess(data, variables) {
-      queryClient.setQueryData(
-        ["medication-profile", "details", variables.medicationProfileId],
-        (existingData: MedicationProfile) => ({
-          ...existingData,
-          amountInPack: data.amountInPack,
-        }),
-      );
+    async onSuccess() {
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
       ]);
+
       showFeedBack({
         title: "Успешно",
         message: "Пополнение добавлено в напоминание.",

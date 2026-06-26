@@ -9,7 +9,7 @@ import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation"
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TABS_VALUE = "ALL" | "ACTIVE" | "IN_ACTIVE";
@@ -72,13 +72,15 @@ export default function Medications() {
     }
   };
 
+  const top = Platform.OS === "android" ? insets.top + 20 : insets.top;
+
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor: bgPrimary }}>
       <Loader visible={isLoading || isPending} />
       {!isLoading && (
         <>
           {hasMedicationsProfiles ? (
-            <View style={[styles.contentWrapper, { paddingTop: insets.top + 10 }]}>
+            <View style={styles.contentWrapper}>
               <View style={styles.tabWrapper}>
                 <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
               </View>
@@ -126,9 +128,6 @@ export default function Medications() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
   contentWrapper: {
     flex: 1,
   },

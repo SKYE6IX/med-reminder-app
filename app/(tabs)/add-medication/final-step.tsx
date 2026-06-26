@@ -24,6 +24,7 @@ import Animated, {
   withDelay,
   withSpring,
 } from "react-native-reanimated";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const COLLAPSED = 75;
 const HALF_EXPAND = 260;
@@ -36,6 +37,8 @@ const createMedicationMutation = async (body: CreateMedication) => {
 
 export default function FinalStepScreen() {
   const sharedStyles = useAddPillScreenStyles();
+
+  const insets = useSafeAreaInsets();
   const isIOS = Platform.OS === "ios";
 
   const router = useRouter();
@@ -191,16 +194,18 @@ export default function FinalStepScreen() {
   // Themes color
   const color = useThemeColor({}, "textPrimary");
   const colorMuted = useThemeColor({}, "textMuted");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const bGTertiary = useThemeColor({}, "backgroundTertiary");
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
-  return (
-    <ScrollView>
-      <View style={[styles.container, sharedStyles.container]}>
-        <Loader visible={isPending} />
+  const top = isIOS ? 0 : insets.top + 10;
 
+  return (
+    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        <Loader visible={isPending} />
         {/* Refill setting container */}
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
@@ -219,12 +224,14 @@ export default function FinalStepScreen() {
               <View style={[styles.refillSettingIcon, { backgroundColor: bGTertiary }]}>
                 <BellIcon />
               </View>
+
               <View style={styles.refillSettingTextWrapper}>
                 <Text style={[styles.refillSettingTextLabel, { color }]}>Напоминание</Text>
                 <Text style={[styles.refillSettingTextInfo, { color: colorMuted }]}>
                   Уведомить до окончания запаса
                 </Text>
               </View>
+
               <View>
                 <Switch
                   onValueChange={toggleSwitch}
@@ -273,18 +280,21 @@ export default function FinalStepScreen() {
             style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
           />
         </View>
-        <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
-      </View>
 
-      {/* SUBSCRIPTION OFFER */}
-      <SubscriptionBanner ref={openBannerRef} />
-    </ScrollView>
+        <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
+        {/* SUBSCRIPTION OFFER */}
+        <SubscriptionBanner ref={openBannerRef} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  contentContainer: {
     gap: 32,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 10,
   },
   refillSettingWrapper: {
     borderWidth: 1,
@@ -307,7 +317,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   refillSettingTextWrapper: {
-    width: 200,
+    width: 180,
     gap: 3,
   },
   refillSettingTextLabel: {

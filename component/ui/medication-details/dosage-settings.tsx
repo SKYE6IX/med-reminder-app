@@ -6,7 +6,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { MedicationProfile } from "@/types/medication";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import DosageAmountInput from "../dosage-picker/dosage-amount-input";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
@@ -28,10 +28,12 @@ export default function DetailsDosageSettings({
     }
   };
 
+  const snapPoint = Platform.OS === "android" ? "50%" : "45%";
+
   const openDosageSettingSheet = () => {
     openSheet({
       title: "Количество дозировки",
-      snapPointPercent: "40%",
+      snapPointPercent: snapPoint,
       content: (
         <DosageAmountInput
           measurementValue={medicationProfile.schedule.measurement}
@@ -41,7 +43,6 @@ export default function DetailsDosageSettings({
       ),
     });
   };
-
   const color = useThemeColor({}, "textPrimary");
   return (
     <React.Fragment>

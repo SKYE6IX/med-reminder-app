@@ -12,7 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const STORAGE_KEY_EMAIL = "password:reset:email";
 const STORAGE_KEY_TOKEN = "password:reset:token";
@@ -87,37 +87,38 @@ export default function NewPasswordScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top * 2, backgroundColor }}>
-      <Loader visible={isPending} />
+    <SafeAreaView style={{ paddingTop: insets.top + 10, backgroundColor, flex: 1 }}>
+      <ScrollView>
+        <View style={styles.container}>
+          <Loader visible={isPending} />
+          <FormHeader title="Новый пароль" subTitle="Введите новый пароль" />
+          <View style={styles.inputWrapper}>
+            <FormInput
+              label="Новый пароль"
+              name="newPassword"
+              onValueChange={handleOnTextInputChange}
+              type="password"
+              placeholder="Придумайте пароль"
+              hasError={inputErrorList.includes("newPassword")}
+            />
+            <FormInput
+              label="Подтвердите новый пароль"
+              name="repeatPassword"
+              onValueChange={handleOnTextInputChange}
+              type="password"
+              placeholder="Придумайте пароль"
+              hasError={inputErrorList.includes("repeatPassword")}
+            />
+          </View>
 
-      <View style={styles.container}>
-        <FormHeader title="Новый пароль" subTitle="Введите новый пароль" />
-        <View style={styles.inputWrapper}>
-          <FormInput
-            label="Новый пароль"
-            name="newPassword"
-            onValueChange={handleOnTextInputChange}
-            type="password"
-            placeholder="Придумайте пароль"
-            hasError={inputErrorList.includes("newPassword")}
-          />
-          <FormInput
-            label="Подтвердите новый пароль"
-            name="repeatPassword"
-            onValueChange={handleOnTextInputChange}
-            type="password"
-            placeholder="Придумайте пароль"
-            hasError={inputErrorList.includes("repeatPassword")}
+          <CustomButton
+            label="Создать новый пароль"
+            style={styles.button}
+            onPress={handleResetPassword}
           />
         </View>
-
-        <CustomButton
-          label="Создать новый пароль"
-          style={styles.button}
-          onPress={handleResetPassword}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
