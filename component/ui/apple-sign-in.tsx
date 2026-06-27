@@ -31,6 +31,7 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
       await queryClient.invalidateQueries({ queryKey: ["users"] });
       setIsAuthenticated(true);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         error.response?.status === 401 &&
@@ -67,6 +68,7 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
 
             const requestBody: SocialAuthRequest = {
               providerId: credential.user,
+              authorizationCode: credential.authorizationCode ?? "",
               provider: "APPLE",
               fullName: familyName + givenName,
               email: credential.email ?? "",

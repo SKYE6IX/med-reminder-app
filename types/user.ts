@@ -18,6 +18,7 @@ export interface SocialAuthRequest {
   providerId: string;
   provider: "APPLE" | "GOOGLE";
   jwtToken: string;
+  authorizationCode: string;
   fullName: string;
   email: string;
 }
