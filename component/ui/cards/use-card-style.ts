@@ -49,7 +49,7 @@ export function useCardStyles() {
       gap: 10,
     },
     cardTextLarge: {
-      width: 220,
+      maxWidth: 220,
       fontFamily: "Roboto_500Medium",
       fontSize: 16,
       lineHeight: 19.2,
