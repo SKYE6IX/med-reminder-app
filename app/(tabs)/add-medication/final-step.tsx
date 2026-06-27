@@ -17,7 +17,16 @@ import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -129,13 +138,16 @@ export default function FinalStepScreen() {
         (existingData: MedicationProfile[]) =>
           existingData ? [...existingData, incomingData] : [incomingData],
       );
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
+
         createScheduleEventNotification({
           ...notfication,
           ...reminderPreferences,
         }),
       ]);
+
       clearFormState();
       router.dismissAll();
       router.navigate("/");
@@ -184,10 +196,11 @@ export default function FinalStepScreen() {
     if (!notifcationAllowed) {
       const allowed = await NotificationHelper.allowsNotificationsAsync();
       if (!allowed) {
-        alert("Allow to notification for us to create schedules");
+        Alert.alert("Allow notification for us to create schedules");
         return;
       }
     }
+
     mutate(data);
   };
 

@@ -31,6 +31,7 @@ export default function Security() {
         message: "Ваше устройство не поддерживает блокировку устройств.",
         status: "error",
       });
+
       return;
     }
     setUseDeviceLock(value);

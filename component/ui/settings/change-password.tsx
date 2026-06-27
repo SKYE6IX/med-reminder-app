@@ -56,7 +56,6 @@ export default function ChangePassword() {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
-
       timerRef.current = setTimeout(() => {
         if (value !== changePasswordState.formState.newPassword) {
           setChangePasswordState((prvState) => ({

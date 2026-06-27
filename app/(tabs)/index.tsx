@@ -22,7 +22,7 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useUserStore } from "@/stores/use-user-store";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -130,11 +130,6 @@ export default function Home() {
     },
 
     onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when updating schedule event -> ", error);
-      } else {
-        console.log("An Unknown error occur when updating schedule event -> ", error);
-      }
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",

@@ -64,6 +64,7 @@ export default function SubscriptionPlan() {
         router.navigate("/(tabs)/settings/subscription");
       }
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.code === "402") {

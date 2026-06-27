@@ -49,9 +49,7 @@ export const getValidAccessToken = async (): Promise<string | null> => {
         refreshToken,
       },
     );
-
     saveTokens(data.accessToken, data.refreshToken);
-
     return data.accessToken;
   } catch {
     return null;

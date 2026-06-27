@@ -166,14 +166,16 @@ export default function CreateAccountScreen() {
             </ThemedText>
           </View>
 
-          <View style={styles.socialButtonWrapper}>
-            <View style={styles.dividerWrapper}>
-              <View style={styles.divider} />
-              <ThemedText style={styles.dividerText}>Или</ThemedText>
-              <View style={styles.divider} />
+          {Platform.OS === "ios" && (
+            <View style={styles.socialButtonWrapper}>
+              <View style={styles.dividerWrapper}>
+                <View style={styles.divider} />
+                <ThemedText style={styles.dividerText}>Или</ThemedText>
+                <View style={styles.divider} />
+              </View>
+              <AppleSignIn type="SIGN_UP" />
             </View>
-            {Platform.OS === "ios" && <AppleSignIn type="SIGN_UP" />}
-          </View>
+          )}
 
           <View style={styles.footerWrapper}>
             <ThemedText style={styles.footerText}>Уже есть аккаунт?</ThemedText>

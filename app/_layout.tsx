@@ -104,7 +104,6 @@ export default function RootLayout() {
     } else {
       useAuthStore.getState().setIsAuthenticated(false);
     }
-
     // Handle when app is open by a notification
     await NotificationHelper.handleOnNotificationOpenApp();
   }

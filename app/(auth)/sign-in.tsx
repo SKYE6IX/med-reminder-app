@@ -156,16 +156,16 @@ export default function SignInScreen() {
             </View>
           </View>
 
-          <View style={styles.socialButtonWrapper}>
-            <View style={styles.dividerWrapper}>
-              <View style={styles.divider} />
-              <ThemedText style={styles.dividerText}>Или</ThemedText>
-              <View style={styles.divider} />
+          {Platform.OS === "ios" && (
+            <View style={styles.socialButtonWrapper}>
+              <View style={styles.dividerWrapper}>
+                <View style={styles.divider} />
+                <ThemedText style={styles.dividerText}>Или</ThemedText>
+                <View style={styles.divider} />
+              </View>
+              <AppleSignIn type="SIGN_IN" />
             </View>
-
-            {/* Social set up */}
-            {Platform.OS === "ios" && <AppleSignIn type="SIGN_IN" />}
-          </View>
+          )}
 
           <View style={styles.footerWrapper}>
             <ThemedText style={styles.footerText}>Нет аккаунта?</ThemedText>

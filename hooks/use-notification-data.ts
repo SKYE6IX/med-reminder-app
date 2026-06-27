@@ -34,7 +34,6 @@ export function useNotificationData({ selectedDate }: { selectedDate: string }) 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
-        console.log("Back to foreground");
         updateData();
       }
     });

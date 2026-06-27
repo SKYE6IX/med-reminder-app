@@ -3,7 +3,7 @@ import { createScheduleEventNotification } from "@/helpers/schedule-new-event-no
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfile } from "@/types/medication";
-import { api, axios } from "@/utils/axiosInstance";
+import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 
@@ -44,8 +44,8 @@ export default function useUpdateMedicationMutation() {
         message: "Данные о ваших лекарствах обновлены.",
         status: "success",
       });
-
       const { data: variableData, id } = variables;
+
       queryClient.setQueryData(
         ["medication-profile", "list"],
         (existingData: MedicationProfile[]) => {
@@ -54,26 +54,23 @@ export default function useUpdateMedicationMutation() {
           );
         },
       );
+
       queryClient.setQueryData(["medication-profile", "details", id], incomingData);
-      // we want to create again when they turn on
+
       if (variableData.isActive) {
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       } else if (!variableData.isActive) {
-        console.log("Ran!");
         await cancelEventNotification({ medProfileId: id });
       }
+
       //  we want to cancel and create when the chaxnge recurrence rule
       if (variableData.recurrenceRule) {
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       }
+
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
     },
-    onError(error) {
-      if (axios.isAxiosError(error)) {
-        console.log("An axios error occur when updating medication profile -> ", error);
-      } else {
-        console.log("An Unknown error occur when updating medication profile -> ", error);
-      }
+    onError() {
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",

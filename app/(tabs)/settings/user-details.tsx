@@ -44,7 +44,6 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 
 export default function UserDetails() {
   const isAndroid = Platform.OS === "android";
-  const isIOS = Platform.OS === "ios";
 
   const { openSheet, closeSheet } = useBottomSheet();
 
