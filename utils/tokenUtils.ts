@@ -1,6 +1,5 @@
 import type { AuthResponse } from "@/types/auth-response";
 import axios from "axios";
-import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 
@@ -40,11 +39,11 @@ export const getValidAccessToken = async (): Promise<string | null> => {
   if (!isTokenExpired(accessToken)) return accessToken;
 
   //   `${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`,
-  const localHost = Constants.expoConfig?.hostUri?.split(":")[0];
+  // const localHost = Constants.expoConfig?.hostUri?.split(":")[0];
 
   try {
     const { data } = await axios.post<AuthResponse>(
-      `http://${localHost}:8080/api/v1/auth/refresh`,
+      `${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`,
       {
         refreshToken,
       },
