@@ -37,11 +37,14 @@ export default function DetailsNoteSettings({
           <Text style={sharedStyles.cardTitle}>Заметка</Text>
           <ArrowRight color={color} />
         </View>
-        <View style={sharedStyles.cardBody}>
+
+        <View style={[sharedStyles.cardBody, { alignItems: "flex-start" }]}>
           <NoteIcon color={color} />
-          <Text style={[sharedStyles.cardTextContent, { color: mutedColor }]}>
-            {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[sharedStyles.cardTextContent, { color: mutedColor }]}>
+              {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
+            </Text>
+          </View>
         </View>
       </Pressable>
     </React.Fragment>
@@ -50,13 +53,21 @@ export default function DetailsNoteSettings({
 
 const UpdateNoteSheet = ({
   medicationProfile,
+  closeSheet,
 }: {
   medicationProfile: MedicationProfile;
   closeSheet: () => void;
 }) => {
-  const { isPending, mutate } = useUpdateMedicationMutation();
+  const { isPending, mutate } = useUpdateMedicationMutation({
+    name: "UPDATE NOTE",
+    onSucceed() {
+      closeSheet();
+    },
+  });
 
   const [updatedNote, setUpdateNote] = useState("");
+
+  const existingNote = medicationProfile.note ? medicationProfile.note : "";
 
   const canUpdate = useMemo(
     () => medicationProfile.note !== updatedNote,
@@ -66,7 +77,6 @@ const UpdateNoteSheet = ({
   const handleUpdateNote = () => {
     const note = updatedNote.length > 1 ? updatedNote : "";
     mutate({ id: medicationProfile.id, data: { note } });
-    // bottomSheetRef.current?.close();
     Keyboard.dismiss();
   };
 
@@ -77,7 +87,7 @@ const UpdateNoteSheet = ({
   return (
     <BottomSheetScrollView contentContainerStyle={{ gap: 32, height: 500 }}>
       <BottomSheetTextInput
-        value={updatedNote}
+        value={updatedNote.length ? updatedNote : existingNote}
         onChangeText={(value) => setUpdateNote(value)}
         autoCorrect={true}
         multiline={true}

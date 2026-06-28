@@ -115,7 +115,6 @@ export default function RootLayout() {
         console.log("Error occur in bootstrap -> ", error);
         setIsReady(true);
       });
-
     // Susbscribe to foreground events for notifications
     const unsubscribe = NotificationHelper.handleOnForeGroundEvent();
     return () => unsubscribe();

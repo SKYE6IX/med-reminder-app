@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native";
 export function useLinkButtonStyles() {
   const primaryBg = useThemeColor({}, "buttonPrimaryBg");
   const outlineBg = useThemeColor({}, "buttonOutlineBg");
-  const borderColor = useThemeColor({}, "borderColor");
   const textPrimary = useThemeColor({}, "textPrimary");
   const textMuted = useThemeColor({}, "textMuted");
   const disabledBg = useThemeColor({}, "buttonDisabledBg");
@@ -20,34 +19,43 @@ export function useLinkButtonStyles() {
       justifyContent: "center",
       alignItems: "center",
     },
+
     text: {
       fontFamily: "Roboto_400Regular",
       fontSize: 16,
       lineHeight: 19.2,
     },
+
     filled: {
       backgroundColor: primaryBg,
     },
+
     outline: {
       backgroundColor: outlineBg,
       borderWidth: 1,
-      borderColor,
+      borderColor: tintColor,
     },
+
     disabled: {
       backgroundColor: disabledBg,
     },
+
     danger: {
       backgroundColor: "#DC0000",
     },
+
     regularText: {
       color: "#FFF",
     },
+
     accentText: {
       color: textPrimary,
     },
+
     mutedText: {
       color: textMuted,
     },
+
     tintText: {
       color: tintColor,
     },

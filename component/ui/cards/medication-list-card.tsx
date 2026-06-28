@@ -54,6 +54,7 @@ export default function MedicationListCard({
     }
     setIsActive(isToggle);
   };
+
   return (
     <View style={sharedStyles.card}>
       {medicationProfile.status === "in_active" && (

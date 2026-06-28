@@ -34,7 +34,7 @@ export default function DetailsTimeSettings({
 
   const [updatedRule, setUpdatedRule] = useState("");
 
-  const { mutate, isPending } = useUpdateMedicationMutation();
+  const { mutate, isPending } = useUpdateMedicationMutation({ name: "UPDATE TIME" });
 
   const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
 

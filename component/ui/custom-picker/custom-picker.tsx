@@ -71,6 +71,7 @@ export default function CustomPicker({
           </Text>
         </Pressable>
       </View>
+
       <PlatformPicker
         pickerRef={pickerRef}
         selectedValue={selectedValue}
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     lineHeight: 19.2,
   },
   customPickerPressable: {
-    width: 80,
+    minWidth: 80,
     marginLeft: "auto",
     padding: 7,
     borderRadius: 16,

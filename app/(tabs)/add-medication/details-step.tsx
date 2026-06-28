@@ -14,7 +14,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { ProfileResponse } from "@/types/user";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -32,24 +32,23 @@ export default function DetailsStepScreen() {
   const UNIT_PRESSABLE_WIDTH = (unitWrapperWidth - UNIT_WRAPPER_GAP * 2) / UNIT_PRESSABLE_PER_ROW;
 
   const { setMedicationDetails, formState } = useAddPillStore();
+
   const { selfProfile, relationProfiles } = useProfilesQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const router = useRouter();
   const sharedStyles = useAddPillScreenStyles();
 
-  // Themes
-  const color = useThemeColor({}, "textPrimary");
-  const tintColor = useThemeColor({}, "tint");
-  const bGColor = useThemeColor({}, "backgroundSecondary");
-  const backgroundColor = useThemeColor({}, "backgroundPrimary");
-  const borderColor = useThemeColor({}, "borderColor");
-
   const selectedRelationProfile = relationProfiles.find(
     (profile) => profile.id === formState.profileId,
   );
 
   const isRelationProfileSelected = selectedRelationProfile?.id === formState.profileId;
+
+  // Default USER profile for the pill
+  useEffect(() => {
+    useAddPillStore.getState().setMedicationDetails({ profileId: selfProfile?.id });
+  }, [selfProfile?.id]);
 
   const handleSetProfile = (profileId: string) => {
     setMedicationDetails({ profileId });
@@ -99,6 +98,13 @@ export default function DetailsStepScreen() {
       openBannerRef.current?.openModal();
     }
   };
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
+  const bGColor = useThemeColor({}, "backgroundSecondary");
+  const backgroundColor = useThemeColor({}, "backgroundPrimary");
+  const borderColor = useThemeColor({}, "borderColor");
 
   const top = Platform.OS === "android" ? insets.top + 10 : 0;
 

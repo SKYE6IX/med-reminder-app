@@ -7,7 +7,7 @@ type CustomLinkProps = Omit<ComponentProps<typeof Link>, "href"> & {
   href: Href & string;
   label: string;
   variant?: "filled" | "outline";
-  textVaraint?: "regularText" | "accentText" | "mutedText";
+  textVaraint?: "regularText" | "accentText" | "mutedText" | "tintText";
   style?: ViewProps["style"];
 };
 

@@ -21,8 +21,12 @@ export const isTokenExpired = (token: string) => {
 };
 
 export const saveTokens = async (accessToken: string, refreshToken: string) => {
-  await SecureStore.setItemAsync("accessToken", accessToken);
-  await SecureStore.setItemAsync("refreshToken", refreshToken);
+  await SecureStore.setItemAsync("accessToken", accessToken, {
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+  });
+  await SecureStore.setItemAsync("refreshToken", refreshToken, {
+    keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+  });
 };
 
 export const clearTokens = async () => {
@@ -43,14 +47,17 @@ export const getValidAccessToken = async (): Promise<string | null> => {
 
   try {
     const { data } = await axios.post<AuthResponse>(
-      `${process.env.EXPO_PUBLIC_API_URL}/auth/refresh`,
+      `${process.env.EXPO_PUBLIC_API_URL}auth/refresh`,
       {
         refreshToken,
       },
     );
+
     saveTokens(data.accessToken, data.refreshToken);
+
     return data.accessToken;
-  } catch {
+  } catch (error) {
+    console.log("An Error Occur In refresh: ", error);
     return null;
   }
 };

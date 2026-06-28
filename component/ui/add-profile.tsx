@@ -135,7 +135,7 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
 
 const styles = StyleSheet.create({
   profileFormContainer: {
-    gap: 16,
+    gap: 32,
   },
   profileFormInputWrapper: {
     gap: 8,

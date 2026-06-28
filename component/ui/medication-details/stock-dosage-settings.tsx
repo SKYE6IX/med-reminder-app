@@ -10,8 +10,7 @@ import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import React, { useMemo, useRef, useState } from "react";
-import { Dimensions, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../custom-button/custom-button";
 import Loader from "../loader";
 import MedicationPackPicker from "../medication-pack-picker";
@@ -97,14 +96,6 @@ export default function StockDosageSettings({
 }
 
 const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedicationPackSheetProps) => {
-  const inset = useSafeAreaInsets();
-  const isAndroid = Platform.OS === "android";
-  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
-
-  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
-  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
-
   const { showFeedBack } = useFeedBackStore();
 
   const [medicationPack, setMedicationPack] = useState<MedicationPackCreation>({
@@ -174,7 +165,7 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
   const color = useThemeColor({}, "textPrimary");
 
   return (
-    <ScrollView contentContainerStyle={[styles.bottomSheetContainer, { height: contentHeight }]}>
+    <ScrollView contentContainerStyle={styles.bottomSheetContainer}>
       <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
       <MedicationPackPicker
         amountInPack={medicationPack.totalQuantity}
@@ -192,6 +183,7 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
         onPress={handleAddMedicationPackMutation}
         style={{ marginTop: 32 }}
       />
+
       <Loader visible={isPending} />
     </ScrollView>
   );
@@ -199,8 +191,9 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
 
 const styles = StyleSheet.create({
   bottomSheetContainer: {
-    gap: 16,
+    gap: 32,
   },
+
   bottomSheetText: {
     fontFamily: "Roboto_500Medium",
     fontSize: 16,

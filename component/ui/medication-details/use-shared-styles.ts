@@ -9,9 +9,11 @@ export function useSharedStyles() {
       flexDirection: "row",
       justifyContent: "space-between",
     },
+
     detailsGroupItem: {
       width: "48%",
     },
+
     card: {
       padding: 12,
       borderRadius: 16,
@@ -20,21 +22,25 @@ export function useSharedStyles() {
       justifyContent: "space-between",
       backgroundColor: bgSecondary,
     },
+
     cardHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
     },
+
     cardBody: {
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
     },
+
     cardTitle: {
       fontFamily: "Roboto_500Medium",
       fontSize: 16,
       lineHeight: 19.2,
       color,
     },
+
     cardTextContent: {
       fontFamily: "Roboto_400Regular",
       fontSize: 14,

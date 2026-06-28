@@ -124,7 +124,7 @@ export default function SubscriptionBanner({ ref, onBannerClose }: SubscriptionB
             <CustomButton
               label="Пропустить"
               variant="outline"
-              textVaraint="mutedText"
+              textVaraint="tintText"
               onPress={closeModal}
             />
           </View>

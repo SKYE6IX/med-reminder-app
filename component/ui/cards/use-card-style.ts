@@ -18,6 +18,7 @@ export function useCardStyles() {
       gap: 16,
       backgroundColor: bgSecondary,
     },
+
     absolute: {
       position: "absolute",
       top: 0,
@@ -25,10 +26,12 @@ export function useCardStyles() {
       bottom: 0,
       right: 0,
     },
+
     cardInnerContainer: {
       flexDirection: "row",
       gap: 10,
     },
+
     cardImageWrapper: {
       width: 100,
       height: 100,
@@ -39,22 +42,26 @@ export function useCardStyles() {
       width: "100%",
       height: "100%",
     },
+
     cardContent: {
+      flex: 1,
       gap: 8,
     },
+
     cardContentRow: {
       flex: 1,
       flexDirection: "row",
       alignItems: "flex-start",
       gap: 10,
     },
+
     cardTextLarge: {
-      maxWidth: 220,
       fontFamily: "Roboto_500Medium",
       fontSize: 16,
       lineHeight: 19.2,
       color,
     },
+
     cardTextMedium: {
       fontFamily: "Roboto_400Regular",
       fontSize: 14,

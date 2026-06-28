@@ -14,13 +14,12 @@ interface UpdateMedicationProfile {
   note: string;
 }
 
-const updateMedicationProfileMutation = async ({
-  id,
-  data,
-}: {
+type UpdateMedicationProfileMutation = {
   id: string;
   data: Partial<UpdateMedicationProfile>;
-}) => {
+};
+
+const updateMedicationProfileMutation = async ({ id, data }: UpdateMedicationProfileMutation) => {
   const updateData = {
     isActive: data.isActive ?? null,
     recurrenceRule: data.recurrenceRule ?? null,
@@ -32,7 +31,13 @@ const updateMedicationProfileMutation = async ({
   return response.data;
 };
 
-export default function useUpdateMedicationMutation() {
+export default function useUpdateMedicationMutation({
+  name,
+  onSucceed,
+}: {
+  name: string;
+  onSucceed?: () => void;
+}) {
   const { notfication, reminderPreferences } = useAppSettingsStore();
   const { showFeedBack } = useFeedBackStore();
 
@@ -44,6 +49,7 @@ export default function useUpdateMedicationMutation() {
         message: "Данные о ваших лекарствах обновлены.",
         status: "success",
       });
+
       const { data: variableData, id } = variables;
 
       queryClient.setQueryData(
@@ -69,8 +75,11 @@ export default function useUpdateMedicationMutation() {
       }
 
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
+
+      onSucceed && onSucceed();
     },
     onError() {
+      console.log("An error occur when performing update from " + name);
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
@@ -78,6 +87,7 @@ export default function useUpdateMedicationMutation() {
       });
     },
   });
+
   return {
     mutate,
     isPending,

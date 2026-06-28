@@ -37,7 +37,7 @@ export default function MedicationDetails() {
   });
 
   // Updating mutation
-  const { mutate, isPending } = useUpdateMedicationMutation();
+  const { mutate, isPending } = useUpdateMedicationMutation({ name: "UPDATE ACTIVE STATE" });
 
   // Update the medication profile status
   const handleOnSwitchToggle = (status: "active" | "inactive", id: string) => {

@@ -98,7 +98,7 @@ const DeleteMedicationSheet = ({
         <CustomButton
           label="Отмена"
           variant="outline"
-          textVaraint="mutedText"
+          textVaraint="tintText"
           onPress={closeSheet}
           style={{ width: "46%" }}
         />

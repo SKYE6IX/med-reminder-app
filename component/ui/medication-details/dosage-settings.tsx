@@ -19,7 +19,7 @@ export default function DetailsDosageSettings({
   const sharedStyles = useSharedStyles();
 
   const { openSheet, closeSheet } = useBottomSheet();
-  const { isPending, mutate } = useUpdateMedicationMutation();
+  const { isPending, mutate } = useUpdateMedicationMutation({ name: "UPDATE DOSAGE" });
 
   const handleUpdateDosage = (value: string) => {
     const shouldUpdate = medicationProfile.schedule.dosage !== value;

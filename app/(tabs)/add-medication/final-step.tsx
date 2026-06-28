@@ -121,6 +121,7 @@ export default function FinalStepScreen() {
   // @platform IOS ONLY
   // It control the height for the container when
   //  days reminder picker trigger it goes from HALF_EXPAND to FULL_EXPAND.
+
   const controlFullExpand = (isPicker: boolean) => {
     refillSettingHeight.value = withSpring(isPicker ? FULL_EXPAND : HALF_EXPAND);
   };
@@ -178,6 +179,7 @@ export default function FinalStepScreen() {
       });
       return;
     }
+
     const endDate = formState.schedule.endDate ? formState.schedule.endDate : null;
 
     const data: CreateMedication = {
@@ -220,8 +222,10 @@ export default function FinalStepScreen() {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Loader visible={isPending} />
         {/* Refill setting container */}
+
         <View style={sharedStyles.sectionContainer}>
           <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
+
           <Animated.View
             style={[
               styles.refillSettingWrapper,
@@ -245,14 +249,13 @@ export default function FinalStepScreen() {
                 </Text>
               </View>
 
-              <View>
-                <Switch
-                  onValueChange={toggleSwitch}
-                  value={showRefillBox}
-                  trackColor={{ false: bGTertiary, true: tintColor }}
-                  thumbColor="#F7F7F7"
-                />
-              </View>
+              <Switch
+                onValueChange={toggleSwitch}
+                value={showRefillBox}
+                trackColor={{ false: bGTertiary, true: tintColor }}
+                thumbColor="#F7F7F7"
+                style={{ alignSelf: "center" }}
+              />
             </View>
 
             <Animated.View
@@ -322,6 +325,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
+
   refillSettingIcon: {
     width: 38,
     height: 38,
@@ -329,9 +333,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   refillSettingTextWrapper: {
-    width: 180,
-    gap: 3,
+    flex: 1,
+    gap: 2,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
   },
   refillSettingTextLabel: {
     fontFamily: "Roboto_500Medium",

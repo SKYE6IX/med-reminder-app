@@ -54,7 +54,7 @@ export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }
           <CustomButton
             label="Отмена"
             variant="outline"
-            textVaraint="mutedText"
+            textVaraint="tintText"
             style={styles.button}
             onPress={closeSheet}
           />

@@ -7,8 +7,7 @@ import { SchedulePreset } from "@/stores/add-pill-store";
 import { MedicationProfile } from "@/types/medication";
 import { formatRRuleToRussian, generateTimeOccurrences } from "@/utils/rruleUtils";
 import React, { useState } from "react";
-import { Dimensions, Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../custom-button/custom-button";
 import FrequencySettings from "../frequency-settings";
 import Loader from "../loader";
@@ -22,7 +21,7 @@ export default function DetailsFrequencySettings({
   const sharedStyles = useSharedStyles();
   const { openSheet, closeSheet } = useBottomSheet();
 
-  const { isPending, mutate } = useUpdateMedicationMutation();
+  const { isPending, mutate } = useUpdateMedicationMutation({ name: "UPDATE FREQUENCY" });
   const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
 
   const handleUpdateRules = (updatedRule: string) => {
@@ -46,9 +45,12 @@ export default function DetailsFrequencySettings({
           <Text style={sharedStyles.cardTitle}>Частота приема</Text>
           <ArrowRight color={color} />
         </View>
-        <View style={sharedStyles.cardBody}>
+
+        <View style={[sharedStyles.cardBody, { alignItems: "flex-start" }]}>
           <AlarmClockIcon color={color} />
-          <Text style={sharedStyles.cardTextContent}>{ruleToText}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={sharedStyles.cardTextContent}>{ruleToText}</Text>
+          </View>
         </View>
       </Pressable>
       <Loader visible={isPending} />
@@ -61,14 +63,6 @@ const FrequencySheet = ({
 }: {
   handleUpdateRules: (updatedRule: string) => void;
 }) => {
-  const inset = useSafeAreaInsets();
-  const isAndroid = Platform.OS === "android";
-  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
-
-  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
-  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
-
   const [selectedPreset, setSelectedPreset] = useState<SchedulePreset | undefined>(undefined);
   const [updatedRule, setUpdatedRule] = useState("");
 
@@ -93,7 +87,7 @@ const FrequencySheet = ({
   const bGColor = useThemeColor({}, "backgroundSecondary");
 
   return (
-    <View style={{ gap: 16, height: contentHeight }}>
+    <View style={{ gap: 32 }}>
       <FrequencySettings onFreqSet={handleSetFrequency} preset={selectedPreset} />
       <View style={styles.scheduleTimeList}>
         {occurences?.map((time, i) => (
@@ -102,6 +96,7 @@ const FrequencySheet = ({
           </Text>
         ))}
       </View>
+
       <CustomButton
         label="Применить"
         onPress={() => handleUpdateRules(updatedRule)}

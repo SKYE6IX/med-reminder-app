@@ -31,7 +31,7 @@ export default function Medications() {
   const { isLoading, data } = useMedicationProfileQuery();
 
   // Updating mutation
-  const { mutate, isPending } = useUpdateMedicationMutation();
+  const { mutate, isPending } = useUpdateMedicationMutation({ name: "UPDATE ACTIVE STATUS" });
 
   const hasMedicationsProfiles = data && data.length >= 1 ? true : false;
 

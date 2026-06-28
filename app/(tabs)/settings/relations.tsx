@@ -200,7 +200,7 @@ const DeleteRelationProfile = ({ color, closeSheet, deleteFn }: DeleteRelationPr
         <CustomButton
           label="Отмена"
           variant="outline"
-          textVaraint="mutedText"
+          textVaraint="tintText"
           style={styles.deleteActionBtn}
           onPress={closeSheet}
         />
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
   relationAvatar: {
     width: "100%",
     height: "100%",
+    borderRadius: 999,
   },
 
   deleteActionBox: {

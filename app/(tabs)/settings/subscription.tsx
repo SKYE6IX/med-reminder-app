@@ -100,7 +100,9 @@ export default function Subscription() {
             <CheckCircleIcon />
           </View>
 
-          <Text style={[styles.cardLabel, { color }]}>{currentPlanLabel}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.cardLabel, { color }]}>{currentPlanLabel}</Text>
+          </View>
 
           {!hideCancelButton && (
             <Pressable
@@ -204,19 +206,18 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardLabel: {
-    width: 130,
     fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,
   },
   cardPressable: {
     marginLeft: "auto",
-    height: 24,
+    height: 28,
     paddingLeft: 12,
     paddingRight: 12,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
+    borderRadius: 16,
   },
   cardPressableText: {
     fontFamily: "Roboto_500Medium",

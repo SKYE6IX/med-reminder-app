@@ -11,7 +11,7 @@ import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useMemo, useState } from "react";
-import { Dimensions, FlatList, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface RefillMedicationPackForm extends MedicationPackCreation {
@@ -128,15 +128,6 @@ const AddMedicationPackPickerSheet = ({
   measurementValue: string;
   closeSheet: () => void;
 }) => {
-  const inset = useSafeAreaInsets();
-
-  const isAndroid = Platform.OS === "android";
-  const BOTTOM_SHEET_HEADER_HIEGHT = 24;
-  const SCREEN_HEIGHT = Dimensions.get("window").height;
-  // Bottom sheet height calculations
-  const bottom = isAndroid ? inset.bottom * 2 : inset.bottom;
-  const contentHeight = SCREEN_HEIGHT - (BOTTOM_SHEET_HEADER_HIEGHT + inset.top + bottom + 20 * 2);
-
   const { showFeedBack } = useFeedBackStore();
 
   const [medicationPack, setMedicationPack] = useState<RefillMedicationPackForm>({
@@ -206,7 +197,7 @@ const AddMedicationPackPickerSheet = ({
     <ScrollView>
       <Loader visible={isPending} />
 
-      <View style={[styles.bottomSheetContainer, { height: contentHeight }]}>
+      <View style={styles.bottomSheetContainer}>
         <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
         <MedicationPackPicker
           amountInPack={amountInPack}
@@ -273,7 +264,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomSheetContainer: {
-    gap: 16,
+    gap: 32,
   },
   bottomSheetText: {
     fontFamily: "Roboto_500Medium",
