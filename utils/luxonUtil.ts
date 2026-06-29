@@ -109,6 +109,7 @@ export const getWeekViewDescription = (isoDate: string) => {
     locale: "ru",
     setZone: true,
   });
+
   const today = DateTime.now().setLocale("ru");
   const tomorrow = today.plus({ days: 1 });
   const yesterday = today.minus({ days: 1 });

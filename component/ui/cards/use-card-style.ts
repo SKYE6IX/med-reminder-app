@@ -87,12 +87,6 @@ export function useCardStyles() {
       backgroundColor: mutedColor,
     },
 
-    cardActionButtons: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-
     profile: {
       flexDirection: "row",
       alignItems: "center",
@@ -144,15 +138,24 @@ export function useCardStyles() {
       color: "#F7F7F7",
     },
 
-    cardButton: {
-      width: 90,
+    cardActionButtonWrapper: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+
+    cardActionButton: {
       height: 24,
+      paddingLeft: 10,
+      paddingRight: 10,
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 16,
       backgroundColor: tintColor,
     },
-    cardButtonText: {
+
+    cardActionButtonText: {
       fontFamily: "Roboto_500Medium",
       fontSize: 12,
       lineHeight: 14.2,
@@ -162,17 +165,20 @@ export function useCardStyles() {
     progressContainer: {
       gap: 5,
     },
+
     progressHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
     },
+
     progressTextValue: {
       fontFamily: "Roboto_400Regular",
       fontSize: 13,
       lineHeight: 14.2,
       color: mutedColor,
     },
+
     progressPipe: {
       height: 5,
       width: "100%",
@@ -180,6 +186,7 @@ export function useCardStyles() {
       position: "relative",
       backgroundColor: bgTertiary,
     },
+
     progressActivePipe: {
       position: "absolute",
       height: 5,

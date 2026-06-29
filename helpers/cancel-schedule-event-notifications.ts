@@ -6,6 +6,7 @@ import { readFromStorage } from "./storage-manager";
 export async function cancelEventNotification({ medProfileId }: { medProfileId: string }) {
   try {
     const pendingAppNotifications = await notifee.getTriggerNotifications();
+
     // We get only notifications with notificationType are due.
     // It's where we store the eventID and medProfileId data.
     const pendings = pendingAppNotifications.filter((appNotification) => {
@@ -31,7 +32,7 @@ export async function cancelEventNotification({ medProfileId }: { medProfileId: 
     await Promise.all(
       eventsToEvict.map((value) => {
         const data = value.notification.data as unknown as NotificationData;
-        return NotificationHelper.removeNotificationsWithKey(data);
+        return NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
       }),
     );
 

@@ -62,8 +62,8 @@ export default function RefillCard({ pack, onRefillButtonPress }: RefillCardProp
 
           {/* This button will only shown for Active pack that need to be refilled */}
           {isDepleted && (
-            <Pressable style={sharedStyles.cardButton} onPress={onRefillButtonPress}>
-              <Text style={sharedStyles.cardButtonText}>Пополнить</Text>
+            <Pressable style={sharedStyles.cardActionButton} onPress={onRefillButtonPress}>
+              <Text style={sharedStyles.cardActionButtonText}>Пополнить</Text>
             </Pressable>
           )}
         </View>

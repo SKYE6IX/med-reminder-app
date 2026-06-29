@@ -22,13 +22,16 @@ interface WeekDay {
 }
 
 const WINDOW_PADDING = 20;
-const CAROUSEL_WIDTH = Dimensions.get("window").width - WINDOW_PADDING * 2;
 const TOTAL_INDEX = 32;
+
 const DATA = [...new Array(TOTAL_INDEX).keys()];
 const CENTER_INDEX = TOTAL_INDEX / 2;
 
 export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
+  const CAROUSEL_WIDTH = Dimensions.get("screen").width - WINDOW_PADDING * 2;
+
   const now = DateTime.now();
+
   const carouselRef = useRef<ICarouselInstance>(null);
   const [selectedISODate, setSelectedISODate] = useState(now.setLocale("ru").toISODate());
   const [activeOffset, setActiveOffset] = useState(0);
@@ -51,6 +54,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   };
 
   const description = getWeekViewDescription(selectedISODate);
+
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
@@ -74,7 +78,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
           data={DATA}
           width={CAROUSEL_WIDTH}
           height={80}
-          style={{ width: CAROUSEL_WIDTH }}
+          style={{ width: CAROUSEL_WIDTH, height: 80 }}
           onSnapToItem={handleOnSnapToItem}
           renderItem={({ index }) => {
             const offset = index - CENTER_INDEX;
@@ -137,48 +141,58 @@ const WeekDayRow = ({
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    maxHeight: 150,
     gap: 10,
-    height: "100%",
+    paddingLeft: 20,
+    paddingRight: 20,
   },
+
   headerConteainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
   },
-  headerPressabaleText: {},
+
   title: {
     fontFamily: "Roboto_500Medium",
     fontSize: 16,
     lineHeight: 19.2,
   },
+
   weekPageContainer: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
+
   weekContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
+
   weekWrapper: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    gap: 5,
   },
+
   weekPressable: {
     flex: 1,
-    padding: 10,
     justifyContent: "center",
     alignItems: "center",
-    gap: 4,
+    gap: 5,
     borderRadius: 10,
   },
+
   weekText: {
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     lineHeight: 19.2,
     textTransform: "uppercase",
   },
+
   weekDescription: {
     fontFamily: "Roboto_400Regular",
     fontSize: 18,

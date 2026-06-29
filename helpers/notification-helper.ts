@@ -48,7 +48,7 @@ export class NotificationHelper {
 
     if (!this.settings.enable || dueReminder < now) return;
 
-    await NotificationHelper.setCategories();
+    await NotificationHelper.setAndroidCategories();
 
     // Composition of all snoozes
     const snoozeReminders = Array.from({ length: MAX_SNOOZE_REPEAT }, (_, i) => ({
@@ -104,7 +104,7 @@ export class NotificationHelper {
             ? `Сейчас время принять ${options.medicationName}, запланированное на ${getScheduleTime(options.scheduleAt)}. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.
       `
             : `Вы ещё не отметили приём ${options.medicationName}, запланированный ${reminder.minutesOverdue}мин назад. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.`;
-        return await this.createNotification({
+        return await this.createNotificationTrigger({
           time: time.getTime(),
           title,
           body,
@@ -117,7 +117,6 @@ export class NotificationHelper {
 
     // Saved all snoonze notification ID to storage.
     await saveToStorage<string[]>(dueStorageKey, notificationsId);
-
     // Early reminder set up, if user turn it on;
     // An early reminder set up
     const earyReminder = dueReminder.minus({ minute: 20 });
@@ -125,7 +124,7 @@ export class NotificationHelper {
       if (earyReminder > now) {
         const title = "Следующее лекарство через 20 минут";
         const body = `Следующее лекарство: ${options.medicationName}`;
-        const notificationId = await this.createNotification({
+        const notificationId = await this.createNotificationTrigger({
           time: earyReminder.toJSDate().getTime(),
           title,
           body,
@@ -148,7 +147,7 @@ export class NotificationHelper {
     if (this.settings.missedDoseAlert) {
       const title = "Пропущен приём лекарства";
       const body = `Лекарство на ${getScheduleTime(options.scheduleAt)} не было принято. Если у вас есть сомнения по поводу дальнейших действий, проконсультируйтесь с врачом.`;
-      const notifcationId = await this.createNotification({
+      const notifcationId = await this.createNotificationTrigger({
         time: missedReminder.toJSDate().getTime(),
         title,
         body,
@@ -184,7 +183,7 @@ export class NotificationHelper {
     const time = date.getTime();
     const title = "Напоминание о пополнении";
     const body = `${medicationName} скоро закончится.`;
-    const notificationId = await this.createNotification({
+    const notificationId = await this.createNotificationTrigger({
       time: time,
       title,
       body,
@@ -200,18 +199,6 @@ export class NotificationHelper {
     await saveToStorage(storageKey, notificationId);
   }
 
-  // REQUEST PERMISSION
-  public static async allowsNotificationsAsync() {
-    const settings = await notifee.requestPermission();
-    if (
-      settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
-      settings.ios.authorizationStatus === AuthorizationStatus.AUTHORIZED
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
   // CHECK FOR PERMISSION
   public static async checkNotificationPermission() {
     const settings = await notifee.getNotificationSettings();
@@ -222,20 +209,33 @@ export class NotificationHelper {
     }
     return false;
   }
+
+  // REQUEST PERMISSION
+  public static async allowsNotifications() {
+    const settings = await notifee.requestPermission();
+    if (
+      settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+      settings.ios.authorizationStatus === AuthorizationStatus.AUTHORIZED
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // A CALLBACK IF NOTIFICATION OPEN THE APP
   public static async handleOnNotificationOpenApp() {
     const initialNotification = await notifee.getInitialNotification();
-
     if (initialNotification) {
       const data = initialNotification.notification.data as unknown as NotificationData;
       if (initialNotification.pressAction.id === "default" && data) {
-        await NotificationHelper.removeNotificationsWithKey(data);
+        await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
       }
     }
   }
 
   // A CALLBACK IF NOTIFCATION OPEN THE APP OR ACTION BTN
-  // WAS CHOSE WHILE THE APP ISN'T KILLED
+  // WAS CHOOSE WHILE THE APP ISN'T KILLED
   public static handleOnBackgroundEvent() {
     notifee.onBackgroundEvent(async ({ type, detail }) => {
       const { notification, pressAction } = detail;
@@ -255,10 +255,13 @@ export class NotificationHelper {
           );
         }
       }
-      await NotificationHelper.removeNotificationsWithKey(data);
+
+      await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
+
       return Promise.resolve();
     });
   }
+
   // A CALLBACK THAT HANDLE WHEN USER IS CURRENTLY USING THE APP
   // WHEN THE NOTIFICATION COME ON.
   public static handleOnForeGroundEvent() {
@@ -269,11 +272,12 @@ export class NotificationHelper {
         case EventType.PRESS:
           const { notification } = detail;
           const data = notification?.data as unknown as NotificationData;
-          await NotificationHelper.removeNotificationsWithKey(data);
+          await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
           break;
       }
     });
   }
+
   // GENERATE KEY STORAGE USED TO SAVED ALL NOTIFICATION
   // IDs
   public static createNotificationStorageKey({
@@ -306,16 +310,16 @@ export class NotificationHelper {
     } else {
       await notifee.cancelNotification(notificationId);
     }
+
     await removeFromStorage(storageKey);
   }
 
-  public static async removeNotificationsWithKey(data: NotificationData) {
+  public static async removeNotificationsWithKey(key: string) {
     let storageKey: string | string[];
-
     try {
-      storageKey = JSON.parse(data.storageKey as string);
+      storageKey = JSON.parse(key);
     } catch {
-      storageKey = data.storageKey;
+      storageKey = key;
     }
 
     if (typeof storageKey === "object") {
@@ -344,7 +348,7 @@ export class NotificationHelper {
     return channelId;
   }
 
-  private async createNotification({
+  private async createNotificationTrigger({
     time,
     title,
     body,
@@ -400,7 +404,8 @@ export class NotificationHelper {
       trigger,
     );
   }
-  private static async setCategories() {
+
+  private static async setAndroidCategories() {
     await notifee.setNotificationCategories([
       {
         id: "due-reminder",
@@ -417,6 +422,7 @@ export class NotificationHelper {
       },
     ]);
   }
+
   private static async updateSchdeuleEventsAction(action: ScheduleAction, scheduleId: string) {
     try {
       const eventResponse = await api.put<MedicationScheduleEvent>(
@@ -425,6 +431,7 @@ export class NotificationHelper {
           action,
         },
       );
+
       if (eventResponse.data) {
         useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
 
@@ -437,6 +444,7 @@ export class NotificationHelper {
           if (!medicationProfile || medicationProfile.pack == null) return;
 
           const { currentAmountInPack, reminderDays } = medicationProfile.pack;
+
           const daysSupply = Math.round(
             Number(currentAmountInPack) / Number(medicationProfile.schedule.dosage),
           );

@@ -42,10 +42,11 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
         const data = pending.notification?.data as unknown as NotificationData;
         pendingMaps.set(data.dosageScheduleEventId as string, pending);
       });
+
       await Promise.all(
         [...pendingMaps.values()].map((value) => {
           const data = value.notification.data as unknown as NotificationData;
-          return NotificationHelper.removeNotificationsWithKey(data);
+          return NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
         }),
       );
       pendingMaps.clear();

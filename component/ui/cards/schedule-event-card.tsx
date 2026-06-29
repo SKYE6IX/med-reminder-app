@@ -4,7 +4,6 @@ import { getScheduleBadge } from "@/helpers/getScheduleBadge";
 import { getScheduleTime } from "@/helpers/getScheduleTime";
 import { getTakenAt } from "@/helpers/getTakenAt";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
-import { showEventActionButton } from "@/helpers/showEventActionButton";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { MedicationScheduleEvent } from "@/types/medication";
@@ -17,6 +16,19 @@ import { useCardStyles } from "./use-card-style";
 type ScheduleEventCardProps = {
   scheduleEvent: MedicationScheduleEvent;
   onActionBtnPress: (action: "TAKEN" | "MISSED") => void;
+};
+
+const showEventButtons = (scheduleAt: string, status: string) => {
+  if (!scheduleAt) {
+    return false;
+  }
+  const now = DateTime.now();
+  const scheduleTime = DateTime.fromISO(scheduleAt, {
+    locale: "ru",
+    setZone: true,
+  });
+  const isSameDay = now.hasSame(scheduleTime, "day");
+  return isSameDay && !["TAKEN", "MISSED"].includes(status);
 };
 
 export default function ScheduleEventCard({
@@ -45,9 +57,9 @@ export default function ScheduleEventCard({
   const takenAtValue = getTakenAt(takenAt);
   const scheduleTime = getScheduleTime(scheduleAt);
 
-  const showActionBtns = showEventActionButton(scheduleAt, status, nowDate);
   const eventBadge = getScheduleBadge(scheduleAt, status, nowDate);
   const upcomingRemainTime = getUpcomingTime(scheduleAt, nowDate);
+  const showEventBtn = showEventButtons(scheduleAt, status);
 
   const badgeBgColor =
     eventBadge === "taken" ? "#009E00" : eventBadge === "missed" ? "#DC0000" : tintColor;
@@ -89,16 +101,20 @@ export default function ScheduleEventCard({
             </View>
           )}
 
-          {showActionBtns && (
-            <View style={sharedStyles.cardActionButtons}>
-              <Pressable style={sharedStyles.cardButton} onPress={() => onActionBtnPress("TAKEN")}>
-                <Text style={sharedStyles.cardButtonText}>Принять</Text>
-              </Pressable>
+          {showEventBtn && (
+            <View style={sharedStyles.cardActionButtonWrapper}>
               <Pressable
-                style={[sharedStyles.cardButton, { backgroundColor: "#DC0000" }]}
+                style={sharedStyles.cardActionButton}
+                onPress={() => onActionBtnPress("TAKEN")}
+              >
+                <Text style={sharedStyles.cardActionButtonText}>Принять</Text>
+              </Pressable>
+
+              <Pressable
+                style={[sharedStyles.cardActionButton, { backgroundColor: "#DC0000" }]}
                 onPress={() => onActionBtnPress("MISSED")}
               >
-                <Text style={sharedStyles.cardButtonText}>Пропустить</Text>
+                <Text style={sharedStyles.cardActionButtonText}>Пропустить</Text>
               </Pressable>
             </View>
           )}

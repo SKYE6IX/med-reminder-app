@@ -15,7 +15,7 @@ export default function OnboardingFinalScreen() {
   const { completeOnaboarding } = useAuthStore();
 
   const requestAllowNotification = async () => {
-    const isAllowed = await NotificationHelper.allowsNotificationsAsync();
+    const isAllowed = await NotificationHelper.allowsNotifications();
     if (!isAllowed) {
       alert("Notification need to be allowed to send schedule!");
     }

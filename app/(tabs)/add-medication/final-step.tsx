@@ -196,7 +196,7 @@ export default function FinalStepScreen() {
     const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
 
     if (!notifcationAllowed) {
-      const allowed = await NotificationHelper.allowsNotificationsAsync();
+      const allowed = await NotificationHelper.allowsNotifications();
       if (!allowed) {
         Alert.alert("Allow notification for us to create schedules");
         return;
