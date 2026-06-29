@@ -99,10 +99,12 @@ export default function Home() {
         <WeekView showDescription={hasScheduleEvents} onDateChange={handleOnDateChange} />
 
         {/* CONTENT DATA */}
-        {!isLoading && data && <ScheduleEventList data={data} selectedDate={selectedDate} />}
+        {!isLoading && data && data.length >= 1 && (
+          <ScheduleEventList data={data} selectedDate={selectedDate} />
+        )}
 
         {/* NO CONTENT*/}
-        {!isLoading && !data && (
+        {!isLoading && data && data.length <= 0 && (
           <View style={styles.noContentWrapper}>
             <Image
               source={require("@/assets/images/pill-bottle.png")}
