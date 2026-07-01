@@ -76,14 +76,13 @@ export default function SignInScreen() {
       await saveTokens(data.accessToken, data.refreshToken);
       setIsAuthenticated(true);
 
-      await Promise.all([
-        NotificationHelper.cancelAllNotifications(),
-        createNextScheduleEventNotification({
-          ...useAppSettingsStore.getState().notfication,
-          ...useAppSettingsStore.getState().reminderPreferences,
-        }),
-      ]);
+      await NotificationHelper.cancelAllNotifications();
+      await createNextScheduleEventNotification({
+        ...useAppSettingsStore.getState().notfication,
+        ...useAppSettingsStore.getState().reminderPreferences,
+      });
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         error.response?.status === 401 &&
