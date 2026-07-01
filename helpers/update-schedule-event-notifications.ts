@@ -1,4 +1,4 @@
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { queryClient } from "@/utils/query-client";
 import notifee from "react-native-notify-kit";
@@ -24,7 +24,7 @@ export const updateScheduleEventNotifications = async (settings: Partial<Notific
       const notifications = new NotificationHelper(settings);
       const data = refillPending.notification.data as unknown as NotificationData;
       const medicationProfile = queryClient
-        .getQueryState<MedicationProfile[]>(["medication-profile", "list"])
+        .getQueryState<MedicationProfileReponse[]>(["medication-profile", "list"])
         ?.data?.find((profile) => profile.id === data.medicationProfileId);
 
       if (medicationProfile) {

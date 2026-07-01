@@ -11,7 +11,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { CreateMedication, MedicationProfile } from "@/types/medication";
+import { CreateMedicationProfile, MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -39,8 +39,8 @@ const COLLAPSED = 75;
 const HALF_EXPAND = 260;
 const FULL_EXPAND = 460;
 
-const createMedicationMutation = async (body: CreateMedication) => {
-  const response = await api.post<MedicationProfile>("medications", body);
+const createMedicationMutation = async (body: CreateMedicationProfile) => {
+  const response = await api.post<MedicationProfileReponse>("medications", body);
   return response.data;
 };
 
@@ -136,13 +136,13 @@ export default function FinalStepScreen() {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfile[]) =>
+        (existingData: MedicationProfileReponse[]) =>
           existingData ? [...existingData, incomingData] : [incomingData],
       );
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
-
+        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
         createScheduleEventNotification({
           ...notfication,
           ...reminderPreferences,
@@ -182,7 +182,7 @@ export default function FinalStepScreen() {
 
     const endDate = formState.schedule.endDate ? formState.schedule.endDate : null;
 
-    const data: CreateMedication = {
+    const data: CreateMedicationProfile = {
       ...formState,
       schedule: {
         dosage: formState.schedule.dosage,

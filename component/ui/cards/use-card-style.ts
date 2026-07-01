@@ -65,7 +65,7 @@ export function useCardStyles() {
     cardTextMedium: {
       fontFamily: "Roboto_400Regular",
       fontSize: 14,
-      lineHeight: 16.2,
+      lineHeight: 17.2,
       textTransform: "lowercase",
       color,
     },
@@ -119,7 +119,7 @@ export function useCardStyles() {
     },
 
     badge: {
-      width: 90,
+      minWidth: 90,
       height: 25,
       position: "absolute",
       flexDirection: "row",
@@ -130,6 +130,8 @@ export function useCardStyles() {
       top: 0,
       borderTopRightRadius: 16,
       borderBottomLeftRadius: 16,
+      paddingLeft: 8,
+      paddingRight: 8,
     },
     badgeText: {
       fontFamily: "Roboto_500Medium",
@@ -147,6 +149,7 @@ export function useCardStyles() {
 
     cardActionButton: {
       height: 24,
+      maxWidth: 120,
       paddingLeft: 10,
       paddingRight: 10,
       justifyContent: "center",

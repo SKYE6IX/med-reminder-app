@@ -1,4 +1,4 @@
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { DateTime } from "@/utils/luxonUtil";
@@ -53,12 +53,15 @@ export const createNextScheduleEventNotification = async (
       anchorDate = DateTime.now().toISO({ precision: "minute" });
     }
 
-    const response = await api.get<MedicationScheduleEvent[]>("medications/schedules/upcoming", {
-      params: {
-        eventDateFrom: anchorDate,
-        limit: slotsAvailable,
+    const response = await api.get<MedicationScheduleEventResponse[]>(
+      "medications/schedules/upcoming",
+      {
+        params: {
+          eventDateFrom: anchorDate,
+          limit: slotsAvailable,
+        },
       },
-    });
+    );
 
     if (!response.data.length) {
       return;

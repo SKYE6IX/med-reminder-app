@@ -24,12 +24,6 @@ export interface MedicationPackCreation {
   reminderDays: number;
 }
 
-export interface Pack {
-  totalAmountInPack: string;
-  currentAmountInPack: string;
-  reminderDays: number;
-}
-
 export interface ScheduleCreation {
   dosage: string;
   recurrenceRule: string;
@@ -37,7 +31,6 @@ export interface ScheduleCreation {
   endDate: string | null;
   timeZone: string;
 }
-
 export interface ScheduleResponse {
   id: string;
   dosage: string;
@@ -48,7 +41,7 @@ export interface ScheduleResponse {
   endDate: string | null;
   amountTaken: string;
 }
-export interface CreateMedication {
+export interface CreateMedicationProfile {
   profileId: string;
   medicationName: string;
   medicationUnit: MedicationUnit;
@@ -59,7 +52,7 @@ export interface CreateMedication {
   medicationPack: Omit<MedicationPackCreation, "medicationProfileId"> | null;
 }
 
-export interface MedicationProfile {
+export interface MedicationProfileReponse {
   id: string;
   medicationName: string;
   medicationUnit: MedicationUnit;
@@ -69,10 +62,13 @@ export interface MedicationProfile {
   medicationReason: string | null;
   profile: ProfileResponse;
   schedule: ScheduleResponse;
-  pack: Pack | null;
+  pack: {
+    totalAmountInPack: string;
+    currentAmountInPack: string;
+  } | null;
 }
 
-export interface MedicationScheduleEvent {
+export interface MedicationScheduleEventResponse {
   id: string;
   status: string;
   medicationName: string;
@@ -85,14 +81,18 @@ export interface MedicationScheduleEvent {
   profile: ProfileResponse;
 }
 
-export interface RefillMedicationPack {
+export interface MedicationPackResponse {
   id: string;
   status: string;
-  startedAt: string;
+  startedAt: string | null;
+  endedAt: string | null;
   totalQuantity: string;
+  currentQuantity: string;
+  isRefilled: boolean;
+  reminderDays: number;
+  medicationProfileId: string;
   medicationName: string;
   medicationImageUrl: string;
-  medicationProfileId: string;
   dosageAmount: string;
   dosageMeasurement: string;
 }

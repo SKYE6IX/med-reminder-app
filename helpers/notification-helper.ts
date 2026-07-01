@@ -9,7 +9,7 @@ import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useNotificationDataStore } from "@/stores/notification-data-store";
-import { MedicationProfile, MedicationScheduleEvent } from "@/types/medication";
+import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import notifee, {
   AndroidImportance,
@@ -425,7 +425,7 @@ export class NotificationHelper {
 
   private static async updateSchdeuleEventsAction(action: ScheduleAction, scheduleId: string) {
     try {
-      const eventResponse = await api.put<MedicationScheduleEvent>(
+      const eventResponse = await api.put<MedicationScheduleEventResponse>(
         `medications/schedules/event/${scheduleId}`,
         {
           action,
@@ -434,39 +434,37 @@ export class NotificationHelper {
 
       if (eventResponse.data) {
         useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
+        const medicationPacks = await api.get<MedicationPackResponse[]>("medications/packs");
 
-        const medicationProfilesResponse = await api.get<MedicationProfile[]>("medications");
-        if (medicationProfilesResponse.data) {
-          const medicationProfile = medicationProfilesResponse.data.find(
-            (profile) => profile.id === eventResponse.data.medicationProfileId,
-          );
+        if (medicationPacks.data) {
+          const activePack = medicationPacks.data.find((pack) => {
+            return (
+              pack.medicationProfileId === eventResponse.data.medicationProfileId &&
+              pack.status === "ACTIVE"
+            );
+          });
 
-          if (!medicationProfile || medicationProfile.pack == null) return;
-
-          const { currentAmountInPack, reminderDays } = medicationProfile.pack;
+          if (!activePack) return;
 
           const daysSupply = Math.round(
-            Number(currentAmountInPack) / Number(medicationProfile.schedule.dosage),
+            Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
 
-          if (daysSupply - 1 < reminderDays) {
+          if (daysSupply - 1 < activePack.reminderDays) {
             const refillDate = DateTime.now()
               .setZone(getTimeZone())
               .plus({ days: 1 })
               .set({ hour: 9, minute: 0, second: 0, millisecond: 0 })
               .toISO();
-
             const appSettingState = useAppSettingsStore.getState();
-
             const notifications = new NotificationHelper({
               ...appSettingState.notfication,
               ...appSettingState.reminderPreferences,
             });
-
             await notifications.scheduleRefillNotification({
               scheduleAt: refillDate ?? "",
-              medicationName: medicationProfile.medicationName,
-              medicationProfileId: medicationProfile.id,
+              medicationName: activePack.medicationName,
+              medicationProfileId: activePack.medicationProfileId,
             });
           }
         }

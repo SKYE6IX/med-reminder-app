@@ -5,7 +5,7 @@ import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationPackCreation, MedicationProfile } from "@/types/medication";
+import { MedicationPackCreation, MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -22,11 +22,11 @@ interface AddMedicationPackReponse {
 }
 
 type AddMedicationPackSheetProps = {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
   closeSheet: () => void;
 };
 
-const addMedicationPackMutation = async (body: MedicationPackCreation) => {
+const addNewMedicationPackMutation = async (body: MedicationPackCreation) => {
   const response = await api.post<AddMedicationPackReponse>("medications/packs", body);
   return response.data;
 };
@@ -34,14 +34,12 @@ const addMedicationPackMutation = async (body: MedicationPackCreation) => {
 export default function StockDosageSettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
 }) {
   const { openSheet, closeSheet } = useBottomSheet();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
-
-  const isAmountInPackAvailable = Number(medicationProfile.pack?.totalAmountInPack) >= 1;
 
   const sharedStyles = useSharedStyles();
 
@@ -61,7 +59,7 @@ export default function StockDosageSettings({
   const color = useThemeColor({}, "textPrimary");
   return (
     <React.Fragment>
-      {isAmountInPackAvailable ? (
+      {medicationProfile.pack ? (
         <View style={[sharedStyles.card, sharedStyles.detailsGroupItem]}>
           <View style={sharedStyles.cardHeader}>
             <Text style={[sharedStyles.cardTitle]}>Запас</Text>
@@ -69,7 +67,7 @@ export default function StockDosageSettings({
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
             <Text style={[sharedStyles.cardTextContent, { color }]}>
-              {medicationProfile.pack?.totalAmountInPack}{" "}
+              {medicationProfile.pack.totalAmountInPack}{" "}
               {getDosageMeasurement(medicationProfile.schedule.measurement)}
             </Text>
           </View>
@@ -119,20 +117,18 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
   };
 
   const { isPending, mutate } = useMutation({
-    mutationFn: addMedicationPackMutation,
+    mutationFn: addNewMedicationPackMutation,
     async onSuccess() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] }),
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
       ]);
-
       showFeedBack({
         title: "Успешно",
         message: "Пополнение добавлено в напоминание.",
         status: "success",
       });
-
       closeSheet();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
@@ -183,7 +179,6 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
         onPress={handleAddMedicationPackMutation}
         style={{ marginTop: 32 }}
       />
-
       <Loader visible={isPending} />
     </ScrollView>
   );
@@ -193,7 +188,6 @@ const styles = StyleSheet.create({
   bottomSheetContainer: {
     gap: 32,
   },
-
   bottomSheetText: {
     fontFamily: "Roboto_500Medium",
     fontSize: 16,

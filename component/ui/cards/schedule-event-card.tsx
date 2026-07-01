@@ -6,7 +6,7 @@ import { getTakenAt } from "@/helpers/getTakenAt";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationScheduleEventResponse } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { Pressable, Text, View } from "react-native";
 import { useCardStyles } from "./use-card-style";
 
 type ScheduleEventCardProps = {
-  scheduleEvent: MedicationScheduleEvent;
+  scheduleEvent: MedicationScheduleEventResponse;
   onActionBtnPress: (action: "TAKEN" | "MISSED") => void;
 };
 

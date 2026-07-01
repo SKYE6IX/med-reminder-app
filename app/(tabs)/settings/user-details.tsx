@@ -70,6 +70,7 @@ export default function UserDetails() {
   const canUpdate = useMemo(() => {
     const exisitngData = user;
     const { name, email, dateOfBirth, gender } = updateUserData;
+
     return (
       name !== exisitngData?.name ||
       email !== exisitngData?.email ||
@@ -126,12 +127,14 @@ export default function UserDetails() {
     // We only send updated data that isn't the same as
     // the exising one;
     const { name, email, dateOfBirth, gender } = updateUserData;
+
     const data: UpdateUserData = {
       name: name !== user?.name ? name : null,
       email: email !== user?.email ? email : null,
       dateOfBirth: dateOfBirth !== user?.dateOfBirth ? dateOfBirth : null,
       gender: gender !== user?.gender ? gender : null,
     };
+
     mutate(data);
   };
 

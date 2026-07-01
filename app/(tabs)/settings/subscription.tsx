@@ -156,7 +156,7 @@ const CancelSubscriptionSheet = ({
         <CustomButton
           label="Отмена"
           variant="outline"
-          textVaraint="mutedText"
+          textVaraint="tintText"
           style={styles.cancelActionBtn}
           onPress={closeSheet}
         />

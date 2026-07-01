@@ -1,6 +1,13 @@
+import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
+import { NotificationHelper } from "@/helpers/notification-helper";
+import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useAuthStore } from "@/stores/use-auth-store";
+import { api } from "@/utils/axiosInstance";
+import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
+import { queryClient } from "@/utils/query-client";
 import { getValidAccessToken } from "@/utils/tokenUtils";
 import {
   Roboto_400Regular,
@@ -9,21 +16,13 @@ import {
   useFonts,
 } from "@expo-google-fonts/roboto";
 import { PortalProvider } from "@gorhom/portal";
+import { QueryClientProvider } from "@tanstack/react-query";
 import * as LocalAuthentication from "expo-local-authentication";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
-import { NotificationHelper } from "@/helpers/notification-helper";
-import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
-import { useAppSettingsStore } from "@/stores/app-settings-store";
-import { api } from "@/utils/axiosInstance";
-import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
-import { queryClient } from "@/utils/query-client";
-import { QueryClientProvider } from "@tanstack/react-query";
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -87,7 +86,6 @@ export default function RootLayout() {
       getAuthorizedUser();
 
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
       // If user set up local device lock
       if (useAppSettingsStore.getState().useDeviceLock && isEnrolled) {
         const localAuthenticate = await LocalAuthentication.authenticateAsync({
@@ -104,6 +102,7 @@ export default function RootLayout() {
     } else {
       useAuthStore.getState().setIsAuthenticated(false);
     }
+
     // Handle when app is open by a notification
     await NotificationHelper.handleOnNotificationOpenApp();
   }
@@ -117,8 +116,8 @@ export default function RootLayout() {
       });
 
     // Susbscribe to foreground events for notifications
-    const unsubscribe = NotificationHelper.handleOnForeGroundEvent();
-    return () => unsubscribe();
+    const subscribe = NotificationHelper.handleOnForeGroundEvent();
+    return () => subscribe();
   }, []);
 
   useEffect(() => {
@@ -169,6 +168,11 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
+
+// TODO:
+// On register and login.
+// Cancel all notification and recreate a new ones
+// Cancel all notifications when user sign out or delete account.
 
 // NOTE:
 // We have a situation, when user doesn't allow notification to our app,

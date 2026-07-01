@@ -12,7 +12,7 @@ import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
@@ -21,7 +21,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 // Medication profile details query
 const fetchMedicationProfileDetails = async (id: string) => {
-  const response = await api.get<MedicationProfile>(`medications/${id}`);
+  const response = await api.get<MedicationProfileReponse>(`medications/${id}`);
   return response.data;
 };
 

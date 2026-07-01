@@ -1,5 +1,5 @@
 import { useNotificationDataStore } from "@/stores/notification-data-store";
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationScheduleEventResponse } from "@/types/medication";
 import { queryClient } from "@/utils/query-client";
 import { useCallback, useEffect } from "react";
 import { AppState } from "react-native";
@@ -14,7 +14,7 @@ export function useNotificationData({ selectedDate }: { selectedDate: string }) 
 
     queryClient.setQueryData(
       ["schedule-events", selectedDate],
-      (existingData: MedicationScheduleEvent[]) => {
+      (existingData: MedicationScheduleEventResponse[]) => {
         const updatedData = existingData?.map((scheduleEvent) =>
           scheduleEvent.id === useNotificationDataStore.getState().scheduleId
             ? useNotificationDataStore.getState().scheduleData

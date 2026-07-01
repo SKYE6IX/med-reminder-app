@@ -2,7 +2,7 @@ import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { MedicationProfile, Pack } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -10,18 +10,20 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useCardStyles } from "./use-card-style";
 
 type MedicationListCardProps = {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
   onSwitchToggle: (status: "active" | "inactive", id: string) => void;
 };
 
-const getProgressText = (pack: Pack | null) => {
-  if (!pack) return;
+const getProgressText = (medicationProfile: MedicationProfileReponse) => {
+  if (!medicationProfile.pack) return;
+  const pack = medicationProfile.pack;
   const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
   return `${consumed} из ${pack.totalAmountInPack} принято`;
 };
 
-function getPercentage(pack: Pack | null) {
-  if (!pack) return;
+function getPercentage(medicationProfile: MedicationProfileReponse) {
+  if (!medicationProfile.pack) return;
+  const pack = medicationProfile.pack;
   const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
   return Math.round((consumed / Number(pack.totalAmountInPack)) * 100);
 }
@@ -30,15 +32,11 @@ export default function MedicationListCard({
   medicationProfile,
   onSwitchToggle,
 }: MedicationListCardProps) {
+  const sharedStyles = useCardStyles();
   const profileImageUrl = useProfileImage(medicationProfile.profile.id);
 
   const [isActive, setIsActive] = useState(medicationProfile.status.toUpperCase() === "ACTIVE");
   const router = useRouter();
-
-  const sharedStyles = useCardStyles();
-  const tintColor = useThemeColor({}, "tint");
-  const bgTertiary = useThemeColor({}, "backgroundTertiary");
-  const disableCard = useThemeColor({}, "disableCard");
 
   const dosageUnit = getDosageMeasurement(medicationProfile.schedule.measurement);
   const startedDate = getStartedDate(medicationProfile.schedule.startDate);
@@ -54,6 +52,10 @@ export default function MedicationListCard({
     }
     setIsActive(isToggle);
   };
+
+  const tintColor = useThemeColor({}, "tint");
+  const bgTertiary = useThemeColor({}, "backgroundTertiary");
+  const disableCard = useThemeColor({}, "disableCard");
 
   return (
     <View style={sharedStyles.card}>
@@ -116,11 +118,9 @@ export default function MedicationListCard({
       {canShowProgress && (
         <View style={sharedStyles.progressContainer}>
           <View style={sharedStyles.progressHeader}>
-            <Text style={sharedStyles.progressTextValue}>
-              {getProgressText(medicationProfile.pack)}
-            </Text>
+            <Text style={sharedStyles.progressTextValue}>{getProgressText(medicationProfile)}</Text>
             <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>
-              {getPercentage(medicationProfile.pack)}%
+              {getPercentage(medicationProfile)}%
             </Text>
           </View>
           <View style={sharedStyles.progressPipe}>
@@ -129,7 +129,7 @@ export default function MedicationListCard({
                 sharedStyles.progressActivePipe,
                 {
                   backgroundColor: tintColor,
-                  width: `${getPercentage(medicationProfile.pack) ?? 0}%`,
+                  width: `${getPercentage(medicationProfile) ?? 0}%`,
                 },
               ]}
             />

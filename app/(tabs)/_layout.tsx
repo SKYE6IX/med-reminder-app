@@ -56,7 +56,7 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon sf="plus.app" md="add_box" />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="refill-medications">
+      <NativeTabs.Trigger name="medication-packs">
         <NativeTabs.Trigger.Label>Запасы</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="plus.arrow.trianglehead.clockwise" md="refresh" />
       </NativeTabs.Trigger>

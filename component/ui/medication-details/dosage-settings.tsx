@@ -4,7 +4,7 @@ import PillIcon from "@/component/icons/pill-icon";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import React from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import DosageAmountInput from "../dosage-picker/dosage-amount-input";
@@ -14,7 +14,7 @@ import { useSharedStyles } from "./use-shared-styles";
 export default function DetailsDosageSettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
 }) {
   const sharedStyles = useSharedStyles();
 
@@ -23,7 +23,7 @@ export default function DetailsDosageSettings({
 
   const handleUpdateDosage = (value: string) => {
     const shouldUpdate = medicationProfile.schedule.dosage !== value;
-    if (shouldUpdate && value.length > 1) {
+    if (shouldUpdate && value.length >= 1) {
       mutate({ id: medicationProfile.id, data: { doseQuantity: value } });
     }
   };

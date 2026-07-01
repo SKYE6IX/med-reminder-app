@@ -1,13 +1,13 @@
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { Image } from "expo-image";
 import { useState } from "react";
 import { Switch, Text, View } from "react-native";
 import { useCardStyles } from "./use-card-style";
 
 type MedicationDetailCardProps = {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
   onSwitchToggle: (status: "active" | "inactive", id: string) => void;
 };
 

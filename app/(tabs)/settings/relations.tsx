@@ -17,7 +17,7 @@ import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -34,7 +34,8 @@ interface DeleteRelationProfileProps {
 }
 
 const deleteRelationProfileMutation = async (profileId: string) => {
-  await api.delete(`users/profiles/${profileId}`);
+  const response = await api.delete(`users/profiles/${profileId}`);
+  return response.data;
 };
 
 export default function Relations() {
@@ -49,10 +50,9 @@ export default function Relations() {
   const { relationProfiles } = useProfilesQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
-  const [profileId, setProfileId] = useState("");
-
   const { isPending, mutate } = useMutation({
     mutationFn: deleteRelationProfileMutation,
+
     onSuccess(data, variables) {
       queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
         existingData.filter((profile) => profile.id !== variables),
@@ -61,6 +61,7 @@ export default function Relations() {
     },
 
     onError(error) {
+      console.log("An error occur when try to delete profile: ", error);
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
@@ -82,15 +83,14 @@ export default function Relations() {
   };
 
   const snapPoint = isAndroid ? "35%" : "30%";
-  const openDeleteProfileSheet = (id: string) => {
-    setProfileId(id);
+  const openDeleteProfileSheet = (profileID: string) => {
     openSheet({
       title: "Удалить пользователя?",
       snapPointPercent: snapPoint,
       content: (
         <DeleteRelationProfile
           color={mutedColor}
-          deleteFn={() => mutate(profileId)}
+          deleteFn={() => mutate(profileID)}
           closeSheet={closeSheet}
         />
       ),
@@ -106,6 +106,7 @@ export default function Relations() {
   const borderColor = useThemeColor({}, "borderColor");
 
   const top = isAndroid ? insets.top + 20 : insets.top + 10;
+
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }]}>
       <Loader visible={isPending} />
@@ -120,6 +121,7 @@ export default function Relations() {
               openDeleteBottomSheet={openDeleteProfileSheet}
             />
           ))}
+
           {/* ADD NEW PROFILE */}
           <Pressable
             style={[
@@ -135,6 +137,7 @@ export default function Relations() {
           </Pressable>
         </View>
       </View>
+
       <SubscriptionBanner ref={openBannerRef} />
     </SafeAreaView>
   );
@@ -150,6 +153,7 @@ const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProf
   const borderColor = useThemeColor({}, "borderColor");
 
   const snapPoint = Platform.OS === "android" ? "60%" : "55%";
+
   const openAvatarPickerSheet = () => {
     openSheet({
       title: "Выберите фотографию",
@@ -178,6 +182,7 @@ const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProf
           </View>
         </Pressable>
         <Text style={[styles.label, { color }]}>{profile.name}</Text>
+
         <Pressable
           style={[styles.profileImage, { backgroundColor: bgTertiary, marginLeft: "auto" }]}
           onPress={() => openDeleteBottomSheet(profile.id)}
@@ -255,7 +260,6 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 999,
   },
-
   deleteActionBox: {
     gap: 16,
     alignItems: "center",

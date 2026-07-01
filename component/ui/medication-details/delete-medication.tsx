@@ -2,7 +2,7 @@ import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfile[]) =>
+        (existingData: MedicationProfileReponse[]) =>
           existingData.filter((oldData) => oldData.id !== variables),
       );
       closeSheet();

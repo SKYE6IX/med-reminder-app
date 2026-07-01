@@ -2,7 +2,7 @@ import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationProfile, MedicationScheduleEvent } from "@/types/medication";
+import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData } from "@/types/notification";
 import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -29,12 +29,13 @@ const TABS = [
 ];
 
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
-  const response = await api.put<MedicationScheduleEvent>(
+  const response = await api.put<MedicationScheduleEventResponse>(
     `medications/schedules/event/${data.id}`,
     {
       action: data.action,
     },
   );
+
   return response.data;
 };
 const cancelEventNotifications = async (eventId: string) => {
@@ -51,7 +52,7 @@ export default function ScheduleEventList({
   data,
   selectedDate,
 }: {
-  data: MedicationScheduleEvent[];
+  data: MedicationScheduleEventResponse[];
   selectedDate: string;
 }) {
   const insets = useSafeAreaInsets();
@@ -90,7 +91,7 @@ export default function ScheduleEventList({
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         ["schedule-events", selectedDate],
-        (existingData: MedicationScheduleEvent[]) =>
+        (existingData: MedicationScheduleEventResponse[]) =>
           existingData.map((scheduleEvent) =>
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),
@@ -99,24 +100,29 @@ export default function ScheduleEventList({
       // Inavlidate
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
         cancelEventNotifications(data.id),
       ]);
 
-      // Here we get the latest data from medication profile list,
+      // Here we get the latest data from medication packs list,
       // we passed it down to refill notification, which will
       // check if user has a pack to refill, and if their refill
       // is near.
       const medicationProfile = queryClient
-        .getQueryState<MedicationProfile[]>(["medication-profile", "list"])
-        ?.data?.find((profile) => profile.id === data.medicationProfileId);
+        .getQueryState<MedicationPackResponse[]>(["medication-packs"])
+        ?.data?.find(
+          (pack) =>
+            pack.medicationProfileId === data.medicationProfileId && pack.status === "ACTIVE",
+        );
+
       await createRefillNotification({
-        medicationProfile,
+        medicationPack: medicationProfile,
         settings: { ...notfication, ...reminderPreferences },
       });
     },
 
     onError(error) {
+      console.log("Error occur inside event updates: ", error);
       showFeedBack({
         title: "Ошибка!",
         message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
@@ -130,7 +136,6 @@ export default function ScheduleEventList({
       <View style={styles.tabsWrapper}>
         <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
       </View>
-
       <FlatList
         style={{ flex: 1 }}
         data={filterScheduleEvents}

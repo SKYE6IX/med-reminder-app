@@ -4,7 +4,7 @@ import ArrowRight from "@/component/icons/arrow-right";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { SchedulePreset } from "@/stores/add-pill-store";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { formatRRuleToRussian, generateTimeOccurrences } from "@/utils/rruleUtils";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -16,7 +16,7 @@ import { useSharedStyles } from "./use-shared-styles";
 export default function DetailsFrequencySettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
 }) {
   const sharedStyles = useSharedStyles();
   const { openSheet, closeSheet } = useBottomSheet();

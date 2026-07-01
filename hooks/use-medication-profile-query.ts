@@ -1,10 +1,10 @@
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 
 // Fetch query
 const fetchMedicationProfiles = async () => {
-  const response = await api.get<MedicationProfile[]>("medications");
+  const response = await api.get<MedicationProfileReponse[]>("medications");
   return response.data;
 };
 

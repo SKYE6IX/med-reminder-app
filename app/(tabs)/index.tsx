@@ -1,7 +1,7 @@
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserData } from "@/hooks/use-user-data";
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationScheduleEventResponse } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -23,7 +23,7 @@ import { useQuery } from "@tanstack/react-query";
 
 // Fetch schedule events query
 const fetchScheduleEvents = async (params: string) => {
-  const response = await api.get<MedicationScheduleEvent[]>("medications/schedules/event", {
+  const response = await api.get<MedicationScheduleEventResponse[]>("medications/schedules/event", {
     params: {
       eventDate: params,
     },

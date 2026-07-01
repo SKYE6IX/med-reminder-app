@@ -2,7 +2,7 @@ import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notific
 import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ const updateMedicationProfileMutation = async ({ id, data }: UpdateMedicationPro
     note: data.note ?? null,
   };
 
-  const response = await api.put<MedicationProfile>(`medications/${id}`, updateData);
+  const response = await api.put<MedicationProfileReponse>(`medications/${id}`, updateData);
   return response.data;
 };
 
@@ -44,17 +44,11 @@ export default function useUpdateMedicationMutation({
   const { mutate, isPending } = useMutation({
     mutationFn: updateMedicationProfileMutation,
     async onSuccess(incomingData, variables) {
-      showFeedBack({
-        title: "Обновлено!",
-        message: "Данные о ваших лекарствах обновлены.",
-        status: "success",
-      });
-
       const { data: variableData, id } = variables;
 
       queryClient.setQueryData(
         ["medication-profile", "list"],
-        (existingData: MedicationProfile[]) => {
+        (existingData: MedicationProfileReponse[]) => {
           return existingData.map((oldData) =>
             oldData.id === incomingData.id ? incomingData : oldData,
           );
@@ -68,15 +62,21 @@ export default function useUpdateMedicationMutation({
       } else if (!variableData.isActive) {
         await cancelEventNotification({ medProfileId: id });
       }
-
       //  we want to cancel and create when the chaxnge recurrence rule
       if (variableData.recurrenceRule) {
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       }
+      if (variableData.doseQuantity) {
+        await queryClient.invalidateQueries({ queryKey: ["medication-packs"] });
+      }
 
       await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
-
       onSucceed && onSucceed();
+      showFeedBack({
+        title: "Обновлено!",
+        message: "Данные о ваших лекарствах обновлены.",
+        status: "success",
+      });
     },
     onError() {
       console.log("An error occur when performing update from " + name);
@@ -87,7 +87,6 @@ export default function useUpdateMedicationMutation({
       });
     },
   });
-
   return {
     mutate,
     isPending,

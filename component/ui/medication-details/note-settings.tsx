@@ -3,7 +3,7 @@ import ArrowRight from "@/component/icons/arrow-right";
 import NoteIcon from "@/component/icons/note-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
@@ -14,7 +14,7 @@ import { useSharedStyles } from "./use-shared-styles";
 export default function DetailsNoteSettings({
   medicationProfile,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
 }) {
   const { openSheet, closeSheet } = useBottomSheet();
 
@@ -55,7 +55,7 @@ const UpdateNoteSheet = ({
   medicationProfile,
   closeSheet,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
   closeSheet: () => void;
 }) => {
   const { isPending, mutate } = useUpdateMedicationMutation({

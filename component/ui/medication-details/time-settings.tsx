@@ -3,7 +3,7 @@ import ArrowRight from "@/component/icons/arrow-right";
 import ClockIcon from "@/component/icons/clock-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
-import { MedicationProfile } from "@/types/medication";
+import { MedicationProfileReponse } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
 import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
@@ -24,7 +24,7 @@ export default function DetailsTimeSettings({
   medicationProfile,
   fullWidth,
 }: {
-  medicationProfile: MedicationProfile;
+  medicationProfile: MedicationProfileReponse;
   fullWidth: boolean;
 }) {
   const sharedStyles = useSharedStyles();

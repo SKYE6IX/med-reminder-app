@@ -1,12 +1,12 @@
-import { MedicationScheduleEvent } from "@/types/medication";
+import { MedicationScheduleEventResponse } from "@/types/medication";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface UpdatedNotificationData {
   scheduleId: string | undefined;
-  scheduleData: MedicationScheduleEvent | null;
-  setScheduleData: (data: MedicationScheduleEvent, id: string) => void;
+  scheduleData: MedicationScheduleEventResponse | null;
+  setScheduleData: (data: MedicationScheduleEventResponse, id: string) => void;
   clearScheduleData: () => void;
 }
 

@@ -1,45 +1,61 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
-import RefillCard from "@/component/ui/cards/refill-card";
+import MedicationPackCard from "@/component/ui/cards/medication-pack-card";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
+import Tabs from "@/component/ui/tabs";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationPackCreation, RefillMedicationPack } from "@/types/medication";
+import { MedicationPackCreation, MedicationPackResponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FlatList, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+type TABS_VALUE = "ACTIVE" | "PENDING" | "COMPLETED";
 
 interface RefillMedicationPackForm extends MedicationPackCreation {
   medicationPackId: string;
 }
 
-const fetchRefillMedicationPacks = async () => {
-  const response = await api.get<RefillMedicationPack[]>("medications/packs/refill");
+const fetchMedicationPacks = async () => {
+  const response = await api.get<MedicationPackResponse[]>("medications/packs");
   return response.data;
 };
 
 const refillMedicationPackMutation = async (body: RefillMedicationPackForm) => {
-  const response = await api.post<RefillMedicationPack>("medications/packs/refill", body);
+  const response = await api.post<MedicationPackResponse>("medications/packs/refill", body);
   return response.data;
 };
 
-export default function RefillPill() {
+const TABS = [
+  { label: "Принимаете", value: "ACTIVE" },
+  { label: "На очереди", value: "PENDING" },
+  { label: "Закончилось", value: "COMPLETED" },
+];
+
+export default function MedicationPacks() {
   const inset = useSafeAreaInsets();
 
   const { openSheet, closeSheet } = useBottomSheet();
+  const [activeTab, setActiveTab] = useState<TABS_VALUE>("ACTIVE");
 
   // Query Data
   const { data, isLoading } = useQuery({
-    queryKey: ["medication-refill-packs"],
-    queryFn: fetchRefillMedicationPacks,
+    queryKey: ["medication-packs"],
+    queryFn: fetchMedicationPacks,
   });
 
-  const isPacksAvailable = data && data.length >= 1;
+  const filterPacks = useMemo(() => {
+    return data?.filter((pack) => pack.status === activeTab);
+  }, [activeTab, data]);
+
+  const handleOnTabChange = (tab: TABS_VALUE) => {
+    setActiveTab(tab);
+  };
 
   const openAddMedicationPackSheet = ({
     medicationPackId,
@@ -54,6 +70,7 @@ export default function RefillPill() {
       title: "Напоминание о пополнении",
       content: (
         <AddMedicationPackPickerSheet
+          key={medicationPackId}
           medicationPackId={medicationPackId}
           medicationProfileId={medicationProfileId}
           measurementValue={measurementValue}
@@ -68,50 +85,52 @@ export default function RefillPill() {
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const top = Platform.OS === "android" ? inset.top : 0;
+  const top = Platform.OS === "android" ? 10 : 0;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
       <Text style={[styles.headerTitle, { color }]}>Пополнение лекарств</Text>
       <Loader visible={isLoading} />
-      {!isLoading && (
-        <>
-          {isPacksAvailable ? (
-            <FlatList
-              style={{ flex: 1 }}
-              data={data}
-              renderItem={({ item }) => (
-                <RefillCard
-                  key={item.id}
-                  pack={item}
-                  onRefillButtonPress={() =>
-                    openAddMedicationPackSheet({
-                      medicationPackId: item.id,
-                      medicationProfileId: item.medicationProfileId,
-                      measurementValue: item.dosageMeasurement,
-                    })
-                  }
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={[
-                styles.listContentContainer,
-                { paddingBottom: inset.bottom + 10 },
-              ]}
-            />
-          ) : (
-            <View style={styles.noContentWrapper}>
-              <Image
-                source={require("@/assets/images/pill-bottle.png")}
-                style={styles.noContentImage}
+      {!isLoading && data && data.length >= 1 && (
+        <React.Fragment>
+          <View style={styles.tabsWrapper}>
+            <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+          </View>
+          <FlatList
+            style={{ flex: 1 }}
+            data={filterPacks}
+            renderItem={({ item }) => (
+              <MedicationPackCard
+                key={item.id}
+                pack={item}
+                onRefillButtonPress={() =>
+                  openAddMedicationPackSheet({
+                    medicationPackId: item.id,
+                    medicationProfileId: item.medicationProfileId,
+                    measurementValue: item.dosageMeasurement,
+                  })
+                }
               />
-              <Text style={[styles.noContentTitle, { color }]}>Ваши запасы лекарств</Text>
-              <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-                Здесь появятся запасы и напоминания о пополнении.
-              </Text>
-            </View>
-          )}
-        </>
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.listContentContainer,
+              { paddingBottom: inset.bottom + 10 },
+            ]}
+          />
+        </React.Fragment>
+      )}
+      {!isLoading && data && data.length <= 0 && (
+        <View style={styles.noContentWrapper}>
+          <Image
+            source={require("@/assets/images/pill-bottle.png")}
+            style={styles.noContentImage}
+          />
+          <Text style={[styles.noContentTitle, { color }]}>Ваши запасы лекарств</Text>
+          <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
+            Здесь появятся запасы и напоминания о пополнении.
+          </Text>
+        </View>
       )}
     </SafeAreaView>
   );
@@ -148,17 +167,8 @@ const AddMedicationPackPickerSheet = ({
   const { isPending, mutate } = useMutation({
     mutationFn: refillMedicationPackMutation,
     async onSuccess(data, variables) {
-      queryClient.setQueryData(
-        ["medication-refill-packs"],
-        (existingPacks: RefillMedicationPack[]) => {
-          const filterPacks = existingPacks.filter(
-            (pack) => pack.id !== variables.medicationPackId,
-          );
-          return [...filterPacks, data];
-        },
-      );
-
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
         queryClient.invalidateQueries({
           queryKey: ["medication-profile", "details", variables.medicationProfileId],
         }),
@@ -169,7 +179,6 @@ const AddMedicationPackPickerSheet = ({
         message: "Пополнение добавлено в напоминание.",
         status: "success",
       });
-
       closeSheet();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
@@ -221,8 +230,10 @@ const AddMedicationPackPickerSheet = ({
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
+  tabsWrapper: {
+    marginTop: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   headerTitle: {
     fontFamily: "Roboto_500Medium",
@@ -234,9 +245,9 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingLeft: 20,
     paddingRight: 20,
-    paddingBottom: 16,
     gap: 16,
   },
+
   noContentWrapper: {
     flex: 1,
     gap: 20,
