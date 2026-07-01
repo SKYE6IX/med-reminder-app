@@ -53,12 +53,12 @@ export default function Settings() {
     mutationFn: logOutMutation,
     async onSuccess() {
       // Clear out all notifications.
-      // At the moment, only medication notifications we target
       await NotificationHelper.cancelAllNotifications();
       queryClient.clear();
       clearTokens();
       setIsAuthenticated(false);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         console.log("An axios error occur in sign out mutation -> ", error);

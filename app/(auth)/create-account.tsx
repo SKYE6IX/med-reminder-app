@@ -13,6 +13,7 @@ import { validateCreateAccountInputs } from "@/utils/validator";
 
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import Loader from "@/component/ui/loader";
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { AuthResponse } from "@/types/auth-response";
 import { api, axios } from "@/utils/axiosInstance";
@@ -74,10 +75,14 @@ export default function CreateAccountScreen() {
   const { mutate, isPending } = useMutation({
     mutationFn: createAccountMutation,
     async onSuccess(data) {
-      clearTokens();
-      saveTokens(data.accessToken, data.refreshToken);
-      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      await clearTokens();
+      await saveTokens(data.accessToken, data.refreshToken);
       setIsAuthenticated(true);
+
+      await Promise.all([
+        NotificationHelper.cancelAllNotifications(),
+        queryClient.invalidateQueries({ queryKey: ["users"] }),
+      ]);
     },
     onError(error) {
       if (axios.isAxiosError(error)) {

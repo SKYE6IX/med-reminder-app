@@ -9,6 +9,7 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -71,14 +72,17 @@ export default function SignInScreen() {
   const { mutate, isPending } = useMutation({
     mutationFn: signInMutation,
     async onSuccess(data) {
-      clearTokens();
-      saveTokens(data.accessToken, data.refreshToken);
-
+      await clearTokens();
+      await saveTokens(data.accessToken, data.refreshToken);
       setIsAuthenticated(true);
-      await createNextScheduleEventNotification({
-        ...useAppSettingsStore.getState().notfication,
-        ...useAppSettingsStore.getState().reminderPreferences,
-      });
+
+      await Promise.all([
+        NotificationHelper.cancelAllNotifications(),
+        createNextScheduleEventNotification({
+          ...useAppSettingsStore.getState().notfication,
+          ...useAppSettingsStore.getState().reminderPreferences,
+        }),
+      ]);
     },
     onError(error) {
       if (axios.isAxiosError(error)) {

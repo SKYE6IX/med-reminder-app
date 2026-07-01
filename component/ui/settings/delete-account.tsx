@@ -1,3 +1,4 @@
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -22,17 +23,19 @@ export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }
 
   const { isPending, mutate } = useMutation({
     mutationFn: deleteAccountMutation,
-    onSuccess() {
+    async onSuccess() {
       // Reset ALL
       closeSheet();
+      useAuthStore.getState().setIsAuthenticated(false);
       useUserStore.getState().resetUserData();
       useNotificationDataStore.getState().clearScheduleData();
       useAppSettingsStore.getState().resetAppSetting();
       useAuthStore.getState().resetOnaboarding();
       clearTokens();
       queryClient.clear();
-      useAuthStore.getState().setIsAuthenticated(false);
+      await NotificationHelper.cancelAllNotifications();
     },
+
     onError(error) {
       showFeedBack({
         title: "Ошибка!",

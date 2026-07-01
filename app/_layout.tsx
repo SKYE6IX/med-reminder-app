@@ -169,11 +169,6 @@ export default function RootLayout() {
   );
 }
 
-// TODO:
-// On register and login.
-// Cancel all notification and recreate a new ones
-// Cancel all notifications when user sign out or delete account.
-
 // NOTE:
 // We have a situation, when user doesn't allow notification to our app,
 // whhic mean we can't set a notification for them. What shall we do:
