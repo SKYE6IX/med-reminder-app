@@ -4,6 +4,7 @@ import StarIcon from "@/component/icons/star-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
+import { QueryKey } from "@/constants/query-keys";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { default as YomoneySdkModule } from "@/modules/yomoney-sdk/src/YomoneySdkModule";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -40,14 +41,6 @@ export default function SubscriptionPlan() {
   const isAndroid = Platform.OS === "android";
   const insets = useSafeAreaInsets();
 
-  const color = useThemeColor({}, "textPrimary");
-  const tintColor = useThemeColor({}, "tint");
-  const mutedColor = useThemeColor({}, "textMuted");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-  const borderColor = useThemeColor({}, "borderColor");
-  const bgTertiary = useThemeColor({}, "backgroundTertiary");
-
   const isMontly = selectedPlan === "MONTHLY";
   const isAnnual = selectedPlan === "ANNUAL";
 
@@ -55,7 +48,7 @@ export default function SubscriptionPlan() {
     mutationFn: createPaidSubscription,
     onSuccess(data) {
       if (data !== null) {
-        queryClient.setQueryData(["subscriptions-plan"], () => data);
+        queryClient.setQueryData([QueryKey.subscriptionPlan], () => data);
         showFeedBack({
           title: "Добро пожаловать Премиум план",
           message: "Наслаждайтесь неограниченным использованием.",
@@ -113,6 +106,15 @@ export default function SubscriptionPlan() {
       zoneId: getTimeZone(),
     });
   };
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
+  const mutedColor = useThemeColor({}, "textMuted");
+  const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
+  const borderColor = useThemeColor({}, "borderColor");
+  const bgTertiary = useThemeColor({}, "backgroundTertiary");
 
   const top = isAndroid ? insets.top + 20 : 0;
 

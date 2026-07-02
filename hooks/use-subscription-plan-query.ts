@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { SubscriptionPlanResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -9,9 +10,8 @@ const fetchSubscriptionPlan = async () => {
 
 export function useSubscriptionPlanQuery() {
   const { data } = useQuery({
-    queryKey: ["subscriptions-plan"],
+    queryKey: [QueryKey.subscriptionPlan],
     queryFn: fetchSubscriptionPlan,
-    staleTime: 60 * 60 * 1000,
   });
 
   if (!data) {

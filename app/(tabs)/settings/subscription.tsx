@@ -2,6 +2,7 @@ import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import CheckCircleIcon from "@/component/icons/check-circle-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
+import { QueryKey } from "@/constants/query-keys";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -48,7 +49,7 @@ export default function Subscription() {
   const { isPending, mutate } = useMutation({
     mutationFn: cancelSubscriptionPlan,
     async onSuccess() {
-      await queryClient.invalidateQueries({ queryKey: ["subscriptions-plan"] });
+      await queryClient.invalidateQueries({ queryKey: [QueryKey.subscriptionPlan] });
       showFeedBack({
         title: "Подписка отменена!",
         message: "Вы отменили свою подписку.",

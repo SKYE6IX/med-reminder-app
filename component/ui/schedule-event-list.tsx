@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -8,7 +9,7 @@ import { api } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, Platform, StyleSheet, View } from "react-native";
 import notifee from "react-native-notify-kit";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScheduleEventCard from "./cards/schedule-event-card";
@@ -38,14 +39,19 @@ const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
 
   return response.data;
 };
+
 const cancelEventNotifications = async (eventId: string) => {
   const pendingAppNotifications = await notifee.getTriggerNotifications();
+
   const eventToCancel = pendingAppNotifications.find((appNotification) => {
     const data = appNotification.notification.data as unknown as NotificationData;
     return data.dosageScheduleEventId === eventId;
   });
+
   const notificationData = eventToCancel?.notification.data as unknown as NotificationData;
-  await NotificationHelper.removeNotificationsWithKey(notificationData.storageKey as string);
+  if (notificationData) {
+    await NotificationHelper.removeNotificationsWithKey(notificationData.storageKey as string);
+  }
 };
 
 export default function ScheduleEventList({
@@ -90,7 +96,7 @@ export default function ScheduleEventList({
     mutationFn: updateScheduleEventMutaion,
     async onSuccess(data, variables) {
       queryClient.setQueryData(
-        ["schedule-events", selectedDate],
+        [QueryKey.scheduleEvents, selectedDate],
         (existingData: MedicationScheduleEventResponse[]) =>
           existingData.map((scheduleEvent) =>
             scheduleEvent.id === variables.id ? data : scheduleEvent,
@@ -99,8 +105,8 @@ export default function ScheduleEventList({
 
       // Inavlidate
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
         cancelEventNotifications(data.id),
       ]);
 
@@ -109,7 +115,7 @@ export default function ScheduleEventList({
       // check if user has a pack to refill, and if their refill
       // is near.
       const medicationProfile = queryClient
-        .getQueryState<MedicationPackResponse[]>(["medication-packs"])
+        .getQueryState<MedicationPackResponse[]>([QueryKey.medicationPack])
         ?.data?.find(
           (pack) =>
             pack.medicationProfileId === data.medicationProfileId && pack.status === "ACTIVE",
@@ -131,6 +137,8 @@ export default function ScheduleEventList({
     },
   });
 
+  const bottom = Platform.OS === "ios" ? insets.bottom + 10 : 10;
+
   return (
     <View style={{ flex: 1 }}>
       <View style={styles.tabsWrapper}>
@@ -147,7 +155,7 @@ export default function ScheduleEventList({
           />
         )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[styles.listContentContainer, { paddingBottom: insets.bottom + 10 }]}
+        contentContainerStyle={[styles.listContentContainer, { paddingBottom: bottom }]}
       />
       <Loader visible={isPending} />
     </View>

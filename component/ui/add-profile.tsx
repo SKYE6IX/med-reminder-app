@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -66,7 +67,7 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
   const { isPending, mutate } = useMutation({
     mutationFn: addRelationProfileMutation,
     onSuccess(data) {
-      queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
+      queryClient.setQueryData([QueryKey.profiles], (existingData: ProfileResponse[]) =>
         existingData ? [...existingData, data] : [data],
       );
       onProfileAdded(data.id);
@@ -77,7 +78,6 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       });
       setFormState({ name: "", relation: "" });
     },
-
     onError() {
       showFeedBack({
         title: "Ошибка!",

@@ -4,6 +4,7 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import Tabs from "@/component/ui/tabs";
+import { QueryKey } from "@/constants/query-keys";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationPackResponse } from "@/types/medication";
@@ -40,12 +41,14 @@ const TABS = [
 export default function MedicationPacks() {
   const inset = useSafeAreaInsets();
 
+  const isIOS = Platform.OS === "ios";
+
   const { openSheet, closeSheet } = useBottomSheet();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ACTIVE");
 
   // Query Data
   const { data, isLoading } = useQuery({
-    queryKey: ["medication-packs"],
+    queryKey: [QueryKey.medicationPack],
     queryFn: fetchMedicationPacks,
   });
 
@@ -85,7 +88,8 @@ export default function MedicationPacks() {
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
-  const top = Platform.OS === "android" ? 10 : 0;
+  const top = isIOS ? 0 : 10;
+  const bottom = isIOS ? inset.bottom + 10 : 10;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
@@ -113,10 +117,7 @@ export default function MedicationPacks() {
               />
             )}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={[
-              styles.listContentContainer,
-              { paddingBottom: inset.bottom + 10 },
-            ]}
+            contentContainerStyle={[styles.listContentContainer, { paddingBottom: bottom }]}
           />
         </React.Fragment>
       )}
@@ -168,17 +169,19 @@ const AddMedicationPackPickerSheet = ({
     mutationFn: refillMedicationPackMutation,
     async onSuccess(data, variables) {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
         queryClient.invalidateQueries({
-          queryKey: ["medication-profile", "details", variables.medicationProfileId],
+          queryKey: [QueryKey.medicationDetails, variables.medicationProfileId],
         }),
-        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
       ]);
+
       showFeedBack({
         title: "Успешно",
         message: "Пополнение добавлено в напоминание.",
         status: "success",
       });
+
       closeSheet();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },

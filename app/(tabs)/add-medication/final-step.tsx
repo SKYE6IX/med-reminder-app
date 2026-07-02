@@ -4,6 +4,7 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
+import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -135,14 +136,15 @@ export default function FinalStepScreen() {
     async onSuccess(incomingData, variable) {
       // Update the cache for medication profiles.
       queryClient.setQueryData(
-        ["medication-profile", "list"],
+        [QueryKey.medicationList],
         (existingData: MedicationProfileReponse[]) =>
           existingData ? [...existingData, incomingData] : [incomingData],
       );
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
+
         createScheduleEventNotification({
           ...notfication,
           ...reminderPreferences,

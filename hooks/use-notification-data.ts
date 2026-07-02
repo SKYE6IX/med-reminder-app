@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { useNotificationDataStore } from "@/stores/notification-data-store";
 import { MedicationScheduleEventResponse } from "@/types/medication";
 import { queryClient } from "@/utils/query-client";
@@ -13,7 +14,7 @@ export function useNotificationData({ selectedDate }: { selectedDate: string }) 
     }
 
     queryClient.setQueryData(
-      ["schedule-events", selectedDate],
+      [QueryKey.scheduleEvents, selectedDate],
       (existingData: MedicationScheduleEventResponse[]) => {
         const updatedData = existingData?.map((scheduleEvent) =>
           scheduleEvent.id === useNotificationDataStore.getState().scheduleId
@@ -26,8 +27,8 @@ export function useNotificationData({ selectedDate }: { selectedDate: string }) 
     );
 
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["medication-profile"] }),
-      queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+      queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+      queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
     ]);
   }, [selectedDate]);
 

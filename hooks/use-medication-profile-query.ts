@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +12,7 @@ const fetchMedicationProfiles = async () => {
 export function useMedicationProfileQuery() {
   // Query data list
   const { data, isLoading } = useQuery({
-    queryKey: ["medication-profile", "list"],
+    queryKey: [QueryKey.medicationList],
     queryFn: fetchMedicationProfiles,
     staleTime: 60 * 60 * 1000,
   });

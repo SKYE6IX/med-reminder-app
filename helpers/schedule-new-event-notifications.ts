@@ -11,6 +11,7 @@ const LAST_SCHEDULED_KEY = "notifications:lastScheduledAt";
 
 export const createScheduleEventNotification = async (settings: Partial<NotificationSettings>) => {
   const isoString = DateTime.now().toISO({ precision: "minute" });
+
   try {
     const response = await api.get<MedicationScheduleEventResponse[]>(
       "medications/schedules/upcoming",
@@ -26,7 +27,6 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
 
     // Inocming events
     const newEvents = response.data;
-
     // Get all the current pending notification
     const pendingAppNotifications = await notifee.getTriggerNotifications();
     // We get only notifications with notificationType of due, it has all the keys

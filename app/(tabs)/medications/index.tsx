@@ -24,6 +24,8 @@ export default function Medications() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  const isIOS = Platform.OS === "ios";
+
   const isMounted = useRef(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
@@ -53,7 +55,6 @@ export default function Medications() {
       setRefreshKey((prev) => prev + 1);
     }, []),
   );
-
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
   };
@@ -72,10 +73,12 @@ export default function Medications() {
     }
   };
 
-  const top = Platform.OS === "android" ? insets.top + 20 : insets.top;
+  // const top = Platform.OS === "android" ? insets.top + 20 : insets.top;
+  const top = isIOS ? insets.top : insets.top + 20;
+  const bottom = isIOS ? insets.bottom + 10 : 10;
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor: bgPrimary }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor: bgPrimary }} edges={["top"]}>
       <Loader visible={isLoading || isPending} />
       {!isLoading && (
         <>
@@ -97,15 +100,12 @@ export default function Medications() {
                     />
                   )}
                   keyExtractor={(item) => item.id}
-                  contentContainerStyle={[
-                    styles.listContentContainer,
-                    { paddingBottom: insets.bottom + 10 },
-                  ]}
+                  contentContainerStyle={[styles.listContentContainer, { paddingBottom: bottom }]}
                 />
               )}
             </View>
           ) : (
-            <View style={[styles.noContentWrapper, { paddingBottom: insets.bottom + 10 }]}>
+            <View style={[styles.noContentWrapper, { paddingBottom: bottom }]}>
               <Image
                 source={require("@/assets/images/pill-bottle.png")}
                 style={styles.noContentImage}

@@ -53,7 +53,7 @@ export const createNextScheduleEventNotification = async (
       anchorDate = DateTime.now().toISO({ precision: "minute" });
     }
 
-    const response = await api.get<MedicationScheduleEventResponse[]>(
+    const upcomingEvents = await api.get<MedicationScheduleEventResponse[]>(
       "medications/schedules/upcoming",
       {
         params: {
@@ -63,11 +63,11 @@ export const createNextScheduleEventNotification = async (
       },
     );
 
-    if (!response.data.length) {
+    if (!upcomingEvents.data.length) {
       return;
     }
 
-    const events = response.data;
+    const events = upcomingEvents.data;
     const newEvents = events.filter((event) => !pendingMaps.has(event.id));
 
     if (!newEvents.length) {

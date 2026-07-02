@@ -1,4 +1,5 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
+import { QueryKey } from "@/constants/query-keys";
 import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -28,7 +29,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
     mutationFn: deleteMedicationProfileMutation,
     async onSuccess(data, variables) {
       queryClient.setQueryData(
-        ["medication-profile", "list"],
+        [QueryKey.medicationList],
         (existingData: MedicationProfileReponse[]) =>
           existingData.filter((oldData) => oldData.id !== variables),
       );
@@ -36,12 +37,11 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
       router.back();
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["schedule-events"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-refill-packs"] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
         cancelEventNotification({ medProfileId: medicationProfileId }),
       ]);
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         showFeedBack({

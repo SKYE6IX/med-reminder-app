@@ -12,6 +12,7 @@ import { useNotificationDataStore } from "@/stores/notification-data-store";
 import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import notifee, {
+  AlarmType,
   AndroidImportance,
   AndroidVisibility,
   AuthorizationStatus,
@@ -48,7 +49,13 @@ export class NotificationHelper {
 
     if (!this.settings.enable || dueReminder < now) return;
 
-    await NotificationHelper.setAndroidCategories();
+    // @Platfrom ANDROID ONLY
+    const channelId = await this.registerAndroidChannel({
+      id: "due-notification-reminder",
+      alertSound: this.settings.alertSound,
+    });
+
+    await NotificationHelper.setIOSCategories();
 
     // Composition of all snoozes
     const snoozeReminders = Array.from({ length: MAX_SNOOZE_REPEAT }, (_, i) => ({
@@ -57,7 +64,6 @@ export class NotificationHelper {
     }));
 
     // Storages keys
-    // Due alarm storage keys
     const dueStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "due-reminder",
       medProfileId: options.medicationProfileId,
@@ -68,17 +74,10 @@ export class NotificationHelper {
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
     });
-
     const missedStorageKey = NotificationHelper.createNotificationStorageKey({
       prefix: "missed-reminder",
       medProfileId: options.medicationProfileId,
       scheduleAt: options.scheduleAt,
-    });
-
-    // @Platfrom ANDROID ONLY
-    const channelId = await this.registerAndroidChannel({
-      id: "reminder",
-      alertSound: this.settings.alertSound,
     });
 
     const eventNotificationKeys = [dueStorageKey, earlyStorageKey, missedStorageKey];
@@ -171,7 +170,7 @@ export class NotificationHelper {
     const date = DateTime.fromISO(scheduleAt).toJSDate();
     // @Platfrom ANDROID ONLY
     const channelId = await this.registerAndroidChannel({
-      id: "reminder",
+      id: "refill-notification-reminder",
       alertSound: this.settings.alertSound,
     });
 
@@ -196,13 +195,17 @@ export class NotificationHelper {
         medicationProfileId,
       },
     });
+
     await saveToStorage(storageKey, notificationId);
   }
 
   // CHECK FOR PERMISSION
   public static async checkNotificationPermission() {
     const settings = await notifee.getNotificationSettings();
-    if (settings.authorizationStatus === AuthorizationStatus.AUTHORIZED) {
+    if (
+      settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+      settings.ios.authorizationStatus === AuthorizationStatus.AUTHORIZED
+    ) {
       return true;
     } else if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
       return false;
@@ -234,31 +237,31 @@ export class NotificationHelper {
     }
   }
 
-  // A CALLBACK IF NOTIFCATION OPEN THE APP OR ACTION BTN
-  // WAS CHOOSE WHILE THE APP ISN'T KILLED
+  // A CALLBACK TO HANDLE BACKGROUND EVENTS OF NOTIFICATIONS
   public static handleOnBackgroundEvent() {
     notifee.onBackgroundEvent(async ({ type, detail }) => {
       const { notification, pressAction } = detail;
-
       const data = notification?.data as unknown as NotificationData;
-
-      if (type === EventType.ACTION_PRESS) {
-        if (pressAction?.id === "taken") {
-          await NotificationHelper.updateSchdeuleEventsAction(
-            "TAKEN",
-            data.dosageScheduleEventId ?? "",
-          );
-        } else if (pressAction?.id === "missed") {
-          await NotificationHelper.updateSchdeuleEventsAction(
-            "MISSED",
-            data.dosageScheduleEventId ?? "",
-          );
+      try {
+        if (type === EventType.ACTION_PRESS) {
+          if (pressAction?.id === "taken") {
+            await NotificationHelper.updateSchdeuleEventsAction(
+              "TAKEN",
+              data.dosageScheduleEventId,
+            );
+            await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
+          } else if (pressAction?.id === "missed") {
+            await NotificationHelper.updateSchdeuleEventsAction(
+              "MISSED",
+              data.dosageScheduleEventId,
+            );
+            await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
+          }
         }
+        return Promise.resolve();
+      } catch (error) {
+        console.log("An error occur inisde the background event: ", error);
       }
-
-      await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
-
-      return Promise.resolve();
     });
   }
 
@@ -268,6 +271,7 @@ export class NotificationHelper {
     return notifee.onForegroundEvent(async ({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
+          // Do nothing with the notifcaton if use dismiss it
           break;
         case EventType.PRESS:
           const { notification } = detail;
@@ -315,6 +319,8 @@ export class NotificationHelper {
   }
 
   public static async removeNotificationsWithKey(key: string) {
+    if (!key) return;
+
     let storageKey: string | string[];
     try {
       storageKey = JSON.parse(key);
@@ -335,6 +341,7 @@ export class NotificationHelper {
 
   // PRIVATE HELPERS
   private async registerAndroidChannel({ id, alertSound }: { id: string; alertSound: string }) {
+    const androidSound = alertSound.replace(/\.[^/.]+$/, "");
     const channelId = await notifee.createChannel({
       id,
       name: "MedRemindR",
@@ -343,7 +350,7 @@ export class NotificationHelper {
       visibility: this.settings.showOnLockScreen
         ? AndroidVisibility.PUBLIC
         : AndroidVisibility.SECRET,
-      ...(this.settings.sound === "enable" && { sound: alertSound }),
+      ...(this.settings.sound === "enable" && { sound: androidSound }),
     });
     return channelId;
   }
@@ -366,6 +373,9 @@ export class NotificationHelper {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: time,
+      alarmManager: {
+        type: AlarmType.SET_ALARM_CLOCK,
+      },
     };
 
     return await notifee.createTriggerNotification(
@@ -374,6 +384,9 @@ export class NotificationHelper {
         body,
         android: {
           channelId: channelId,
+          pressAction: {
+            id: "default",
+          },
           ...(showQuickActions && {
             actions: [
               { title: "Taken", pressAction: { id: "taken" } },
@@ -405,7 +418,7 @@ export class NotificationHelper {
     );
   }
 
-  private static async setAndroidCategories() {
+  private static async setIOSCategories() {
     await notifee.setNotificationCategories([
       {
         id: "due-reminder",
@@ -423,7 +436,11 @@ export class NotificationHelper {
     ]);
   }
 
-  private static async updateSchdeuleEventsAction(action: ScheduleAction, scheduleId: string) {
+  private static async updateSchdeuleEventsAction(
+    action: ScheduleAction,
+    scheduleId: string | undefined,
+  ) {
+    if (!scheduleId) return;
     try {
       const eventResponse = await api.put<MedicationScheduleEventResponse>(
         `medications/schedules/event/${scheduleId}`,

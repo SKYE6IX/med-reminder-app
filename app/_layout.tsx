@@ -1,5 +1,6 @@
 import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
+import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -25,6 +26,7 @@ import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
+
 SplashScreen.setOptions({
   duration: 1000,
   fade: true,
@@ -61,60 +63,63 @@ export default function RootLayout() {
 
   async function bootstrap() {
     // Check for valid token and authorized user with it.
-    const token = await getValidAccessToken();
+    try {
+      const token = await getValidAccessToken();
+      if (token) {
+        // Prefetch Applications Datas
+        await Promise.all([
+          queryClient.prefetchQuery({
+            queryKey: [QueryKey.subscriptionPlan],
+            queryFn: async () => {
+              const res = await api.get("subscriptions");
+              return res.data;
+            },
+          }),
 
-    if (token) {
-      // Prefetch Applications Datas
-      await Promise.all([
-        queryClient.prefetchQuery({
-          queryKey: ["subscriptions-plan"],
-          queryFn: async () => (await api.get("subscriptions")).data,
-        }),
+          queryClient.prefetchQuery({
+            queryKey: [QueryKey.medicationList],
+            queryFn: async () => {
+              const res = await api.get("medications");
+              return res.data;
+            },
+          }),
+          // Generate next medicatiion schedule events if available
+          createNextScheduleEventNotification({
+            ...useAppSettingsStore.getState().notfication,
+            ...useAppSettingsStore.getState().reminderPreferences,
+          }),
+        ]);
 
-        queryClient.prefetchQuery({
-          queryKey: ["medication-profile", "list"],
-          queryFn: async () => (await api.get("medications")).data,
-        }),
+        getAuthorizedUser();
 
-        // Generate next medicatiion schedule events if available
-        createNextScheduleEventNotification({
-          ...useAppSettingsStore.getState().notfication,
-          ...useAppSettingsStore.getState().reminderPreferences,
-        }),
-      ]);
-
-      getAuthorizedUser();
-
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      // If user set up local device lock
-      if (useAppSettingsStore.getState().useDeviceLock && isEnrolled) {
-        const localAuthenticate = await LocalAuthentication.authenticateAsync({
-          promptMessage: "Подтвердите личность",
-          cancelLabel: "Отменить",
-          fallbackLabel: "Используйте пароль",
-        });
-        if (localAuthenticate.success) {
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        // If user set up local device lock
+        if (useAppSettingsStore.getState().useDeviceLock && isEnrolled) {
+          const localAuthenticate = await LocalAuthentication.authenticateAsync({
+            promptMessage: "Подтвердите личность",
+            cancelLabel: "Отменить",
+            fallbackLabel: "Используйте пароль",
+          });
+          if (localAuthenticate.success) {
+            useAuthStore.getState().setIsAuthenticated(true);
+          }
+        } else {
           useAuthStore.getState().setIsAuthenticated(true);
         }
       } else {
-        useAuthStore.getState().setIsAuthenticated(true);
+        useAuthStore.getState().setIsAuthenticated(false);
       }
-    } else {
-      useAuthStore.getState().setIsAuthenticated(false);
+      // Handle when app is open by a notification
+      await NotificationHelper.handleOnNotificationOpenApp();
+    } catch (error) {
+      console.error("An error occur in Bootstrap", error);
+    } finally {
+      setIsReady(true);
     }
-
-    // Handle when app is open by a notification
-    await NotificationHelper.handleOnNotificationOpenApp();
   }
 
   useEffect(() => {
-    bootstrap()
-      .then(() => setIsReady(true))
-      .catch((error) => {
-        console.log("Error occur in bootstrap -> ", error);
-        setIsReady(true);
-      });
-
+    bootstrap();
     // Susbscribe to foreground events for notifications
     const subscribe = NotificationHelper.handleOnForeGroundEvent();
     return () => subscribe();
@@ -123,9 +128,13 @@ export default function RootLayout() {
   useEffect(() => {
     // Only load the app after the fonts are loaded.
     if (isReady && (loaded || error)) {
-      SplashScreen.hideAsync();
+      SplashScreen.hide();
     }
   }, [error, isReady, loaded]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -168,16 +177,3 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
-
-// NOTE:
-// We have a situation, when user doesn't allow notification to our app,
-// whhic mean we can't set a notification for them. What shall we do:
-// 1. Allow them to create a medication, but alert them that they won't receive a
-//  notifications for this particular medications.
-
-// 2. Prevent them from creating a medication, since after a creation of medication
-//  we are creating a notification, and this will throw an error if the user does
-//  not allow our app to acess notification.
-
-// In both cases, we need to handle all situation so that our app won't break
-// or cause an error whcih user won't like.

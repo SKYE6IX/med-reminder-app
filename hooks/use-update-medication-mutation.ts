@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
 import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -47,7 +48,7 @@ export default function useUpdateMedicationMutation({
       const { data: variableData, id } = variables;
 
       queryClient.setQueryData(
-        ["medication-profile", "list"],
+        [QueryKey.medicationList],
         (existingData: MedicationProfileReponse[]) => {
           return existingData.map((oldData) =>
             oldData.id === incomingData.id ? incomingData : oldData,
@@ -55,7 +56,7 @@ export default function useUpdateMedicationMutation({
         },
       );
 
-      queryClient.setQueryData(["medication-profile", "details", id], incomingData);
+      queryClient.setQueryData([QueryKey.medicationDetails, id], incomingData);
 
       if (variableData.isActive) {
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
@@ -67,10 +68,10 @@ export default function useUpdateMedicationMutation({
         await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
       }
       if (variableData.doseQuantity) {
-        await queryClient.invalidateQueries({ queryKey: ["medication-packs"] });
+        await queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] });
       }
 
-      await queryClient.invalidateQueries({ queryKey: ["schedule-events"] });
+      await queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] });
       onSucceed && onSucceed();
       showFeedBack({
         title: "Обновлено!",

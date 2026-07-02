@@ -1,3 +1,4 @@
+import { QueryKey } from "@/constants/query-keys";
 import { ProfileResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +10,7 @@ const fetchProfiles = async () => {
 
 export function useProfilesQuery() {
   const { data, error, isLoading } = useQuery({
-    queryKey: ["profiles"],
+    queryKey: [QueryKey.profiles],
     queryFn: fetchProfiles,
     staleTime: 60 * 60 * 1000,
   });

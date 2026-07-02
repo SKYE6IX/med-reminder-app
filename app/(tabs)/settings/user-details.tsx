@@ -10,11 +10,12 @@ import AndroidDateTimeWrapper, {
 import IOSDateTimeWrapper from "@/component/ui/date-time-wrapper/date-time-wrapper.ios";
 import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
+import { QueryKey } from "@/constants/query-keys";
 
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useUserData } from "@/hooks/use-user-data";
+import { useUserQuery } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { UserResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
@@ -52,7 +53,7 @@ export default function UserDetails() {
 
   const { showFeedBack } = useFeedBackStore();
 
-  const { user } = useUserData();
+  const { user } = useUserQuery();
   const { selfProfile } = useProfilesQuery();
   const profileImageUrl = useProfileImage();
 
@@ -106,7 +107,7 @@ export default function UserDetails() {
   const { isPending, mutate } = useMutation({
     mutationFn: updateUserMutation,
     onSuccess(data) {
-      queryClient.setQueryData(["users"], data);
+      queryClient.setQueryData([QueryKey.users], data);
       showFeedBack({
         title: "Успех!",
         message: "Данные обновлены!",

@@ -1,7 +1,7 @@
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Stack } from "expo-router";
-import { ColorValue, StyleProp, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: "index",
@@ -9,17 +9,8 @@ export const unstable_settings = {
 
 export default function SettingsLayout() {
   const color = useThemeColor({}, "textPrimary");
-  const bgPrimary = useThemeColor({}, "backgroundPrimary");
 
   const { isPremiumPlan } = useSubscriptionPlanQuery();
-
-  const headerStyle: StyleProp<{
-    backgroundColor: ColorValue;
-    shadowColor: "transparent";
-  }> = {
-    shadowColor: "transparent",
-    backgroundColor: bgPrimary,
-  };
 
   return (
     <Stack>

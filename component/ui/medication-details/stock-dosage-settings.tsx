@@ -1,6 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
+import { QueryKey } from "@/constants/query-keys";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -26,7 +27,7 @@ type AddMedicationPackSheetProps = {
   closeSheet: () => void;
 };
 
-const addNewMedicationPackMutation = async (body: MedicationPackCreation) => {
+const addMedicationPackMutation = async (body: MedicationPackCreation) => {
   const response = await api.post<AddMedicationPackReponse>("medications/packs", body);
   return response.data;
 };
@@ -117,12 +118,14 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
   };
 
   const { isPending, mutate } = useMutation({
-    mutationFn: addNewMedicationPackMutation,
+    mutationFn: addMedicationPackMutation,
     async onSuccess() {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["medication-profile", "details"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-profile", "list"] }),
-        queryClient.invalidateQueries({ queryKey: ["medication-packs"] }),
+        queryClient.invalidateQueries({
+          queryKey: [QueryKey.medicationDetails, medicationProfile.id],
+        }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
       ]);
       showFeedBack({
         title: "Успешно",

@@ -1,6 +1,6 @@
 import WeekView from "@/component/ui/week-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useUserData } from "@/hooks/use-user-data";
+import { useUserQuery } from "@/hooks/use-user-data";
 import { MedicationScheduleEventResponse } from "@/types/medication";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -14,6 +14,7 @@ import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import ScheduleEventList from "@/component/ui/schedule-event-list";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
+import { QueryKey } from "@/constants/query-keys";
 import { useNotificationData } from "@/hooks/use-notification-data";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -35,7 +36,7 @@ const localDateString = getDateLocalString();
 export default function Home() {
   const router = useRouter();
 
-  const { user } = useUserData();
+  const { user } = useUserQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
 
@@ -45,17 +46,17 @@ export default function Home() {
   // Show premimum plan offer once to newly user.
   useEffect(() => {
     let timeout: number;
-    if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
-      timeout = setTimeout(() => {
+    timeout = setTimeout(() => {
+      if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
         subscriptionBannerRef.current?.openModal();
-      }, 2000);
-    }
+      }
+    }, 2000);
     return () => clearTimeout(timeout);
   }, [isPremiumPlan]);
 
   // Query schedule event list
   const { data, isLoading } = useQuery({
-    queryKey: ["schedule-events", selectedDate],
+    queryKey: [QueryKey.scheduleEvents, selectedDate],
     queryFn: () => fetchScheduleEvents(selectedDate),
   });
 
@@ -66,6 +67,7 @@ export default function Home() {
 
   // Update schedule event
   const hasScheduleEvents = data && data.length >= 1 ? true : false;
+
   const handleOnDateChange = (ISODate: string) => {
     const date = new Date(ISODate);
     const toLocalDateString = getDateLocalString(date);

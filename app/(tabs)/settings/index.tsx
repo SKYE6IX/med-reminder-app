@@ -19,7 +19,7 @@ import { NotificationHelper } from "@/helpers/notification-helper";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useUserData } from "@/hooks/use-user-data";
+import { useUserQuery } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -37,7 +37,7 @@ export default function Settings() {
 
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
-  const { user } = useUserData();
+  const { user } = useUserQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
   const { showFeedBack } = useFeedBackStore();

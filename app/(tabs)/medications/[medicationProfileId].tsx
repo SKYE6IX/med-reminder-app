@@ -8,6 +8,7 @@ import DetailsFrequencySettings from "@/component/ui/medication-details/frequenc
 import DetailsNoteSettings from "@/component/ui/medication-details/note-settings";
 import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
+import { QueryKey } from "@/constants/query-keys";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { getStartedDate } from "@/helpers/getStartedDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -31,7 +32,7 @@ export default function MedicationDetails() {
 
   // Query details data
   const { data: medicationProfile, isLoading } = useQuery({
-    queryKey: ["medication-profile", "details", medicationProfileId],
+    queryKey: [QueryKey.medicationDetails, medicationProfileId],
     queryFn: () => fetchMedicationProfileDetails(medicationProfileId as string),
     staleTime: 60 * 60 * 1000,
   });

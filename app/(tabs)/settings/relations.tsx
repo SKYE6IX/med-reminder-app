@@ -7,6 +7,7 @@ import AvatarPicker from "@/component/ui/avatar-picker";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
+import { QueryKey } from "@/constants/query-keys";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
@@ -54,7 +55,7 @@ export default function Relations() {
     mutationFn: deleteRelationProfileMutation,
 
     onSuccess(data, variables) {
-      queryClient.setQueryData(["profiles"], (existingData: ProfileResponse[]) =>
+      queryClient.setQueryData([QueryKey.profiles], (existingData: ProfileResponse[]) =>
         existingData.filter((profile) => profile.id !== variables),
       );
       closeSheet();
