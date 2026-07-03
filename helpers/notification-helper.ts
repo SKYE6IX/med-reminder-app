@@ -448,11 +448,9 @@ export class NotificationHelper {
           action,
         },
       );
-
       if (eventResponse.data) {
         useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
         const medicationPacks = await api.get<MedicationPackResponse[]>("medications/packs");
-
         if (medicationPacks.data) {
           const activePack = medicationPacks.data.find((pack) => {
             return (
@@ -460,13 +458,10 @@ export class NotificationHelper {
               pack.status === "ACTIVE"
             );
           });
-
           if (!activePack) return;
-
           const daysSupply = Math.round(
             Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
-
           if (daysSupply - 1 < activePack.reminderDays) {
             const refillDate = DateTime.now()
               .setZone(getTimeZone())

@@ -106,6 +106,9 @@ export default function ScheduleEventList({
       // Inavlidate
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+        queryClient.invalidateQueries({
+          queryKey: [QueryKey.medicationDetails, data.medicationProfileId],
+        }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
         cancelEventNotifications(data.id),
       ]);
@@ -120,7 +123,6 @@ export default function ScheduleEventList({
           (pack) =>
             pack.medicationProfileId === data.medicationProfileId && pack.status === "ACTIVE",
         );
-
       await createRefillNotification({
         medicationPack: medicationProfile,
         settings: { ...notfication, ...reminderPreferences },

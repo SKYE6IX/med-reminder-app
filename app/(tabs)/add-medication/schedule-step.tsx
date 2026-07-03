@@ -164,7 +164,7 @@ export default function ScheduleStepScreen() {
     <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }} edges={["top"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "position" : "height"}
-        style={[styles.container]}
+        style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Frequency Settings */}
@@ -280,9 +280,6 @@ export default function ScheduleStepScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   contentContainer: {
     gap: 32,
     paddingLeft: 20,

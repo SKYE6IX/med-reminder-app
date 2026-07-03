@@ -93,6 +93,7 @@ export default function RootLayout() {
         getAuthorizedUser();
 
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
         // If user set up local device lock
         if (useAppSettingsStore.getState().useDeviceLock && isEnrolled) {
           const localAuthenticate = await LocalAuthentication.authenticateAsync({
@@ -109,6 +110,7 @@ export default function RootLayout() {
       } else {
         useAuthStore.getState().setIsAuthenticated(false);
       }
+
       // Handle when app is open by a notification
       await NotificationHelper.handleOnNotificationOpenApp();
     } catch (error) {

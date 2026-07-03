@@ -20,6 +20,7 @@ import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Alert,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
@@ -221,88 +222,93 @@ export default function FinalStepScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Loader visible={isPending} />
-        {/* Refill setting container */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "position" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <Loader visible={isPending} />
+          {/* Refill setting container */}
 
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
-
-          <Animated.View
-            style={[
-              styles.refillSettingWrapper,
-              {
-                borderColor,
-                backgroundColor: bGColor,
-                overflow: isIOS ? "hidden" : undefined,
-              },
-              animatedStyle,
-            ]}
-          >
-            <View style={styles.refillSettingTop}>
-              <View style={[styles.refillSettingIcon, { backgroundColor: bGTertiary }]}>
-                <BellIcon />
-              </View>
-
-              <View style={styles.refillSettingTextWrapper}>
-                <Text style={[styles.refillSettingTextLabel, { color }]}>Напоминание</Text>
-                <Text style={[styles.refillSettingTextInfo, { color: colorMuted }]}>
-                  Уведомить до окончания запаса
-                </Text>
-              </View>
-
-              <Switch
-                onValueChange={toggleSwitch}
-                value={showRefillBox}
-                trackColor={{ false: bGTertiary, true: tintColor }}
-                thumbColor="#F7F7F7"
-                style={{ alignSelf: "center" }}
-              />
-            </View>
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
 
             <Animated.View
-              style={{
-                opacity: !isIOS ? pickersWrapperOpacity : undefined,
-                pointerEvents: showRefillBox ? "auto" : "none",
-              }}
+              style={[
+                styles.refillSettingWrapper,
+                {
+                  borderColor,
+                  backgroundColor: bGColor,
+                  overflow: isIOS ? "hidden" : undefined,
+                },
+                animatedStyle,
+              ]}
             >
-              <MedicationPackPicker
-                key={version}
-                amountInPack={amountInPack}
-                refillDaysReminder={refillDaysReminder}
-                onAmountInPackSet={handleAmountInPackSet}
-                onRefillDaysReminderSet={handleRefillDaysSet}
-                onPickerTrigger={controlFullExpand}
-                measurementValue={formState.medicationMeasurement}
-              />
+              <View style={styles.refillSettingTop}>
+                <View style={[styles.refillSettingIcon, { backgroundColor: bGTertiary }]}>
+                  <BellIcon />
+                </View>
+
+                <View style={styles.refillSettingTextWrapper}>
+                  <Text style={[styles.refillSettingTextLabel, { color }]}>Напоминание</Text>
+                  <Text style={[styles.refillSettingTextInfo, { color: colorMuted }]}>
+                    Уведомить до окончания запаса
+                  </Text>
+                </View>
+
+                <Switch
+                  onValueChange={toggleSwitch}
+                  value={showRefillBox}
+                  trackColor={{ false: bGTertiary, true: tintColor }}
+                  thumbColor="#F7F7F7"
+                  style={{ alignSelf: "center" }}
+                />
+              </View>
+
+              <Animated.View
+                style={{
+                  opacity: !isIOS ? pickersWrapperOpacity : undefined,
+                  pointerEvents: showRefillBox ? "auto" : "none",
+                }}
+              >
+                <MedicationPackPicker
+                  key={version}
+                  amountInPack={amountInPack}
+                  refillDaysReminder={refillDaysReminder}
+                  onAmountInPackSet={handleAmountInPackSet}
+                  onRefillDaysReminderSet={handleRefillDaysSet}
+                  onPickerTrigger={controlFullExpand}
+                  measurementValue={formState.medicationMeasurement}
+                />
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </View>
+          </View>
 
-        {/* Note settings */}
-        <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Заметка</Text>
-          <TextInput
-            value={medicationNote}
-            onChangeText={(value) => handleOnTextChange(value)}
-            autoCorrect={true}
-            multiline={true}
-            numberOfLines={4}
-            textAlignVertical="top"
-            scrollEnabled={true}
-            returnKeyType="default"
-            keyboardType="default"
-            placeholder="Заметка о лекарстве"
-            placeholderTextColor="#9E9E9E"
-            maxLength={500}
-            style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
-          />
-        </View>
+          {/* Note settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>Заметка</Text>
+            <TextInput
+              value={medicationNote}
+              onChangeText={(value) => handleOnTextChange(value)}
+              autoCorrect={true}
+              multiline={true}
+              numberOfLines={4}
+              textAlignVertical="top"
+              scrollEnabled={true}
+              returnKeyType="default"
+              keyboardType="default"
+              placeholder="Заметка о лекарстве"
+              placeholderTextColor="#9E9E9E"
+              maxLength={500}
+              style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
+            />
+          </View>
 
-        <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
-        {/* SUBSCRIPTION OFFER */}
-        <SubscriptionBanner ref={openBannerRef} />
-      </ScrollView>
+          <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
+          {/* SUBSCRIPTION OFFER */}
+          <SubscriptionBanner ref={openBannerRef} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

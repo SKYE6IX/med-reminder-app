@@ -45,16 +45,26 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
   const startedDate = getStartedDate(pack.startedAt);
   const endedDate = getStartedDate(pack.endedAt);
   const showRefillButton = pack.status !== "PENDING" && !pack.isRefilled;
-  const badgeLabel =
-    pack.status === "ACTIVE"
-      ? "Заканчивается"
-      : pack.status === "PENDING"
-        ? "Пополнено"
-        : "Закончилось";
-  const badgeColor =
-    pack.status === "ACTIVE" ? "#DC0000" : pack.status === "PENDING" ? "#009E00" : "#9E9E9E";
-  const tintColor = useThemeColor({}, "tint");
 
+  const badgeLabel =
+    pack.status === "ACTIVE" && isPackDepleted(pack)
+      ? "Заканчивается"
+      : pack.status === "ACTIVE" && pack.isRefilled
+        ? "Пополнено"
+        : pack.status === "PENDING"
+          ? "Пополнено"
+          : "Закончилось";
+
+  const badgeColor =
+    pack.status === "ACTIVE" && isPackDepleted(pack)
+      ? "#DC0000"
+      : pack.status === "ACTIVE" && pack.isRefilled
+        ? "#009E00"
+        : pack.status === "PENDING"
+          ? "#009E00"
+          : "#9E9E9E";
+
+  const tintColor = useThemeColor({}, "tint");
   return (
     <View style={sharedStyles.card}>
       {/* Container */}
@@ -109,7 +119,10 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
       </View>
 
       {/* Badge will be shown for a pending pack, to indicate a pack as been added! */}
-      {(isPackDepleted(pack) || pack.status === "PENDING" || pack.status === "COMPLETED") && (
+      {(isPackDepleted(pack) ||
+        (pack.status === "ACTIVE" && pack.isRefilled) ||
+        pack.status === "PENDING" ||
+        pack.status === "COMPLETED") && (
         <View style={[sharedStyles.badge, { backgroundColor: badgeColor }]}>
           <Text style={sharedStyles.badgeText}>{badgeLabel}</Text>
         </View>

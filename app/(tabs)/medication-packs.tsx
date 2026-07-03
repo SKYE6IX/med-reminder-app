@@ -121,6 +121,7 @@ export default function MedicationPacks() {
           />
         </React.Fragment>
       )}
+
       {!isLoading && data && data.length <= 0 && (
         <View style={styles.noContentWrapper}>
           <Image
