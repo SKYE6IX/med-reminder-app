@@ -78,13 +78,11 @@ export default function Home() {
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
-
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: bgPrimary }]} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary }} edges={["top"]}>
       <Loader visible={isLoading} />
       <View style={styles.container}>
         {/* HEADER */}
-
         <View style={styles.header}>
           <View style={styles.headerProfileContainer}>
             <Image
@@ -133,15 +131,10 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
-
   container: {
     flex: 1,
-    gap: 32,
+    gap: 16,
   },
-
   header: {
     height: 60,
     flexDirection: "row",

@@ -92,7 +92,7 @@ export default function MedicationListCard({
             <Text
               style={sharedStyles.cardTextMedium}
             >{`${medicationProfile.schedule.dosage} ${dosageUnit}`}</Text>
-            <Text style={sharedStyles.cardTextMedium}>Начало, {startedDate}</Text>
+            <Text style={sharedStyles.cardTextMedium}>Начало: {startedDate}</Text>
 
             {!medicationProfile.profile.isSelf && (
               <View style={sharedStyles.profile}>
