@@ -1,6 +1,7 @@
 import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
 import { QueryKey } from "@/constants/query-keys";
+import { logOverdueEvents } from "@/helpers/log-overdue-event";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -75,7 +76,6 @@ export default function RootLayout() {
               return res.data;
             },
           }),
-
           queryClient.prefetchQuery({
             queryKey: [QueryKey.medicationList],
             queryFn: async () => {
@@ -83,6 +83,7 @@ export default function RootLayout() {
               return res.data;
             },
           }),
+          logOverdueEvents(),
           // Generate next medicatiion schedule events if available
           createNextScheduleEventNotification({
             ...useAppSettingsStore.getState().notfication,
@@ -91,7 +92,6 @@ export default function RootLayout() {
         ]);
 
         getAuthorizedUser();
-
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 
         // If user set up local device lock
