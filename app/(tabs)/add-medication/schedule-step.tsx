@@ -163,7 +163,7 @@ export default function ScheduleStepScreen() {
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }} edges={["top"]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "position" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.contentContainer}>

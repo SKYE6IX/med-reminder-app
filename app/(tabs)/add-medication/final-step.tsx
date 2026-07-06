@@ -221,18 +221,16 @@ export default function FinalStepScreen() {
   const top = isIOS ? 0 : insets.top + 10;
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }}>
+    <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }} edges={["top"]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "position" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <Loader visible={isPending} />
           {/* Refill setting container */}
-
           <View style={sharedStyles.sectionContainer}>
             <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
-
             <Animated.View
               style={[
                 styles.refillSettingWrapper,
