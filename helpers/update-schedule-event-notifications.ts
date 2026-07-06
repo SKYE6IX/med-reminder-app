@@ -8,6 +8,7 @@ import { createScheduleEventNotification } from "./schedule-new-event-notificati
 export const updateScheduleEventNotifications = async (settings: Partial<NotificationSettings>) => {
   try {
     const pendingAppNotifications = await notifee.getTriggerNotifications();
+
     const refillPending = pendingAppNotifications.find((appNotification) => {
       const data = appNotification.notification?.data as unknown as NotificationData;
       return data.notificationType === "refill";
@@ -15,6 +16,7 @@ export const updateScheduleEventNotifications = async (settings: Partial<Notific
 
     // Nuke all existing notifications
     await NotificationHelper.cancelAllNotifications();
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Create a new notification for pills with the updated settings
     await createScheduleEventNotification(settings);

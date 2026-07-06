@@ -5,6 +5,7 @@ import PhoneIcon from "@/component/icons/phone-icon";
 import SignalIcon from "@/component/icons/signal-icon";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
+import { NotificationHelper } from "@/helpers/notification-helper";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -65,39 +66,40 @@ export default function Notifications() {
     if (!isPremiumPlan) {
       // Settings for basic account
       setNotificationSetting({ sound: value as soundType });
-      await updateScheduleEventNotifications({
-        ...notfication,
-        ...reminderPreferences,
-        sound: value as NotificationSoundMode,
-      });
-    } else {
-      // Setting for pro account
       if (value === "silent") {
-        setNotificationSetting({ sound: value });
+        await NotificationHelper.cancelAllNotifications();
+      } else {
         await updateScheduleEventNotifications({
           ...notfication,
           ...reminderPreferences,
-          sound: value,
+          sound: value as NotificationSoundMode,
         });
+      }
+    } else {
+      // Settings for pro account
+      if (value === "silent") {
+        setNotificationSetting({ sound: value });
+        await NotificationHelper.cancelAllNotifications();
       } else {
         if (timeoutId.current) {
           clearTimeout(timeoutId.current);
         }
+
         if (value === "universfield_soft.wav") {
           player.replace(universfieldSoft);
         } else if (value === "universfield_passive.wav") {
           player.replace(universfieldPassive);
-        } else {
+        } else if (value === "dragon_wavy.wav") {
           player.replace(dragonWavy);
         }
+
+        player.seekTo(0);
         player.play();
-
-        setNotificationSetting({ sound: "enable", alertSound: value });
-
         setTimeout(() => {
           player.pause();
-        }, 6000);
+        }, 5000);
 
+        setNotificationSetting({ sound: "enable", alertSound: value });
         // We wait atleat 8 second before we recreate
         // the new sound for user notification
         timeoutId.current = setTimeout(async () => {
@@ -107,7 +109,8 @@ export default function Notifications() {
             sound: "enable",
             alertSound: value,
           });
-        }, 8000);
+          timeoutId.current = null;
+        }, 6000);
       }
     }
   };

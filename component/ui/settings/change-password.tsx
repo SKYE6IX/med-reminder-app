@@ -1,6 +1,8 @@
+import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import { clearTokens } from "@/utils/tokenUtils";
 import { validateChangePasswordInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
@@ -27,6 +29,7 @@ const resetPasswordMutation = async (resetData: FormState) => {
 
 export default function ChangePassword() {
   const { showFeedBack } = useFeedBackStore();
+  const { closeSheet } = useBottomSheet();
 
   const [changePasswordState, setChangePasswordState] = useState<ChangePasswordState>({
     formState: {
@@ -78,16 +81,26 @@ export default function ChangePassword() {
 
   const { isPending, mutate } = useMutation({
     mutationFn: resetPasswordMutation,
-    onSuccess() {
+    async onSuccess() {
       showFeedBack({
         title: "Пароль изменен!",
         message: "Успешно смените пароль!",
         status: "success",
       });
-      clearTokens();
+
+      setChangePasswordState({
+        formState: {
+          oldPassword: "",
+          newPassword: "",
+        },
+        errorsSet: new Set(),
+      });
+
+      queryClient.clear();
+      closeSheet();
+      await clearTokens();
       useAuthStore.getState().setIsAuthenticated(false);
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
@@ -118,7 +131,6 @@ export default function ChangePassword() {
     } else if (changePasswordState.errorsSet.has("repeatPassword")) {
       return;
     }
-
     mutate(validatedInputs.data);
   };
 

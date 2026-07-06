@@ -52,6 +52,7 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
           return NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
         }),
       );
+
       pendingMaps.clear();
     }
 

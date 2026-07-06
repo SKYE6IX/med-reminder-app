@@ -52,13 +52,10 @@ const TOKEN_LENGTH = 6;
 const RETRY_AFTER_SECONDS = 60;
 
 export default function OTPVerificationScreen() {
+  const { showFeedBack } = useFeedBackStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
   const inputRefs = useRef<TextInput[]>([]);
-
-  const { showFeedBack } = useFeedBackStore();
-  const { requestResetPasswordToken } = useRequestResetPasswordToken({ onSuccessAction() {} });
 
   const [otpState, setOtpState] = useState<OTPState>({
     userEmail: "",
@@ -66,6 +63,12 @@ export default function OTPVerificationScreen() {
     inputValues: new Array(TOKEN_LENGTH).fill(""),
     focusedIndex: null,
     retryAfter: RETRY_AFTER_SECONDS,
+  });
+
+  const { requestResetPasswordToken } = useRequestResetPasswordToken({
+    onSuccessAction() {
+      setOtpState((prvState) => ({ ...prvState, retryAfter: RETRY_AFTER_SECONDS }));
+    },
   });
 
   // Consumed the user email from an Async local storage for
@@ -250,7 +253,7 @@ export default function OTPVerificationScreen() {
             onPress={handleVerifyToken}
             disabled={!isTokenFilled}
             variant={isTokenFilled ? "filled" : "disabled"}
-            textVaraint={isTokenFilled ? "mutedText" : "regularText"}
+            textVaraint={isTokenFilled ? "regularText" : "mutedText"}
           />
         </View>
       </ScrollView>

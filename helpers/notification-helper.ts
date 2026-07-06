@@ -51,7 +51,6 @@ export class NotificationHelper {
 
     // @Platfrom ANDROID ONLY
     const channelId = await this.registerAndroidChannel({
-      id: "due-notification-reminder",
       alertSound: this.settings.alertSound,
     });
 
@@ -170,7 +169,6 @@ export class NotificationHelper {
     const date = DateTime.fromISO(scheduleAt).toJSDate();
     // @Platfrom ANDROID ONLY
     const channelId = await this.registerAndroidChannel({
-      id: "refill-notification-reminder",
       alertSound: this.settings.alertSound,
     });
 
@@ -340,10 +338,18 @@ export class NotificationHelper {
   }
 
   // PRIVATE HELPERS
-  private async registerAndroidChannel({ id, alertSound }: { id: string; alertSound: string }) {
+  private async registerAndroidChannel({ alertSound }: { alertSound: string }) {
+    // We delete all the previous ID that might have being
+    // created.
+
+    const channelIds = await notifee.getChannels();
+    for (const id in channelIds) {
+      await notifee.deleteChannel(id);
+    }
+
     const androidSound = alertSound.replace(/\.[^/.]+$/, "");
     const channelId = await notifee.createChannel({
-      id,
+      id: `medremindr_${Date.now()}`,
       name: "MedRemindR",
       vibration: this.settings.vibration,
       importance: AndroidImportance.HIGH,
@@ -352,6 +358,7 @@ export class NotificationHelper {
         : AndroidVisibility.SECRET,
       ...(this.settings.sound === "enable" && { sound: androidSound }),
     });
+
     return channelId;
   }
 
