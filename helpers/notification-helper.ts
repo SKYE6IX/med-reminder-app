@@ -227,6 +227,7 @@ export class NotificationHelper {
   // A CALLBACK IF NOTIFICATION OPEN THE APP
   public static async handleOnNotificationOpenApp() {
     const initialNotification = await notifee.getInitialNotification();
+
     if (initialNotification) {
       const data = initialNotification.notification.data as unknown as NotificationData;
       if (initialNotification.pressAction.id === "default" && data) {
@@ -339,16 +340,15 @@ export class NotificationHelper {
 
   // PRIVATE HELPERS
   private async registerAndroidChannel({ alertSound }: { alertSound: string }) {
-    // We delete all the previous ID that might have being
-    // created.
-
+    // // We delete all the previous ID that might have being
+    // // created.
     const channelIds = await notifee.getChannels();
     for (const id in channelIds) {
       await notifee.deleteChannel(id);
     }
 
     const androidSound = alertSound.replace(/\.[^/.]+$/, "");
-    const channelId = await notifee.createChannel({
+    return await notifee.createChannel({
       id: `medremindr_${Date.now()}`,
       name: "MedRemindR",
       vibration: this.settings.vibration,
@@ -358,8 +358,6 @@ export class NotificationHelper {
         : AndroidVisibility.SECRET,
       ...(this.settings.sound === "enable" && { sound: androidSound }),
     });
-
-    return channelId;
   }
 
   private async createNotificationTrigger({
@@ -391,6 +389,8 @@ export class NotificationHelper {
         body,
         android: {
           channelId: channelId,
+          importance: AndroidImportance.HIGH,
+          showTimestamp: true,
           pressAction: {
             id: "default",
           },

@@ -78,6 +78,7 @@ export default function Home() {
   const color = useThemeColor({}, "textPrimary");
   const mutedColor = useThemeColor({}, "textMuted");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary }} edges={["top"]}>
       <Loader visible={isLoading} />
