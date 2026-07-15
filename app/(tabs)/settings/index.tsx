@@ -61,15 +61,23 @@ export default function Settings() {
 
     onError(error) {
       if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+            status: "error",
+          });
+        }
         console.log("An axios error occur in sign out mutation -> ", error);
       } else {
         console.log("An unknown error occur in sign out mutation   -> ", error);
       }
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
-        status: "error",
-      });
     },
   });
 

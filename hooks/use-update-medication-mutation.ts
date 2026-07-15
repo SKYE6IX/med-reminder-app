@@ -4,7 +4,7 @@ import { createScheduleEventNotification } from "@/helpers/schedule-new-event-no
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfileReponse } from "@/types/medication";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 
@@ -79,15 +79,26 @@ export default function useUpdateMedicationMutation({
         status: "success",
       });
     },
-    onError() {
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+            status: "error",
+          });
+        }
+      }
       console.log("An error occur when performing update from " + name);
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
-        status: "error",
-      });
     },
   });
+
   return {
     mutate,
     isPending,

@@ -121,8 +121,11 @@ export default function ScheduleEventList({
         .getQueryState<MedicationPackResponse[]>([QueryKey.medicationPack])
         ?.data?.find(
           (pack) =>
-            pack.medicationProfileId === data.medicationProfileId && pack.status === "ACTIVE",
+            pack.medicationProfileId === data.medicationProfileId &&
+            pack.status === "ACTIVE" &&
+            !pack.isRefilled,
         );
+
       await createRefillNotification({
         medicationPack: medicationProfile,
         settings: { ...notfication, ...reminderPreferences },

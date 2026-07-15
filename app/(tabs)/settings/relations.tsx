@@ -14,7 +14,7 @@ import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -62,12 +62,22 @@ export default function Relations() {
     },
 
     onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            status: "error",
+          });
+        }
+      }
       console.log("An error occur when try to delete profile: ", error);
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
-        status: "error",
-      });
       closeSheet();
     },
   });

@@ -3,7 +3,7 @@ import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useMutation } from "@tanstack/react-query";
@@ -78,12 +78,22 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       });
       setFormState({ name: "", relation: "" });
     },
-    onError() {
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
-        status: "error",
-      });
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

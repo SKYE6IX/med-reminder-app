@@ -2,7 +2,6 @@ import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
 import { QueryKey } from "@/constants/query-keys";
 import { logOverdueEvents } from "@/helpers/log-overdue-event";
-import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -110,9 +109,6 @@ export default function RootLayout() {
       } else {
         useAuthStore.getState().setIsAuthenticated(false);
       }
-
-      // Handle when app is open by a notification
-      await NotificationHelper.handleOnNotificationOpenApp();
     } catch (error) {
       console.error("An error occur in Bootstrap", error);
     } finally {
@@ -123,8 +119,8 @@ export default function RootLayout() {
   useEffect(() => {
     bootstrap();
     // Susbscribe to foreground events for notifications
-    const subscribe = NotificationHelper.handleOnForeGroundEvent();
-    return () => subscribe();
+    // const subscribe = NotificationHelper.handleOnForeGroundEvent();
+    // return () => subscribe();
   }, []);
 
   useEffect(() => {

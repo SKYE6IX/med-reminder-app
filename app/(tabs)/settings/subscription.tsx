@@ -6,7 +6,7 @@ import { QueryKey } from "@/constants/query-keys";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { getDateLocalString } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
@@ -59,11 +59,21 @@ export default function Subscription() {
     },
 
     onError(error) {
-      showFeedBack({
-        title: "Что-то пошло не так!",
-        message: "Пожалуйста, попробуйте еще раз!",
-        status: "error",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Что-то пошло не так!",
+            message: "Пожалуйста, попробуйте еще раз!",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

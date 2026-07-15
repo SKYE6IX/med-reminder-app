@@ -41,6 +41,7 @@ export default function Medications() {
     if (activeTab === "ALL") {
       return data;
     }
+
     return data?.filter((medProfile) => medProfile.status.toUpperCase() === activeTab);
   }, [activeTab, data]);
 

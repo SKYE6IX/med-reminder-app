@@ -101,9 +101,16 @@ export default function ChangePassword() {
       await clearTokens();
       useAuthStore.getState().setIsAuthenticated(false);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else if (error.response?.status === 401) {
           showFeedBack({ title: "Ошибка!", message: "Неверный старый пароль.", status: "error" });
         } else {
           showFeedBack({

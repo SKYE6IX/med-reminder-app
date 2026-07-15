@@ -18,7 +18,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserQuery } from "@/hooks/use-user-data";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { UserResponse } from "@/types/user";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -115,12 +115,22 @@ export default function UserDetails() {
       });
     },
 
-    onError() {
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
-        status: "error",
-      });
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

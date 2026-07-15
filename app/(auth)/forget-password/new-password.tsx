@@ -5,7 +5,7 @@ import Loader from "@/component/ui/loader";
 import { readFromStorage, removeFromStorage } from "@/helpers/storage-manager";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { clearTokens } from "@/utils/tokenUtils";
 import { validateResetPasswordInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
@@ -60,12 +60,22 @@ export default function NewPasswordScreen() {
         removeFromStorage(STORAGE_KEY_TOKEN),
       ]);
     },
-    onError() {
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пробовать снова.",
-        status: "error",
-      });
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так. Пробовать снова.",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

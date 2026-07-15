@@ -86,14 +86,22 @@ export default function CreateAccountScreen() {
     },
     onError(error) {
       if (axios.isAxiosError(error)) {
-        showFeedBack({
-          title: "Что-то пошло не так!",
-          message: "Что-то пошло не так при создании учетной записи. Попробуйте еще раз!",
-          status: "error",
-        });
-        console.log("An Axios error occur -> ", error);
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Что-то пошло не так!",
+            message: "Что-то пошло не так при создании учетной записи. Попробуйте еще раз!",
+            status: "error",
+          });
+        }
+        console.log("An axios error occur  in create account mutation: ", error);
       } else {
-        console.log("An unknown error occur in create account mutation", error);
+        console.log("An unknown error occur in create account mutation: ", error);
       }
     },
   });

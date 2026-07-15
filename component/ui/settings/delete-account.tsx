@@ -5,7 +5,7 @@ import { useFeedBackStore } from "@/stores/feedback-store";
 import { useNotificationDataStore } from "@/stores/notification-data-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { useUserStore } from "@/stores/use-user-store";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens } from "@/utils/tokenUtils";
 import { useMutation } from "@tanstack/react-query";
@@ -37,11 +37,21 @@ export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }
     },
 
     onError(error) {
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
-        status: "error",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

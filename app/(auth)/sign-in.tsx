@@ -85,12 +85,20 @@ export default function SignInScreen() {
 
     onError(error) {
       if (axios.isAxiosError(error)) {
-        error.response?.status === 401 &&
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else if (error.response?.status === 401) {
           showFeedBack({
             title: "Не удалось авторизовать!",
             message: "Неверный адрес электронной почты или пароль!",
             status: "error",
           });
+        }
+        console.log("An axios error occur in sign in mutation", error);
       } else {
         console.log("An unknown error occur in sign in mutation", error);
       }

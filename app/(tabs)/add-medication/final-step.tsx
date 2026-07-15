@@ -13,7 +13,7 @@ import { useAddPillStore } from "@/stores/add-pill-store";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { CreateMedicationProfile, MedicationProfileReponse } from "@/types/medication";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -156,12 +156,23 @@ export default function FinalStepScreen() {
       router.dismissAll();
       router.navigate("/");
     },
-    onError() {
-      showFeedBack({
-        title: "Что-то пошло не так!",
-        message: "Пожалуйста, проверьте, попробуйте еще раз!",
-        status: "error",
-      });
+
+    onError(error) {
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Что-то пошло не так!",
+            message: "Пожалуйста, проверьте, попробуйте еще раз!",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

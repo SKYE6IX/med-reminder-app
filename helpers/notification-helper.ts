@@ -224,18 +224,6 @@ export class NotificationHelper {
     }
   }
 
-  // A CALLBACK IF NOTIFICATION OPEN THE APP
-  public static async handleOnNotificationOpenApp() {
-    const initialNotification = await notifee.getInitialNotification();
-
-    if (initialNotification) {
-      const data = initialNotification.notification.data as unknown as NotificationData;
-      if (initialNotification.pressAction.id === "default" && data) {
-        await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
-      }
-    }
-  }
-
   // A CALLBACK TO HANDLE BACKGROUND EVENTS OF NOTIFICATIONS
   public static handleOnBackgroundEvent() {
     notifee.onBackgroundEvent(async ({ type, detail }) => {
@@ -264,25 +252,7 @@ export class NotificationHelper {
     });
   }
 
-  // A CALLBACK THAT HANDLE WHEN USER IS CURRENTLY USING THE APP
-  // WHEN THE NOTIFICATION COME ON.
-  public static handleOnForeGroundEvent() {
-    return notifee.onForegroundEvent(async ({ type, detail }) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          // Do nothing with the notifcaton if use dismiss it
-          break;
-        case EventType.PRESS:
-          const { notification } = detail;
-          const data = notification?.data as unknown as NotificationData;
-          await NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
-          break;
-      }
-    });
-  }
-
-  // GENERATE KEY STORAGE USED TO SAVED ALL NOTIFICATION
-  // IDs
+  // GENERATE KEY STORAGE USED TO SAVED ALL NOTIFICATION IDs
   public static createNotificationStorageKey({
     prefix,
     medProfileId,
@@ -313,7 +283,6 @@ export class NotificationHelper {
     } else {
       await notifee.cancelNotification(notificationId);
     }
-
     await removeFromStorage(storageKey);
   }
 
@@ -326,7 +295,6 @@ export class NotificationHelper {
     } catch {
       storageKey = key;
     }
-
     if (typeof storageKey === "object") {
       for (const key of storageKey) {
         const notifcationId = await readFromStorage<string | string[]>(key);
@@ -340,8 +308,14 @@ export class NotificationHelper {
 
   // PRIVATE HELPERS
   private async registerAndroidChannel({ alertSound }: { alertSound: string }) {
-    // // We delete all the previous ID that might have being
-    // // created.
+    const parts = [
+      this.settings.vibration ? "vib1" : "vib0",
+      this.settings.showOnLockScreen ? "vis-public" : "vis-secret",
+      this.settings.sound === "enable" ? `snd-${alertSound}` : "snd-none",
+    ];
+    const id = `medremindr_${parts.join("_")}`;
+
+    // We delete all the previous ID that might have being created.
     const channelIds = await notifee.getChannels();
     for (const id in channelIds) {
       await notifee.deleteChannel(id);
@@ -349,7 +323,7 @@ export class NotificationHelper {
 
     const androidSound = alertSound.replace(/\.[^/.]+$/, "");
     return await notifee.createChannel({
-      id: `medremindr_${Date.now()}`,
+      id,
       name: "MedRemindR",
       vibration: this.settings.vibration,
       importance: AndroidImportance.HIGH,
@@ -382,7 +356,6 @@ export class NotificationHelper {
         type: AlarmType.SET_ALARM_CLOCK,
       },
     };
-
     return await notifee.createTriggerNotification(
       {
         title,
@@ -457,20 +430,25 @@ export class NotificationHelper {
       );
       if (eventResponse.data) {
         useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
+
         const medicationPacks = await api.get<MedicationPackResponse[]>("medications/packs");
         if (medicationPacks.data) {
           const activePack = medicationPacks.data.find((pack) => {
             return (
               pack.medicationProfileId === eventResponse.data.medicationProfileId &&
-              pack.status === "ACTIVE"
+              pack.status === "ACTIVE" &&
+              !pack.isRefilled
             );
           });
+
           if (!activePack) return;
+
           const daysSupply = Math.round(
             Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
+
           if (daysSupply - 1 < activePack.reminderDays) {
-            const refillDate = DateTime.now()
+            const refillReminder = DateTime.now()
               .setZone(getTimeZone())
               .plus({ days: 1 })
               .set({ hour: 9, minute: 0, second: 0, millisecond: 0 })
@@ -481,7 +459,7 @@ export class NotificationHelper {
               ...appSettingState.reminderPreferences,
             });
             await notifications.scheduleRefillNotification({
-              scheduleAt: refillDate ?? "",
+              scheduleAt: refillReminder ?? "",
               medicationName: activePack.medicationName,
               medicationProfileId: activePack.medicationProfileId,
             });
