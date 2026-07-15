@@ -55,7 +55,7 @@ export default function NewPasswordScreen() {
       });
       clearTokens();
 
-      router.replace("/(auth)/sign-in");
+      router.dismissTo("/(auth)/sign-in");
 
       await Promise.all([
         removeFromStorage(STORAGE_KEY_EMAIL),

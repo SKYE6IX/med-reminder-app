@@ -167,12 +167,12 @@ export default function CreateAccountScreen() {
             <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
             <ThemedText style={styles.termsText}>
               Создавая аккаунт, Вы принимаете
-              <Link href="/" style={{ color: linkColor }}>
+              <Link href="https://medremindr.ru/privacy" style={{ color: linkColor }}>
                 {" "}
                 Условия использования
               </Link>{" "}
               и
-              <Link href="/" style={{ color: linkColor }}>
+              <Link href="https://medremindr.ru/privacy" style={{ color: linkColor }}>
                 {" "}
                 Политику конфиденциальности.
               </Link>
