@@ -5,7 +5,7 @@ import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData } from "@/types/notification";
-import { api } from "@/utils/axiosInstance";
+import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -103,7 +103,7 @@ export default function ScheduleEventList({
           ),
       );
 
-      // Inavlidate
+      // Inavlidate and cancel other notification relate to it.
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
         queryClient.invalidateQueries({
@@ -133,12 +133,21 @@ export default function ScheduleEventList({
     },
 
     onError(error) {
-      console.log("Error occur inside event updates: ", error);
-      showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
-        status: "error",
-      });
+      if (axios.isAxiosError(error)) {
+        if (error.code === "ERR_NETWORK") {
+          showFeedBack({
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
+            status: "error",
+          });
+        } else {
+          showFeedBack({
+            title: "Ошибка!",
+            message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+            status: "error",
+          });
+        }
+      }
     },
   });
 

@@ -82,7 +82,9 @@ export default function RootLayout() {
               return res.data;
             },
           }),
+
           logOverdueEvents(),
+
           // Generate next medicatiion schedule events if available
           createNextScheduleEventNotification({
             ...useAppSettingsStore.getState().notfication,
@@ -118,9 +120,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     bootstrap();
-    // Susbscribe to foreground events for notifications
-    // const subscribe = NotificationHelper.handleOnForeGroundEvent();
-    // return () => subscribe();
   }, []);
 
   useEffect(() => {
