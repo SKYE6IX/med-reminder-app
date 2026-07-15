@@ -41,7 +41,7 @@ export default function Subscription() {
 
   const activePaidSubscription = subscriptionStatus && subscriptionStatus === "ACTIVE";
 
-  const currentPlanLabel = isPremiumPlan ? "Премиальный тариф" : "Базовый тариф";
+  const currentPlanLabel = isPremiumPlan ? "Премиум тариф" : "Базовый тариф";
   const pressableText = isPremiumPlan ? "Отменить план" : "Обновить план";
 
   const hideCancelButton = isPremiumPlan && !activePaidSubscription;

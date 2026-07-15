@@ -131,9 +131,9 @@ export default function ScheduleEventCard({
             </>
           )}
           {/* Taken */}
-          {eventBadge === "taken" && <Text style={sharedStyles.badgeText}>Принятые</Text>}
+          {eventBadge === "taken" && <Text style={sharedStyles.badgeText}>Принято</Text>}
           {/* Missed */}
-          {eventBadge === "missed" && <Text style={sharedStyles.badgeText}>Пропущенно</Text>}
+          {eventBadge === "missed" && <Text style={sharedStyles.badgeText}>Пропущено</Text>}
         </View>
       )}
     </View>

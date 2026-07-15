@@ -217,7 +217,7 @@ export default function ScheduleStepScreen() {
           <View style={sharedStyles.sectionContainer}>
             <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
               <Text style={sharedStyles.title}>Период</Text>
-              <Text style={[styles.durationOptionalText, { color }]}>«Необязательно»</Text>
+              <Text style={[styles.durationOptionalText, { color }]}> *Необязательно</Text>
             </View>
             <TextInput
               value={durations}

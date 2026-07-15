@@ -72,8 +72,8 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       );
       onProfileAdded(data.id);
       showFeedBack({
-        title: "Добавлено отношение!",
-        message: "Успешно добавлено новое отношение!",
+        title: "Успешно!",
+        message: "Добавлен новый член семьи.",
         status: "success",
       });
       setFormState({ name: "", relation: "" });

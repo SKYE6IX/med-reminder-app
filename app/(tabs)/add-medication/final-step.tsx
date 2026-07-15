@@ -145,7 +145,6 @@ export default function FinalStepScreen() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
-
         createScheduleEventNotification({
           ...notfication,
           ...reminderPreferences,
@@ -155,6 +154,12 @@ export default function FinalStepScreen() {
       clearFormState();
       router.dismissAll();
       router.navigate("/");
+
+      showFeedBack({
+        title: "Успешно!",
+        message: "Добавлено новое лекарство.",
+        status: "success",
+      });
     },
 
     onError(error) {

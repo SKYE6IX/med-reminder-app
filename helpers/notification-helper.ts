@@ -99,9 +99,8 @@ export class NotificationHelper {
         const title = i === 0 ? "Пора принять лекарство" : "Напоминание о приёме";
         const body =
           i === 0
-            ? `Сейчас время принять ${options.medicationName}, запланированное на ${getScheduleTime(options.scheduleAt)}. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.
-      `
-            : `Вы ещё не отметили приём ${options.medicationName}, запланированный ${reminder.minutesOverdue}мин назад. Нажмите, чтобы отметить приём или воспользуйтесь быстрыми действиями.`;
+            ? `${options.medicationName} на ${getScheduleTime(options.scheduleAt)}. Воспользуйтесь быстрыми действиями.`
+            : `${options.medicationName}, запланировано ${reminder.minutesOverdue}мин назад. Воспользуйтесь быстрыми действиями.`;
         return await this.createNotificationTrigger({
           time: time.getTime(),
           title,
@@ -121,7 +120,7 @@ export class NotificationHelper {
     if (this.settings.earlyReminder) {
       if (earyReminder > now) {
         const title = "Следующее лекарство через 20 минут";
-        const body = `Следующее лекарство: ${options.medicationName}`;
+        const body = `${options.medicationName}`;
         const notificationId = await this.createNotificationTrigger({
           time: earyReminder.toJSDate().getTime(),
           title,
@@ -144,7 +143,7 @@ export class NotificationHelper {
     const missedReminder = lastSnooze.plus({ minutes: 30 });
     if (this.settings.missedDoseAlert) {
       const title = "Пропущен приём лекарства";
-      const body = `Лекарство на ${getScheduleTime(options.scheduleAt)} не было принято. Если у вас есть сомнения по поводу дальнейших действий, проконсультируйтесь с врачом.`;
+      const body = `${options.medicationName} на ${getScheduleTime(options.scheduleAt)} не было отмечено.`;
       const notifcationId = await this.createNotificationTrigger({
         time: missedReminder.toJSDate().getTime(),
         title,
@@ -369,9 +368,9 @@ export class NotificationHelper {
           },
           ...(showQuickActions && {
             actions: [
-              { title: "Taken", pressAction: { id: "taken" } },
+              { title: "Принять", pressAction: { id: "taken" } },
               {
-                title: "Skip",
+                title: "Пропустить",
                 pressAction: {
                   id: "missed",
                 },
@@ -405,11 +404,11 @@ export class NotificationHelper {
         actions: [
           {
             id: "taken",
-            title: "Taken",
+            title: "Принять",
           },
           {
             id: "missed",
-            title: "Skip",
+            title: "Пропустить",
           },
         ],
       },

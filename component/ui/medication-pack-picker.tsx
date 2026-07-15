@@ -75,7 +75,7 @@ export default function MedicationPackPicker({
   return (
     <React.Fragment>
       <View style={styles.packAmountContainer}>
-        <Text style={[styles.bottomSheetlabel, { color }]}>Общее количество дозы.</Text>
+        <Text style={[styles.bottomSheetlabel, { color }]}>Общее количество дозы</Text>
         <TextInput
           style={[
             styles.bottomSheetInput,

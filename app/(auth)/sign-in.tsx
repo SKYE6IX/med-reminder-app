@@ -93,8 +93,8 @@ export default function SignInScreen() {
           });
         } else if (error.response?.status === 401) {
           showFeedBack({
-            title: "Не удалось авторизовать!",
-            message: "Неверный адрес электронной почты или пароль!",
+            title: "Ошибка авторизации!",
+            message: "Неверный адрес электронной почты или пароль.",
             status: "error",
           });
         }

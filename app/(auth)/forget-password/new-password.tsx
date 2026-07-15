@@ -49,12 +49,14 @@ export default function NewPasswordScreen() {
     mutationFn: resetPasswordMutation,
     async onSuccess() {
       showFeedBack({
-        title: "Пароль изменен!",
-        message: "Успешно смените пароль!",
+        title: "Успешно!",
+        message: "Ваш пароль изменен.",
         status: "success",
       });
       clearTokens();
-      router.navigate("/(auth)/sign-in");
+
+      router.replace("/(auth)/sign-in");
+
       await Promise.all([
         removeFromStorage(STORAGE_KEY_EMAIL),
         removeFromStorage(STORAGE_KEY_TOKEN),
@@ -116,7 +118,7 @@ export default function NewPasswordScreen() {
               name="repeatPassword"
               onValueChange={handleOnTextInputChange}
               type="password"
-              placeholder="Придумайте пароль"
+              placeholder="Повторите пароль"
               hasError={inputErrorList.includes("repeatPassword")}
             />
           </View>

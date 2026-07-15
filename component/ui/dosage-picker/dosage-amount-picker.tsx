@@ -70,7 +70,7 @@ export default function DosageAmounPicker() {
       </View>
 
       <View style={styles.bodyView}>
-        <Text style={[styles.label, { color }]}>Форма лекарства</Text>
+        <Text style={[styles.label, { color }]}>Единица измерения</Text>
         <View
           style={styles.dosageUnitWrapper}
           onLayout={(event) => {

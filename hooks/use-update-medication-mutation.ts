@@ -74,8 +74,8 @@ export default function useUpdateMedicationMutation({
       await queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] });
       onSucceed && onSucceed();
       showFeedBack({
-        title: "Обновлено!",
-        message: "Данные о ваших лекарствах обновлены.",
+        title: "Успешно!",
+        message: "Данные о Ваших лекарствах обновлены.",
         status: "success",
       });
     },
