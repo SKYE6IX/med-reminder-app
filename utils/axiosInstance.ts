@@ -14,12 +14,12 @@ const MAX_RETRIES = 3;
 
 api.interceptors.request.use(async (config) => {
   const isAuthEndpoint =
-    config.url?.includes("/auth/refresh") ||
-    config.url?.includes("/auth/login") ||
-    config.url?.includes("/auth/register") ||
-    config.url?.includes("/auth/social") ||
-    config.url?.includes("/auth/forget-password") ||
-    config.url?.includes("/auth/forget-password/token");
+    config.url?.includes("auth/refresh") ||
+    config.url?.includes("auth/login") ||
+    config.url?.includes("auth/register") ||
+    config.url?.includes("auth/social") ||
+    config.url?.includes("auth/forget-password") ||
+    config.url?.includes("auth/forget-password/token");
 
   if (!isAuthEndpoint) {
     const token = await getValidAccessToken();
@@ -28,7 +28,6 @@ api.interceptors.request.use(async (config) => {
       return config;
     }
   }
-
   return config;
 });
 
