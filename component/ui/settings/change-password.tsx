@@ -39,7 +39,7 @@ export default function ChangePassword() {
     errorsSet: new Set(),
   });
 
-  const timerRef = useRef<number>(null);
+  const timerRef = useRef<NodeJS.Timeout>(null);
 
   const handleOnValueChanges = ({ name, value }: { name: string; value: string }) => {
     setChangePasswordState((prvState) => {

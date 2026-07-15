@@ -40,8 +40,8 @@ export default function Notifications() {
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const player = useAudioPlayer();
-  const commitTimeoutId = useRef<number>(null);
-  const previewTimeoutId = useRef<number>(null);
+  const commitTimeoutId = useRef<NodeJS.Timeout>(null);
+  const previewTimeoutId = useRef<NodeJS.Timeout>(null);
 
   const clearPending = () => {
     if (previewTimeoutId.current) {

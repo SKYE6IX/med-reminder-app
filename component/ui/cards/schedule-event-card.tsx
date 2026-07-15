@@ -41,7 +41,7 @@ export default function ScheduleEventCard({
   const profileImageUrl = useProfileImage(profile.id);
 
   useEffect(() => {
-    let id: number;
+    let id: NodeJS.Timeout;
     if (status === "PENDING") {
       id = setInterval(() => {
         setNowDate(DateTime.now().setZone(getTimeZone()));

@@ -45,7 +45,7 @@ export default function Home() {
 
   // Show premimum plan offer once to newly user.
   useEffect(() => {
-    let timeout: number;
+    let timeout: NodeJS.Timeout;
     timeout = setTimeout(() => {
       if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
         subscriptionBannerRef.current?.openModal();

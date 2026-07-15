@@ -1,9 +1,4 @@
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react-native";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import CustomPicker from "../custom-picker";
 
@@ -20,6 +15,7 @@ describe("Custom picker component", () => {
         label="Custom Picker"
         items={mockItem}
         onValueSelected={() => {}}
+        selectedValue=""
       />,
     );
 
@@ -34,6 +30,7 @@ describe("Custom picker component", () => {
         label="Custom Picker"
         items={mockItem}
         onValueSelected={() => {}}
+        selectedValue=""
       />,
     );
 

@@ -44,7 +44,7 @@ export default function FeedbackAlert() {
 
   // Auto hide the animation if user doesn't react to it
   useEffect(() => {
-    let timeout: number;
+    let timeout: NodeJS.Timeout;
     if (visible) {
       timeout = setTimeout(() => {
         useFeedBackStore.getState().hideFeedBack();

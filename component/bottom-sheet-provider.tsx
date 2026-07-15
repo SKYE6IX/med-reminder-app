@@ -35,7 +35,7 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const timeoutId = useRef<number>(null);
+  const timeoutId = useRef<NodeJS.Timeout>(null);
 
   const [title, setTitle] = useState<string>("");
   const [snapPointPercent, setSnapPointPercent] = useState("100%");
