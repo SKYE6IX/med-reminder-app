@@ -195,7 +195,6 @@ export default function ScheduleStepScreen() {
                 </Text>
               ))}
             </View>
-
             <CustomButton
               label="Установить время начала"
               variant="outline"

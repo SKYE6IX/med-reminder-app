@@ -22,6 +22,7 @@ const basicSoundSettings = [
   { label: "Звук приложения по умолчанию", value: "enable" },
   { label: "Беззвучно", value: "silent" },
 ];
+
 const proSoundSettings = [
   { label: "Беззвучно", value: "silent" },
   { label: "Universe Wave", value: "universfield_soft.wav" },
@@ -100,7 +101,7 @@ export default function Notifications() {
         }, 5000);
 
         setNotificationSetting({ sound: "enable", alertSound: value });
-        // We wait atleat 8 second before we recreate
+        // We wait atleat 6 second before we recreate
         // the new sound for user notification
         timeoutId.current = setTimeout(async () => {
           await updateScheduleEventNotifications({
