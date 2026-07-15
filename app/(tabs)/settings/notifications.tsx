@@ -40,7 +40,19 @@ export default function Notifications() {
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const player = useAudioPlayer();
-  const timeoutId = useRef<number>(null);
+  const commitTimeoutId = useRef<number>(null);
+  const previewTimeoutId = useRef<number>(null);
+
+  const clearPending = () => {
+    if (previewTimeoutId.current) {
+      clearTimeout(previewTimeoutId.current);
+      previewTimeoutId.current = null;
+    }
+    if (commitTimeoutId.current) {
+      clearTimeout(commitTimeoutId.current);
+      commitTimeoutId.current = null;
+    }
+  };
 
   const universfieldSoft = require("@/assets/sounds/universfield_soft.wav");
   const universfieldPassive = require("@/assets/sounds/universfield_passive.wav");
@@ -77,42 +89,45 @@ export default function Notifications() {
         });
       }
     } else {
+      clearPending();
+
       // Settings for pro account
       if (value === "silent") {
         setNotificationSetting({ sound: value });
         await NotificationHelper.cancelAllNotifications();
-      } else {
-        if (timeoutId.current) {
-          clearTimeout(timeoutId.current);
-        }
-
-        if (value === "universfield_soft.wav") {
-          player.replace(universfieldSoft);
-        } else if (value === "universfield_passive.wav") {
-          player.replace(universfieldPassive);
-        } else if (value === "dragon_wavy.wav") {
-          player.replace(dragonWavy);
-        }
-
-        player.seekTo(0);
-        player.play();
-        setTimeout(() => {
-          player.pause();
-        }, 5000);
-
-        setNotificationSetting({ sound: "enable", alertSound: value });
-        // We wait atleat 6 second before we recreate
-        // the new sound for user notification
-        timeoutId.current = setTimeout(async () => {
-          await updateScheduleEventNotifications({
-            ...notfication,
-            ...reminderPreferences,
-            sound: "enable",
-            alertSound: value,
-          });
-          timeoutId.current = null;
-        }, 6000);
+        return;
       }
+
+      player.pause();
+
+      if (value === "universfield_soft.wav") {
+        player.replace(universfieldSoft);
+      } else if (value === "universfield_passive.wav") {
+        player.replace(universfieldPassive);
+      } else if (value === "dragon_wavy.wav") {
+        player.replace(dragonWavy);
+      }
+
+      player.seekTo(0);
+      player.play();
+
+      previewTimeoutId.current = setTimeout(() => {
+        player.pause();
+        previewTimeoutId.current = null;
+      }, 5000);
+
+      setNotificationSetting({ sound: "enable", alertSound: value });
+      // We wait atleat 6 second before we recreate
+      // the new sound for user notification
+      commitTimeoutId.current = setTimeout(async () => {
+        await updateScheduleEventNotifications({
+          ...notfication,
+          ...reminderPreferences,
+          sound: "enable",
+          alertSound: value,
+        });
+        commitTimeoutId.current = null;
+      }, 6000);
     }
   };
 
