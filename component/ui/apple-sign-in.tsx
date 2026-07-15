@@ -1,3 +1,7 @@
+import { QueryKey } from "@/constants/query-keys";
+import { NotificationHelper } from "@/helpers/notification-helper";
+import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
+import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
@@ -28,18 +32,32 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
     async onSuccess(data) {
       clearTokens();
       saveTokens(data.accessToken, data.refreshToken);
-      await queryClient.invalidateQueries({ queryKey: ["users"] });
+      await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
       setIsAuthenticated(true);
+
+      await NotificationHelper.cancelAllNotifications();
+
+      await createNextScheduleEventNotification({
+        ...useAppSettingsStore.getState().notfication,
+        ...useAppSettingsStore.getState().reminderPreferences,
+      });
     },
 
     onError(error) {
       if (axios.isAxiosError(error)) {
-        error.response?.status === 401 &&
+        if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Не удалось авторизовать!",
-            message: "Неверный адрес электронной почты или пароль!",
+            title: "Ошибка сети!",
+            message: "Проверьте подключение к интернету.",
             status: "error",
           });
+        } else if (error.response?.status === 401) {
+          showFeedBack({
+            title: "Не удалось авторизоваться",
+            message: "Неверный адрес электронной почты или пароль.",
+            status: "error",
+          });
+        }
       } else {
         console.log("An unknown error occur in apple sign in mutation", error);
       }

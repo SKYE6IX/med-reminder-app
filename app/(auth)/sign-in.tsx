@@ -9,6 +9,7 @@ import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import Loader from "@/component/ui/loader";
+import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -17,6 +18,7 @@ import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
 import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateSignInInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
@@ -74,9 +76,11 @@ export default function SignInScreen() {
     async onSuccess(data) {
       await clearTokens();
       await saveTokens(data.accessToken, data.refreshToken);
+      await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
       setIsAuthenticated(true);
 
       await NotificationHelper.cancelAllNotifications();
+
       await createNextScheduleEventNotification({
         ...useAppSettingsStore.getState().notfication,
         ...useAppSettingsStore.getState().reminderPreferences,

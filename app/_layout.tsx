@@ -75,6 +75,7 @@ export default function RootLayout() {
               return res.data;
             },
           }),
+
           queryClient.prefetchQuery({
             queryKey: [QueryKey.medicationList],
             queryFn: async () => {
