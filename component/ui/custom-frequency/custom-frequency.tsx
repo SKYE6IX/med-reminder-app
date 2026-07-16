@@ -35,7 +35,7 @@ export default function CustomFrequency({
   const optionsContainerOpacity = useSharedValue(0);
 
   const newHeight = useMemo(() => {
-    if ((isSelected && !isDailyUnit) || isOnceADay) {
+    if ((isSelected && !isDailyUnit) || (isSelected && isOnceADay)) {
       return HEIGHT.EXPANDED.BASE;
     } else if (isSelected && isDailyUnit) {
       return HEIGHT.EXPANDED.EXTRA;
