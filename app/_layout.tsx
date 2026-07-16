@@ -175,8 +175,3 @@ export default function RootLayout() {
     </QueryClientProvider>
   );
 }
-
-// TODO:
-// 1. On Week view, when user click to ge back to the current
-//  week after pagination, it does choose the current date, but not
-//  the right data get display.

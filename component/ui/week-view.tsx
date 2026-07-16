@@ -38,14 +38,20 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
 
   const handleOnSnapToItem = (index: number) => {
     if (index === CENTER_INDEX) {
-      setSelectedISODate(now.setLocale("ru").toISODate());
+      const isoDate = now.setLocale("ru").toISODate();
+      setSelectedISODate(isoDate);
+      onDateChange(isoDate);
     }
+
     const offset = index - CENTER_INDEX;
     setActiveOffset(offset);
   };
 
   const scrollToCurrentWeek = () => {
-    setSelectedISODate(now.setLocale("ru").toISODate());
+    const isoDate = now.setLocale("ru").toISODate();
+    setSelectedISODate(isoDate);
+    onDateChange(isoDate);
+
     carouselRef.current?.scrollTo({
       index: CENTER_INDEX,
       animated: true,
