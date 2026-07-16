@@ -154,11 +154,25 @@ export default function FinalStepScreen() {
       clearFormState();
       router.dismissAll();
       router.navigate("/");
-
       showFeedBack({
         title: "Успешно!",
         message: "Добавлено новое лекарство.",
         status: "success",
+      });
+
+      // Check for permission before creating notification
+      const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+      if (!notifcationAllowed) {
+        const allowed = await NotificationHelper.allowsNotifications();
+        if (!allowed) {
+          Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
+          return;
+        }
+      }
+
+      await createScheduleEventNotification({
+        ...notfication,
+        ...reminderPreferences,
       });
     },
 
@@ -211,16 +225,6 @@ export default function FinalStepScreen() {
         timeZone: formState.schedule.timeZone,
       },
     };
-
-    const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
-
-    if (!notifcationAllowed) {
-      const allowed = await NotificationHelper.allowsNotifications();
-      if (!allowed) {
-        Alert.alert("Allow notification for us to create schedules");
-        return;
-      }
-    }
 
     mutate(data);
   };

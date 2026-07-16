@@ -72,7 +72,7 @@
             "minSdkVersion": 24
           },
           "ios": {
-            "useFrameworks": "dynamic"
+            "useFrameworks": "static"
           }
         }
       ],

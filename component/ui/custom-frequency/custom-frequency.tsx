@@ -29,20 +29,20 @@ export default function CustomFrequency({
   });
 
   const isDailyUnit = customState.pattern.unit === "DAILY";
+  const isOnceADay = customState.pattern.occurrencesPerDay === 1;
 
   const height = useSharedValue(HEIGHT.COLLAPSED);
-
   const optionsContainerOpacity = useSharedValue(0);
 
   const newHeight = useMemo(() => {
-    if (isSelected && !isDailyUnit) {
+    if ((isSelected && !isDailyUnit) || isOnceADay) {
       return HEIGHT.EXPANDED.BASE;
     } else if (isSelected && isDailyUnit) {
       return HEIGHT.EXPANDED.EXTRA;
     } else {
       return HEIGHT.COLLAPSED;
     }
-  }, [isDailyUnit, isSelected]);
+  }, [isDailyUnit, isOnceADay, isSelected]);
 
   useEffect(() => {
     height.value = withSpring(newHeight, { duration: 400 });
@@ -58,11 +58,10 @@ export default function CustomFrequency({
       ...prvState,
       pattern: { ...prvState.pattern, intervalValue },
     }));
-
     onCustomPatternChange({ ...customState.pattern, intervalValue });
   };
 
-  // Set unit
+  // Set Unit
   const handleSetUnit = (unit: Unit) => {
     if (unit === "DAILY") {
       const defaultHoursBetween = 3;
@@ -70,7 +69,6 @@ export default function CustomFrequency({
         ...prvState,
         pattern: { ...prvState.pattern, unit, hoursBetweenOccurrences: defaultHoursBetween },
       }));
-
       onCustomPatternChange({
         ...customState.pattern,
         hoursBetweenOccurrences: defaultHoursBetween,
@@ -89,8 +87,11 @@ export default function CustomFrequency({
     }
   };
 
-  // Set occurencePerDay
+  // Set OccurencePerDay
   const handleOccurencePerDay = (occurrencesPerDay: number) => {
+    if (occurrencesPerDay === 1) {
+    }
+
     setCustomState((prvState) => ({
       ...prvState,
       pattern: { ...prvState.pattern, occurrencesPerDay },
@@ -102,7 +103,7 @@ export default function CustomFrequency({
     });
   };
 
-  // Set hoursBetweenOccurrences
+  // Set HoursBetweenOccurrences
   const handlehoursBetweenOccurrences = (hoursBetweenOccurrences: number) => {
     if (customState.pattern.unit === "DAILY") {
       setCustomState((prvState) => ({
@@ -117,6 +118,10 @@ export default function CustomFrequency({
   };
 
   const handleChooseCustom = () => {
+    if (isSelected) {
+      setCustomState((prvState) => ({ ...prvState, showPicker: undefined }));
+      return;
+    }
     handleSelection(defaultvalue);
     setCustomState({ showPicker: undefined, pattern: DEFAULT_PATTERN });
   };
@@ -197,14 +202,14 @@ export default function CustomFrequency({
         </View>
 
         {/* CONDITIONAL OPTION BASE ON UNIT VALUE = "DAILY" */}
-        {customState.pattern.unit === "DAILY" && (
+        {customState.pattern.unit === "DAILY" && !isOnceADay && (
           <View
             style={[
               sharedStyles.opitonsItem,
               { borderTopWidth: 1, borderColor: "#F7F7F7", paddingTop: 8 },
             ]}
           >
-            <Text style={sharedStyles.optionsLabel}>Интервал между приемами</Text>
+            <Text style={sharedStyles.optionsLabel}>Интервал (ч)</Text>
             <View style={sharedStyles.optionsGroup}>
               <Pressable
                 style={sharedStyles.optionsGroupItem}

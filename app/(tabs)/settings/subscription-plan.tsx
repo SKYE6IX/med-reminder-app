@@ -54,7 +54,8 @@ export default function SubscriptionPlan() {
           message: "Наслаждайтесь неограниченным использованием.",
           status: "success",
         });
-        router.navigate("/(tabs)/settings/subscription");
+
+        router.dismissTo("/(tabs)/settings/subscription");
       }
     },
 

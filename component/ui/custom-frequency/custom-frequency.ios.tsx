@@ -23,16 +23,17 @@ export default function CustomFrequency({
   });
 
   const isDailyUnit = customState.pattern.unit === "DAILY";
+  const isOnceADay = customState.pattern.occurrencesPerDay === 1;
 
   const height = useSharedValue(HEIGHT.COLLAPSED);
 
   const newHeight = useMemo(() => {
     if (isSelected) {
       if (customState.showPicker && !isDailyUnit) {
-        return HEIGHT.EXPANDED.PICKER;
+        return HEIGHT.EXPANDED.PICKER_IOS;
       } else if (customState.showPicker && isDailyUnit) {
-        return HEIGHT.EXPANDED.EXTRA_WITH_PICKER;
-      } else if (!customState.showPicker && isDailyUnit) {
+        return HEIGHT.EXPANDED.EXTRA_WITH_PICKER_IOS;
+      } else if (!customState.showPicker && isDailyUnit && !isOnceADay) {
         return HEIGHT.EXPANDED.EXTRA;
       } else {
         return HEIGHT.EXPANDED.BASE;
@@ -40,7 +41,7 @@ export default function CustomFrequency({
     } else {
       return HEIGHT.COLLAPSED;
     }
-  }, [customState.showPicker, isDailyUnit, isSelected]);
+  }, [customState.showPicker, isDailyUnit, isOnceADay, isSelected]);
 
   useEffect(() => {
     height.value = withSpring(newHeight);
@@ -117,6 +118,10 @@ export default function CustomFrequency({
 
   // Choose custom option
   const handleChooseCustom = () => {
+    if (isSelected) {
+      setCustomState((prvState) => ({ ...prvState, showPicker: undefined }));
+      return;
+    }
     handleSelection(defaultvalue);
     setCustomState({ showPicker: undefined, pattern: DEFAULT_PATTERN });
   };
@@ -274,7 +279,7 @@ export default function CustomFrequency({
         </View>
 
         {/* HOUR_BETWEEN_OCCURENCES WHEN UNIT VALUE = "DAILY" */}
-        {customState.pattern.unit === "DAILY" && (
+        {customState.pattern.unit === "DAILY" && !isOnceADay && (
           <View
             style={[
               styles.optionsWrapper,
@@ -282,7 +287,7 @@ export default function CustomFrequency({
             ]}
           >
             <View style={sharedStyles.opitonsItem}>
-              <Text style={sharedStyles.optionsLabel}>Интервал между приемами</Text>
+              <Text style={sharedStyles.optionsLabel}>Интервал (ч)</Text>
               <View style={sharedStyles.optionsGroup}>
                 <Pressable
                   style={sharedStyles.optionsGroupItem}

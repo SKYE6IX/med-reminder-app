@@ -30,6 +30,7 @@ export function useCustomFreqStyles() {
       color: "#F7F7F7",
     },
     optionsGroup: {
+      flexShrink: 0,
       marginLeft: "auto",
       flexDirection: "row",
       alignItems: "center",

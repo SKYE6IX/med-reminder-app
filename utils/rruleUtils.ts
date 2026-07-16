@@ -152,6 +152,7 @@ const populateOcurrencesTimes = (
     if (next >= endOfDay) break;
     times.push(next);
   }
+
   return times.map((times) => times.toJSDate());
 };
 

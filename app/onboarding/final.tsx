@@ -3,7 +3,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
@@ -17,7 +17,7 @@ export default function OnboardingFinalScreen() {
   const requestAllowNotification = async () => {
     const isAllowed = await NotificationHelper.allowsNotifications();
     if (!isAllowed) {
-      alert("Notification need to be allowed to send schedule!");
+      Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
     }
     completeOnaboarding();
     router.navigate("/welcome");

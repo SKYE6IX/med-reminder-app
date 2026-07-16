@@ -2,6 +2,7 @@ import { MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { DateTime } from "@/utils/luxonUtil";
+import { Alert } from "react-native";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { saveToStorage } from "./storage-manager";
@@ -52,12 +53,19 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
           return NotificationHelper.removeNotificationsWithKey(data.storageKey as string);
         }),
       );
-
       pendingMaps.clear();
     }
 
-    const notifications = new NotificationHelper(settings);
+    const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+    if (!notifcationAllowed) {
+      const allowed = await NotificationHelper.allowsNotifications();
+      if (!allowed) {
+        Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
+        return;
+      }
+    }
 
+    const notifications = new NotificationHelper(settings);
     await Promise.all(
       newEvents.map((event) =>
         notifications.scheduleDosageNotification({

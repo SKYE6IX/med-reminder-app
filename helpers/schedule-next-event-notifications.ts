@@ -2,6 +2,7 @@ import { MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { DateTime } from "@/utils/luxonUtil";
+import { Alert } from "react-native";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-manager";
@@ -72,6 +73,15 @@ export const createNextScheduleEventNotification = async (
 
     if (!newEvents.length) {
       return;
+    }
+
+    const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+    if (!notifcationAllowed) {
+      const allowed = await NotificationHelper.allowsNotifications();
+      if (!allowed) {
+        Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
+        return;
+      }
     }
 
     const notifications = new NotificationHelper(settings);

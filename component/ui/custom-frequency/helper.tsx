@@ -13,8 +13,8 @@ export const HEIGHT = {
   EXPANDED: {
     BASE: isAndroid ? 170 : 165, // Without extra option.
     EXTRA: isAndroid ? 220 : 210, // With extra opiton when user pick "DAILY".
-    PICKER: 390, // Full height if extra option isn't included. (IOS ONLY)
-    EXTRA_WITH_PICKER: 430, // Full height if extra option is included. (IOS ONLY)
+    PICKER_IOS: 390, // Full height if extra option isn't included. (IOS ONLY)
+    EXTRA_WITH_PICKER_IOS: 430, // Full height if extra option is included. (IOS ONLY)
   },
 };
 
