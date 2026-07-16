@@ -59,6 +59,7 @@ export default function Notifications() {
   const dragonWavy = require("@/assets/sounds/dragon_wavy.wav");
 
   const soundListSettings = isPremiumPlan ? proSoundSettings : basicSoundSettings;
+
   const soundSelectedValue =
     isPremiumPlan && notfication.sound === "silent"
       ? notfication.sound
@@ -68,11 +69,15 @@ export default function Notifications() {
 
   // Audio set up
   useEffect(() => {
-    setAudioModeAsync({
-      playsInSilentMode: true,
-      allowsRecording: false,
-      shouldPlayInBackground: false,
-    });
+    const setup = async () => {
+      await setAudioModeAsync({
+        playsInSilentMode: true,
+        allowsRecording: false,
+        shouldPlayInBackground: false,
+      });
+    };
+
+    setup();
   }, []);
 
   const handleSoundChange = async (value: string) => {
@@ -90,15 +95,14 @@ export default function Notifications() {
       }
     } else {
       clearPending();
-
       // Settings for pro account
       if (value === "silent") {
+        player.pause();
+        player.remove();
         setNotificationSetting({ sound: value });
         await NotificationHelper.cancelAllNotifications();
         return;
       }
-
-      player.pause();
 
       if (value === "universfield_soft.wav") {
         player.replace(universfieldSoft);
@@ -108,15 +112,15 @@ export default function Notifications() {
         player.replace(dragonWavy);
       }
 
-      player.seekTo(0);
       player.play();
 
       previewTimeoutId.current = setTimeout(() => {
         player.pause();
+        player.remove();
         previewTimeoutId.current = null;
       }, 5000);
 
-      setNotificationSetting({ sound: "enable", alertSound: value });
+      // setNotificationSetting({ sound: "enable", alertSound: value });
       // We wait atleat 6 second before we recreate
       // the new sound for user notification
       commitTimeoutId.current = setTimeout(async () => {
