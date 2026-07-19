@@ -355,6 +355,7 @@ export class NotificationHelper {
         type: AlarmType.SET_ALARM_CLOCK,
       },
     };
+
     return await notifee.createTriggerNotification(
       {
         title,
@@ -446,7 +447,7 @@ export class NotificationHelper {
             Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
 
-          if (daysSupply - 1 < activePack.reminderDays) {
+          if (daysSupply - 1 < activePack.reminderDays && !activePack.isRefilled) {
             const refillReminder = DateTime.now()
               .setZone(getTimeZone())
               .plus({ days: 1 })

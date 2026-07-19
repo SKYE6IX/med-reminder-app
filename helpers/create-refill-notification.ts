@@ -21,7 +21,7 @@ export async function createRefillNotification({
     Number(medicationPack.currentQuantity) / Number(medicationPack.dosageAmount),
   );
 
-  if (daysSupply - 1 < medicationPack.reminderDays) {
+  if (daysSupply - 1 < medicationPack.reminderDays && !medicationPack.isRefilled) {
     const refillDate = DateTime.now()
       .setZone(getTimeZone())
       .plus({ days: 1 })

@@ -49,6 +49,7 @@ const cancelEventNotifications = async (eventId: string) => {
   });
 
   const notificationData = eventToCancel?.notification.data as unknown as NotificationData;
+
   if (notificationData) {
     await NotificationHelper.removeNotificationsWithKey(notificationData.storageKey as string);
   }
