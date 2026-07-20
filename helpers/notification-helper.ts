@@ -429,9 +429,25 @@ export class NotificationHelper {
         },
       );
       if (eventResponse.data) {
+        // Cancel any following notification after action taken.
+        const pendingAppNotifications = await notifee.getTriggerNotifications();
+        const eventToCancel = pendingAppNotifications.find((appNotification) => {
+          const data = appNotification.notification.data as unknown as NotificationData;
+          return data.dosageScheduleEventId === eventResponse.data.id;
+        });
+        const notificationData = eventToCancel?.notification.data as unknown as NotificationData;
+        if (notificationData) {
+          await NotificationHelper.removeNotificationsWithKey(
+            notificationData.storageKey as string,
+          );
+        }
+
+        // Send the data up, so when user open the app, which in turn make the app
+        // active, the store data will be used to update the event data.
         useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
 
         const medicationPacks = await api.get<MedicationPackResponse[]>("medications/packs");
+
         if (medicationPacks.data) {
           const activePack = medicationPacks.data.find((pack) => {
             return (
@@ -458,6 +474,7 @@ export class NotificationHelper {
               ...appSettingState.notfication,
               ...appSettingState.reminderPreferences,
             });
+
             await notifications.scheduleRefillNotification({
               scheduleAt: refillReminder ?? "",
               medicationName: activePack.medicationName,

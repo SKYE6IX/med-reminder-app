@@ -38,7 +38,6 @@ export function useNotificationData({ selectedDate }: { selectedDate: string }) 
         updateData();
       }
     });
-
     return () => {
       subscription.remove();
     };

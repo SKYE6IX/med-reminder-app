@@ -18,6 +18,7 @@ export const useNotificationDataStore = create<UpdatedNotificationData>()(
       setScheduleData(data, id) {
         set(() => ({ scheduleData: data, scheduleId: id }));
       },
+
       clearScheduleData() {
         set((state) => ({ ...state, scheduleId: undefined, scheduleData: null }));
       },
