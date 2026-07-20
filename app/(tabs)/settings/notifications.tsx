@@ -12,7 +12,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { NotificationSoundMode } from "@/types/notification";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -30,6 +30,15 @@ const proSoundSettings = [
   { label: "Dragon Time", value: "dragon_wavy.wav" },
 ];
 
+const RINGTONE_TRACKS = [
+  { key: "universfield_soft.wav", source: require("@/assets/sounds/universfield_soft.wav") },
+  {
+    key: "universfield_passive.wav",
+    source: require("@/assets/sounds/universfield_passive.wav"),
+  },
+  { key: "dragon_wavy.wav", source: require("@/assets/sounds/dragon_wavy.wav") },
+];
+
 export default function Notifications() {
   const insets = useSafeAreaInsets();
   const { openSheet } = useBottomSheet();
@@ -39,7 +48,12 @@ export default function Notifications() {
   const { notfication, reminderPreferences, setNotificationSetting } = useAppSettingsStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
-  const player = useAudioPlayer();
+  const [selectedSound, setSelectedSounds] = useState(RINGTONE_TRACKS[0]);
+
+  const player = useAudioPlayer(selectedSound.source, {
+    downloadFirst: true,
+  });
+
   const commitTimeoutId = useRef<NodeJS.Timeout>(null);
   const previewTimeoutId = useRef<NodeJS.Timeout>(null);
 
@@ -53,10 +67,6 @@ export default function Notifications() {
       commitTimeoutId.current = null;
     }
   };
-
-  const universfieldSoft = require("@/assets/sounds/universfield_soft.wav");
-  const universfieldPassive = require("@/assets/sounds/universfield_passive.wav");
-  const dragonWavy = require("@/assets/sounds/dragon_wavy.wav");
 
   const soundListSettings = isPremiumPlan ? proSoundSettings : basicSoundSettings;
 
@@ -98,33 +108,26 @@ export default function Notifications() {
 
       // Settings for pro account
       if (value === "silent") {
-        player.pause();
-        player.remove();
+        if (player.playing) {
+          player.pause();
+        }
         setNotificationSetting({ sound: value });
         await NotificationHelper.cancelAllNotifications();
         return;
       }
 
       setNotificationSetting({ sound: "enable", alertSound: value });
-      if (value === "universfield_soft.wav") {
-        player.replace(universfieldSoft);
-      } else if (value === "universfield_passive.wav") {
-        player.replace(universfieldPassive);
-      } else if (value === "dragon_wavy.wav") {
-        player.replace(dragonWavy);
-      }
-
-      player.play();
-
+      const newSound = RINGTONE_TRACKS.find((track) => track.key === value)!;
+      setSelectedSounds(newSound);
       previewTimeoutId.current = setTimeout(() => {
-        player.pause();
-        player.remove();
+        player.play();
         previewTimeoutId.current = null;
-      }, 5000);
+      }, 80);
 
-      // We wait atleat 6 second before we recreate
+      // We wait atleat 5 second before we recreate
       // the new sound for user notification
       commitTimeoutId.current = setTimeout(async () => {
+        player.pause();
         await updateScheduleEventNotifications({
           ...notfication,
           ...reminderPreferences,
@@ -132,7 +135,7 @@ export default function Notifications() {
           alertSound: value,
         });
         commitTimeoutId.current = null;
-      }, 6000);
+      }, 5000);
     }
   };
 
