@@ -8,59 +8,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
-const pillNames = [
-  "Aspirin",
-  "Ibuprofen",
-  "Paracetamol",
-  "Amoxicillin",
-  "Metformin",
-  "Lisinopril",
-  "Atorvastatin",
-  "Omeprazole",
-  "Levothyroxine",
-  "Azithromycin",
-  "Losartan",
-  "Prednisone",
-  "Gabapentin",
-  "Hydrochlorothiazide",
-  "Sertraline",
-  "Citalopram",
-  "Fluoxetine",
-  "Simvastatin",
-  "Warfarin",
-  "Clopidogrel",
-  "Metoprolol",
-  "Amlodipine",
-  "Furosemide",
-  "Pantoprazole",
-  "Tramadol",
-  "Codeine",
-  "Doxycycline",
-  "Clindamycin",
-  "Cephalexin",
-  "Naproxen",
-  "Melatonin",
-  "Vitamin D",
-  "Calcium Carbonate",
-  "Magnesium",
-  "Iron Supplement",
-  "Folic Acid",
-  "Zinc",
-  "Biotin",
-  "Multivitamin",
-  "Fish Oil",
-  "Probiotic",
-  "Loratadine",
-  "Cetirizine",
-  "Diphenhydramine",
-  "Montelukast",
-  "Alprazolam",
-  "Diazepam",
-  "Insulin",
-  "Glipizide",
-  "Bupropion",
-];
+import nameSearch from "../../../dictionary.json";
 
 export default function NameStepScreen() {
   const insets = useSafeAreaInsets();
@@ -81,10 +29,11 @@ export default function NameStepScreen() {
   const tint = useThemeColor({}, "tint");
   const router = useRouter();
 
-  // Mock Data!
   const results = isQueryFieldEmpty
     ? []
-    : pillNames.filter((pill) => pill.toLowerCase().startsWith(medicationName.toLocaleLowerCase()));
+    : nameSearch.dictionary.filter((pill) =>
+        pill.toLowerCase().startsWith(medicationName.toLocaleLowerCase()),
+      );
 
   const canContinue = useAddPillStore((s) => s.isFieldFilled(["medicationName"]));
 
