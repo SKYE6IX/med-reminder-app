@@ -86,7 +86,6 @@ export default function Notifications() {
         shouldPlayInBackground: false,
       });
     };
-
     setup();
   }, []);
 
@@ -117,6 +116,7 @@ export default function Notifications() {
       }
 
       setNotificationSetting({ sound: "enable", alertSound: value });
+
       const newSound = RINGTONE_TRACKS.find((track) => track.key === value)!;
       setSelectedSounds(newSound);
       previewTimeoutId.current = setTimeout(() => {

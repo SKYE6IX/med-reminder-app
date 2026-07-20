@@ -64,6 +64,7 @@ export default function MedicationDetails() {
         {medicationProfile && (
           <>
             <MedicationDetailCard
+              key={medicationProfile.status}
               medicationProfile={medicationProfile}
               onSwitchToggle={handleOnSwitchToggle}
             />

@@ -7,8 +7,8 @@ import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query"
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { Image } from "expo-image";
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useRouter } from "expo-router";
+import { useMemo, useState } from "react";
 import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -26,8 +26,6 @@ export default function Medications() {
 
   const isIOS = Platform.OS === "ios";
 
-  const isMounted = useRef(false);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
   const { isLoading, data } = useMedicationProfileQuery();
@@ -41,21 +39,9 @@ export default function Medications() {
     if (activeTab === "ALL") {
       return data;
     }
-
     return data?.filter((medProfile) => medProfile.status.toUpperCase() === activeTab);
   }, [activeTab, data]);
 
-  // We force a re-render for the UI so the List information
-  // is up to date we the data.
-  useFocusEffect(
-    useCallback(() => {
-      if (!isMounted.current) {
-        isMounted.current = true;
-        return;
-      }
-      setRefreshKey((prev) => prev + 1);
-    }, []),
-  );
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
   };
@@ -74,7 +60,6 @@ export default function Medications() {
     }
   };
 
-  // const top = Platform.OS === "android" ? insets.top + 20 : insets.top;
   const top = isIOS ? insets.top : insets.top + 20;
   const bottom = isIOS ? insets.bottom + 10 : 10;
 
@@ -90,12 +75,12 @@ export default function Medications() {
               </View>
               {!isLoading && (
                 <FlatList
-                  key={refreshKey}
                   style={{ flex: 1 }}
                   data={getFilterMedicationsProfile}
+                  extraData={data}
                   renderItem={({ item }) => (
                     <MedicationListCard
-                      key={item.id}
+                      key={item.id + item.status}
                       medicationProfile={item}
                       onSwitchToggle={handleOnSwitchToggle}
                     />

@@ -88,7 +88,7 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
               providerId: credential.user,
               authorizationCode: credential.authorizationCode ?? "",
               provider: "APPLE",
-              fullName: familyName + givenName,
+              fullName: familyName + " " + givenName,
               email: credential.email ?? "",
               jwtToken: credential.identityToken ?? "",
             };

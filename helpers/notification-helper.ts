@@ -7,10 +7,11 @@ import {
 } from "@/types/notification";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 
+import { QueryKey } from "@/constants/query-keys";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
-import { useNotificationDataStore } from "@/stores/notification-data-store";
 import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
+import { queryClient } from "@/utils/query-client";
 import notifee, {
   AlarmType,
   AndroidImportance,
@@ -442,12 +443,14 @@ export class NotificationHelper {
           );
         }
 
-        // Send the data up, so when user open the app, which in turn make the app
-        // active, the store data will be used to update the event data.
-        useNotificationDataStore.getState().setScheduleData(eventResponse.data, scheduleId);
+        // Inavlidate event related data
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
+          queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+          queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
+        ]);
 
         const medicationPacks = await api.get<MedicationPackResponse[]>("medications/packs");
-
         if (medicationPacks.data) {
           const activePack = medicationPacks.data.find((pack) => {
             return (
@@ -456,13 +459,10 @@ export class NotificationHelper {
               !pack.isRefilled
             );
           });
-
           if (!activePack) return;
-
           const daysSupply = Math.round(
             Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
-
           if (daysSupply - 1 < activePack.reminderDays && !activePack.isRefilled) {
             const refillReminder = DateTime.now()
               .setZone(getTimeZone())

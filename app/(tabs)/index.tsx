@@ -15,7 +15,6 @@ import Loader from "@/component/ui/loader";
 import ScheduleEventList from "@/component/ui/schedule-event-list";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { QueryKey } from "@/constants/query-keys";
-import { useNotificationData } from "@/hooks/use-notification-data";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useUserStore } from "@/stores/use-user-store";
@@ -59,11 +58,6 @@ export default function Home() {
     queryKey: [QueryKey.scheduleEvents, selectedDate],
     queryFn: () => fetchScheduleEvents(selectedDate),
   });
-
-  // When the screen focus back, we track the data that get update
-  // base on user action from the notification data centre
-  // Right now we only focus on Schedule Events
-  useNotificationData({ selectedDate });
 
   // Update schedule event
   const hasScheduleEvents = data && data.length >= 1 ? true : false;

@@ -70,7 +70,7 @@ export default function ScheduleEventCard({
         {/* Image Wrapper */}
         <View style={sharedStyles.cardImageWrapper}>
           <Image
-            source={require("@/assets/images/pill.png")}
+            source={require("@/assets/images/pill-bottle.png")}
             style={sharedStyles.cardImage}
             contentFit="contain"
             contentPosition="top center"
