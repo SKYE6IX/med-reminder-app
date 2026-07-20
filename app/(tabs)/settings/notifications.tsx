@@ -106,7 +106,6 @@ export default function Notifications() {
       }
 
       setNotificationSetting({ sound: "enable", alertSound: value });
-
       if (value === "universfield_soft.wav") {
         player.replace(universfieldSoft);
       } else if (value === "universfield_passive.wav") {

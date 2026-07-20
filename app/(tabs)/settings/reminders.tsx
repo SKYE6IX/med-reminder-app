@@ -8,6 +8,7 @@ import { updateScheduleEventNotifications } from "@/helpers/update-schedule-even
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
+import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -25,14 +26,23 @@ export default function Reminders() {
 
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
+  const commitTimeoutId = useRef<NodeJS.Timeout>(null);
 
-  const handleSnoozeChange = async (value: string) => {
+  const handleSnoozeChange = (value: string) => {
     setReminderPreference({ snoozeDuration: Number(value) as SnoozeDuration });
-    await updateScheduleEventNotifications({
-      ...notfication,
-      ...reminderPreferences,
-      snoozeDuration: Number(value) as SnoozeDuration,
-    });
+
+    if (commitTimeoutId.current) {
+      clearTimeout(commitTimeoutId.current);
+    }
+
+    commitTimeoutId.current = setTimeout(async () => {
+      await updateScheduleEventNotifications({
+        ...notfication,
+        ...reminderPreferences,
+        snoozeDuration: Number(value) as SnoozeDuration,
+      });
+      commitTimeoutId.current = null;
+    }, 5000);
   };
 
   const toggleAllowEarlyReminder = async (value: boolean) => {

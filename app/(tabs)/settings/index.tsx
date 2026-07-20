@@ -58,7 +58,6 @@ export default function Settings() {
       clearTokens();
       setIsAuthenticated(false);
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
