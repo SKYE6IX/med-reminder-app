@@ -44,7 +44,6 @@ export default function Notifications() {
   const { openSheet } = useBottomSheet();
 
   const isAndroid = Platform.OS === "android";
-
   const { notfication, reminderPreferences, setNotificationSetting } = useAppSettingsStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
@@ -104,7 +103,6 @@ export default function Notifications() {
       }
     } else {
       clearPending();
-
       // Settings for pro account
       if (value === "silent") {
         if (player.playing) {
@@ -185,7 +183,6 @@ export default function Notifications() {
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const bgPrimary = useThemeColor({}, "backgroundPrimary");
-
   const top = isAndroid ? insets.top + 20 : insets.top + 10;
 
   return (

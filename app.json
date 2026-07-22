@@ -36,12 +36,8 @@
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.SCHEDULE_EXACT_ALARM",
-        "android.permission.RECORD_AUDIO",
         "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.USE_FINGERPRINT"
       ],
       "runtimeVersion": {
         "policy": "appVersion"
@@ -114,8 +110,9 @@
         "expo-audio",
         {
           "microphonePermission": "Разрешите $(PRODUCT_NAME) получить доступ к вашему микрофону.",
-          "enableBackgroundPlayback": true,
-          "enableBackgroundRecording": false
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": false,
+          "recordAudioAndroid": false
         }
       ],
       "expo-status-bar",
