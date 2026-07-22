@@ -44,6 +44,7 @@ export default function OnboardingLayout() {
           <Stack.Title></Stack.Title>
         </Stack.Screen>
       </Stack>
+
       <OnboardingStepper steps={ONBOARDING_SEGMENTS} currentStep={currentStep} />
     </React.Fragment>
   );

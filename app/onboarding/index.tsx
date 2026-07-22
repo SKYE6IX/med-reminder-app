@@ -12,6 +12,7 @@ export default function OnboardingFirstScreen() {
         source={require("@/assets/images/onboarding-image-screen-1.png")}
         style={styles.image}
         contentPosition="top center"
+        contentFit="contain"
       />
       <View style={styles.textContainer}>
         <ThemedText type="title">Ваше здоровье - в Ваших руках</ThemedText>
@@ -26,8 +27,9 @@ export default function OnboardingFirstScreen() {
 
 const styles = StyleSheet.create({
   image: {
-    width: 360,
-    height: 400,
+    width: "100%",
+    height: "auto",
+    aspectRatio: 1 / 1,
   },
   textContainer: {
     gap: 16,

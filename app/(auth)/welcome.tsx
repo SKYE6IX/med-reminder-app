@@ -32,7 +32,6 @@ export default function WelcomeScreen() {
 
       <View style={styles.linkWrapper}>
         <CustomLink label="Создать аккаунт" href="/create-account" />
-
         <CustomLink
           label="Войти в аккаунт"
           href="/sign-in"

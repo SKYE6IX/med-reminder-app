@@ -22,8 +22,7 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Это приложение или один из его компонентов может запрашивать доступ к местоположению, чтобы улучшить ваш опыт",
-        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио.",
-        "UIBackgroundModes": ["audio"]
+        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио."
       }
     },
     "android": {

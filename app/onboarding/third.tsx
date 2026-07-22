@@ -18,7 +18,7 @@ export default function OnboardingThirdscreen() {
   return (
     <FullScreenView>
       <View style={styles.imageWrapper}>
-        <Image source={source} style={styles.image} />
+        <Image source={source} style={styles.image} contentFit="contain" />
       </View>
 
       <View style={styles.textContainer}>
@@ -35,14 +35,16 @@ export default function OnboardingThirdscreen() {
 
 const styles = StyleSheet.create({
   imageWrapper: {
-    width: 360,
-    height: 400,
+    width: "100%",
+    height: "auto",
+    aspectRatio: 1 / 1,
     justifyContent: "center",
     alignItems: "center",
   },
   image: {
-    width: 313,
-    height: 313,
+    width: "100%",
+    height: "auto",
+    aspectRatio: 1 / 1,
   },
   textContainer: {
     gap: 16,

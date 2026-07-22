@@ -12,6 +12,7 @@ export default function OnboardingSecondScreen() {
         source={require("@/assets/images/onboarding-image-screen-2.png")}
         style={styles.image}
         contentPosition="top center"
+        contentFit="contain"
       />
       <View style={styles.textContainer}>
         <ThemedText type="title">Умные напоминания, простой контроль лекрств</ThemedText>
@@ -26,8 +27,9 @@ export default function OnboardingSecondScreen() {
 
 const styles = StyleSheet.create({
   image: {
-    width: 360,
-    height: 400,
+    width: "100%",
+    height: "auto",
+    aspectRatio: 1 / 1,
   },
   textContainer: {
     gap: 16,

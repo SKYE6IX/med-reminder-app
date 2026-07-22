@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -7,16 +7,13 @@ type OnboardingStepperProps = {
   steps: string[];
 };
 
-export default function OnboardingStepper({
-  currentStep,
-  steps,
-}: OnboardingStepperProps) {
-  // Top element height size + size of the space (60) between the top element and the
-  // text content
-  const OFFSET_TOP = 405 + 60;
+export default function OnboardingStepper({ currentStep, steps }: OnboardingStepperProps) {
+  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const top = insets.top + (width - 20);
+
   return (
-    <View style={[{ top: insets.top + OFFSET_TOP }, styles.container]}>
+    <View style={[{ top }, styles.container]}>
       {steps.map((_, i) => (
         <Animated.View
           key={i}
