@@ -117,7 +117,8 @@
       ],
       "expo-status-bar",
       "expo-asset",
-      "./app.plugin.js"
+      "./app.plugin.js",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,
