@@ -14,12 +14,14 @@ import { validateCreateAccountInputs } from "@/utils/validator";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import Loader from "@/component/ui/loader";
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { AuthResponse } from "@/types/auth-response";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { useMutation } from "@tanstack/react-query";
+import { Trans } from "react-i18next";
 
 type FormState = {
   email: string;
@@ -38,6 +40,7 @@ const createAccountMutation = async (formState: FormState) => {
 };
 
 export default function CreateAccountScreen() {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const { setIsAuthenticated } = useAuthStore();
   const [createAccountState, setCreateAccountState] = useState<CreateAccountState>({
@@ -88,14 +91,14 @@ export default function CreateAccountScreen() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Что-то пошло не так!",
-            message: "Что-то пошло не так при создании учетной записи. Попробуйте еще раз!",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -131,32 +134,32 @@ export default function CreateAccountScreen() {
       <ScrollView contentContainerStyle={{ flex: 1 }}>
         <View style={styles.container}>
           <Loader visible={isPending} />
-          <FormHeader title="Создать аккаунт" subTitle="Заполните Ваши данные" />
+          <FormHeader title={t("sign_up_screen.title")} subTitle={t("sign_up_screen.sub_title")} />
           <View style={styles.inputsWrapper}>
             <FormInput
-              label="Имя"
+              label={t("common.form.name_label")}
               name="name"
               onValueChange={handleOnValueChanges}
               inputRef={textInputRef}
               type="text"
-              placeholder="Введите Ваше имя"
+              placeholder={t("common.form.name_placeholder")}
               hasError={createAccountState.errorsSet.has("name")}
             />
             <FormInput
-              label="Почта"
+              label={t("common.form.email_label")}
               name="email"
               onValueChange={handleOnValueChanges}
               inputRef={emaiInputRef}
               type="email"
-              placeholder="Введите адрес Вашей почты"
+              placeholder={t("common.form.email_placeholder")}
               hasError={createAccountState.errorsSet.has("email")}
             />
             <FormInput
-              label="Пароль"
+              label={t("common.form.password_label")}
               name="password"
               onValueChange={handleOnValueChanges}
               type="password"
-              placeholder="Придумайте пароль"
+              placeholder={t("common.form.password_placeholder")}
               hasError={createAccountState.errorsSet.has("password")}
               textContentType="newPassword"
               autoComplete="new-password"
@@ -164,18 +167,23 @@ export default function CreateAccountScreen() {
           </View>
 
           <View style={styles.submitButtonWrapper}>
-            <CustomButton label="Создать аккаунт" onPress={handleSubmitForm} disabled={isPending} />
+            <CustomButton
+              label={t("sign_up_screen.create_account_btn")}
+              onPress={handleSubmitForm}
+              disabled={isPending}
+            />
             <ThemedText style={styles.termsText}>
-              Создавая аккаунт, Вы принимаете
-              <Link href="https://medremindr.ru/terms" style={{ color: linkColor }}>
-                {" "}
-                Условия использования
-              </Link>{" "}
-              и
-              <Link href="https://medremindr.ru/privacy" style={{ color: linkColor }}>
-                {" "}
-                Политику конфиденциальности.
-              </Link>
+              <Trans
+                i18nKey="sign_up_screen.terms_and_policy"
+                components={{
+                  termsLink: (
+                    <Link href="https://medremindr.ru/terms" style={{ color: linkColor }} />
+                  ),
+                  privacyLink: (
+                    <Link href="https://medremindr.ru/privacy" style={{ color: linkColor }} />
+                  ),
+                }}
+              />
             </ThemedText>
           </View>
 
@@ -183,7 +191,7 @@ export default function CreateAccountScreen() {
             <View style={styles.socialButtonWrapper}>
               <View style={styles.dividerWrapper}>
                 <View style={styles.divider} />
-                <ThemedText style={styles.dividerText}>Или</ThemedText>
+                <ThemedText style={styles.dividerText}>{t("sign_up_screen.or")}</ThemedText>
                 <View style={styles.divider} />
               </View>
               <AppleSignIn type="SIGN_UP" />
@@ -191,10 +199,12 @@ export default function CreateAccountScreen() {
           )}
 
           <View style={styles.footerWrapper}>
-            <ThemedText style={styles.footerText}>Уже есть аккаунт?</ThemedText>
+            <ThemedText style={styles.footerText}>{t("sign_up_screen.have_account")}</ThemedText>
             <Link href="/sign-in" asChild>
               <Pressable>
-                <Text style={[styles.footerText, { color: linkColor }]}>Войти</Text>
+                <Text style={[styles.footerText, { color: linkColor }]}>
+                  {t("sign_up_screen.sign_in")}
+                </Text>
               </Pressable>
             </Link>
           </View>

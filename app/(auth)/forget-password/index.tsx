@@ -9,12 +9,14 @@ import Loader from "@/component/ui/loader";
 import { saveToStorage } from "@/helpers/storage-manager";
 import { useRequestResetPasswordToken } from "@/hooks/use-request-reset-password-token";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { validateResetPasswordInputs } from "@/utils/validator";
 import { useState } from "react";
 
 const STORAGE_KEY_EMAIL = "password:reset:email";
 
 export default function ForgetPasswordScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -50,21 +52,24 @@ export default function ForgetPasswordScreen() {
         <Loader visible={isPending} />
         <View style={[{ paddingBottom: insets.bottom }, styles.container]}>
           <FormHeader
-            title="Забыли пароль?"
-            subTitle="Введите данные для восстановления аккаунта"
+            title={t("forget_passowrd_screen.step1.title")}
+            subTitle={t("forget_passowrd_screen.step1.text")}
           />
           <FormInput
-            label="Почта"
+            label={t("common.form.email_label")}
             onValueChange={({ value }) => {
               setEmail(value);
               setShowError(false);
             }}
             type="email"
             name="email"
-            placeholder="Введите Вашу почту"
+            placeholder={t("common.form.email_placeholder")}
             hasError={showError}
           />
-          <CustomButton label="Восстановить пароль" onPress={handleContinueToOTP} />
+          <CustomButton
+            label={t("forget_passowrd_screen.step1.recover")}
+            onPress={handleContinueToOTP}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

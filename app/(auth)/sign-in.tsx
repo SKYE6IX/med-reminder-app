@@ -1,18 +1,14 @@
-import FormHeader from "@/component/ui/form/form-header";
-import FormInput from "@/component/ui/form/form-input";
-import { Link } from "expo-router";
-import { useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
 import { ThemedText } from "@/component/themed-text/themed-text";
 import AppleSignIn from "@/component/ui/apple-sign-in";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import FormHeader from "@/component/ui/form/form-header";
+import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
 import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
@@ -22,6 +18,10 @@ import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { validateSignInInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "expo-router";
+import { useRef, useState } from "react";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FormState = {
   email: string;
@@ -39,6 +39,7 @@ const signInMutation = async (formState: FormState) => {
 };
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const { setIsAuthenticated } = useAuthStore();
   const [signInState, setSignInState] = useState<SignInState>({
@@ -91,14 +92,14 @@ export default function SignInScreen() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else if (error.response?.status === 401) {
           showFeedBack({
-            title: "Ошибка авторизации!",
-            message: "Неверный адрес электронной почты или пароль.",
+            title: t("feedback.error.authorized.title"),
+            message: t("feedback.error.authorized.text"),
             status: "error",
           });
         }
@@ -134,23 +135,23 @@ export default function SignInScreen() {
       <ScrollView contentContainerStyle={{ flex: 1 }}>
         <View style={styles.container}>
           <Loader visible={isPending} />
-          <FormHeader title="Войти" subTitle="Введите данные для входа в аккаунт" />
+          <FormHeader title={t("sign_in_screen.title")} subTitle={t("sign_in_screen.sub_title")} />
           <View style={styles.inputsWrapper}>
             <FormInput
-              label="Почта"
+              label={t("common.form.email_label")}
               name="email"
               onValueChange={handleOnValueChanges}
               inputRef={emaiInputRef}
               type="email"
-              placeholder="Введите адрес Вашей почты"
+              placeholder={t("common.form.email_placeholder")}
               hasError={signInState.errorsSet.has("email")}
             />
             <FormInput
-              label="Пароль"
+              label={t("common.form.password_label")}
               name="password"
               onValueChange={handleOnValueChanges}
               type="password"
-              placeholder="Введите пароль"
+              placeholder={t("common.form.password_placeholder")}
               hasError={signInState.errorsSet.has("password")}
               textContentType="password"
               autoComplete="password"
@@ -158,13 +159,19 @@ export default function SignInScreen() {
           </View>
 
           <View style={styles.submitButtonWrapper}>
-            <CustomButton label="Войти" onPress={handleSubmitForm} disabled={isPending} />
+            <CustomButton
+              label={t("sign_in_screen.sign_in_btn")}
+              onPress={handleSubmitForm}
+              disabled={isPending}
+            />
             <View style={styles.resetPassword}>
-              <ThemedText style={styles.resetPasswordText}>Забыли пароль?</ThemedText>
+              <ThemedText style={styles.resetPasswordText}>
+                {t("sign_in_screen.forget_password")}
+              </ThemedText>
               <Link href="/forget-password" asChild>
                 <Pressable>
                   <Text style={[styles.resetPasswordText, { color: linkColor }]}>
-                    Нажмите здесь
+                    {t("sign_in_screen.click_here")}
                   </Text>
                 </Pressable>
               </Link>
@@ -175,7 +182,7 @@ export default function SignInScreen() {
             <View style={styles.socialButtonWrapper}>
               <View style={styles.dividerWrapper}>
                 <View style={styles.divider} />
-                <ThemedText style={styles.dividerText}>Или</ThemedText>
+                <ThemedText style={styles.dividerText}>{t("sign_in_screen.or")}</ThemedText>
                 <View style={styles.divider} />
               </View>
               <AppleSignIn type="SIGN_IN" />
@@ -183,10 +190,12 @@ export default function SignInScreen() {
           )}
 
           <View style={styles.footerWrapper}>
-            <ThemedText style={styles.footerText}>Нет аккаунта?</ThemedText>
+            <ThemedText style={styles.footerText}>{t("sign_in_screen.no_account")}</ThemedText>
             <Link href="/create-account" asChild>
               <Pressable>
-                <Text style={[styles.footerText, { color: linkColor }]}>Создать аккаунт</Text>
+                <Text style={[styles.footerText, { color: linkColor }]}>
+                  {t("sign_in_screen.sign_up")}
+                </Text>
               </Pressable>
             </Link>
           </View>

@@ -5,8 +5,10 @@ import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTranslation } from "@/i18next/i18next";
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation();
   const scheme = useColorScheme();
 
   const appNameColor = scheme === "dark" ? "#1E6EF4" : "#1256DB";
@@ -26,14 +28,14 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.textContainer}>
-        <ThemedText type="title">Контролируйте прием Ваших лекарств просто</ThemedText>
-        <ThemedText type="subtitle">Все ваши таблетки в одном месте.</ThemedText>
+        <ThemedText type="title">{t("welcome_screen.heading")}</ThemedText>
+        <ThemedText type="subtitle">{t("welcome_screen.text")}</ThemedText>
       </View>
 
       <View style={styles.linkWrapper}>
-        <CustomLink label="Создать аккаунт" href="/create-account" />
+        <CustomLink label={t("welcome_screen.create_account_btn")} href="/create-account" />
         <CustomLink
-          label="Войти в аккаунт"
+          label={t("welcome_screen.sign_in_btn")}
           href="/sign-in"
           variant="outline"
           textVaraint="tintText"

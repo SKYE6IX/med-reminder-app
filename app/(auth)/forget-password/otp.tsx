@@ -4,6 +4,7 @@ import Loader from "@/component/ui/loader";
 import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
 import { useRequestResetPasswordToken } from "@/hooks/use-request-reset-password-token";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -52,6 +53,7 @@ const TOKEN_LENGTH = 6;
 const RETRY_AFTER_SECONDS = 60;
 
 export default function OTPVerificationScreen() {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -151,8 +153,8 @@ export default function OTPVerificationScreen() {
       })
       .catch(() => {
         showFeedBack({
-          title: "Не удалось авторизовать!",
-          message: "Просроченный или недействительный код.",
+          title: t("feedback.error.otp.title"),
+          message: t("feedback.error.otp.text"),
           status: "error",
         });
       });
@@ -173,16 +175,18 @@ export default function OTPVerificationScreen() {
           <Loader visible={isLoading} />
           <View style={styles.headerWrapper}>
             <ThemedText type="title" style={styles.title}>
-              Введите код
+              {t("forget_passowrd_screen.step2.title")}
             </ThemedText>
             <ThemedText type="subtitle" style={styles.subtitle}>
-              Мы отправили код подтверждения на вашу почту {maskEmailAddress(otpState.userEmail)}{" "}
+              {t("forget_passowrd_screen.step2.text", {
+                email: maskEmailAddress(otpState.userEmail),
+              })}
               <Text
                 onPress={() => router.back()}
                 style={[styles.changeEmaiAction, { color: tintColor }]}
                 suppressHighlighting
               >
-                Изменить
+                {t("forget_passowrd_screen.step2.change_email")}
               </Text>
             </ThemedText>
           </View>
@@ -227,7 +231,7 @@ export default function OTPVerificationScreen() {
 
             <View style={styles.bodyBottom}>
               <ThemedText style={[styles.bodyBottomText, { color: textColor }]}>
-                Не получили код?{" "}
+                {t("forget_passowrd_screen.step2.no_code")}
               </ThemedText>
               {otpState.retryAfter <= 0 ? (
                 <Pressable
@@ -236,22 +240,24 @@ export default function OTPVerificationScreen() {
                   }}
                 >
                   <Text style={[styles.bodyBottomText, { color: tintColor }]}>
-                    Отправить повторно
+                    {t("forget_passowrd_screen.step2.request_again")}
                   </Text>
                 </Pressable>
               ) : (
                 <Text style={[styles.bodyBottomText, { color: textColor }]}>
-                  Ещё раз {`через 00:${String(otpState.retryAfter).padStart(2, "0")}`}
+                  {t("forget_passowrd_screen.step2.try_again", {
+                    time: `00:${String(otpState.retryAfter).padStart(2, "0")}`,
+                  })}
                 </Text>
               )}
             </View>
           </View>
 
           <CustomButton
-            label="Продолжить"
+            label={t("forget_passowrd_screen.step2.continue")}
             style={styles.button}
             onPress={handleVerifyToken}
-            disabled={!isTokenFilled}
+            // disabled={!isTokenFilled}
             variant={isTokenFilled ? "filled" : "disabled"}
             textVaraint={isTokenFilled ? "regularText" : "mutedText"}
           />

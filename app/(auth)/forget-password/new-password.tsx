@@ -4,6 +4,7 @@ import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
 import { readFromStorage, removeFromStorage } from "@/helpers/storage-manager";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { clearTokens } from "@/utils/tokenUtils";
@@ -29,6 +30,7 @@ const resetPasswordMutation = async (requestBody: PasswordResetRequest) => {
 };
 
 export default function NewPasswordScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { showFeedBack } = useFeedBackStore();
@@ -49,8 +51,8 @@ export default function NewPasswordScreen() {
     mutationFn: resetPasswordMutation,
     async onSuccess() {
       showFeedBack({
-        title: "Успешно!",
-        message: "Ваш пароль изменен.",
+        title: t("feedback.success.change_password.title"),
+        message: t("feedback.success.change_password.text"),
         status: "success",
       });
       clearTokens();
@@ -62,18 +64,19 @@ export default function NewPasswordScreen() {
         removeFromStorage(STORAGE_KEY_TOKEN),
       ]);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так. Пробовать снова.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -103,28 +106,31 @@ export default function NewPasswordScreen() {
       <ScrollView>
         <View style={styles.container}>
           <Loader visible={isPending} />
-          <FormHeader title="Новый пароль" subTitle="Введите новый пароль" />
+          <FormHeader
+            title={t("forget_passowrd_screen.setp3.title")}
+            subTitle={t("forget_passowrd_screen.setp3.text")}
+          />
           <View style={styles.inputWrapper}>
             <FormInput
-              label="Новый пароль"
+              label={t("forget_passowrd_screen.setp3.new_password_label")}
               name="newPassword"
               onValueChange={handleOnTextInputChange}
               type="password"
-              placeholder="Придумайте пароль"
+              placeholder={t("forget_passowrd_screen.setp3.new_password_placeholder")}
               hasError={inputErrorList.includes("newPassword")}
             />
             <FormInput
-              label="Подтвердите новый пароль"
+              label={t("forget_passowrd_screen.setp3.confirm_password_label")}
               name="repeatPassword"
               onValueChange={handleOnTextInputChange}
               type="password"
-              placeholder="Повторите пароль"
+              placeholder={t("forget_passowrd_screen.setp3.confirm_password_placholder")}
               hasError={inputErrorList.includes("repeatPassword")}
             />
           </View>
 
           <CustomButton
-            label="Создать новый пароль"
+            label={t("forget_passowrd_screen.setp3.submit_text")}
             style={styles.button}
             onPress={handleResetPassword}
           />
