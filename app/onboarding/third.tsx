@@ -6,8 +6,10 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
+import { useTranslation } from "@/i18next/i18next";
 
 export default function OnboardingThirdscreen() {
+  const { t } = useTranslation();
   const scheme = useColorScheme();
 
   const source =
@@ -22,13 +24,11 @@ export default function OnboardingThirdscreen() {
       </View>
 
       <View style={styles.textContainer}>
-        <ThemedText type="title">Для Вас и Вашей семьи</ThemedText>
-        <ThemedText type="subtitle">
-          Легко управляйте приёмом лекарств для всех, о ком вы заботитесь.
-        </ThemedText>
+        <ThemedText type="title">{t("onboarding.step3.title")}</ThemedText>
+        <ThemedText type="subtitle">{t("onboarding.step3.text")}</ThemedText>
       </View>
 
-      <CustomLink label="Дальше" href="/onboarding/final" style={styles.link} />
+      <CustomLink label={t("common.next")} href="/onboarding/final" style={styles.link} />
     </FullScreenView>
   );
 }

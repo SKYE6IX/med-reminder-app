@@ -8,8 +8,10 @@ import { Alert, StyleSheet, View } from "react-native";
 import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomButton from "@/component/ui/custom-button/custom-button";
+import { useTranslation } from "@/i18next/i18next";
 
 export default function OnboardingFinalScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const scheme = useColorScheme();
   const { completeOnaboarding } = useAuthStore();
@@ -34,13 +36,11 @@ export default function OnboardingFinalScreen() {
         <Image source={source} style={styles.image} contentFit="contain" />
       </View>
       <View style={styles.textContainer}>
-        <ThemedText type="title">Разрешить уведомления</ThemedText>
-        <ThemedText type="subtitle">
-          Уведомления будут приходить согласно вашим настройкам.
-        </ThemedText>
+        <ThemedText type="title">{t("onboarding.step4.title")}</ThemedText>
+        <ThemedText type="subtitle">{t("onboarding.step4.text")}</ThemedText>
       </View>
       <CustomButton
-        label="Разрешить уведомление"
+        label={t("onboarding.step4.title")}
         style={styles.button}
         onPress={requestAllowNotification}
       />

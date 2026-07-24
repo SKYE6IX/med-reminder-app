@@ -16,13 +16,15 @@
         "light": "./assets/icons/ios-light.png",
         "tinted": "./assets/icons/ios-light.png"
       },
-      "runtimeVersion": {
-        "policy": "appVersion"
-      },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "Это приложение или один из его компонентов может запрашивать доступ к местоположению, чтобы улучшить ваш опыт",
-        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио."
+        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио.",
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": ["en", "ru"]
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "android": {

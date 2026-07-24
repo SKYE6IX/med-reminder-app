@@ -1,11 +1,12 @@
-import { Image } from "expo-image";
-import { StyleSheet, View } from "react-native";
-
 import { FullScreenView } from "@/component/full-screen-view";
 import { ThemedText } from "@/component/themed-text/themed-text";
 import CustomLink from "@/component/ui/custom-link/custom-link";
+import { useTranslation } from "@/i18next/i18next";
+import { Image } from "expo-image";
+import { StyleSheet, View } from "react-native";
 
 export default function OnboardingFirstScreen() {
+  const { t } = useTranslation();
   return (
     <FullScreenView>
       <Image
@@ -15,12 +16,10 @@ export default function OnboardingFirstScreen() {
         contentFit="contain"
       />
       <View style={styles.textContainer}>
-        <ThemedText type="title">Ваше здоровье - в Ваших руках</ThemedText>
-        <ThemedText type="subtitle">
-          Возьмите под контроль свое самочувствие с помощью простых напоминаний о приеме лекарств.
-        </ThemedText>
+        <ThemedText type="title">{t("onboarding.step1.title")}</ThemedText>
+        <ThemedText type="subtitle">{t("onboarding.step1.text")}</ThemedText>
       </View>
-      <CustomLink label="Дальше" href="/onboarding/second" style={styles.link} />
+      <CustomLink label={t("common.next")} href="/onboarding/second" style={styles.link} />
     </FullScreenView>
   );
 }

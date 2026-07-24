@@ -4,13 +4,18 @@ import { initReactI18next } from "react-i18next";
 import en from "./locales/en";
 import ru from "./locales/ru";
 
+export { useTranslation } from "react-i18next";
 export const lng = getLocales()[0].languageCode ?? "en";
 
 // eslint-disable-next-line import/no-named-as-default-member
 i18n.use(initReactI18next).init({
   resources: {
-    en,
-    ru,
+    en: {
+      translation: en,
+    },
+    ru: {
+      translation: ru,
+    },
   },
   lng,
   fallbackLng: "en",
@@ -19,3 +24,5 @@ i18n.use(initReactI18next).init({
     escapeValue: false,
   },
 });
+
+export default i18n;
