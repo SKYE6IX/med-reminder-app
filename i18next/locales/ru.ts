@@ -36,6 +36,13 @@ const ru = {
       },
     },
   },
+  tabs: {
+    home: "Главная",
+    medications: "Лекарства",
+    add_medication: "Добавить",
+    refills: "Запасы",
+    settings: "Настройки",
+  },
   onboarding: {
     step1: {
       title: "Ваше здоровье - в Ваших руках",

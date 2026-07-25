@@ -36,6 +36,13 @@ const en = {
       },
     },
   },
+  tabs: {
+    home: "Home",
+    medications: "Medications",
+    add_medication: "Add Meds",
+    refills: "Refills",
+    settings: "Settings",
+  },
   onboarding: {
     step1: {
       title: "Your health is in your hands",
