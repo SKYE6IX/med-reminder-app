@@ -1,6 +1,7 @@
 const en = {
   common: {
     next: "Next",
+    add_medication: "Add Medication",
     form: {
       name_label: "Name",
       name_placeholder: "Enter your name",
@@ -42,6 +43,12 @@ const en = {
     add_medication: "Add Meds",
     refills: "Refills",
     settings: "Settings",
+  },
+  offer_modal: {
+    title: "Unlock premium features",
+    text: "Add unlimited medications, personlize reminders, and manage your family's medications.",
+    activate: "Activate",
+    skip: "Skip",
   },
   onboarding: {
     step1: {
@@ -111,6 +118,20 @@ const en = {
       confirm_password_placholder: "Re-enter your new Password",
       submit_text: "Create new Password",
     },
+  },
+  home_screen: {
+    no_content_heading: "No Medications are Scheduled for this day",
+    no_content_body: "You can add medications now.",
+    week_view_to_current: "Current week",
+    week_view_meds_for: "Medications for ",
+    tab_all: "All",
+    tab_taken: "Taken",
+    tab_missed: "Missed",
+    event_card_daily: "Daily",
+    event_card_banner_taken: "Taken",
+    event_card_banner_missed: "Missed",
+    event_card_btn_taken: "Taken",
+    event_card_btn_missed: "Skipped",
   },
 } as const;
 

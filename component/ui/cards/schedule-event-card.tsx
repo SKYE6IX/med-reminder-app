@@ -6,6 +6,7 @@ import { getTakenAt } from "@/helpers/getTakenAt";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { MedicationScheduleEventResponse } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -22,9 +23,10 @@ const showEventButtons = (scheduleAt: string, status: string) => {
   if (!scheduleAt) {
     return false;
   }
+
   const now = DateTime.now();
   const scheduleTime = DateTime.fromISO(scheduleAt, {
-    locale: "ru",
+    locale: lng,
     setZone: true,
   });
   const isSameDay = now.hasSame(scheduleTime, "day");
@@ -35,6 +37,7 @@ export default function ScheduleEventCard({
   scheduleEvent,
   onActionBtnPress,
 }: ScheduleEventCardProps) {
+  const { t } = useTranslation();
   const [nowDate, setNowDate] = useState<DateTime>(DateTime.now().setZone(getTimeZone()));
   const { status, measurement, takenAt, scheduleAt, profile } = scheduleEvent;
 
@@ -88,7 +91,9 @@ export default function ScheduleEventCard({
             <View style={sharedStyles.medicationSchedule}>
               <Text style={sharedStyles.medicationScheduleText}>{scheduleTime}</Text>
               <View style={sharedStyles.medicationScheduleDivider} />
-              <Text style={sharedStyles.medicationScheduleText}>Ежедневно</Text>
+              <Text style={sharedStyles.medicationScheduleText}>
+                {t("home_screen.event_card_daily")}
+              </Text>
             </View>
           )}
 
@@ -107,14 +112,18 @@ export default function ScheduleEventCard({
                 style={sharedStyles.cardActionButton}
                 onPress={() => onActionBtnPress("TAKEN")}
               >
-                <Text style={sharedStyles.cardActionButtonText}>Принять</Text>
+                <Text style={sharedStyles.cardActionButtonText}>
+                  {t("home_screen.event_card_btn_taken")}
+                </Text>
               </Pressable>
 
               <Pressable
                 style={[sharedStyles.cardActionButton, { backgroundColor: "#DC0000" }]}
                 onPress={() => onActionBtnPress("MISSED")}
               >
-                <Text style={sharedStyles.cardActionButtonText}>Пропустить</Text>
+                <Text style={sharedStyles.cardActionButtonText}>
+                  {t("home_screen.event_card_btn_missed")}
+                </Text>
               </Pressable>
             </View>
           )}
@@ -131,9 +140,13 @@ export default function ScheduleEventCard({
             </>
           )}
           {/* Taken */}
-          {eventBadge === "taken" && <Text style={sharedStyles.badgeText}>Принято</Text>}
+          {eventBadge === "taken" && (
+            <Text style={sharedStyles.badgeText}>{t("home_screen.event_card_banner_taken")}</Text>
+          )}
           {/* Missed */}
-          {eventBadge === "missed" && <Text style={sharedStyles.badgeText}>Пропущено</Text>}
+          {eventBadge === "missed" && (
+            <Text style={sharedStyles.badgeText}>{t("home_screen.event_card_banner_missed")}</Text>
+          )}
         </View>
       )}
     </View>

@@ -1,6 +1,7 @@
 import { QueryKey } from "@/constants/query-keys";
 import { createRefillNotification } from "@/helpers/create-refill-notification";
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
@@ -17,17 +18,10 @@ import Loader from "./loader";
 import Tabs from "./tabs";
 
 type TABS_VALUE = "ALL" | "TAKEN" | "MISSED";
-
 interface UpdateScheduleEvent {
   id: string;
   action: "TAKEN" | "MISSED";
 }
-
-const TABS = [
-  { label: "Все", value: "ALL" },
-  { label: "Принято", value: "TAKEN" },
-  { label: "Пропущено", value: "MISSED" },
-];
 
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
   const response = await api.put<MedicationScheduleEventResponse>(
@@ -36,20 +30,16 @@ const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
       action: data.action,
     },
   );
-
   return response.data;
 };
 
 const cancelEventNotifications = async (eventId: string) => {
   const pendingAppNotifications = await notifee.getTriggerNotifications();
-
   const eventToCancel = pendingAppNotifications.find((appNotification) => {
     const data = appNotification.notification.data as unknown as NotificationData;
     return data.dosageScheduleEventId === eventId;
   });
-
   const notificationData = eventToCancel?.notification.data as unknown as NotificationData;
-
   if (notificationData) {
     await NotificationHelper.removeNotificationsWithKey(notificationData.storageKey as string);
   }
@@ -62,6 +52,7 @@ export default function ScheduleEventList({
   data: MedicationScheduleEventResponse[];
   selectedDate: string;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
 
@@ -126,7 +117,6 @@ export default function ScheduleEventList({
             pack.status === "ACTIVE" &&
             !pack.isRefilled,
         );
-
       await createRefillNotification({
         medicationPack: medicationProfile,
         settings: { ...notfication, ...reminderPreferences },
@@ -137,14 +127,14 @@ export default function ScheduleEventList({
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -153,6 +143,11 @@ export default function ScheduleEventList({
   });
 
   const bottom = Platform.OS === "ios" ? insets.bottom + 10 : 10;
+  const TABS = [
+    { label: t("home_screen.tab_all"), value: "ALL" },
+    { label: t("home_screen.tab_taken"), value: "TAKEN" },
+    { label: t("home_screen.tab_missed"), value: "MISSED" },
+  ];
 
   return (
     <View style={{ flex: 1 }}>

@@ -17,6 +17,7 @@ import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscr
 import { QueryKey } from "@/constants/query-keys";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
+import { useTranslation } from "@/i18next/i18next";
 import { useUserStore } from "@/stores/use-user-store";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -32,9 +33,10 @@ const fetchScheduleEvents = async (params: string) => {
 };
 
 const localDateString = getDateLocalString();
-export default function Home() {
-  const router = useRouter();
 
+export default function Home() {
+  const { t } = useTranslation();
+  const router = useRouter();
   const { user } = useUserQuery();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
@@ -61,7 +63,6 @@ export default function Home() {
 
   // Update schedule event
   const hasScheduleEvents = data && data.length >= 1 ? true : false;
-
   const handleOnDateChange = (ISODate: string) => {
     const date = new Date(ISODate);
     const toLocalDateString = getDateLocalString(date);
@@ -106,13 +107,13 @@ export default function Home() {
               style={styles.noContentImage}
             />
             <Text style={[styles.noContentTitle, { color }]}>
-              На этот день лекарства не запланированы
+              {t("home_screen.no_content_heading")}
             </Text>
             <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-              Вы можете добавить лекарства сейчас.
+              {t("home_screen.no_content_body")}
             </Text>
             <CustomButton
-              label="Добавить лекарства"
+              label={t("common.add_medication")}
               svgIcon={<PlusIcon size={15} />}
               onPress={() => router.navigate("/(tabs)/add-medication")}
             />

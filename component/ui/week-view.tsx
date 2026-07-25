@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import {
   DateTime,
   formatHomeScreenDate,
@@ -28,8 +29,8 @@ const DATA = [...new Array(TOTAL_INDEX).keys()];
 const CENTER_INDEX = TOTAL_INDEX / 2;
 
 export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
+  const { t } = useTranslation();
   const CAROUSEL_WIDTH = Dimensions.get("screen").width - WINDOW_PADDING * 2;
-
   const now = DateTime.now();
 
   const carouselRef = useRef<ICarouselInstance>(null);
@@ -62,20 +63,20 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
     setSelectedISODate(ISODate);
     onDateChange(ISODate);
   };
-
   const description = getWeekViewDescription(selectedISODate);
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
-
   return (
     <View style={styles.container}>
       <View style={styles.headerConteainer}>
         <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
         {activeOffset !== 0 && (
           <Pressable onPress={scrollToCurrentWeek}>
-            <Text style={[styles.title, { color: tintColor }]}>К текущей неделе</Text>
+            <Text style={[styles.title, { color: tintColor }]}>
+              {t("home_screen.week_view_to_current")}
+            </Text>
           </Pressable>
         )}
       </View>
@@ -105,7 +106,10 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
       </View>
 
       {showDescription && (
-        <Text style={[styles.weekDescription, { color }]}>Лекарства на {description}</Text>
+        <Text style={[styles.weekDescription, { color }]}>
+          {t("home_screen.week_view_meds_for")}
+          {description}
+        </Text>
       )}
     </View>
   );
@@ -195,14 +199,12 @@ const styles = StyleSheet.create({
     gap: 5,
     borderRadius: 10,
   },
-
   weekText: {
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     lineHeight: 19.2,
     textTransform: "uppercase",
   },
-
   weekDescription: {
     fontFamily: "Roboto_400Regular",
     fontSize: 18,

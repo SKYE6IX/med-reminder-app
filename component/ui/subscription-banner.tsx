@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useUserStore } from "@/stores/use-user-store";
 import { useRouter } from "expo-router";
 import { RefObject, useCallback, useEffect, useImperativeHandle, useState } from "react";
@@ -24,6 +25,7 @@ type SubscriptionBannerProps = {
 };
 
 export default function SubscriptionBanner({ ref, onBannerClose }: SubscriptionBannerProps) {
+  const { t } = useTranslation();
   const isAndroid = Platform.OS === "android";
   const router = useRouter();
 
@@ -53,7 +55,6 @@ export default function SubscriptionBanner({ ref, onBannerClose }: SubscriptionB
     if (useUserStore.getState().displaySubscriptioOffer) {
       useUserStore.getState().disabledShowSubscriptionOffer();
     }
-
     onBannerClose && onBannerClose();
   }, [onBannerClose]);
 
@@ -113,16 +114,15 @@ export default function SubscriptionBanner({ ref, onBannerClose }: SubscriptionB
             <StarIcon color={tintColor} width={33} height={35} />
           </View>
 
-          <Text style={[styles.contentTitle, { color }]}>Разблокировать премиум-функции</Text>
+          <Text style={[styles.contentTitle, { color }]}>{t("offer_modal.title")}</Text>
           <Text style={[styles.contentSubtitle, { color: mutedColor }]}>
-            Добавляйте неограниченное количество лекарств, настраивайте напоминания и управляйте
-            лекарствами всей семьи.
+            {t("offer_modal.text")}
           </Text>
 
           <View style={styles.buttonWrapper}>
-            <CustomButton label="Продолжить" onPress={navigateToSubscritionPlan} />
+            <CustomButton label={t("offer_modal.activate")} onPress={navigateToSubscritionPlan} />
             <CustomButton
-              label="Пропустить"
+              label={t("offer_modal.skip")}
               variant="outline"
               textVaraint="tintText"
               onPress={closeModal}

@@ -1,6 +1,7 @@
 const ru = {
   common: {
     next: "Дальше",
+    add_medication: "Добавить лекарства",
     form: {
       name_label: "Имя",
       name_placeholder: "Введите Ваше имя",
@@ -42,6 +43,12 @@ const ru = {
     add_medication: "Добавить",
     refills: "Запасы",
     settings: "Настройки",
+  },
+  offer_modal: {
+    title: "Разблокировать премиум-функции",
+    text: "Добавляйте неограниченное количество лекарств, настраивайте напоминания и управляйте лекарствами всей семьи.",
+    activate: "Продолжить",
+    skip: "Пропустить",
   },
   onboarding: {
     step1: {
@@ -111,6 +118,20 @@ const ru = {
       confirm_password_placholder: "Повторите пароль",
       submit_text: "Создать новый пароль",
     },
+  },
+  home_screen: {
+    no_content_heading: "На этот день лекарства не запланированы",
+    no_content_body: "Вы можете добавить лекарства сейчас.",
+    week_view_to_current: "К текущей неделе",
+    week_view_meds_for: "Лекарства на ",
+    tab_all: "Все",
+    tab_taken: "Принято",
+    tab_missed: "Пропущено",
+    event_card_daily: "Ежедневно",
+    event_card_banner_taken: "Принято",
+    event_card_banner_missed: "Пропущено",
+    event_card_btn_taken: "Принять",
+    event_card_btn_missed: "Пропустить",
   },
 } as const;
 
