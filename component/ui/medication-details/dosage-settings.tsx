@@ -4,6 +4,7 @@ import PillIcon from "@/component/icons/pill-icon";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import React from "react";
 import { Platform, Pressable, Text, View } from "react-native";
@@ -16,6 +17,7 @@ export default function DetailsDosageSettings({
 }: {
   medicationProfile: MedicationProfileReponse;
 }) {
+  const { t } = useTranslation();
   const sharedStyles = useSharedStyles();
 
   const { openSheet, closeSheet } = useBottomSheet();
@@ -32,7 +34,7 @@ export default function DetailsDosageSettings({
 
   const openDosageSettingSheet = () => {
     openSheet({
-      title: "Количество дозировки",
+      title: t("common.dose_amount_picker_title"),
       snapPointPercent: snapPoint,
       content: (
         <DosageAmountInput
@@ -51,7 +53,9 @@ export default function DetailsDosageSettings({
         onPress={openDosageSettingSheet}
       >
         <View style={sharedStyles.cardHeader}>
-          <Text style={sharedStyles.cardTitle}>Доза за прием</Text>
+          <Text style={sharedStyles.cardTitle}>
+            {t("medication_screen.details_dosage_amount_title")}
+          </Text>
           <ArrowRight color={color} />
         </View>
         <View style={sharedStyles.cardBody}>

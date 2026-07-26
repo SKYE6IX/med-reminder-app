@@ -3,9 +3,10 @@ import AlarmClockIcon from "@/component/icons/alarm-clock-icon";
 import ArrowRight from "@/component/icons/arrow-right";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset } from "@/stores/add-pill-store";
 import { MedicationProfileReponse } from "@/types/medication";
-import { formatRRuleToRussian, generateTimeOccurrences } from "@/utils/rruleUtils";
+import { formatRRuleToText, generateTimeOccurrences } from "@/utils/rruleUtils";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../custom-button/custom-button";
@@ -18,11 +19,12 @@ export default function DetailsFrequencySettings({
 }: {
   medicationProfile: MedicationProfileReponse;
 }) {
+  const { t } = useTranslation();
   const sharedStyles = useSharedStyles();
   const { openSheet, closeSheet } = useBottomSheet();
 
   const { isPending, mutate } = useUpdateMedicationMutation({ name: "UPDATE FREQUENCY" });
-  const ruleToText = formatRRuleToRussian(medicationProfile.schedule.recurrenceRule);
+  const ruleToText = formatRRuleToText(medicationProfile.schedule.recurrenceRule);
 
   const handleUpdateRules = (updatedRule: string) => {
     closeSheet();
@@ -30,9 +32,10 @@ export default function DetailsFrequencySettings({
       mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
     }
   };
+
   const openFrequencySettingSheet = () => {
     openSheet({
-      title: "Изменить частоту",
+      title: t("medication_screen.details_schedule_freq_sheet_title"),
       content: <FrequencySheet handleUpdateRules={handleUpdateRules} />,
     });
   };
@@ -42,10 +45,11 @@ export default function DetailsFrequencySettings({
     <React.Fragment>
       <Pressable style={sharedStyles.card} onPress={openFrequencySettingSheet}>
         <View style={sharedStyles.cardHeader}>
-          <Text style={sharedStyles.cardTitle}>Частота приема</Text>
+          <Text style={sharedStyles.cardTitle}>
+            {t("medication_screen.details_schedule_freq_label")}
+          </Text>
           <ArrowRight color={color} />
         </View>
-
         <View style={[sharedStyles.cardBody, { alignItems: "flex-start" }]}>
           <AlarmClockIcon color={color} />
           <View style={{ flex: 1 }}>
@@ -63,6 +67,7 @@ const FrequencySheet = ({
 }: {
   handleUpdateRules: (updatedRule: string) => void;
 }) => {
+  const { t } = useTranslation();
   const [selectedPreset, setSelectedPreset] = useState<SchedulePreset | undefined>(undefined);
   const [updatedRule, setUpdatedRule] = useState("");
 
@@ -96,9 +101,8 @@ const FrequencySheet = ({
           </Text>
         ))}
       </View>
-
       <CustomButton
-        label="Применить"
+        label={t("common.apply")}
         onPress={() => handleUpdateRules(updatedRule)}
         disabled={!canUpdate}
         variant={canUpdate ? "filled" : "disabled"}

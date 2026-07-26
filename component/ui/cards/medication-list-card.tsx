@@ -1,7 +1,8 @@
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
-import { getStartedDate } from "@/helpers/getStartedDate";
+import { getDurationDate } from "@/helpers/getDurationDate";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -18,7 +19,8 @@ const getProgressText = (medicationProfile: MedicationProfileReponse) => {
   if (!medicationProfile.pack) return;
   const pack = medicationProfile.pack;
   const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
-  return `${consumed} из ${pack.totalAmountInPack} принято`;
+  const isRU = lng === "ru";
+  return `${consumed} ${isRU ? "из" : "of"} ${pack.totalAmountInPack} ${isRU ? "принято" : "taken"}`;
 };
 
 function getPercentage(medicationProfile: MedicationProfileReponse) {
@@ -32,6 +34,7 @@ export default function MedicationListCard({
   medicationProfile,
   onSwitchToggle,
 }: MedicationListCardProps) {
+  const { t } = useTranslation();
   const sharedStyles = useCardStyles();
   const profileImageUrl = useProfileImage(medicationProfile.profile.id);
 
@@ -39,7 +42,7 @@ export default function MedicationListCard({
   const router = useRouter();
 
   const dosageUnit = getDosageMeasurement(medicationProfile.schedule.measurement);
-  const startedDate = getStartedDate(medicationProfile.schedule.startDate);
+  const startedDate = getDurationDate(medicationProfile.schedule.startDate);
 
   const canShowProgress = medicationProfile.pack !== null;
 
@@ -92,8 +95,9 @@ export default function MedicationListCard({
             <Text
               style={sharedStyles.cardTextMedium}
             >{`${medicationProfile.schedule.dosage} ${dosageUnit}`}</Text>
-            <Text style={sharedStyles.cardTextMedium}>Начало: {startedDate}</Text>
-
+            <Text style={sharedStyles.cardTextMedium}>
+              {t("medication_screen.list_card_start_at", { date: startedDate })}
+            </Text>
             {!medicationProfile.profile.isSelf && (
               <View style={sharedStyles.profile}>
                 <View style={sharedStyles.profileImage}>

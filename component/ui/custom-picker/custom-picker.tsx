@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { Picker } from "@react-native-picker/picker";
 import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -21,14 +22,9 @@ export default function CustomPicker({
   onValueSelected,
   selectedValue,
 }: CustomPickerProps) {
+  const { t } = useTranslation();
   const [isSelectionVisible, setIsSelectionVisible] = useState(false);
   const pickerRef = useRef<Picker<string>>(null);
-
-  //   Theme color
-  const textColor = useThemeColor({}, "textPrimary");
-  const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
-  const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
-  const tintColor = useThemeColor({}, "tint");
 
   const triggerSelection = () => {
     const isVisible = !isSelectionVisible;
@@ -51,6 +47,12 @@ export default function CustomPicker({
     onValueSelected(value);
   };
 
+  //   Theme color
+  const textColor = useThemeColor({}, "textPrimary");
+  const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
+  const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
+  const tintColor = useThemeColor({}, "tint");
+
   return (
     <View style={[styles.customPickerWrapper, { backgroundColor: bGColorSecondary }]}>
       <View style={styles.customPickerHeader}>
@@ -67,7 +69,9 @@ export default function CustomPicker({
               { color: isSelectionVisible ? tintColor : textColor },
             ]}
           >
-            {selectedValue ? getSelectedValueLabel(selectedValue) : "Выбрать"}
+            {selectedValue
+              ? getSelectedValueLabel(selectedValue)
+              : t("common.custom_picker_button")}
           </Text>
         </Pressable>
       </View>

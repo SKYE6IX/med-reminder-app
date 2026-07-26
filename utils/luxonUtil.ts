@@ -34,7 +34,7 @@ export const getDateLocalString = (date: Date = new Date()) => {
 
 export const formatRegularDate = (isoDate: string) => {
   const date = DateTime.fromFormat(isoDate, "dd MM yyyy", {
-    locale: "ru-RU",
+    locale: lng,
     setZone: true,
   });
 

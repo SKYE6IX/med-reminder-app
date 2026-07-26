@@ -3,6 +3,7 @@ import ArrowRight from "@/component/icons/arrow-right";
 import NoteIcon from "@/component/icons/note-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { BottomSheetScrollView, BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React, { useMemo, useState } from "react";
@@ -16,6 +17,7 @@ export default function DetailsNoteSettings({
 }: {
   medicationProfile: MedicationProfileReponse;
 }) {
+  const { t } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheet();
 
   // Themes
@@ -25,7 +27,7 @@ export default function DetailsNoteSettings({
 
   const openUpdateNoteSheet = () => {
     openSheet({
-      title: "Изменить заметку",
+      title: t("medication_screen.details_note_sheet_title"),
       content: <UpdateNoteSheet medicationProfile={medicationProfile} closeSheet={closeSheet} />,
     });
   };
@@ -34,7 +36,7 @@ export default function DetailsNoteSettings({
     <React.Fragment>
       <Pressable style={sharedStyles.card} onPress={openUpdateNoteSheet}>
         <View style={sharedStyles.cardHeader}>
-          <Text style={sharedStyles.cardTitle}>Заметка</Text>
+          <Text style={sharedStyles.cardTitle}>{t("medication_screen.details_note_title")}</Text>
           <ArrowRight color={color} />
         </View>
 
@@ -42,7 +44,9 @@ export default function DetailsNoteSettings({
           <NoteIcon color={color} />
           <View style={{ flex: 1 }}>
             <Text style={[sharedStyles.cardTextContent, { color: mutedColor }]}>
-              {medicationProfile.note ? medicationProfile.note : "Добавьте заметку..."}
+              {medicationProfile.note
+                ? medicationProfile.note
+                : t("medication_screen.details_note_placeholder")}
             </Text>
           </View>
         </View>
@@ -58,17 +62,15 @@ const UpdateNoteSheet = ({
   medicationProfile: MedicationProfileReponse;
   closeSheet: () => void;
 }) => {
+  const { t } = useTranslation();
   const { isPending, mutate } = useUpdateMedicationMutation({
     name: "UPDATE NOTE",
     onSucceed() {
       closeSheet();
     },
   });
-
   const [updatedNote, setUpdateNote] = useState("");
-
   const existingNote = medicationProfile.note ? medicationProfile.note : "";
-
   const canUpdate = useMemo(
     () => medicationProfile.note !== updatedNote,
     [medicationProfile.note, updatedNote],
@@ -96,20 +98,18 @@ const UpdateNoteSheet = ({
         scrollEnabled={true}
         returnKeyType="default"
         keyboardType="default"
-        placeholder="Заметка о лекарстве"
+        placeholder={t("medication_screen.details_note_input_placeholder")}
         placeholderTextColor="#9E9E9E"
         maxLength={500}
         style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
       />
-
       <CustomButton
-        label="Применить"
+        label={t("common.apply")}
         onPress={handleUpdateNote}
         disabled={!canUpdate}
         variant={canUpdate ? "filled" : "disabled"}
         textVaraint={canUpdate ? "regularText" : "mutedText"}
       />
-
       <Loader visible={isPending} />
     </BottomSheetScrollView>
   );

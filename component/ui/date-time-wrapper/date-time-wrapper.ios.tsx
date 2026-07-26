@@ -1,3 +1,4 @@
+import { lng, useTranslation } from "@/i18next/i18next";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import { View } from "react-native";
@@ -20,6 +21,7 @@ export default function DateTimeWrapper({
   showUpdateButton,
   onUpdateButtonPress,
 }: DateTimeWrapperProps) {
+  const { t } = useTranslation();
   const [date, setDate] = useState(new Date(getNow()));
 
   const handleSetDateTime = (date?: Date) => {
@@ -43,10 +45,10 @@ export default function DateTimeWrapper({
         mode={mode}
         onValueChange={(event, date) => handleSetDateTime(date)}
         display={mode === "date" ? "inline" : "spinner"}
-        locale="ru-RU"
+        locale={lng}
         minimumDate={disabledDate && mode === "date" ? new Date(getNow()) : undefined}
       />
-      {showUpdateButton && <CustomButton label="Применить" onPress={onUpdateButtonPress} />}
+      {showUpdateButton && <CustomButton label={t("common.apply")} onPress={onUpdateButtonPress} />}
     </View>
   );
 }

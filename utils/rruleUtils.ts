@@ -1,6 +1,9 @@
 import { CustomPattern } from "@/component/ui/custom-frequency/types";
+import { lng } from "@/i18next/i18next";
 import { Options, RRule } from "rrule";
 import { DateTime, getTimeZone, toLocalUtcTime } from "./luxonUtil";
+
+const isRU = lng === "ru";
 
 export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   if (!rrule) return;
@@ -156,7 +159,7 @@ const populateOcurrencesTimes = (
   return times.map((times) => times.toJSDate());
 };
 
-export const formatRRuleToRussian = (rrule: string | undefined) => {
+export const formatRRuleToText = (rrule: string | undefined) => {
   if (!rrule) return;
   const rule = RRule.fromString(rrule);
   const options = rule.options;
@@ -166,12 +169,10 @@ export const formatRRuleToRussian = (rrule: string | undefined) => {
     case RRule.HOURLY: {
       const hours = options.byhour || [];
       const equalInterval = calculateEqualHourInterval(hours);
-
       if (equalInterval) {
-        return `Каждые ${equalInterval} ${pluralizeHours(equalInterval)}, ${hours.length} ${pluralizeTimes(hours.length)} в день`;
+        return `${isRU ? "Каждые" : "Every"} ${equalInterval} ${pluralizeHours(equalInterval)}, ${hours.length} ${pluralizeTimes(hours.length)} ${isRU ? "в день" : "in a day"}`;
       }
-
-      return "Каждый час";
+      return isRU ? "Каждый час" : "Every hour";
     }
 
     case RRule.DAILY: {
@@ -181,25 +182,26 @@ export const formatRRuleToRussian = (rrule: string | undefined) => {
       const minute = byminute[0].toString().length < 2 ? `${byminute[0]}0` : byminute[0];
 
       let baseText = "";
+
       if (interval === 1) {
-        baseText = "Каждый день";
+        baseText = isRU ? "Каждый день" : "Every day";
       } else {
-        baseText = `Каждые ${interval} ${pluralizeDays(interval)}`;
+        baseText = `${isRU ? "Каждые" : "Every"} ${interval} ${pluralizeDays(interval)}`;
       }
 
       if (hours.length === 1) {
         const hour = String(hours[0]).padStart(2, "0");
-
-        return `${baseText} в ${hour}:${minute}`;
+        const text = isRU ? "в" : "at";
+        return `${baseText} ${text} ${hour}:${minute}`;
       }
 
       const equalInterval = calculateEqualHourInterval(hours);
 
       if (equalInterval) {
-        return `${baseText}, каждые ${equalInterval} ${pluralizeHours(equalInterval)}`;
+        return `${baseText}, ${isRU ? "каждые" : "every"} ${equalInterval} ${pluralizeHours(equalInterval)}`;
       }
 
-      return `${baseText}, ${hours.length} ${pluralizeTimes(hours.length)} в день`;
+      return `${baseText}, ${hours.length} ${pluralizeTimes(hours.length)} ${isRU ? "в день" : "in a day"}`;
     }
   }
 };
@@ -208,29 +210,39 @@ const calculateEqualHourInterval = (hours: number[]) => {
   if (hours.length < 2) {
     return null;
   }
+
   const sorted = [...hours].sort((a, b) => a - b);
+
   const diffs: number[] = [];
 
   for (let i = 1; i < sorted.length; i++) {
     diffs.push(sorted[i] - sorted[i - 1]);
   }
-  const isEqual = diffs.every((d) => d === diffs[0]);
 
+  const isEqual = diffs.every((d) => d === diffs[0]);
   return isEqual ? diffs[0] : null;
 };
 
 const pluralize = (count: number, one: string, few: string, many: string) => {
   const mod10 = count % 10;
   const mod100 = count % 100;
+
   if (mod10 === 1 && mod100 !== 11) {
     return one;
   }
+
   if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) {
     return few;
   }
+
   return many;
 };
 
-const pluralizeHours = (count: number) => pluralize(count, "час", "часа", "часов");
-const pluralizeDays = (count: number) => pluralize(count, "день", "дня", "дней");
-const pluralizeTimes = (count: number) => pluralize(count, "раз", "раза", "раз");
+const pluralizeHours = (count: number) =>
+  pluralize(count, isRU ? "час" : "hour", isRU ? "часа" : "hours", isRU ? "часов" : "hours");
+
+const pluralizeDays = (count: number) =>
+  pluralize(count, isRU ? "день" : "day", isRU ? "дня" : "days", isRU ? "дней" : "days");
+
+const pluralizeTimes = (count: number) =>
+  pluralize(count, isRU ? "раз" : "time", isRU ? "раза" : "times", isRU ? "раз" : "times");

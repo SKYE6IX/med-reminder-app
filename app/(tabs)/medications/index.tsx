@@ -6,6 +6,7 @@ import Tabs from "@/component/ui/tabs";
 import { useMedicationProfileQuery } from "@/hooks/use-medication-profile-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
@@ -14,20 +15,14 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 type TABS_VALUE = "ALL" | "ACTIVE" | "IN_ACTIVE";
 
-const TABS = [
-  { label: "Все", value: "ALL" },
-  { label: "Активно", value: "ACTIVE" },
-  { label: "Неактивно", value: "IN_ACTIVE" },
-];
-
 export default function Medications() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const isIOS = Platform.OS === "ios";
 
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ALL");
-
   const { isLoading, data } = useMedicationProfileQuery();
 
   // Updating mutation
@@ -62,6 +57,11 @@ export default function Medications() {
 
   const top = isIOS ? insets.top : insets.top + 20;
   const bottom = isIOS ? insets.bottom + 10 : 10;
+  const TABS = [
+    { label: t("medication_screen.tab_all"), value: "ALL" },
+    { label: t("medication_screen.tab_active"), value: "ACTIVE" },
+    { label: t("medication_screen.tab_inactive"), value: "IN_ACTIVE" },
+  ];
 
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor: bgPrimary }} edges={["top"]}>
@@ -96,12 +96,14 @@ export default function Medications() {
                 source={require("@/assets/images/pill-bottle.png")}
                 style={styles.noContentImage}
               />
-              <Text style={[styles.noContentTitle, { color }]}>У Вас нет никаких лекарств.</Text>
+              <Text style={[styles.noContentTitle, { color }]}>
+                {t("medication_screen.no_content_heading")}
+              </Text>
               <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-                Вы можете добавить лекарства сейчас.
+                {t("medication_screen.no_content_body")}
               </Text>
               <CustomButton
-                label="Добавить лекарства"
+                label={t("common.add_medication")}
                 svgIcon={<PlusIcon size={15} />}
                 onPress={() => router.navigate("/(tabs)/add-medication")}
               />

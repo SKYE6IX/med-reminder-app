@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useEffect } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
@@ -14,11 +15,7 @@ export default function CustomPicker({
   triggerSelection,
   selectedValue,
 }: CustomPickerProps) {
-  // Themes color
-  const textColor = useThemeColor({}, "textPrimary");
-  const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
-  const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
-  const tintColor = useThemeColor({}, "tint");
+  const { t } = useTranslation();
 
   const height = useSharedValue(60);
 
@@ -33,6 +30,12 @@ export default function CustomPicker({
   const handleValueChange = (value: string) => {
     onValueSelected(value);
   };
+
+  // Themes color
+  const textColor = useThemeColor({}, "textPrimary");
+  const bGColorTertiary = useThemeColor({}, "backgroundTertiary");
+  const bGColorSecondary = useThemeColor({}, "backgroundSecondary");
+  const tintColor = useThemeColor({}, "tint");
 
   return (
     <Animated.View
@@ -59,7 +62,9 @@ export default function CustomPicker({
               { color: isSelectionVisible ? tintColor : textColor },
             ]}
           >
-            {selectedValue ? getSelectedValueLabel(selectedValue) : "Выбрать"}
+            {selectedValue
+              ? getSelectedValueLabel(selectedValue)
+              : t("common.custom_picker_button")}
           </Text>
         </Pressable>
       </View>

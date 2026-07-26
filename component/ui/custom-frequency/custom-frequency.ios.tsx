@@ -1,5 +1,6 @@
 import { HOUR_BETWEEN_OCCURENCES, OCCURENCES_PER_DAY } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { PickerIOS } from "@react-native-picker/picker";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,6 +16,7 @@ export default function CustomFrequency({
   handleSelection,
   onCustomPatternChange,
 }: CustomFrequencyProps) {
+  const { t } = useTranslation();
   const sharedStyles = useCustomFreqStyles();
 
   const [customState, setCustomState] = useState<CustomState>({
@@ -160,7 +162,7 @@ export default function CustomFrequency({
         <View style={styles.optionsWrapper}>
           {/* LABEL AND VALUE */}
           <View style={sharedStyles.opitonsItem}>
-            <Text style={sharedStyles.optionsLabel}>Каждые</Text>
+            <Text style={sharedStyles.optionsLabel}>{t("common.custom_freq_every_label")}</Text>
 
             <View style={sharedStyles.optionsGroup}>
               <Pressable
@@ -221,8 +223,8 @@ export default function CustomFrequency({
                 color: "#F7F7F7",
               }}
             >
-              <PickerIOS.Item label="Часа" value="HOURLY" />
-              <PickerIOS.Item label="Дня" value="DAILY" />
+              <PickerIOS.Item label={t("common.custom_freq_hour_unit")} value="HOURLY" />
+              <PickerIOS.Item label={t("common.custom_freq_day_unit")} value="DAILY" />
             </PickerIOS>
           )}
         </View>
@@ -239,7 +241,7 @@ export default function CustomFrequency({
           ]}
         >
           <View style={sharedStyles.opitonsItem}>
-            <Text style={sharedStyles.optionsLabel}>В день</Text>
+            <Text style={sharedStyles.optionsLabel}>{t("common.custom_freq_in_a_day_label")}</Text>
             <View style={sharedStyles.optionsGroup}>
               <Pressable
                 style={sharedStyles.optionsGroupItem}
@@ -287,7 +289,9 @@ export default function CustomFrequency({
             ]}
           >
             <View style={sharedStyles.opitonsItem}>
-              <Text style={sharedStyles.optionsLabel}>Интервал (ч)</Text>
+              <Text style={sharedStyles.optionsLabel}>
+                {t("common.custom_freq_hour_interval_label")}
+              </Text>
               <View style={sharedStyles.optionsGroup}>
                 <Pressable
                   style={sharedStyles.optionsGroupItem}

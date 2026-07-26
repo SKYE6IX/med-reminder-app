@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng } from "@/i18next/i18next";
 import { SchedulePreset } from "@/stores/add-pill-store";
 import { buildRRule } from "@/utils/rruleUtils";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -18,33 +19,38 @@ type FrequencySettingsProps = {
   onFreqSet: ({ rrule, preset }: { rrule: string; preset: SchedulePreset | undefined }) => void;
 };
 
-const DEFALUT_FREQUENCIES: FrequencySettingsState[] = [
-  {
-    label: "Один раз в день",
-    info: "Каждые 24 часа",
-    rrule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
-    preset: "ONCE_A_DAY",
-  },
-  {
-    label: "Два раза в день",
-    info: "Каждые 12 часов",
-    rrule: "FREQ=DAILY;BYHOUR=8,20;BYMINUTE=0",
-    preset: "TWICE_A_DAY",
-  },
-  {
-    label: "Три раза в день",
-    info: "Каждые 8 часов",
-    rrule: "FREQ=DAILY;BYHOUR=7,15,23;BYMINUTE=0",
-    preset: "THREE_TIMES_A_DAY",
-  },
-  {
-    label: "Своя частота",
-    rrule: "FREQ=HOURLY;BYHOUR=8,11,14;BYMINUTE=0",
-    preset: "CUSTOM",
-  },
-];
+const getDefaultFrequency = (): FrequencySettingsState[] => {
+  const isRu = lng === "ru";
+  return [
+    {
+      label: isRu ? "Один раз в день" : "Once a day",
+      info: isRu ? "Каждые 24 часа" : "Every 24 hours",
+      rrule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
+      preset: "ONCE_A_DAY",
+    },
+    {
+      label: isRu ? "Два раза в день" : "Two times a day",
+      info: isRu ? "Каждые 12 часов" : "Every 12 hours",
+      rrule: "FREQ=DAILY;BYHOUR=8,20;BYMINUTE=0",
+      preset: "TWICE_A_DAY",
+    },
+    {
+      label: isRu ? "Три раза в день" : "Three times a day",
+      info: isRu ? "Каждые 8 часов" : "Every 8 hours",
+      rrule: "FREQ=DAILY;BYHOUR=7,15,23;BYMINUTE=0",
+      preset: "THREE_TIMES_A_DAY",
+    },
+    {
+      label: isRu ? "Своя частота" : "Custom frequency",
+      rrule: "FREQ=HOURLY;BYHOUR=8,11,14;BYMINUTE=0",
+      preset: "CUSTOM",
+    },
+  ];
+};
 
 export default function FrequencySettings({ preset, onFreqSet }: FrequencySettingsProps) {
+  const DEFALUT_FREQUENCIES = getDefaultFrequency();
+
   const regularDefualts = DEFALUT_FREQUENCIES.filter((freq) => freq.preset !== "CUSTOM");
   const customDefault = DEFALUT_FREQUENCIES[DEFALUT_FREQUENCIES.length - 1];
 

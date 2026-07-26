@@ -2,6 +2,7 @@ import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { QueryKey } from "@/constants/query-keys";
 import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfileReponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
@@ -20,6 +21,7 @@ const deleteMedicationProfileMutation = async (id: string) => {
 };
 
 export default function DeleteMedication({ medicationProfileId }: { medicationProfileId: string }) {
+  const { t } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheet();
   const { showFeedBack } = useFeedBackStore();
 
@@ -35,18 +37,18 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
       );
       closeSheet();
       router.back();
-
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
         cancelEventNotification({ medProfileId: medicationProfileId }),
       ]);
     },
+
     onError(error) {
       if (axios.isAxiosError(error)) {
         showFeedBack({
-          title: "Ошибка!",
-          message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+          title: t("feedback.error.general.title"),
+          message: t("feedback.error.general.text"),
           status: "error",
         });
       } else {
@@ -63,7 +65,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
 
   const openDeleteMedicationSheet = () => {
     openSheet({
-      title: "Удалить это лекарство?",
+      title: t("medication_screen.details_delete_sheet_title"),
       snapPointPercent: snapPoint,
       content: <DeleteMedicationSheet deleteAction={handleDeleteAction} closeSheet={closeSheet} />,
     });
@@ -73,7 +75,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
     <React.Fragment>
       <Loader visible={isPending} />
       <CustomButton
-        label="Удалить лекарство"
+        label={t("medication_screen.details_delete_title")}
         variant="danger"
         onPress={openDeleteMedicationSheet}
       />
@@ -88,22 +90,23 @@ const DeleteMedicationSheet = ({
   deleteAction: () => void;
   closeSheet: () => void;
 }) => {
+  const { t } = useTranslation();
   const mutedColor = useThemeColor({}, "textMuted");
   return (
     <View style={styles.deleteActionBox}>
       <Text style={[styles.deleteActionDescription, { color: mutedColor }]}>
-        Все данные об этом лекарстве будут удалены.
+        {t("medication_screen.details_delete_sheet_description")}
       </Text>
       <View style={styles.deleteActionBtnWrapper}>
         <CustomButton
-          label="Отмена"
+          label={t("medication_screen.details_delete_sheet_btn1")}
           variant="outline"
           textVaraint="tintText"
           onPress={closeSheet}
           style={{ width: "46%" }}
         />
         <CustomButton
-          label="Удалить"
+          label={t("medication_screen.details_delete_sheet_btn2")}
           variant="danger"
           onPress={deleteAction}
           style={{ width: "46%" }}

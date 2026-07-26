@@ -1,5 +1,6 @@
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import React, { useState } from "react";
 import { Platform, StyleSheet, Text, TextInput, View } from "react-native";
 import CustomPicker from "./custom-picker/custom-picker";
@@ -31,6 +32,7 @@ export default function MedicationPackPicker({
   onPickerTrigger,
   measurementValue,
 }: MedicationPackPickerProps) {
+  const { t } = useTranslation();
   const isIOS = Platform.OS === "ios";
 
   const measurement = getDosageMeasurement(measurementValue);
@@ -75,7 +77,9 @@ export default function MedicationPackPicker({
   return (
     <React.Fragment>
       <View style={styles.packAmountContainer}>
-        <Text style={[styles.bottomSheetlabel, { color }]}>Общее количество дозы</Text>
+        <Text style={[styles.bottomSheetlabel, { color }]}>
+          {t("common.reserve_setting_input_label")}
+        </Text>
         <TextInput
           style={[
             styles.bottomSheetInput,
@@ -93,12 +97,12 @@ export default function MedicationPackPicker({
           onChangeText={handleOnTextChange}
         />
         <Text style={[styles.bottomSheetText, { color }]}>
-          Введите общую сумму в «{measurement}»
+          {t("common.reserve_setting_input_description", { measurement: measurement ?? "" })}
         </Text>
       </View>
 
       <CustomPicker
-        label="Напомнить за срок (дни)"
+        label={t("common.reserve_setting_label")}
         items={REMINDER_DAYS}
         selectedValue={localValue.refillDaysReminder}
         onValueSelected={handleRefillDaysSet}

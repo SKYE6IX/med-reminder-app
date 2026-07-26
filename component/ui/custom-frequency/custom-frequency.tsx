@@ -1,5 +1,6 @@
 import { HOUR_BETWEEN_OCCURENCES, OCCURENCES_PER_DAY } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { Picker } from "@react-native-picker/picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,6 +16,7 @@ export default function CustomFrequency({
   handleSelection,
   onCustomPatternChange,
 }: CustomFrequencyProps) {
+  const { t } = useTranslation();
   const sharedStyles = useCustomFreqStyles();
 
   // Picker Refs
@@ -159,7 +161,7 @@ export default function CustomFrequency({
       <Animated.View style={[{ opacity: optionsContainerOpacity }]}>
         {/* BASE OPTIONS  */}
         <View style={sharedStyles.opitonsItem}>
-          <Text style={sharedStyles.optionsLabel}>Каждые</Text>
+          <Text style={sharedStyles.optionsLabel}>{t("common.custom_freq_every_label")}</Text>
           <View style={sharedStyles.optionsGroup}>
             <Pressable
               style={[sharedStyles.optionsGroupItem, { width: 60 }]}
@@ -188,7 +190,7 @@ export default function CustomFrequency({
             { borderTopWidth: 1, borderColor: "#F7F7F7", paddingTop: 8 },
           ]}
         >
-          <Text style={sharedStyles.optionsLabel}>В день</Text>
+          <Text style={sharedStyles.optionsLabel}>{t("common.custom_freq_in_a_day_label")}</Text>
           <View style={sharedStyles.optionsGroup}>
             <Pressable
               style={sharedStyles.optionsGroupItem}
@@ -209,7 +211,9 @@ export default function CustomFrequency({
               { borderTopWidth: 1, borderColor: "#F7F7F7", paddingTop: 8 },
             ]}
           >
-            <Text style={sharedStyles.optionsLabel}>Интервал (ч)</Text>
+            <Text style={sharedStyles.optionsLabel}>
+              {t("common.custom_freq_hour_interval_label")}
+            </Text>
             <View style={sharedStyles.optionsGroup}>
               <Pressable
                 style={sharedStyles.optionsGroupItem}
@@ -268,8 +272,8 @@ export default function CustomFrequency({
           color,
         }}
       >
-        <Picker.Item label="Часа" value="HOURLY" />
-        <Picker.Item label="Дня" value="DAILY" />
+        <Picker.Item label={t("common.custom_freq_hour_unit")} value="HOURLY" />
+        <Picker.Item label={t("common.custom_freq_day_unit")} value="DAILY" />
       </Picker>
 
       {/* OCCURENCES_PER_DAY OPTIONS */}

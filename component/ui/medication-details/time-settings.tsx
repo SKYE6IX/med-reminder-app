@@ -3,6 +3,7 @@ import ArrowRight from "@/component/icons/arrow-right";
 import ClockIcon from "@/component/icons/clock-icon";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
 import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
@@ -27,6 +28,7 @@ export default function DetailsTimeSettings({
   medicationProfile: MedicationProfileReponse;
   fullWidth: boolean;
 }) {
+  const { t } = useTranslation();
   const sharedStyles = useSharedStyles();
   const isAndroid = Platform.OS === "android";
 
@@ -70,7 +72,7 @@ export default function DetailsTimeSettings({
       androidTimeRef.current?.showDateTime();
     } else {
       openSheet({
-        title: "Время начала",
+        title: t("medication_screen.details_schedule_time_label"),
         snapPointPercent: "45%",
         content: (
           <IOSDateTimeWrapper
@@ -91,7 +93,9 @@ export default function DetailsTimeSettings({
         onPress={openDateTime}
       >
         <View style={sharedStyles.cardHeader}>
-          <Text style={sharedStyles.cardTitle}>Время начала</Text>
+          <Text style={sharedStyles.cardTitle}>
+            {t("medication_screen.details_schedule_time_label")}
+          </Text>
           <ArrowRight color={color} />
         </View>
         <View style={sharedStyles.cardBody}>

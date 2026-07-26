@@ -1,3 +1,4 @@
+import { lng } from "@/i18next/i18next";
 import { Platform } from "react-native";
 import { CustomPattern, Unit } from "./types";
 
@@ -27,24 +28,25 @@ export const getOptionsValueLabel = (
 
 export const getUnitValueLabel = (unit: Unit, value: number) => {
   const num = Number(value);
+  const isRU = lng === "ru";
 
   if (unit === "DAILY") {
     if (num === 1) {
-      return "день";
+      return isRU ? "день" : "Day";
     } else if (num > 1 && num < 5) {
-      return "дня";
+      return isRU ? "дня" : "Days";
     } else {
-      return "дней";
+      return isRU ? "дней" : "Days";
     }
   }
 
   if (unit === "HOURLY") {
     if (num === 1) {
-      return "час";
+      return isRU ? "час" : "Hour";
     } else if (num > 1 && num < 5) {
-      return "часа";
+      return isRU ? "часа" : "Hours";
     } else {
-      return "часов";
+      return isRU ? "часов" : "Hours";
     }
   }
 };

@@ -1,5 +1,6 @@
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useState } from "react";
@@ -17,6 +18,7 @@ export default function DosageAmountInput({
   measurementValue,
   closeSheet,
 }: DosageAmountInputProps) {
+  const { t } = useTranslation();
   const [value, setValue] = useState("");
 
   const { showFeedBack } = useFeedBackStore();
@@ -30,8 +32,8 @@ export default function DosageAmountInput({
   const handleSetDosageAmount = () => {
     if (Number(value) <= 0) {
       showFeedBack({
-        title: "Неправильная дозировка",
-        message: "Пожалуйста, установите допустимую дозировку.",
+        title: t("feedback.error.dosage_amount.title"),
+        message: t("feedback.error.dosage_amount.text"),
         status: "error",
       });
       return;
@@ -45,9 +47,10 @@ export default function DosageAmountInput({
   const color = useThemeColor({}, "textPrimary");
   const inputBgColor = useThemeColor({}, "backgroundSecondary");
   const inputBorderColor = useThemeColor({}, "borderColor");
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { color }]}>Доза за приём</Text>
+      <Text style={[styles.label, { color }]}>{t("common.dose_amount_picker_heading")}</Text>
       <View style={styles.innerWrapper}>
         <BottomSheetTextInput
           style={[
@@ -65,9 +68,15 @@ export default function DosageAmountInput({
           value={value}
           onChangeText={handleOnChangeText}
         />
-        <Text style={[styles.text, { color }]}>Введите общую сумму в «{measurement}»</Text>
+        <Text style={[styles.text, { color }]}>
+          {t("common.dose_amount_picker_description", { measurement: measurement ?? "" })}
+        </Text>
       </View>
-      <CustomButton label="Задать" onPress={handleSetDosageAmount} style={{ marginTop: "auto" }} />
+      <CustomButton
+        label={t("common.apply")}
+        onPress={handleSetDosageAmount}
+        style={{ marginTop: "auto" }}
+      />
     </View>
   );
 }

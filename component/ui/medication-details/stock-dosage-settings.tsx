@@ -5,6 +5,7 @@ import { QueryKey } from "@/constants/query-keys";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
@@ -37,6 +38,7 @@ export default function StockDosageSettings({
 }: {
   medicationProfile: MedicationProfileReponse;
 }) {
+  const { t } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheet();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
@@ -47,7 +49,7 @@ export default function StockDosageSettings({
   const openAddMedicationPack = () => {
     if (isPremiumPlan) {
       openSheet({
-        title: "Напоминание о пополнении",
+        title: t("medication_screen.details_dosage_reserve_sheet_title"),
         content: (
           <AddMedicationPackSheet medicationProfile={medicationProfile} closeSheet={closeSheet} />
         ),
@@ -63,7 +65,9 @@ export default function StockDosageSettings({
       {medicationProfile.pack ? (
         <View style={[sharedStyles.card, sharedStyles.detailsGroupItem]}>
           <View style={sharedStyles.cardHeader}>
-            <Text style={[sharedStyles.cardTitle]}>Запас</Text>
+            <Text style={[sharedStyles.cardTitle]}>
+              {t("medication_screen.details_dosage_reserve_title")}
+            </Text>
           </View>
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
@@ -79,11 +83,15 @@ export default function StockDosageSettings({
           onPress={openAddMedicationPack}
         >
           <View style={sharedStyles.cardHeader}>
-            <Text style={[sharedStyles.cardTitle]}>Запас</Text>
+            <Text style={[sharedStyles.cardTitle]}>
+              {t("medication_screen.details_dosage_reserve_title")}
+            </Text>
             <ArrowRight color={color} />
           </View>
           <View style={sharedStyles.cardBody}>
-            <Text style={[sharedStyles.cardTextContent, { color }]}>Добавить</Text>
+            <Text style={[sharedStyles.cardTextContent, { color }]}>
+              {t("medication_screen.details_dosage_reserve_add")}
+            </Text>
           </View>
         </Pressable>
       )}
@@ -95,6 +103,7 @@ export default function StockDosageSettings({
 }
 
 const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedicationPackSheetProps) => {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
 
   const [medicationPack, setMedicationPack] = useState<MedicationPackCreation>({
@@ -128,18 +137,17 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
       ]);
       showFeedBack({
-        title: "Успешно",
-        message: "Пополнение добавлено в напоминание.",
+        title: t("feedback.success.reserve_setup.title"),
+        message: t("feedback.success.reserve_setup.text"),
         status: "success",
       });
       closeSheet();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
-
     onError() {
       showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+        title: t("feedback.error.general.title"),
+        message: t("feedback.error.general.text"),
         status: "error",
       });
     },
@@ -151,21 +159,21 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
       Number(medicationPack.totalQuantity) <= Number(medicationProfile.schedule.dosage)
     ) {
       showFeedBack({
-        title: "Неверный ввод",
-        message: "Пожалуйста, введите все данные о вашей упаковке с лекарствами.",
+        title: t("feedback.error.reserve_setup.title"),
+        message: t("feedback.error.reserve_setup.text"),
         status: "error",
       });
       return;
     }
-
     mutate(medicationPack);
   };
 
   const color = useThemeColor({}, "textPrimary");
-
   return (
     <ScrollView contentContainerStyle={styles.bottomSheetContainer}>
-      <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
+      <Text style={[styles.bottomSheetText, { color }]}>
+        {t("medication_screen.details_dosage_reserve_sheet_heading")}
+      </Text>
       <MedicationPackPicker
         amountInPack={medicationPack.totalQuantity}
         refillDaysReminder={reminderDays}
@@ -173,9 +181,8 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
         onRefillDaysReminderSet={handleRefillDaysSet}
         measurementValue={medicationProfile.schedule.measurement}
       />
-
       <CustomButton
-        label="Добавить"
+        label={t("common.add")}
         disabled={!canContinue || isPending}
         variant={canContinue ? "filled" : "disabled"}
         textVaraint={canContinue ? "regularText" : "mutedText"}

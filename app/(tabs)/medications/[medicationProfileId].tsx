@@ -10,9 +10,10 @@ import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
 import { QueryKey } from "@/constants/query-keys";
 import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
-import { getStartedDate } from "@/helpers/getStartedDate";
+import { getDurationDate } from "@/helpers/getDurationDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ const fetchMedicationProfileDetails = async (id: string) => {
 };
 
 export default function MedicationDetails() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { medicationProfileId } = useLocalSearchParams();
 
@@ -72,7 +74,9 @@ export default function MedicationDetails() {
             <View style={styles.detailsContainer}>
               {/* Schedule Information Wrapper */}
               <View style={styles.detailsWrapper}>
-                <Text style={[styles.detailsTitle, { color }]}>Расписание</Text>
+                <Text style={[styles.detailsTitle, { color }]}>
+                  {t("medication_screen.details_schedule_heading")}
+                </Text>
                 {medicationProfile.schedule.endDate ? (
                   <>
                     <View style={styles.detailsGroup}>
@@ -85,12 +89,14 @@ export default function MedicationDetails() {
                         ]}
                       >
                         <View style={styles.cardHeader}>
-                          <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+                          <Text style={[styles.cardTitle, { color }]}>
+                            {t("medication_screen.details_schedule_start_label")}
+                          </Text>
                         </View>
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getStartedDate(medicationProfile.schedule.startDate)}
+                            {getDurationDate(medicationProfile.schedule.startDate)}
                           </Text>
                         </View>
                       </View>
@@ -104,17 +110,18 @@ export default function MedicationDetails() {
                         ]}
                       >
                         <View style={styles.cardHeader}>
-                          <Text style={[styles.cardTitle, { color }]}>Конец</Text>
+                          <Text style={[styles.cardTitle, { color }]}>
+                            {t("medication_screen.details_schedule_end_label")}
+                          </Text>
                         </View>
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getStartedDate(medicationProfile.schedule.endDate ?? "")}
+                            {getDurationDate(medicationProfile.schedule.endDate ?? "")}
                           </Text>
                         </View>
                       </View>
                     </View>
-
                     {/* TIME STARTED */}
                     <DetailsTimeSettings medicationProfile={medicationProfile} fullWidth />
                   </>
@@ -128,16 +135,17 @@ export default function MedicationDetails() {
                       ]}
                     >
                       <View style={styles.cardHeader}>
-                        <Text style={[styles.cardTitle, { color }]}>Дата начала</Text>
+                        <Text style={[styles.cardTitle, { color }]}>
+                          {t("medication_screen.details_schedule_start_label")}
+                        </Text>
                       </View>
                       <View style={styles.cardBody}>
                         <CalenderIcon color={color} />
                         <Text style={[styles.cardTextContent, { color }]}>
-                          {getStartedDate(medicationProfile.schedule.startDate)}
+                          {getDurationDate(medicationProfile.schedule.startDate)}
                         </Text>
                       </View>
                     </View>
-
                     {/* TIME STARTED */}
                     <DetailsTimeSettings medicationProfile={medicationProfile} fullWidth={false} />
                   </View>
@@ -149,7 +157,9 @@ export default function MedicationDetails() {
               {/* MEDICATION REASON */}
               {medicationProfile.medicationReason && (
                 <View style={styles.detailsWrapper}>
-                  <Text style={[styles.detailsTitle, { color }]}>Причина приема лекарства</Text>
+                  <Text style={[styles.detailsTitle, { color }]}>
+                    {t("medication_screen.details_reason_heading")}
+                  </Text>
                   <View style={[styles.dosageTakenInfo, { backgroundColor: bgSecondary }]}>
                     <PillFilledIcon color={color} />
                     <Text style={[styles.cardTextContent, { color: mutedColor }]}>
@@ -161,8 +171,9 @@ export default function MedicationDetails() {
 
               {/* Dosage Information */}
               <View style={styles.detailsWrapper}>
-                <Text style={[styles.detailsTitle, { color }]}>Дозировка</Text>
-
+                <Text style={[styles.detailsTitle, { color }]}>
+                  {t("medication_screen.details_dosage_heading")}
+                </Text>
                 <View style={styles.detailsGroup}>
                   {/* DOSAGE AMOUNT */}
                   <DetailsDosageSettings medicationProfile={medicationProfile} />
@@ -179,8 +190,10 @@ export default function MedicationDetails() {
                   <PillFilledIcon color={color} />
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
                     {medicationProfile && Number(medicationProfile.schedule.amountTaken) >= 1
-                      ? `${medicationProfile.schedule.amountTaken} ${getDosageMeasurement(medicationProfile.schedule.measurement)} принято`
-                      : "Лекарство еще не было принято"}
+                      ? t("medication_screen.details_amount_dose_taken", {
+                          data: `${medicationProfile.schedule.amountTaken} ${getDosageMeasurement(medicationProfile.schedule.measurement)}`,
+                        })
+                      : t("medication_screen.details_no_amount_dose_taken")}
                   </Text>
                 </View>
               </View>
@@ -197,7 +210,6 @@ export default function MedicationDetails() {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    // flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
     gap: 16,
@@ -209,10 +221,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: 300,
     alignSelf: "center",
-  },
-  contentContainer: {
-    // flex: 1,
-    // gap: 16,
   },
   detailsContainer: {
     gap: 16,
