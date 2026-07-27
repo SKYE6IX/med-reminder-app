@@ -1,9 +1,11 @@
 const en = {
   common: {
     next: "Next",
+    continue: "Continue",
     add: "Add",
     add_medication: "Add Medication",
     apply: "Apply",
+    create: "Create",
     custom_freq_hour_unit: "Hours",
     custom_freq_day_unit: "Day",
     custom_freq_every_label: "Every",
@@ -61,6 +63,14 @@ const en = {
         title: "Success!",
         text: "Reserve successfully added to your reminder.",
       },
+      add_new_profile: {
+        title: "Success!",
+        text: "Successfully added a new family profile.",
+      },
+      add_new_medication: {
+        title: "Success!",
+        text: "Added a new medication.",
+      },
     },
   },
   tabs: {
@@ -75,6 +85,17 @@ const en = {
     text: "Add unlimited medications, personlize reminders, and manage your family's medications.",
     activate: "Activate",
     skip: "Skip",
+  },
+  profile_card: {
+    you: "You",
+    for_me: "For me",
+    change: "Change",
+  },
+  add_profile_sheet: {
+    input_label: "Name",
+    input_placeholder: "Enter name",
+    button_label: "Add new profile",
+    picker_label: "Relationship",
   },
   onboarding: {
     step1: {
@@ -192,6 +213,36 @@ const en = {
     details_delete_sheet_description: "All information about this medication will be deleted.",
     details_delete_sheet_btn1: "Cancel",
     details_delete_sheet_btn2: "Delete",
+  },
+  add_medication_screen: {
+    step1_input_label: "Medication name",
+    step1_input_placeholder: "Search",
+    step1_choose_name: "Add '{{medicationName}}' as the name",
+    step2_med_form_label: "Choose medication form",
+    step2_reason_label: "Reason",
+    step2_reason_optional: " *Optional",
+    step2_profile_label: "Who is this medication for?",
+    step2_profile_create: "Add a family member",
+    step2_profile_choose: "Choose a family member",
+    step3_freq_label: "Frequency",
+    step3_dosage_label: "Dosage",
+    step3_dosage_amount_label: "Dose amount",
+    step3_dosage_amount_measurement_label: "Measurement",
+    step3_dosage_amount_sheet_title: "Amount of dosage",
+    step3_time_label: "Times",
+    step3_time_choose_btn: "Set starting time",
+    step3_time_sheet_title: "Starting time",
+    step3_duration_label: "Duration",
+    step3_duration_optional: " *Optional",
+    step3_duration_input_placeholder: "How many days...",
+    step3_date_label: "Start date",
+    step3_date_start_label: "Starting",
+    step4_reserve_label: "Set up reserve reminder",
+    step4_reserve_input_title: "Reminder",
+    step4_reserve_input_text: "Get notification before reserve runs out",
+    step4_note_label: "Note",
+    step4_note_input_placeholder: "Note about medication",
+    step4_allow_notification_msg: "Turn on notifications to receive alerts about your medications.",
   },
 } as const;
 

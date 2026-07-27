@@ -1,23 +1,18 @@
+import { lng } from "@/i18next/i18next";
+
 export type Relation =
-  | "FATHER"
-  | "MOTHER"
-  | "SON"
-  | "DAUGHTER"
-  | "BROTHER"
-  | "SISTER"
-  | "WIFE"
-  | "HUSBAND"
-  | "SELF";
+  "FATHER" | "MOTHER" | "SON" | "DAUGHTER" | "BROTHER" | "SISTER" | "WIFE" | "HUSBAND" | "SELF";
 
 type RelationItem = { label: string; value: Relation };
 
+const isRU = lng === "ru";
 export const RELATION_LIST: RelationItem[] = [
-  { label: "Отец", value: "FATHER" },
-  { label: "Мать", value: "MOTHER" },
-  { label: "Сын", value: "SON" },
-  { label: "Дочь", value: "DAUGHTER" },
-  { label: "Брат", value: "BROTHER" },
-  { label: "Сестра", value: "SISTER" },
-  { label: "Жена", value: "WIFE" },
-  { label: "Муж", value: "HUSBAND" },
+  { label: isRU ? "Отец" : "Father", value: "FATHER" },
+  { label: isRU ? "Мать" : "Mother", value: "MOTHER" },
+  { label: isRU ? "Сын" : "Son", value: "SON" },
+  { label: isRU ? "Дочь" : "Daughter", value: "DAUGHTER" },
+  { label: isRU ? "Брат" : "Brother", value: "BROTHER" },
+  { label: isRU ? "Сестра" : "Sister", value: "SISTER" },
+  { label: isRU ? "Жена" : "Wife", value: "WIFE" },
+  { label: isRU ? "Муж" : "Husband", value: "HUSBAND" },
 ];

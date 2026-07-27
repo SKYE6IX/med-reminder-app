@@ -9,6 +9,7 @@ import { NotificationHelper } from "@/helpers/notification-helper";
 import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -47,6 +48,7 @@ const createMedicationMutation = async (body: CreateMedicationProfile) => {
 };
 
 export default function FinalStepScreen() {
+  const { t } = useTranslation();
   const sharedStyles = useAddPillScreenStyles();
 
   const insets = useSafeAreaInsets();
@@ -155,8 +157,8 @@ export default function FinalStepScreen() {
       router.dismissAll();
       router.navigate("/");
       showFeedBack({
-        title: "Успешно!",
-        message: "Добавлено новое лекарство.",
+        title: t("feedback.success.add_new_medication.title"),
+        message: t("feedback.success.add_new_medication.text"),
         status: "success",
       });
 
@@ -165,7 +167,7 @@ export default function FinalStepScreen() {
       if (!notifcationAllowed) {
         const allowed = await NotificationHelper.allowsNotifications();
         if (!allowed) {
-          Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
+          Alert.alert(t("add_medication_screen.step4_allow_notification_msg"));
           return;
         }
       }
@@ -180,14 +182,14 @@ export default function FinalStepScreen() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Что-то пошло не так!",
-            message: "Пожалуйста, проверьте, попробуйте еще раз!",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -206,8 +208,8 @@ export default function FinalStepScreen() {
         Number(formState.medicationPack.totalQuantity) <= Number(formState.schedule.dosage))
     ) {
       showFeedBack({
-        title: "Неверный ввод",
-        message: "Пожалуйста, введите все данные о вашей упаковке с лекарствами.",
+        title: t("feedback.error.reserve_setup.title"),
+        message: t("feedback.error.reserve_setup.text"),
         status: "error",
       });
       return;
@@ -250,7 +252,7 @@ export default function FinalStepScreen() {
           <Loader visible={isPending} />
           {/* Refill setting container */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Напоминание о пополнении</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step4_reserve_label")}</Text>
             <Animated.View
               style={[
                 styles.refillSettingWrapper,
@@ -268,9 +270,11 @@ export default function FinalStepScreen() {
                 </View>
 
                 <View style={styles.refillSettingTextWrapper}>
-                  <Text style={[styles.refillSettingTextLabel, { color }]}>Напоминание</Text>
+                  <Text style={[styles.refillSettingTextLabel, { color }]}>
+                    {t("add_medication_screen.step4_reserve_input_title")}
+                  </Text>
                   <Text style={[styles.refillSettingTextInfo, { color: colorMuted }]}>
-                    Уведомить до окончания запаса
+                    {t("add_medication_screen.step4_reserve_input_text")}
                   </Text>
                 </View>
 
@@ -304,7 +308,7 @@ export default function FinalStepScreen() {
 
           {/* Note settings */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Заметка</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step4_note_label")}</Text>
             <TextInput
               value={medicationNote}
               onChangeText={(value) => handleOnTextChange(value)}
@@ -315,14 +319,18 @@ export default function FinalStepScreen() {
               scrollEnabled={true}
               returnKeyType="default"
               keyboardType="default"
-              placeholder="Заметка о лекарстве"
+              placeholder={t("add_medication_screen.step4_note_input_placeholder")}
               placeholderTextColor="#9E9E9E"
               maxLength={500}
               style={[styles.textAreaInput, { borderColor, backgroundColor: bGColor, color }]}
             />
           </View>
 
-          <CustomButton label="Создать" onPress={createMedicationSchedule} disabled={isPending} />
+          <CustomButton
+            label={t("common.create")}
+            onPress={createMedicationSchedule}
+            disabled={isPending}
+          />
           {/* SUBSCRIPTION OFFER */}
           <SubscriptionBanner ref={openBannerRef} />
         </ScrollView>

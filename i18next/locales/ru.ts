@@ -1,9 +1,11 @@
 const ru = {
   common: {
     next: "Дальше",
+    continue: "Далее",
     add: "Добавить",
     add_medication: "Добавить лекарства",
     apply: "Применить",
+    create: "Создать",
     custom_freq_hour_unit: "Часа",
     custom_freq_day_unit: "Дня",
     custom_freq_every_label: "Каждые",
@@ -61,6 +63,14 @@ const ru = {
         title: "Успех!",
         text: "Пополнение добавлено в напоминание.",
       },
+      add_new_profile: {
+        title: "Успех!",
+        text: "Добавлен новый член семьи.",
+      },
+      add_new_medication: {
+        title: "Успех!",
+        text: "Добавлено новое лекарство.",
+      },
     },
   },
   tabs: {
@@ -75,6 +85,17 @@ const ru = {
     text: "Добавляйте неограниченное количество лекарств, настраивайте напоминания и управляйте лекарствами всей семьи.",
     activate: "Продолжить",
     skip: "Пропустить",
+  },
+  profile_card: {
+    you: "Вы",
+    for_me: "Для меня",
+    change: "Изменить",
+  },
+  add_profile_sheet: {
+    input_label: "Имя",
+    input_placeholder: "Введите имя",
+    button_label: "Добавить нового члена",
+    picker_label: "Отношения",
   },
   onboarding: {
     step1: {
@@ -192,6 +213,37 @@ const ru = {
     details_delete_sheet_description: "Все данные об этом лекарстве будут удалены.",
     details_delete_sheet_btn1: "Отмена",
     details_delete_sheet_btn2: "Удалить",
+  },
+  add_medication_screen: {
+    step1_input_label: "Название лекарства",
+    step1_input_placeholder: "Поиск",
+    step1_choose_name: "Добавить «{{medicationName}}» как название",
+    step2_med_form_label: "Выберите форму лекарства",
+    step2_reason_label: "Причина",
+    step2_reason_optional: " *Необязательно",
+    step2_profile_label: "Для кого это лекарство?",
+    step2_profile_create: "Добавить члена семьи",
+    step2_profile_choose: "Выбрать члена семьи",
+    step3_freq_label: "Частота",
+    step3_dosage_label: "Дозировка",
+    step3_dosage_amount_label: "Доза за приём",
+    step3_dosage_amount_measurement_label: "Measurement",
+    step3_dosage_amount_sheet_title: "Количество дозировки",
+    step3_time_label: "Время приема",
+    step3_time_choose_btn: "Установить время начала",
+    step3_time_sheet_title: "Дата начала",
+    step3_duration_label: "Период",
+    step3_duration_optional: " *Необязательно",
+    step3_duration_input_placeholder: "Сколько дней...",
+    step3_date_label: "Дата начала",
+    step3_date_start_label: "Начало",
+    step4_reserve_label: "Напоминание о пополнении",
+    step4_reserve_input_title: "Напоминание",
+    step4_reserve_input_text: "Уведомить до окончания запаса",
+    step4_note_label: "Заметка",
+    step4_note_input_placeholder: "Заметка о лекарстве",
+    step4_allow_notification_msg:
+      "Включите уведомления, чтобы получать оповещения о ваших лекарствах.",
   },
 } as const;
 

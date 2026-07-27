@@ -1,6 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { DOSAGE_MEASUREMENT } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
 import { useState } from "react";
@@ -11,6 +12,7 @@ const UNIT_PRESSABLE_PER_ROW = 3;
 const UNIT_WRAPPER_GAP = 12;
 
 export default function DosageAmounPicker() {
+  const { t } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheet();
 
   const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
@@ -33,7 +35,7 @@ export default function DosageAmounPicker() {
 
   const openDosageAmountInputSheet = () => {
     openSheet({
-      title: "Количество дозировки",
+      title: t("add_medication_screen.step3_dosage_amount_sheet_title"),
       snapPointPercent: snapPoint,
       content: (
         <DosageAmountInput
@@ -55,7 +57,9 @@ export default function DosageAmounPicker() {
   return (
     <View style={[styles.container, { borderColor, backgroundColor: bGColor }]}>
       <View style={styles.topView}>
-        <Text style={[styles.label, { color }]}>Доза за приём</Text>
+        <Text style={[styles.label, { color }]}>
+          {t("add_medication_screen.step3_dosage_amount_label")}
+        </Text>
 
         <View style={styles.dosageAmountWrapper}>
           <Pressable
@@ -70,7 +74,9 @@ export default function DosageAmounPicker() {
       </View>
 
       <View style={styles.bodyView}>
-        <Text style={[styles.label, { color }]}>Единица измерения</Text>
+        <Text style={[styles.label, { color }]}>
+          {t("add_medication_screen.step3_dosage_amount_measurement_label")}
+        </Text>
         <View
           style={styles.dosageUnitWrapper}
           onLayout={(event) => {
@@ -93,7 +99,7 @@ export default function DosageAmounPicker() {
                 ]}
                 onPress={() => handleSetDosageUnit(unit.value)}
               >
-                <unit.icon size={30} color={isSelected ? "#F7F7F7" : color} />
+                <unit.icon size={30} color={isSelected ? "#F7F7F7" : color} locale={lng} />
                 <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
                   {unit.label}
                 </Text>

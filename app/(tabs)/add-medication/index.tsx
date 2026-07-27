@@ -3,6 +3,7 @@ import SearchIcon from "@/component/icons/search-icon";
 import { useAddPillScreenStyles } from "@/component/shared-styles/add-pill-screen-styles";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -11,6 +12,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import nameSearch from "../../../dictionary.json";
 
 export default function NameStepScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const sharedStyles = useAddPillScreenStyles();
   const { setMedicationDetails, formState } = useAddPillStore();
@@ -76,7 +78,7 @@ export default function NameStepScreen() {
     >
       <ScrollView>
         <View style={styles.headerWrapper}>
-          <Text style={sharedStyles.title}>Название лекарства</Text>
+          <Text style={sharedStyles.title}>{t("add_medication_screen.step1_input_label")}</Text>
           <View
             style={[
               styles.inputWrapper,
@@ -88,7 +90,7 @@ export default function NameStepScreen() {
               value={medicationName}
               onChangeText={handleOnTextChange}
               style={[styles.input, { color }]}
-              placeholder="Поиск"
+              placeholder={t("add_medication_screen.step1_input_placeholder")}
               placeholderTextColor={color}
               returnKeyType="search"
               keyboardType="default"
@@ -109,7 +111,7 @@ export default function NameStepScreen() {
                 <PlusIcon />
               </View>
               <Text style={[styles.itemText, { color }]}>
-                Добавить «{medicationName}» как название
+                {t("add_medication_screen.step1_choose_name", { medicationName })}
               </Text>
             </Pressable>
           )}
@@ -127,7 +129,7 @@ export default function NameStepScreen() {
       </ScrollView>
 
       <CustomButton
-        label="Далее"
+        label={t("common.continue")}
         style={sharedStyles.button}
         variant={canContinue ? "filled" : "disabled"}
         textVaraint={canContinue ? "regularText" : "mutedText"}

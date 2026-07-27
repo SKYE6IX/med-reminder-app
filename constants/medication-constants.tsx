@@ -27,7 +27,7 @@ export const DOSAGE_MEASUREMENT = [
 export const MEDICATION_UNITS = [
   { name: isRU ? "Капсулы" : "Capsule", icon: CapsuleIcon, value: MedicationUnit.CAPSULE },
   { name: isRU ? "Таблетки" : "Tablet", icon: TabletIcon, value: MedicationUnit.TABLET },
-  { name: isRU ? "Инъекции" : "injection", icon: InjectionIcon, value: MedicationUnit.INJECTION },
+  { name: isRU ? "Инъекции" : "Injection", icon: InjectionIcon, value: MedicationUnit.INJECTION },
   { name: isRU ? "Спрей" : "Spray", icon: SprayIcon, value: MedicationUnit.SPRAY },
   { name: isRU ? "Капли" : "Drop", icon: EyeDropIcon, value: MedicationUnit.DROPS },
   { name: isRU ? "Сироп" : "Syrup", icon: SyrupBottleIcon, value: MedicationUnit.SYRUP },

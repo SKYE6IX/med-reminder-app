@@ -11,6 +11,7 @@ import IOSDateTimeWrapper from "@/component/ui/date-time-wrapper/date-time-wrapp
 import DosageAmounPicker from "@/component/ui/dosage-picker/dosage-amount-picker";
 import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
 import { DateTime, formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
@@ -32,6 +33,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const sharedStyles = useAddPillScreenStyles();
@@ -117,7 +119,7 @@ export default function ScheduleStepScreen() {
       androidTimeRef.current?.showDateTime();
     } else {
       openSheet({
-        title: "Время начала",
+        title: t("add_medication_screen.step3_time_sheet_title"),
         snapPointPercent: "40%",
         content: (
           <IOSDateTimeWrapper
@@ -135,7 +137,7 @@ export default function ScheduleStepScreen() {
       androidDateRef.current?.showDateTime();
     } else {
       openSheet({
-        title: "Дата начала",
+        title: t("add_medication_screen.step3_date_label"),
         snapPointPercent: "40%",
         content: (
           <IOSDateTimeWrapper
@@ -169,7 +171,7 @@ export default function ScheduleStepScreen() {
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {/* Frequency Settings */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Частота</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_freq_label")}</Text>
             <FrequencySettings
               onFreqSet={handleSetFrequency}
               preset={formState.schedule.rule.preset}
@@ -178,13 +180,13 @@ export default function ScheduleStepScreen() {
 
           {/* Dosage Settings */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Дозировка</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_dosage_label")}</Text>
             <DosageAmounPicker />
           </View>
 
           {/* Time Settings */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Время приема</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_time_label")}</Text>
             <View style={styles.timeSettingList}>
               {occurences?.map((time, i) => (
                 <Text
@@ -196,7 +198,7 @@ export default function ScheduleStepScreen() {
               ))}
             </View>
             <CustomButton
-              label="Установить время начала"
+              label={t("add_medication_screen.step3_time_choose_btn")}
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={14} />}
@@ -216,15 +218,19 @@ export default function ScheduleStepScreen() {
           {/* Duration days settings. (Optional) */}
           <View style={sharedStyles.sectionContainer}>
             <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-              <Text style={sharedStyles.title}>Период</Text>
-              <Text style={[styles.durationOptionalText, { color }]}> *Необязательно</Text>
+              <Text style={sharedStyles.title}>
+                {t("add_medication_screen.step3_duration_label")}
+              </Text>
+              <Text style={[styles.durationOptionalText, { color }]}>
+                {t("add_medication_screen.step3_duration_optional")}
+              </Text>
             </View>
             <TextInput
               value={durations}
               onChangeText={handleOnDurationInputChange}
               keyboardType="number-pad"
               inputMode="numeric"
-              placeholder="Сколько дней..."
+              placeholder={t("add_medication_screen.step3_duration_input_placeholder")}
               style={[
                 styles.durationInput,
                 {
@@ -238,7 +244,7 @@ export default function ScheduleStepScreen() {
 
           {/* Date Settings */}
           <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>Дата начала</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_date_label")}</Text>
             <Pressable
               style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
               onPress={showDateSetting}
@@ -247,7 +253,9 @@ export default function ScheduleStepScreen() {
                 <CalenderIcon color={tintColor} />
               </View>
               <View style={styles.dateSettingTextWrapper}>
-                <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>Начало</Text>
+                <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>
+                  {t("add_medication_screen.step3_date_start_label")}
+                </Text>
                 <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
               </View>
               <View style={styles.dateSettingRightIcon}>
@@ -266,7 +274,7 @@ export default function ScheduleStepScreen() {
           </View>
 
           <CustomButton
-            label="Далее"
+            label={t("common.continue")}
             style={sharedStyles.button}
             variant="filled"
             textVaraint="regularText"

@@ -11,6 +11,7 @@ import { Relation } from "@/constants/relation";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { ProfileResponse } from "@/types/user";
 import { useRouter } from "expo-router";
@@ -22,6 +23,7 @@ const UNIT_PRESSABLE_PER_ROW = 4;
 const UNIT_WRAPPER_GAP = 16;
 
 export default function DetailsStepScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
 
@@ -68,7 +70,7 @@ export default function DetailsStepScreen() {
   const openAddNewProfileSheet = () => {
     if (isPremiumPlan) {
       openSheet({
-        title: "Добавить члена семьи",
+        title: t("add_medication_screen.step2_profile_create"),
         content: (
           <AddProfile
             onProfileAdded={(id) => {
@@ -86,7 +88,7 @@ export default function DetailsStepScreen() {
   const openRelationProfileListSheet = () => {
     if (isPremiumPlan) {
       openSheet({
-        title: "Выбрать члена семьи",
+        title: t("add_medication_screen.step2_profile_choose"),
         content: (
           <RelationProfileListSheet
             relationProfiles={relationProfiles}
@@ -113,7 +115,7 @@ export default function DetailsStepScreen() {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Pill Form selections */}
         <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Выберите форму лекарства</Text>
+          <Text style={sharedStyles.title}>{t("add_medication_screen.step2_med_form_label")}</Text>
           <View
             style={[styles.pillFormWrapper]}
             onLayout={(event) => {
@@ -146,8 +148,10 @@ export default function DetailsStepScreen() {
         {/* MEDICATION REASON */}
         <View style={sharedStyles.sectionContainer}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={sharedStyles.title}>Причина</Text>
-            <Text style={[styles.optionalText, { color }]}> *Необязательно</Text>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step2_reason_label")}</Text>
+            <Text style={[styles.optionalText, { color }]}>
+              {t("add_medication_screen.step2_reason_optional")}
+            </Text>
           </View>
           <FormInput
             showLabel={false}
@@ -160,7 +164,7 @@ export default function DetailsStepScreen() {
 
         {/* Profile selection*/}
         <View style={sharedStyles.sectionContainer}>
-          <Text style={sharedStyles.title}>Для кого это лекарство?</Text>
+          <Text style={sharedStyles.title}>{t("add_medication_screen.step2_profile_label")}</Text>
           <View style={styles.profilesWrapper}>
             {/* SELF PROFILE*/}
             <ProfileCard
@@ -188,7 +192,7 @@ export default function DetailsStepScreen() {
             {/* TRIGGER BUTTON FOR RELATION PROFILE LIST */}
             {relationProfiles.length >= 1 && !isRelationProfileSelected && (
               <CustomButton
-                label="Выбрать члена семьи"
+                label={t("add_medication_screen.step2_profile_choose")}
                 variant="outline"
                 textVaraint="tintText"
                 svgIcon={<PlusIcon color={tintColor} size={12} />}
@@ -198,7 +202,7 @@ export default function DetailsStepScreen() {
 
             {/* TRIGGER BUTTON FOR ADDING NEW RELATION PROFILE */}
             <CustomButton
-              label="Добавить члена семьи"
+              label={t("add_medication_screen.step2_profile_create")}
               variant="outline"
               textVaraint="tintText"
               svgIcon={<PlusIcon color={tintColor} size={12} />}
@@ -209,7 +213,7 @@ export default function DetailsStepScreen() {
 
         {/* CONTINUE BUTTON */}
         <CustomButton
-          label="Далее"
+          label={t("common.continue")}
           style={sharedStyles.button}
           variant={canContinue ? "filled" : "disabled"}
           textVaraint={canContinue ? "regularText" : "mutedText"}

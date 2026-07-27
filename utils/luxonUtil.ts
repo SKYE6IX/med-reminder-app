@@ -3,6 +3,8 @@ import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
 export const getTimeZone = () => DateTime.now().zoneName;
 
+const isRU = lng === "ru";
+
 export const toLocalUtcTime = (date: Date) => {
   return DateTime.fromJSDate(date)
     .toUTC()
@@ -46,11 +48,14 @@ export const formatRegularDate = (isoDate: string) => {
     day: "2-digit",
   };
 
+  const todayText = isRU ? "Сегодня" : "Today";
+  const tomorrowText = isRU ? "Завтра" : "Tomorrow";
+
   if (date.hasSame(today, "day")) {
-    return "Сегодня";
+    return todayText;
   }
   if (date.hasSame(tomorrow, "day")) {
-    return "Завтра";
+    return tomorrowText;
   }
 
   return date.toLocaleString({
@@ -74,9 +79,9 @@ export const formatHomeScreenDate = (isoDate: string) => {
     day: "2-digit",
   };
 
-  const todayText = lng === "ru" ? "сегодня" : "Today";
-  const tomorrowText = lng === "ru" ? "завтра" : "Tomorrow";
-  const yesterdayText = lng === "ru" ? "вчера" : "Yesterday";
+  const todayText = isRU ? "сегодня" : "Today";
+  const tomorrowText = isRU ? "завтра" : "Tomorrow";
+  const yesterdayText = isRU ? "вчера" : "Yesterday";
 
   if (date.hasSame(now, "day")) {
     return `${todayText}, ${now.toLocaleString(toLocaleOptions)}`;
@@ -124,9 +129,9 @@ export const getWeekViewDescription = (isoDate: string) => {
     day: "2-digit",
   };
 
-  const todayText = lng === "ru" ? "сегодня" : "Today";
-  const tomorrowText = lng === "ru" ? "завтра" : "Tomorrow";
-  const yesterdayText = lng === "ru" ? "вчера" : "Yesterday";
+  const todayText = isRU ? "сегодня" : "Today";
+  const tomorrowText = isRU ? "завтра" : "Tomorrow";
+  const yesterdayText = isRU ? "вчера" : "Yesterday";
 
   if (date.hasSame(today, "day")) {
     return todayText;

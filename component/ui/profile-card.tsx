@@ -1,6 +1,7 @@
 import { RELATION_LIST, Relation } from "@/constants/relation";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import SelectionDot from "./selection-dot";
@@ -28,17 +29,18 @@ export default function ProfileCard({
   asList,
   isSelected,
 }: ProfileCardProps) {
+  const { t } = useTranslation();
   const profileImageUrl = useProfileImage(!isSelf ? profileId : "");
+
+  const getRelationLabel = (value: string) => {
+    return RELATION_LIST.find((list) => list.value === value)?.label;
+  };
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
   const tintColor = useThemeColor({}, "tint");
   const bGColor = useThemeColor({}, "backgroundSecondary");
   const borderColor = useThemeColor({}, "borderColor");
-
-  const getRelationLabel = (value: string) => {
-    return RELATION_LIST.find((list) => list.value === value)?.label;
-  };
 
   return (
     <Pressable
@@ -58,17 +60,17 @@ export default function ProfileCard({
 
       <View style={styles.profileTextWrapper}>
         <Text style={[styles.profileNameText, { color: isSelected ? "#F7F7F7" : color }]}>
-          {isSelf ? "Для меня" : name}
+          {isSelf ? t("profile_card.for_me") : name}
         </Text>
         <Text style={[styles.profileRelationText, { color: isSelected ? "#F7F7F7" : color }]}>
-          {isSelf ? "Вы" : getRelationLabel(relation || "")}
+          {isSelf ? t("profile_card.you") : getRelationLabel(relation || "")}
         </Text>
       </View>
 
       <View style={styles.profileActionsContainer}>
         {!isSelf && !asList && (
           <Pressable style={styles.changeSelectedProfile} onPress={changeProfile}>
-            <Text style={styles.changeSelectedProfileText}>Изменить</Text>
+            <Text style={styles.changeSelectedProfileText}>{t("profile_card.change")}</Text>
           </Pressable>
         )}
         {hasActiveDot && <SelectionDot isActive={isSelected} />}

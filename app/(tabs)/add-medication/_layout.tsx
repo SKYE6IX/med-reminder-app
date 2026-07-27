@@ -44,7 +44,7 @@ export default function AddPillLayout() {
 
         <Stack.Screen name="details-step">
           <Stack.Screen.BackButton displayMode="minimal" />
-          <Stack.Header transparent style={{}} />
+          <Stack.Header transparent style={{ shadowColor: "transparent" }} />
           <Stack.Screen.Title asChild />
         </Stack.Screen>
 
@@ -62,6 +62,7 @@ export default function AddPillLayout() {
       </Stack>
 
       <Stepper currentStep={currentStep} />
+
       {/* Subscription Banner */}
       <SubscriptionBanner
         ref={openBannerRef}

@@ -1,6 +1,7 @@
 import { QueryKey } from "@/constants/query-keys";
 import { RELATION_LIST } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
@@ -29,6 +30,7 @@ const addRelationProfileMutation = async (data: AddProfileForm) => {
 };
 
 export default function AddProfile({ onProfileAdded }: AddProfileProps) {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const [formState, setFormState] = useState<AddProfileForm>({
     name: "",
@@ -72,8 +74,8 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       );
       onProfileAdded(data.id);
       showFeedBack({
-        title: "Успешно!",
-        message: "Добавлен новый член семьи.",
+        title: t("feedback.success.add_new_profile.title"),
+        message: t("feedback.success.add_new_profile.text"),
         status: "success",
       });
       setFormState({ name: "", relation: "" });
@@ -82,14 +84,14 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -106,7 +108,7 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
       <ScrollView>
         <View style={styles.profileFormContainer}>
           <View style={styles.profileFormInputWrapper}>
-            <ThemedText type="label">Имя</ThemedText>
+            <ThemedText type="label">{t("add_profile_sheet.input_label")}</ThemedText>
             <BottomSheetTextInput
               value={formState.name}
               onChangeText={handleOnTextChange}
@@ -114,12 +116,12 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
               autoCorrect={false}
               autoCapitalize="sentences"
               keyboardType="default"
-              placeholder="Введите имя"
+              placeholder={t("add_profile_sheet.input_placeholder")}
               placeholderTextColor="#9E9E9E"
             />
           </View>
           <CustomPicker
-            label="Отношения"
+            label={t("add_profile_sheet.picker_label")}
             selectedValue={formState.relation}
             items={RELATION_LIST}
             svgIcon={<PeopleGroupIcon color={textColor} />}
@@ -129,7 +131,7 @@ export default function AddProfile({ onProfileAdded }: AddProfileProps) {
           />
 
           <CustomButton
-            label="Добавить нового члена"
+            label={t("add_profile_sheet.button_label")}
             variant={canSubmit ? "filled" : "disabled"}
             textVaraint={canSubmit ? "regularText" : "mutedText"}
             style={styles.button}
