@@ -245,6 +245,25 @@ const ru = {
     step4_allow_notification_msg:
       "Включите уведомления, чтобы получать оповещения о ваших лекарствах.",
   },
+  medication_reserve_screen: {
+    title: "Пополнение лекарств",
+    tab_active_label: "Принимаете",
+    tab_pending_label: "На очереди",
+    tab_complete_label: "Закончилось",
+    no_content_heading: "Ваши запасы лекарств",
+    no_content_body: "Здесь появятся запасы и напоминания о пополнении.",
+    add_reserve_sheet_title: "Напоминание о пополнении",
+    add_reserve_sheet_heading: "Уведомить до окончания запаса",
+    card_start_at: "Начало: {{date}}",
+    card_end_at: "Законченный: {{date}}",
+    card_refill_btn: "Пополнить",
+    card_status_active_label: "Принимаете",
+    card_status_pending_label: "На очереди",
+    card_status_complete_label: "Закончилось",
+    card_badge_depleted_label: "Заканчивается",
+    card_badge_refilled_label: "Пополнено",
+    card_badge_complete_label: "Закончилось",
+  },
 } as const;
 
 export default ru;

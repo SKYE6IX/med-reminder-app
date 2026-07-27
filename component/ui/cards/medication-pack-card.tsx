@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { MedicationPackResponse } from "@/types/medication";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -12,7 +13,8 @@ type RefillCardProps = {
 
 const getProgressText = (pack: MedicationPackResponse) => {
   const consumed = Number(pack.totalQuantity) - Number(pack.currentQuantity);
-  return `${consumed} из ${pack.totalQuantity} принято`;
+  const isRU = lng === "ru";
+  return `${consumed} ${isRU ? "из" : "of"} ${pack.totalQuantity} ${isRU ? "принято" : "taken"}`;
 };
 const getPercentage = (pack: MedicationPackResponse) => {
   const consumed = Number(pack.totalQuantity) - Number(pack.currentQuantity);
@@ -35,25 +37,29 @@ const isPackDepleted = (pack: MedicationPackResponse) => {
 };
 
 export default function MedicationPackCard({ pack, onRefillButtonPress }: RefillCardProps) {
+  const { t } = useTranslation();
+
   const sharedStyles = useCardStyles();
+
   const statusLabel =
     pack.status === "ACTIVE"
-      ? "Принимаете"
+      ? t("medication_reserve_screen.card_status_active_label")
       : pack.status === "PENDING"
-        ? "На очереди"
-        : "Закончилось";
+        ? t("medication_reserve_screen.card_status_pending_label")
+        : t("medication_reserve_screen.card_status_complete_label");
+
   const startedDate = getStartedDate(pack.startedAt);
   const endedDate = getStartedDate(pack.endedAt);
   const showRefillButton = pack.status !== "PENDING" && !pack.isRefilled;
 
   const badgeLabel =
     pack.status === "ACTIVE" && isPackDepleted(pack)
-      ? "Заканчивается"
+      ? t("medication_reserve_screen.card_badge_depleted_label")
       : pack.status === "ACTIVE" && pack.isRefilled
-        ? "Пополнено"
+        ? t("medication_reserve_screen.card_badge_refilled_label")
         : pack.status === "PENDING"
-          ? "Пополнено"
-          : "Закончилось";
+          ? t("medication_reserve_screen.card_badge_refilled_label")
+          : t("medication_reserve_screen.card_badge_complete_label");
 
   const badgeColor =
     pack.status === "ACTIVE" && isPackDepleted(pack)
@@ -65,6 +71,7 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
           : "#9E9E9E";
 
   const tintColor = useThemeColor({}, "tint");
+
   return (
     <View style={sharedStyles.card}>
       {/* Container */}
@@ -84,20 +91,28 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
           <Text style={sharedStyles.cardTextMedium}>{statusLabel}</Text>
 
           {pack.startedAt && pack.status === "ACTIVE" && (
-            <Text style={sharedStyles.cardTextMedium}>Начало: {startedDate}</Text>
+            <Text style={sharedStyles.cardTextMedium}>
+              {t("medication_reserve_screen.card_start_at", { date: startedDate ?? "" })}
+            </Text>
           )}
+
           {pack.endedAt && pack.status === "COMPLETED" && (
-            <Text style={sharedStyles.cardTextMedium}>Законченный:{endedDate}</Text>
+            <Text style={sharedStyles.cardTextMedium}>
+              {t("medication_reserve_screen.card_end_at", { date: endedDate ?? "" })}
+            </Text>
           )}
 
           {/* This button will only shown for Active pack that need to be refilled */}
           {showRefillButton && (
             <Pressable style={sharedStyles.cardActionButton} onPress={onRefillButtonPress}>
-              <Text style={sharedStyles.cardActionButtonText}>Пополнить</Text>
+              <Text style={sharedStyles.cardActionButtonText}>
+                {t("medication_reserve_screen.card_refill_btn")}
+              </Text>
             </Pressable>
           )}
         </View>
       </View>
+
       <View style={sharedStyles.progressContainer}>
         <View style={sharedStyles.progressHeader}>
           <Text style={sharedStyles.progressTextValue}>{getProgressText(pack)}</Text>

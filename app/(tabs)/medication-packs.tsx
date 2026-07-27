@@ -6,6 +6,7 @@ import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import Tabs from "@/component/ui/tabs";
 import { QueryKey } from "@/constants/query-keys";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationPackResponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
@@ -32,15 +33,9 @@ const refillMedicationPackMutation = async (body: RefillMedicationPackForm) => {
   return response.data;
 };
 
-const TABS = [
-  { label: "Принимаете", value: "ACTIVE" },
-  { label: "На очереди", value: "PENDING" },
-  { label: "Закончилось", value: "COMPLETED" },
-];
-
 export default function MedicationPacks() {
+  const { t } = useTranslation();
   const inset = useSafeAreaInsets();
-
   const isIOS = Platform.OS === "ios";
 
   const { openSheet, closeSheet } = useBottomSheet();
@@ -70,7 +65,7 @@ export default function MedicationPacks() {
     measurementValue: string;
   }) => {
     openSheet({
-      title: "Напоминание о пополнении",
+      title: t("medication_reserve_screen.add_reserve_sheet_title"),
       content: (
         <AddMedicationPackPickerSheet
           key={medicationPackId}
@@ -91,9 +86,15 @@ export default function MedicationPacks() {
   const top = isIOS ? 0 : 10;
   const bottom = isIOS ? inset.bottom + 10 : 10;
 
+  const TABS = [
+    { label: t("medication_reserve_screen.tab_active_label"), value: "ACTIVE" },
+    { label: t("medication_reserve_screen.tab_pending_label"), value: "PENDING" },
+    { label: t("medication_reserve_screen.tab_complete_label"), value: "COMPLETED" },
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
-      <Text style={[styles.headerTitle, { color }]}>Пополнение лекарств</Text>
+      <Text style={[styles.headerTitle, { color }]}>{t("medication_reserve_screen.title")}</Text>
       <Loader visible={isLoading} />
       {!isLoading && data && data.length >= 1 && (
         <React.Fragment>
@@ -128,9 +129,11 @@ export default function MedicationPacks() {
             source={require("@/assets/images/pill-bottle.png")}
             style={styles.noContentImage}
           />
-          <Text style={[styles.noContentTitle, { color }]}>Ваши запасы лекарств</Text>
+          <Text style={[styles.noContentTitle, { color }]}>
+            {t("medication_reserve_screen.no_content_heading")}
+          </Text>
           <Text style={[styles.noContentSubtitle, { color: mutedColor }]}>
-            Здесь появятся запасы и напоминания о пополнении.
+            {t("medication_reserve_screen.no_content_body")}
           </Text>
         </View>
       )}
@@ -149,6 +152,7 @@ const AddMedicationPackPickerSheet = ({
   measurementValue: string;
   closeSheet: () => void;
 }) => {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
 
   const [medicationPack, setMedicationPack] = useState<RefillMedicationPackForm>({
@@ -176,21 +180,19 @@ const AddMedicationPackPickerSheet = ({
         }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
       ]);
-
       showFeedBack({
-        title: "Успешно",
-        message: "Пополнение добавлено в напоминание.",
+        title: t("feedback.success.reserve_setup.title"),
+        message: t("feedback.success.reserve_setup.text"),
         status: "success",
       });
-
       closeSheet();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
 
-    onError(error) {
+    onError() {
       showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+        title: t("feedback.error.general.title"),
+        message: t("feedback.error.general.text"),
         status: "error",
       });
     },
@@ -211,7 +213,9 @@ const AddMedicationPackPickerSheet = ({
       <Loader visible={isPending} />
 
       <View style={styles.bottomSheetContainer}>
-        <Text style={[styles.bottomSheetText, { color }]}>Уведомить до окончания запаса</Text>
+        <Text style={[styles.bottomSheetText, { color }]}>
+          {t("medication_reserve_screen.add_reserve_sheet_heading")}
+        </Text>
         <MedicationPackPicker
           amountInPack={amountInPack}
           refillDaysReminder={reminderDays}
@@ -221,7 +225,7 @@ const AddMedicationPackPickerSheet = ({
         />
 
         <CustomButton
-          label="Добавить"
+          label={t("common.add")}
           disabled={!canContinue || isPending}
           variant={canContinue ? "filled" : "disabled"}
           textVaraint={canContinue ? "regularText" : "mutedText"}
@@ -251,7 +255,6 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     gap: 16,
   },
-
   noContentWrapper: {
     flex: 1,
     gap: 20,
