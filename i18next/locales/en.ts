@@ -78,6 +78,7 @@ const en = {
       wife: "Wife",
       husband: "Husband",
     },
+    bottom_sheet_close: "Close",
   },
   feedback: {
     error: {

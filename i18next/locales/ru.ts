@@ -78,6 +78,7 @@ const ru = {
       wife: "Жена",
       husband: "Муж",
     },
+    bottom_sheet_close: "Отмена",
   },
   feedback: {
     error: {

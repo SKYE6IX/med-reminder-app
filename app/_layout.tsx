@@ -123,7 +123,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     bootstrap();
-
     const subscription = AppState.addEventListener("change", (appState) => {
       if (appState === "active") {
         const lng = resolveLanguage();

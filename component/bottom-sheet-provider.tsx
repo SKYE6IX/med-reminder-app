@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
@@ -119,6 +120,7 @@ const Handle: React.FC<HandleProps> = ({
   title,
   animatedIndex,
 }) => {
+  const { t } = useTranslation();
   const animatedStyles = useAnimatedStyle(() => {
     return {
       opacity: animatedIndex.value < 1 ? 0 : 1,
@@ -127,7 +129,9 @@ const Handle: React.FC<HandleProps> = ({
   return (
     <Animated.View style={[styles.header, { borderColor }, animatedStyles]}>
       <Pressable style={styles.headerPressable} onPress={close}>
-        <Text style={[styles.headerPressableText, { color: tintColor }]}>Отмена</Text>
+        <Text style={[styles.headerPressableText, { color: tintColor }]}>
+          {t("common.bottom_sheet_close")}
+        </Text>
       </Pressable>
       <Text style={[styles.headerTitle, { color: textColor }]}>{title}</Text>
       <View style={styles.headerGhostView} />
