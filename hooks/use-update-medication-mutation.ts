@@ -1,6 +1,6 @@
 import { QueryKey } from "@/constants/query-keys";
-import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
-import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
+import { cancelMedicationNotifications } from "@/helpers/cancel-medication-notifications";
+import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfileReponse } from "@/types/medication";
@@ -59,13 +59,13 @@ export default function useUpdateMedicationMutation({
       queryClient.setQueryData([QueryKey.medicationDetails, id], incomingData);
 
       if (variableData.isActive) {
-        await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
+        await scheduleNewMedicationNotifications({ ...notfication, ...reminderPreferences });
       } else if (!variableData.isActive) {
-        await cancelEventNotification({ medProfileId: id });
+        await cancelMedicationNotifications({ medProfileId: id });
       }
       //  we want to cancel and create when the chaxnge recurrence rule
       if (variableData.recurrenceRule) {
-        await createScheduleEventNotification({ ...notfication, ...reminderPreferences });
+        await scheduleNewMedicationNotifications({ ...notfication, ...reminderPreferences });
       }
       if (variableData.doseQuantity) {
         await queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] });

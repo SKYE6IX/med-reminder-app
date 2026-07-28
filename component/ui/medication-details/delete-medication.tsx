@@ -1,6 +1,6 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { QueryKey } from "@/constants/query-keys";
-import { cancelEventNotification } from "@/helpers/cancel-schedule-event-notifications";
+import { cancelMedicationNotifications } from "@/helpers/cancel-medication-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -40,7 +40,7 @@ export default function DeleteMedication({ medicationProfileId }: { medicationPr
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
-        cancelEventNotification({ medProfileId: medicationProfileId }),
+        cancelMedicationNotifications({ medProfileId: medicationProfileId }),
       ]);
     },
 

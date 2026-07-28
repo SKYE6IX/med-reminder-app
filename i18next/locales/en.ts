@@ -79,6 +79,9 @@ const en = {
       husband: "Husband",
     },
     bottom_sheet_close: "Close",
+    local_auth_prompt_msg: "Confirm your identity",
+    local_auth_cancel_label: "Cancel",
+    local_auth_fallback_label: "Use password",
   },
   feedback: {
     error: {
@@ -269,7 +272,7 @@ const en = {
     details_dosage_reserve_title: "Reserve",
     details_dosage_reserve_add: "Add",
     details_dosage_reserve_sheet_title: "Set up reserve reminder",
-    details_dosage_reserve_sheet_heading: "Get notification before reserve runs out",
+    details_dosage_reserve_sheet_heading: "Get notification before reserve run out",
     details_note_title: "Note",
     details_note_placeholder: "Add a note...",
     details_note_sheet_title: "Update note",
@@ -307,7 +310,7 @@ const en = {
     step3_date_start_label: "Starting",
     step4_reserve_label: "Set up reserve reminder",
     step4_reserve_input_title: "Reminder",
-    step4_reserve_input_text: "Get notification before reserve runs out",
+    step4_reserve_input_text: "Get notification before reserve run out",
     step4_note_label: "Note",
     step4_note_input_placeholder: "Note about medication",
     step4_allow_notification_msg: "Turn on notifications to receive alerts about your medications.",
@@ -320,7 +323,7 @@ const en = {
     no_content_heading: "Medication reserves",
     no_content_body: "Your medication reserve and refills will appear here.",
     add_reserve_sheet_title: "Set up reserve reminder",
-    add_reserve_sheet_heading: "Get notification before reserve runs out",
+    add_reserve_sheet_heading: "Get notification before reserve run out",
     card_start_at: "Started: {{date}}",
     card_end_at: "Ended: {{date}}",
     card_refill_btn: "Refill",
@@ -411,6 +414,18 @@ const en = {
     about_review_description: "Leave a review on the {{store}}",
     about_support_title: "Contact us",
     about_support_description: "Reach out to us via email",
+  },
+  notification: {
+    due_title: "Medication time is due",
+    due_body: "{{medicationName}} for {{scheduleAt}}. Use the quick action button.",
+    snooze_title: "Reminder to take your medication",
+    snooze_body:
+      "{{medicationName}}, scheduled {{minutesOverdue}} minutes ago. Use the quick action button.",
+    early_title: "The next medication is in 20 minutes",
+    missed_title: "Missed medication reminder",
+    missed_body: "{{medicationName}} for {{scheduleAt}} wasn't taken.",
+    reserve_title: "Reserve reminder",
+    reserve_body: "{{medicationName}} will soon run out",
   },
 } as const;
 

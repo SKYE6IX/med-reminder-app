@@ -2,7 +2,9 @@ import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
 import { QueryKey } from "@/constants/query-keys";
 import { logOverdueEvents } from "@/helpers/log-overdue-event";
-import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
+import { regenarateNotifications } from "@/helpers/regenerate-notifications";
+import { scheduleNextMedicationNotifications } from "@/helpers/schedule-next-event-notifications";
+import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useAuthStore } from "@/stores/use-auth-store";
@@ -66,9 +68,10 @@ export default function RootLayout() {
   async function bootstrap() {
     // Check for valid token and authorized user with it.
     try {
+      // Request valid acess token
       const token = await getValidAccessToken();
       if (token) {
-        // Prefetch Applications Datas
+        // Prefetch Applications data
         await Promise.all([
           queryClient.prefetchQuery({
             queryKey: [QueryKey.subscriptionPlan],
@@ -77,7 +80,6 @@ export default function RootLayout() {
               return res.data;
             },
           }),
-
           queryClient.prefetchQuery({
             queryKey: [QueryKey.medicationList],
             queryFn: async () => {
@@ -85,25 +87,37 @@ export default function RootLayout() {
               return res.data;
             },
           }),
-
           logOverdueEvents(),
-
-          // Generate next medicatiion schedule events if available
-          createNextScheduleEventNotification({
-            ...useAppSettingsStore.getState().notfication,
-            ...useAppSettingsStore.getState().reminderPreferences,
-          }),
         ]);
 
-        getAuthorizedUser();
-        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        const resolveLng = resolveLanguage();
+        const currentAppLng = await readFromStorage<string>("lng");
+        // If the currentAppLng which we store in local storage
+        // is the same as the resolveLng, then the app can
+        // schedule next medication without cancel exisiting
+        // ones. If that not the case, then we can recreate
+        // the all notifications.
+        if (resolveLng === currentAppLng) {
+          await scheduleNextMedicationNotifications({
+            ...useAppSettingsStore.getState().notfication,
+            ...useAppSettingsStore.getState().reminderPreferences,
+          });
+        } else {
+          await regenarateNotifications({
+            ...useAppSettingsStore.getState().notfication,
+            ...useAppSettingsStore.getState().reminderPreferences,
+          });
+        }
 
+        getAuthorizedUser();
+        // Check if user has a set up device lock.
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
         // If user set up local device lock
         if (useAppSettingsStore.getState().useDeviceLock && isEnrolled) {
           const localAuthenticate = await LocalAuthentication.authenticateAsync({
-            promptMessage: "Подтвердите личность",
-            cancelLabel: "Отменить",
-            fallbackLabel: "Используйте пароль",
+            promptMessage: i18n.t("common.local_auth_prompt_msg"),
+            cancelLabel: i18n.t("common.local_auth_cancel_label"),
+            fallbackLabel: i18n.t("common.local_auth_fallback_label"),
           });
           if (localAuthenticate.success) {
             useAuthStore.getState().setIsAuthenticated(true);
@@ -118,7 +132,23 @@ export default function RootLayout() {
       console.error("An error occur in Bootstrap", error);
     } finally {
       setIsReady(true);
+
+      // We always want to save the initial
+      // app language, so we can make use it to trigger
+      // re-creation of notifications if user change the
+      // app language.
+      await saveToStorage("lng", i18n.language);
     }
+  }
+
+  async function resetNotificationsOnLanguageChange(resolveLng: string) {
+    const currentLng = await readFromStorage<string>("lng");
+    if (currentLng === resolveLng) return;
+    await regenarateNotifications({
+      ...useAppSettingsStore.getState().notfication,
+      ...useAppSettingsStore.getState().reminderPreferences,
+    });
+    await saveToStorage("lng", resolveLng);
   }
 
   useEffect(() => {
@@ -127,6 +157,7 @@ export default function RootLayout() {
       if (appState === "active") {
         const lng = resolveLanguage();
         i18n.changeLanguage(lng);
+        resetNotificationsOnLanguageChange(lng);
       }
     });
     return () => {

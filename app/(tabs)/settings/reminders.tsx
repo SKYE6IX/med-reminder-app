@@ -4,7 +4,7 @@ import BellNotificationIcon from "@/component/icons/bell-notification-icon";
 import PhoneIcon from "@/component/icons/phone-icon";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
+import { regenarateNotifications } from "@/helpers/regenerate-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -39,7 +39,7 @@ export default function Reminders() {
     }
 
     commitTimeoutId.current = setTimeout(async () => {
-      await updateScheduleEventNotifications({
+      await regenarateNotifications({
         ...notfication,
         ...reminderPreferences,
         snoozeDuration: Number(value) as SnoozeDuration,
@@ -50,7 +50,7 @@ export default function Reminders() {
 
   const toggleAllowEarlyReminder = async (value: boolean) => {
     setReminderPreference({ earlyReminder: value });
-    await updateScheduleEventNotifications({
+    await regenarateNotifications({
       ...notfication,
       ...reminderPreferences,
       earlyReminder: value,
@@ -59,7 +59,7 @@ export default function Reminders() {
 
   const toggleAllowMissedDosage = async (value: boolean) => {
     setReminderPreference({ missedDoseAlert: value });
-    await updateScheduleEventNotifications({
+    await regenarateNotifications({
       ...notfication,
       ...reminderPreferences,
       missedDoseAlert: value,

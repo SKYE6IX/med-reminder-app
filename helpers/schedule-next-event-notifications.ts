@@ -2,7 +2,6 @@ import { MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { DateTime } from "@/utils/luxonUtil";
-import { Alert } from "react-native";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-manager";
@@ -10,11 +9,11 @@ import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-man
 const MAX_PREBUILD_EVENTS = 10;
 const LAST_SCHEDULED_KEY = "notifications:lastScheduledAt";
 
-export const createNextScheduleEventNotification = async (
+export const scheduleNextMedicationNotifications = async (
   settings: Partial<NotificationSettings>,
 ) => {
-  // Inspect current pending notifications
   try {
+    // Inspect current pending notifications
     const pendingAppNotifications = await notifee.getTriggerNotifications();
     // We get only notifications with notificationType are due.
     // It's where we store the eventID data.
@@ -43,6 +42,7 @@ export const createNextScheduleEventNotification = async (
     const slotsAvailable = MAX_PREBUILD_EVENTS - pendingCount;
 
     let anchorDate: string;
+
     if (pendingCount > 0) {
       const storeDate = await readFromStorage<string>(LAST_SCHEDULED_KEY);
       const localStringDate = storeDate
@@ -76,15 +76,16 @@ export const createNextScheduleEventNotification = async (
     }
 
     const notifcationAllowed = await NotificationHelper.checkNotificationPermission();
+
     if (!notifcationAllowed) {
       const allowed = await NotificationHelper.allowsNotifications();
       if (!allowed) {
-        Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
         return;
       }
     }
 
     const notifications = new NotificationHelper(settings);
+
     await Promise.all(
       newEvents.map((event) =>
         notifications.scheduleDosageNotification({

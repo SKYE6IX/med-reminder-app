@@ -2,7 +2,6 @@ import { MedicationScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { DateTime } from "@/utils/luxonUtil";
-import { Alert } from "react-native";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { saveToStorage } from "./storage-manager";
@@ -10,7 +9,9 @@ import { saveToStorage } from "./storage-manager";
 const MAX_PREBUILD_EVENTS = 10;
 const LAST_SCHEDULED_KEY = "notifications:lastScheduledAt";
 
-export const createScheduleEventNotification = async (settings: Partial<NotificationSettings>) => {
+export const scheduleNewMedicationNotifications = async (
+  settings: Partial<NotificationSettings>,
+) => {
   const isoString = DateTime.now().toISO({ precision: "minute" });
 
   try {
@@ -26,7 +27,7 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
 
     if (!response.data.length) return;
 
-    // Inocming events
+    // Inocoming events
     const newEvents = response.data;
     // Get all the current pending notification
     const pendingAppNotifications = await notifee.getTriggerNotifications();
@@ -37,11 +38,13 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
       return data.notificationType === "due";
     });
 
-    // We cancel all the exisiting events
+    // We need to cancel due, snoozes, early and
+    // missed.
     if (pendings.length) {
       // Because a due return 3 notification (snoonze), we use the only
       // single unique key, eventID to set them into map.
       const pendingMaps = new Map<string, TriggerNotification>();
+
       pendings.forEach((pending) => {
         const data = pending.notification?.data as unknown as NotificationData;
         pendingMaps.set(data.dosageScheduleEventId as string, pending);
@@ -60,12 +63,12 @@ export const createScheduleEventNotification = async (settings: Partial<Notifica
     if (!notifcationAllowed) {
       const allowed = await NotificationHelper.allowsNotifications();
       if (!allowed) {
-        Alert.alert("Включите уведомления, чтобы получать оповещения о ваших лекарствах.");
         return;
       }
     }
 
     const notifications = new NotificationHelper(settings);
+
     await Promise.all(
       newEvents.map((event) =>
         notifications.scheduleDosageNotification({

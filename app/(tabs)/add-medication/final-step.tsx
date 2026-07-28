@@ -6,7 +6,7 @@ import MedicationPackPicker from "@/component/ui/medication-pack-picker";
 import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
-import { createScheduleEventNotification } from "@/helpers/schedule-new-event-notifications";
+import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
@@ -147,7 +147,7 @@ export default function FinalStepScreen() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
-        createScheduleEventNotification({
+        scheduleNewMedicationNotifications({
           ...notfication,
           ...reminderPreferences,
         }),
@@ -172,7 +172,7 @@ export default function FinalStepScreen() {
         }
       }
 
-      await createScheduleEventNotification({
+      await scheduleNewMedicationNotifications({
         ...notfication,
         ...reminderPreferences,
       });

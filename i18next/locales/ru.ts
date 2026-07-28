@@ -79,6 +79,9 @@ const ru = {
       husband: "Муж",
     },
     bottom_sheet_close: "Отмена",
+    local_auth_prompt_msg: "Подтвердите личность",
+    local_auth_cancel_label: "Отменить",
+    local_auth_fallback_label: "Используйте пароль",
   },
   feedback: {
     error: {
@@ -415,6 +418,18 @@ const ru = {
     about_review_description: "Оставьте отзыв в {{store}}",
     about_support_title: "Связаться с нами",
     about_support_description: "Свяжитесь с нами по электронной почте",
+  },
+  notification: {
+    due_title: "Пора принять лекарство",
+    due_body: "{{medicationName}} на {{scheduleAt}}. Воспользуйтесь быстрыми действиями.",
+    snooze_title: "Напоминание о приёме",
+    snooze_body:
+      "{{medicationName}}, запланировано {{minutesOverdue}} мин назад. Воспользуйтесь быстрыми действиями.",
+    early_title: "Следующее лекарство через 20 минут",
+    missed_title: "Пропущен приём лекарства",
+    missed_body: "{{medicationName}} на {{scheduleAt}} не было отмечено.",
+    reserve_title: "Напоминание о пополнении",
+    reserve_body: "{{medicationName}} скоро закончится.",
   },
 } as const;
 

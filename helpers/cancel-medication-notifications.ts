@@ -3,7 +3,7 @@ import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { readFromStorage } from "./storage-manager";
 
-export async function cancelEventNotification({ medProfileId }: { medProfileId: string }) {
+export async function cancelMedicationNotifications({ medProfileId }: { medProfileId: string }) {
   try {
     const pendingAppNotifications = await notifee.getTriggerNotifications();
 
@@ -17,6 +17,7 @@ export async function cancelEventNotification({ medProfileId }: { medProfileId: 
     if (!pendings.length) return;
 
     const pendingMaps = new Map<string, TriggerNotification>();
+
     pendings.forEach((pending) => {
       const data = pending.notification?.data as unknown as NotificationData;
       pendingMaps.set(data.dosageScheduleEventId as string, pending);
@@ -43,6 +44,7 @@ export async function cancelEventNotification({ medProfileId }: { medProfileId: 
     });
 
     const refillNotificationId = await readFromStorage<string>(refillKey);
+
     if (refillNotificationId) {
       await NotificationHelper.cancelNotificationWithId(refillNotificationId, refillKey);
     }

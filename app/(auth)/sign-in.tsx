@@ -6,7 +6,7 @@ import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
 import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
-import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
+import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -82,7 +82,7 @@ export default function SignInScreen() {
 
       await NotificationHelper.cancelAllNotifications();
 
-      await createNextScheduleEventNotification({
+      await scheduleNewMedicationNotifications({
         ...useAppSettingsStore.getState().notfication,
         ...useAppSettingsStore.getState().reminderPreferences,
       });

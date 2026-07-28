@@ -1,11 +1,12 @@
+import { QueryKey } from "@/constants/query-keys";
 import { MedicationProfileReponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { queryClient } from "@/utils/query-client";
 import notifee from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
-import { createScheduleEventNotification } from "./schedule-new-event-notifications";
+import { scheduleNewMedicationNotifications } from "./schedule-new-event-notifications";
 
-export const updateScheduleEventNotifications = async (settings: Partial<NotificationSettings>) => {
+export const regenarateNotifications = async (settings: Partial<NotificationSettings>) => {
   try {
     const pendingAppNotifications = await notifee.getTriggerNotifications();
 
@@ -19,14 +20,14 @@ export const updateScheduleEventNotifications = async (settings: Partial<Notific
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Create a new notification for pills with the updated settings
-    await createScheduleEventNotification(settings);
+    await scheduleNewMedicationNotifications(settings);
 
     // Check if refillPending exist
     if (refillPending) {
       const notifications = new NotificationHelper(settings);
       const data = refillPending.notification.data as unknown as NotificationData;
       const medicationProfile = queryClient
-        .getQueryState<MedicationProfileReponse[]>(["medication-profile", "list"])
+        .getQueryState<MedicationProfileReponse[]>([QueryKey.medicationList])
         ?.data?.find((profile) => profile.id === data.medicationProfileId);
 
       if (medicationProfile) {

@@ -6,7 +6,7 @@ import SignalIcon from "@/component/icons/signal-icon";
 import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { NotificationHelper } from "@/helpers/notification-helper";
-import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
+import { regenarateNotifications } from "@/helpers/regenerate-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
@@ -98,7 +98,7 @@ export default function Notifications() {
       if (value === "silent") {
         await NotificationHelper.cancelAllNotifications();
       } else {
-        await updateScheduleEventNotifications({
+        await regenarateNotifications({
           ...notfication,
           ...reminderPreferences,
           sound: value as NotificationSoundMode,
@@ -129,7 +129,7 @@ export default function Notifications() {
       // the new sound for user notification
       commitTimeoutId.current = setTimeout(async () => {
         player.pause();
-        await updateScheduleEventNotifications({
+        await regenarateNotifications({
           ...notfication,
           ...reminderPreferences,
           sound: "enable",
@@ -142,7 +142,7 @@ export default function Notifications() {
 
   const toggleAllowNotification = async (value: boolean) => {
     setNotificationSetting({ enable: value });
-    await updateScheduleEventNotifications({
+    await regenarateNotifications({
       ...notfication,
       ...reminderPreferences,
       enable: value,
@@ -152,7 +152,7 @@ export default function Notifications() {
   // @platform ANDROID ONLY
   const toggleAllowVibration = async (value: boolean) => {
     setNotificationSetting({ vibration: value });
-    await updateScheduleEventNotifications({
+    await regenarateNotifications({
       ...notfication,
       ...reminderPreferences,
       vibration: value,
@@ -161,7 +161,7 @@ export default function Notifications() {
 
   const toggleAllowDisplayOnLockScreen = async (value: boolean) => {
     setNotificationSetting({ showOnLockScreen: value });
-    await updateScheduleEventNotifications({
+    await regenarateNotifications({
       ...notfication,
       ...reminderPreferences,
       showOnLockScreen: value,

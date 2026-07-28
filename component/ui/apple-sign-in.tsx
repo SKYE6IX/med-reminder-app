@@ -1,6 +1,6 @@
 import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
-import { createNextScheduleEventNotification } from "@/helpers/schedule-next-event-notifications";
+import { scheduleNextMedicationNotifications } from "@/helpers/schedule-next-event-notifications";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
@@ -37,7 +37,7 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
 
       await NotificationHelper.cancelAllNotifications();
 
-      await createNextScheduleEventNotification({
+      await scheduleNextMedicationNotifications({
         ...useAppSettingsStore.getState().notfication,
         ...useAppSettingsStore.getState().reminderPreferences,
       });
