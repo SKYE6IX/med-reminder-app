@@ -1,4 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useUserStore } from "@/stores/use-user-store";
 import { ProfileResponse } from "@/types/user";
@@ -67,6 +68,7 @@ const uploadImageMutation = async (uploadRequest: UploadReqeust) => {
 };
 
 export default function AvatarPicker({ profileId, onActionComplete }: AvatarPickerProps) {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const { addEmojiAvatar, removeEmojiAvatar } = useUserStore();
   const [listWidth, setListWidth] = useState(0);
@@ -88,9 +90,10 @@ export default function AvatarPicker({ profileId, onActionComplete }: AvatarPick
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
-      Alert.alert("Требуется разрешение, требуется разрешение на доступ к медиабиблиотеке.");
+      Alert.alert(t("alert.image_picker_permission"));
       return;
     }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       aspect: [4, 3],
@@ -129,8 +132,8 @@ export default function AvatarPicker({ profileId, onActionComplete }: AvatarPick
     },
     onError() {
       showFeedBack({
-        title: "Ошибка!",
-        message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+        title: t("feedback.error.general.title"),
+        message: t("feedback.error.general.text"),
         status: "error",
       });
     },
@@ -208,7 +211,7 @@ export default function AvatarPicker({ profileId, onActionComplete }: AvatarPick
           </Pressable>
         ))}
       </View>
-      <CustomButton label="Сохранить" onPress={saveChoosenAvatar} />
+      <CustomButton label={t("common.save")} onPress={saveChoosenAvatar} />
     </View>
   );
 }

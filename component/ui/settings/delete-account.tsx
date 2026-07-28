@@ -1,5 +1,6 @@
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useNotificationDataStore } from "@/stores/notification-data-store";
@@ -19,6 +20,7 @@ const deleteAccountMutation = async () => {
 };
 
 export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }) {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
 
   const { isPending, mutate } = useMutation({
@@ -40,14 +42,14 @@ export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -61,18 +63,18 @@ export default function DeleteAccount({ closeSheet }: { closeSheet: () => void }
       <Loader visible={isPending} />
       <View style={styles.container}>
         <Text style={[styles.text, { color: mutedColor }]}>
-          Все данные, связанные с этим пользователем, будут удалены.
+          {t("settings_screen.security_delete_account_sheet_heading")}
         </Text>
         <View style={styles.buttonWrapper}>
           <CustomButton
-            label="Отмена"
+            label={t("settings_screen.security_delete_account_sheet_cancel")}
             variant="outline"
             textVaraint="tintText"
             style={styles.button}
             onPress={closeSheet}
           />
           <CustomButton
-            label="Удалить"
+            label={t("settings_screen.security_delete_account_sheet_delete")}
             variant="danger"
             style={styles.button}
             onPress={() => mutate()}

@@ -12,6 +12,7 @@ import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { ProfileResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
@@ -40,6 +41,7 @@ const deleteRelationProfileMutation = async (profileId: string) => {
 };
 
 export default function Relations() {
+  const { t } = useTranslation();
   const isAndroid = Platform.OS === "android";
 
   const insets = useSafeAreaInsets();
@@ -65,14 +67,14 @@ export default function Relations() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -85,7 +87,7 @@ export default function Relations() {
   const openAddNewProfileSheet = () => {
     if (isPremiumPlan) {
       openSheet({
-        title: "Добавить члена семьи",
+        title: t("settings_screen.relation_add_profile_sheet_title"),
         content: <AddProfile onProfileAdded={closeSheet} />,
       });
     } else {
@@ -94,9 +96,10 @@ export default function Relations() {
   };
 
   const snapPoint = isAndroid ? "35%" : "30%";
+
   const openDeleteProfileSheet = (profileID: string) => {
     openSheet({
-      title: "Удалить пользователя?",
+      title: t("settings_screen.relation_delete_profile_sheet_title"),
       snapPointPercent: snapPoint,
       content: (
         <DeleteRelationProfile
@@ -144,7 +147,9 @@ export default function Relations() {
             <View style={[styles.profileImage, { backgroundColor: bgTertiary }]}>
               <PlusIcon color={color} size={15} />
             </View>
-            <Text style={[styles.label, { color }]}>Добавить члена семьи</Text>
+            <Text style={[styles.label, { color }]}>
+              {t("settings_screen.relation_add_profile")}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -155,6 +160,7 @@ export default function Relations() {
 }
 
 const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProfileProps) => {
+  const { t } = useTranslation();
   const profileImageUrl = useProfileImage(profile.id);
   const { openSheet, closeSheet } = useBottomSheet();
 
@@ -167,7 +173,7 @@ const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProf
 
   const openAvatarPickerSheet = () => {
     openSheet({
-      title: "Выберите фотографию",
+      title: t("settings_screen.user_details_sheet_title"),
       snapPointPercent: snapPoint,
       content: <AvatarPicker profileId={profile.id} onActionComplete={closeSheet} />,
     });
@@ -206,22 +212,23 @@ const RelationProfile = ({ profile, index, openDeleteBottomSheet }: RelationProf
 };
 
 const DeleteRelationProfile = ({ color, closeSheet, deleteFn }: DeleteRelationProfileProps) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.deleteActionBox}>
       <Text style={[styles.deletActionText, { color }]}>
-        Все данные, связанные с этим пользователем, будут удалены.
+        {t("settings_screen.relation_delete_profile_sheet_heading")}
       </Text>
 
       <View style={styles.deleActionBtnWrapper}>
         <CustomButton
-          label="Отмена"
+          label={t("settings_screen.relation_delete_profile_sheet_cancel")}
           variant="outline"
           textVaraint="tintText"
           style={styles.deleteActionBtn}
           onPress={closeSheet}
         />
         <CustomButton
-          label="Удалить"
+          label={t("settings_screen.relation_delete_profile_sheet_delete")}
           variant="danger"
           style={styles.deleteActionBtn}
           onPress={deleteFn}

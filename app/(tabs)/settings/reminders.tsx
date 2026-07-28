@@ -6,19 +6,22 @@ import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
 import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+const isRU = lng === "ru";
 const snoozes = [
-  { label: "5мин", value: "5" },
-  { label: "10мин", value: "10" },
-  { label: "15мин", value: "15" },
+  { label: isRU ? "5мин" : "5min", value: "5" },
+  { label: isRU ? "10мин" : "10min", value: "10" },
+  { label: isRU ? "15мин" : "15min", value: "15" },
 ];
 
 export default function Reminders() {
+  const { t } = useTranslation();
   const { openSheet } = useBottomSheet();
 
   const { reminderPreferences, notfication, setReminderPreference } = useAppSettingsStore();
@@ -65,7 +68,7 @@ export default function Reminders() {
 
   const showSnoozeOptioonSheet = () => {
     openSheet({
-      title: "Интервал повтора",
+      title: t("settings_screen.reminder_snooze_title"),
       snapPointPercent: "30%",
       content: (
         <PlatformPicker
@@ -85,8 +88,8 @@ export default function Reminders() {
       <View style={styles.container}>
         {/* Snooze Settings */}
         <SettingsCard
-          title="Интервал повтора"
-          description="Выберите интервал повторного напоминания"
+          title={t("settings_screen.reminder_snooze_title")}
+          description={t("settings_screen.reminder_snooze_description")}
           svgIcon={<AlarmClockIcon color={color} />}
           interaction="press"
           onPress={showSnoozeOptioonSheet}
@@ -94,8 +97,8 @@ export default function Reminders() {
 
         {/* Allow early reminder */}
         <SettingsCard
-          title="Предварительное напоминание"
-          description="Напоминание за 20 минут до приёма"
+          title={t("settings_screen.reminder_allow_early_title")}
+          description={t("settings_screen.reminder_allow_early_description")}
           svgIcon={<PhoneIcon color={color} />}
           interaction="toggle"
           toggleValue={reminderPreferences.earlyReminder}
@@ -104,8 +107,8 @@ export default function Reminders() {
 
         {/* Allow missed dosage notiification */}
         <SettingsCard
-          title="Уведомления о пропущенном приёме"
-          description="Если доза не отмечена в течение 30 минут"
+          title={t("settings_screen.reminder_allow_missed_title")}
+          description={t("settings_screen.reminder_allow_missed_description")}
           svgIcon={<BellNotificationIcon color={color} />}
           interaction="toggle"
           toggleValue={reminderPreferences.missedDoseAlert}

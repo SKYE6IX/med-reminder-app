@@ -16,6 +16,7 @@ import { useProfileImage } from "@/hooks/use-profile-image";
 import { useProfilesQuery } from "@/hooks/use-profiles-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserQuery } from "@/hooks/use-user-data";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { UserResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
@@ -25,11 +26,6 @@ import { Image } from "expo-image";
 import { useMemo, useRef, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
-const genderList = [
-  { label: "Мужской", value: "MALE" },
-  { label: "Женский", value: "FEMALE" },
-];
 
 interface UpdateUserData {
   name: string | null;
@@ -44,6 +40,7 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 };
 
 export default function UserDetails() {
+  const { t } = useTranslation();
   const isAndroid = Platform.OS === "android";
 
   const { openSheet, closeSheet } = useBottomSheet();
@@ -109,8 +106,8 @@ export default function UserDetails() {
     onSuccess(data) {
       queryClient.setQueryData([QueryKey.users], data);
       showFeedBack({
-        title: "Успех!",
-        message: "Данные обновлены!",
+        title: t("feedback.success.user_data.title"),
+        message: t("feedback.success.user_data.text"),
         status: "success",
       });
     },
@@ -119,14 +116,14 @@ export default function UserDetails() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так! Пожалуйста, попробуйте еще раз.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -152,7 +149,7 @@ export default function UserDetails() {
   const snapPoint = isAndroid ? "60%" : "55%";
   const openAvatarPickerSheet = () => {
     openSheet({
-      title: "Выберите фотографию",
+      title: t("settings_screen.user_details_sheet_title"),
       snapPointPercent: snapPoint,
       content: <AvatarPicker profileId={selfProfile?.id ?? ""} onActionComplete={closeSheet} />,
     });
@@ -163,7 +160,7 @@ export default function UserDetails() {
       androidDateRef.current?.showDateTime();
     } else {
       openSheet({
-        title: "Дата рождения",
+        title: t("settings_screen.user_details_dob_label"),
         snapPointPercent: "40%",
         content: (
           <IOSDateTimeWrapper
@@ -187,6 +184,11 @@ export default function UserDetails() {
 
   const top = isAndroid ? insets.top + 20 : 0;
 
+  const genderList = [
+    { label: t("settings_screen.user_details_gender_male"), value: "MALE" },
+    { label: t("settings_screen.user_details_gender_female"), value: "FEMALE" },
+  ];
+
   return (
     <SafeAreaView
       style={[{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }]}
@@ -208,7 +210,7 @@ export default function UserDetails() {
 
         <View style={styles.body}>
           <FormInput
-            label="Имя"
+            label={t("settings_screen.user_details_name_label")}
             placeholder=""
             type="text"
             name="name"
@@ -218,7 +220,7 @@ export default function UserDetails() {
           />
 
           <FormInput
-            label="Почта"
+            label={t("settings_screen.user_details_email_label")}
             placeholder={user?.email}
             type="email"
             name="email"
@@ -229,13 +231,15 @@ export default function UserDetails() {
 
           {/* DATE OF BIRTH */}
           <View style={styles.bodyItem}>
-            <Text style={[styles.bodyItemLabel, { color }]}>Дата рождения</Text>
+            <Text style={[styles.bodyItemLabel, { color }]}>
+              {t("settings_screen.user_details_dob_label")}
+            </Text>
             <Pressable
               style={[styles.bodyItemPressable, { backgroundColor: bgSecondary, borderColor }]}
               onPress={openDatePicker}
             >
               <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                {updateUserData.dateOfBirth || "Введите дату Вашего рождения"}
+                {updateUserData.dateOfBirth || t("settings_screen.user_details_dob_placeholder")}
               </Text>
             </Pressable>
 
@@ -252,7 +256,7 @@ export default function UserDetails() {
           {/* GENDER */}
           <View style={[styles.bodyItem, { borderWidth: 1, borderRadius: 16, borderColor }]}>
             <CustomPicker
-              label="Пол"
+              label={t("settings_screen.user_details_gender_label")}
               items={genderList}
               selectedValue={updateUserData.gender ?? ""}
               onValueSelected={handleOnGenderValueSelected}
@@ -264,7 +268,7 @@ export default function UserDetails() {
         </View>
 
         <CustomButton
-          label="Сохранить"
+          label={t("common.save")}
           style={styles.button}
           disabled={!canUpdate}
           variant={canUpdate ? "filled" : "disabled"}

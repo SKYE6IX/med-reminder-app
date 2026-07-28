@@ -1,5 +1,6 @@
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import { Stack } from "expo-router";
 import { StyleSheet } from "react-native";
 
@@ -8,6 +9,7 @@ export const unstable_settings = {
 };
 
 export default function SettingsLayout() {
+  const { t } = useTranslation();
   const color = useThemeColor({}, "textPrimary");
 
   const { isPremiumPlan } = useSubscriptionPlanQuery();
@@ -16,26 +18,32 @@ export default function SettingsLayout() {
     <Stack>
       <Stack.Screen name="index">
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Настройки</Stack.Screen.Title>
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          {t("settings_screen.index_header")}
+        </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Screen name="user-details">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Профиль</Stack.Screen.Title>
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          {t("settings_screen.profile_header")}
+        </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Screen name="relations">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Моя семья</Stack.Screen.Title>
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          {t("settings_screen.relation_header")}
+        </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Screen name="notifications">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
-          Настройки уведомлений
+          {t("settings_screen.notification_header")}
         </Stack.Screen.Title>
       </Stack.Screen>
 
@@ -43,7 +51,7 @@ export default function SettingsLayout() {
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
-          Настройки напоминаний
+          {t("settings_screen.reminders_header")}
         </Stack.Screen.Title>
       </Stack.Screen>
 
@@ -51,14 +59,16 @@ export default function SettingsLayout() {
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
         <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
-          Приватность и безопасность
+          {t("settings_screen.security_header")}
         </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Screen name="subscription">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>Подписка</Stack.Screen.Title>
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          {t("settings_screen.subscription_header")}
+        </Stack.Screen.Title>
       </Stack.Screen>
 
       <Stack.Protected guard={!isPremiumPlan}>
@@ -66,7 +76,7 @@ export default function SettingsLayout() {
           <Stack.Screen.BackButton displayMode="minimal" />
           <Stack.Header transparent style={{ shadowColor: "transparent" }} />
           <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
-            Премиум-функции
+            {t("settings_screen.subscription_plans_header")}
           </Stack.Screen.Title>
         </Stack.Screen>
       </Stack.Protected>
@@ -74,7 +84,9 @@ export default function SettingsLayout() {
       <Stack.Screen name="about">
         <Stack.Screen.BackButton displayMode="minimal" />
         <Stack.Header transparent style={{ shadowColor: "transparent" }} />
-        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>О нас</Stack.Screen.Title>
+        <Stack.Screen.Title style={[styles.headerTitle, { color }]}>
+          {t("settings_screen.about_header")}
+        </Stack.Screen.Title>
       </Stack.Screen>
     </Stack>
   );

@@ -9,6 +9,7 @@ import { NotificationHelper } from "@/helpers/notification-helper";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { lng, useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { NotificationSoundMode } from "@/types/notification";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
@@ -18,13 +19,14 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 type soundType = "enable" | "silent";
 
+const isRU = lng === "ru";
 const basicSoundSettings = [
-  { label: "Звук приложения по умолчанию", value: "enable" },
-  { label: "Беззвучно", value: "silent" },
+  { label: isRU ? "Звук приложения по умолчанию" : "Default app sound", value: "enable" },
+  { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
 ];
 
 const proSoundSettings = [
-  { label: "Беззвучно", value: "silent" },
+  { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
   { label: "Universe Wave", value: "universfield_soft.wav" },
   { label: "Earth Softy", value: "universfield_passive.wav" },
   { label: "Dragon Time", value: "dragon_wavy.wav" },
@@ -40,6 +42,7 @@ const RINGTONE_TRACKS = [
 ];
 
 export default function Notifications() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { openSheet } = useBottomSheet();
 
@@ -167,7 +170,7 @@ export default function Notifications() {
 
   const showNotificationSoundListSheet = () => {
     openSheet({
-      title: "Звук уведомления",
+      title: t("settings_screen.notification_sound_title"),
       snapPointPercent: "35%",
       content: (
         <PlatformPicker
@@ -190,8 +193,8 @@ export default function Notifications() {
       <View style={styles.container}>
         {/* Allow Sounds */}
         <SettingsCard
-          title="Звук уведомления"
-          description="Изменить звук уведомлений"
+          title={t("settings_screen.notification_sound_title")}
+          description={t("settings_screen.notification_sound_description")}
           svgIcon={<BellOnIcon color={color} />}
           interaction="press"
           onPress={showNotificationSoundListSheet}
@@ -199,8 +202,8 @@ export default function Notifications() {
 
         {/* Allow Notification */}
         <SettingsCard
-          title="Уведомления приложения"
-          description="Получать уведомления приложения"
+          title={t("settings_screen.notification_allow_sound_title")}
+          description={t("settings_screen.notification_allow_sound_description")}
           svgIcon={<PhoneIcon color={color} />}
           interaction="toggle"
           toggleValue={notfication.enable}
@@ -211,8 +214,8 @@ export default function Notifications() {
         {/* @platform ANDROID ONLY */}
         {isAndroid && (
           <SettingsCard
-            title="Вибрация"
-            description="Устройство вибрирует, когда приходит уведомление"
+            title={t("settings_screen.notification_vib_title")}
+            description={t("settings_screen.notification_vib_description")}
             svgIcon={<SignalIcon color={color} />}
             interaction="toggle"
             toggleValue={notfication.vibration}
@@ -222,8 +225,8 @@ export default function Notifications() {
 
         {/* Allow notification display on lock screen */}
         <SettingsCard
-          title="Показывать на экране блокировки"
-          description="Показывать напоминания о лекарствах на экране блокировки"
+          title={t("settings_screen.notification_lock_screen_title")}
+          description={t("settings_screen.notification_lock_screen_description")}
           svgIcon={<LockverifiedIcon color={color} />}
           interaction="toggle"
           toggleValue={notfication.showOnLockScreen}

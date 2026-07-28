@@ -3,15 +3,17 @@ import PhoneCallIcon from "@/component/icons/phone-call-icon";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useTranslation } from "@/i18next/i18next";
 import * as Application from "expo-application";
 import { Image } from "expo-image";
 import * as Linking from "expo-linking";
 import * as StoreReview from "expo-store-review";
 import { useCallback } from "react";
-import { Alert, Platform, StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function About() {
+  const { t } = useTranslation();
   const isIOS = Platform.OS === "ios";
   const insets = useSafeAreaInsets();
   const scheme = useColorScheme();
@@ -38,8 +40,6 @@ export default function About() {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
       await Linking.openURL(url);
-    } else {
-      Alert.alert("Не удается открыть вашу почту.");
     }
   }, []);
 
@@ -63,22 +63,24 @@ export default function About() {
         </View>
 
         <View style={[styles.versionWrapper, { backgroundColor: bgSecondary, borderColor }]}>
-          <Text style={[styles.versionLabel, { color }]}>Версия</Text>
+          <Text style={[styles.versionLabel, { color }]}>
+            {t("settings_screen.about_version_label")}
+          </Text>
           <Text style={[styles.versionValue, { color: mutedColor }]}>{applicationVersion}</Text>
         </View>
 
         <View style={styles.sectionGroup}>
           <SettingsCard
-            title="Оцените приложение"
-            description={`Оставьте отзыв в ${storeName}`}
+            title={t("settings_screen.about_review_title")}
+            description={t("settings_screen.about_review_description", { store: storeName })}
             svgIcon={<ChatStartIcon color={color} />}
             interaction="press"
             onPress={requestAReview}
           />
 
           <SettingsCard
-            title="Связаться с нами"
-            description="Свяжитесь с нами по электронной почте"
+            title={t("settings_screen.about_support_title")}
+            description={t("settings_screen.about_support_description")}
             svgIcon={<PhoneCallIcon color={color} />}
             interaction="press"
             onPress={openEmail}

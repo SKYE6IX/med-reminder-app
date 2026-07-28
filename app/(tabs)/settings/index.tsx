@@ -20,6 +20,7 @@ import { useProfileImage } from "@/hooks/use-profile-image";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserQuery } from "@/hooks/use-user-data";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -31,6 +32,7 @@ const logOutMutation = async () => {
 };
 
 export default function Settings() {
+  const { t } = useTranslation();
   const isIOS = Platform.OS === "ios";
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -99,18 +101,20 @@ export default function Settings() {
         <Loader visible={isPending} />
         {/* PROFILE SETTINGS ✅ */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>Профиль</Text>
+          <Text style={[styles.sectionTitle, { color }]}>
+            {t("settings_screen.index_profile_label")}
+          </Text>
           <SettingsCard
             title={user?.name || ""}
-            description="Посмотреть профиль"
+            description={t("settings_screen.card_profile_description")}
             interaction="press"
             avatarUrl={profileImageUrl}
             onPress={() => router.navigate("/(tabs)/settings/user-details")}
           />
 
           <SettingsCard
-            title="Моя семья"
-            description="Управление данными семьи"
+            title={t("settings_screen.card_relation_title")}
+            description={t("settings_screen.card_relation_description")}
             interaction="press"
             svgIcon={<PeopleGroupIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/relations")}
@@ -119,18 +123,20 @@ export default function Settings() {
 
         {/* NOTIFICATION & REMINDER SETTINGS ✅ */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>Уведомления и напоминания</Text>
+          <Text style={[styles.sectionTitle, { color }]}>
+            {t("settings_screen.index_notification_label")}
+          </Text>
           <SettingsCard
-            title="Настройки уведомлений"
-            description="Измените звук и видимость уведомлений"
+            title={t("settings_screen.card_notification_title")}
+            description={t("settings_screen.card_notification_decription")}
             interaction="press"
             svgIcon={<BellIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/notifications")}
           />
 
           <SettingsCard
-            title="Настройки напоминаний"
-            description="Измените повторы и дополнительные напоминания"
+            title={t("settings_screen.card_reminder_title")}
+            description={t("settings_screen.card_reminder_description")}
             interaction="press"
             svgIcon={<SoundIcon color={color} />}
             onPress={navigateToReminderPreference}
@@ -139,10 +145,12 @@ export default function Settings() {
 
         {/* GENERAL SETTINGS (Subscription)  */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>Общие</Text>
+          <Text style={[styles.sectionTitle, { color }]}>
+            {t("settings_screen.index_general_label")}
+          </Text>
           <SettingsCard
-            title="Подписки"
-            description="Управление подпиской"
+            title={t("settings_screen.card_subscription_title")}
+            description={t("settings_screen.card_subscription_description")}
             interaction="press"
             svgIcon={<EyeIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/subscription")}
@@ -151,10 +159,12 @@ export default function Settings() {
 
         {/* SECURITY SETTINGS ✅*/}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>Безопасность</Text>
+          <Text style={[styles.sectionTitle, { color }]}>
+            {t("settings_screen.index_security_label")}
+          </Text>
           <SettingsCard
-            title="Приватность и безопасность"
-            description="Управляйте паролями и безопасностью приложения"
+            title={t("settings_screen.card_security_title")}
+            description={t("settings_screen.card_security_description")}
             interaction="press"
             svgIcon={<LockIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/security")}
@@ -163,10 +173,12 @@ export default function Settings() {
 
         {/* ABOUT US ✅ */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color }]}>О нас</Text>
+          <Text style={[styles.sectionTitle, { color }]}>
+            {t("settings_screen.index_about_label")}
+          </Text>
           <SettingsCard
-            title="О нас"
-            description="Узнайте больше о приложении и его версии"
+            title={t("settings_screen.card_about_title")}
+            description={t("settings_screen.card_about_description")}
             interaction="press"
             svgIcon={<InfoCircle color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/about")}
@@ -175,7 +187,7 @@ export default function Settings() {
 
         {/* SIGN OUT BUTTON */}
         <CustomButton
-          label="Выйти"
+          label={t("settings_screen.index_sign_out_label")}
           variant="danger"
           svgIcon={<LogoutIcon color="#F7F7F7" />}
           onPress={() => mutate()}

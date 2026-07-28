@@ -1,4 +1,5 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
+import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { api, axios } from "@/utils/axiosInstance";
@@ -28,6 +29,7 @@ const resetPasswordMutation = async (resetData: FormState) => {
 };
 
 export default function ChangePassword() {
+  const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
   const { closeSheet } = useBottomSheet();
 
@@ -83,8 +85,8 @@ export default function ChangePassword() {
     mutationFn: resetPasswordMutation,
     async onSuccess() {
       showFeedBack({
-        title: "Пароль изменен!",
-        message: "Успешно смените пароль!",
+        title: t("feedback.success.change_password.title"),
+        message: t("feedback.success.change_password.text"),
         status: "success",
       });
 
@@ -106,16 +108,20 @@ export default function ChangePassword() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else if (error.response?.status === 401) {
-          showFeedBack({ title: "Ошибка!", message: "Неверный старый пароль.", status: "error" });
+          showFeedBack({
+            title: t("feedback.error.update_password.title"),
+            message: t("feedback.error.update_password.text"),
+            status: "error",
+          });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -146,21 +152,21 @@ export default function ChangePassword() {
       <Loader visible={isPending} />
       <View style={styles.container}>
         <FormInput
-          label="Старый пароль"
+          label={t("settings_screen.security_password_input1_label")}
           name="oldPassword"
           onValueChange={handleOnValueChanges}
           type="password"
-          placeholder="Введите Ваш старый пароль"
+          placeholder={t("settings_screen.security_password_input1_placeholder")}
           hasError={changePasswordState.errorsSet.has("oldPassword")}
           returnKeyType="next"
         />
 
         <FormInput
-          label="Новый пароль"
+          label={t("settings_screen.security_password_input2_label")}
           name="newPassword"
           onValueChange={handleOnValueChanges}
           type="password"
-          placeholder="Введите Ваш новый пароль"
+          placeholder={t("settings_screen.security_password_input2_placeholder")}
           hasError={changePasswordState.errorsSet.has("newPassword")}
           textContentType="newPassword"
           autoComplete="new-password"
@@ -168,16 +174,20 @@ export default function ChangePassword() {
         />
 
         <FormInput
-          label="Подтвердите новый пароль"
+          label={t("settings_screen.security_password_input3_label")}
           name="repeatPassword"
           onValueChange={handleOnValueChanges}
           type="password"
-          placeholder="Повторно введите Ваш новый пароль"
+          placeholder={t("settings_screen.security_password_input3_placeholder")}
           hasError={changePasswordState.errorsSet.has("repeatPassword")}
           returnKeyType="done"
         />
 
-        <CustomButton label="Изменить пароль" disabled={isPending} onPress={handleResetPassword} />
+        <CustomButton
+          label={t("settings_screen.security_password_title")}
+          disabled={isPending}
+          onPress={handleResetPassword}
+        />
       </View>
     </React.Fragment>
   );
