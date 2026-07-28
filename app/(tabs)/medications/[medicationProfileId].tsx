@@ -9,7 +9,7 @@ import DetailsNoteSettings from "@/component/ui/medication-details/note-settings
 import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
 import { QueryKey } from "@/constants/query-keys";
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { getDurationDate } from "@/helpers/getDurationDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
@@ -28,7 +28,7 @@ const fetchMedicationProfileDetails = async (id: string) => {
 };
 
 export default function MedicationDetails() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
   const { medicationProfileId } = useLocalSearchParams();
 
@@ -96,7 +96,7 @@ export default function MedicationDetails() {
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getDurationDate(medicationProfile.schedule.startDate)}
+                            {getDurationDate(medicationProfile.schedule.startDate, i18n.language)}
                           </Text>
                         </View>
                       </View>
@@ -117,7 +117,10 @@ export default function MedicationDetails() {
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getDurationDate(medicationProfile.schedule.endDate ?? "")}
+                            {getDurationDate(
+                              medicationProfile.schedule.endDate ?? "",
+                              i18n.language,
+                            )}
                           </Text>
                         </View>
                       </View>
@@ -142,7 +145,7 @@ export default function MedicationDetails() {
                       <View style={styles.cardBody}>
                         <CalenderIcon color={color} />
                         <Text style={[styles.cardTextContent, { color }]}>
-                          {getDurationDate(medicationProfile.schedule.startDate)}
+                          {getDurationDate(medicationProfile.schedule.startDate, i18n.language)}
                         </Text>
                       </View>
                     </View>
@@ -191,7 +194,8 @@ export default function MedicationDetails() {
                   <Text style={[styles.cardTextContent, { color: mutedColor }]}>
                     {medicationProfile && Number(medicationProfile.schedule.amountTaken) >= 1
                       ? t("medication_screen.details_amount_dose_taken", {
-                          data: `${medicationProfile.schedule.amountTaken} ${getDosageMeasurement(medicationProfile.schedule.measurement)}`,
+                          // @ts-ignore
+                          data: `${medicationProfile.schedule.amountTaken} ${t(`common.dosage_measuremnet.${getDosageMeasurementLabelKey(medicationProfile.schedule.measurement)}`)}`,
                         })
                       : t("medication_screen.details_no_amount_dose_taken")}
                   </Text>

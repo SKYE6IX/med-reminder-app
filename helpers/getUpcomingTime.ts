@@ -1,7 +1,6 @@
-import { lng } from "@/i18next/i18next";
 import { DateTime } from "@/utils/luxonUtil";
 
-export const getUpcomingTime = (isoDateTime: string, now: DateTime) => {
+export const getUpcomingTime = (isoDateTime: string, now: DateTime, lng: string) => {
   if (!isoDateTime) return;
 
   const scheduleTime = DateTime.fromISO(isoDateTime, {

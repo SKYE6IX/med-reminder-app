@@ -19,12 +19,12 @@ export default function DetailsFrequencySettings({
 }: {
   medicationProfile: MedicationProfileReponse;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sharedStyles = useSharedStyles();
   const { openSheet, closeSheet } = useBottomSheet();
 
   const { isPending, mutate } = useUpdateMedicationMutation({ name: "UPDATE FREQUENCY" });
-  const ruleToText = formatRRuleToText(medicationProfile.schedule.recurrenceRule);
+  const ruleToText = formatRRuleToText(medicationProfile.schedule.recurrenceRule, i18n.language);
 
   const handleUpdateRules = (updatedRule: string) => {
     closeSheet();

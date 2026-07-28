@@ -1,4 +1,4 @@
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -22,7 +22,7 @@ export default function DosageAmountInput({
   const [value, setValue] = useState("");
 
   const { showFeedBack } = useFeedBackStore();
-  const measurement = getDosageMeasurement(measurementValue);
+  const labelKey = getDosageMeasurementLabelKey(measurementValue);
 
   const handleOnChangeText = (text: string) => {
     const normalized = text.replace(",", ".");
@@ -69,7 +69,10 @@ export default function DosageAmountInput({
           onChangeText={handleOnChangeText}
         />
         <Text style={[styles.text, { color }]}>
-          {t("common.dose_amount_picker_description", { measurement: measurement ?? "" })}
+          {t("common.dose_amount_picker_description", {
+            // @ts-ignore
+            measurement: t(`common.dosage_measuremnet.${labelKey}`) ?? "",
+          })}
         </Text>
       </View>
       <CustomButton

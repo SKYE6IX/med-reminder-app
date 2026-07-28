@@ -1,8 +1,8 @@
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { getDurationDate } from "@/helpers/getDurationDate";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -15,7 +15,7 @@ type MedicationListCardProps = {
   onSwitchToggle: (status: "active" | "inactive", id: string) => void;
 };
 
-const getProgressText = (medicationProfile: MedicationProfileReponse) => {
+const getProgressText = (medicationProfile: MedicationProfileReponse, lng: string) => {
   if (!medicationProfile.pack) return;
   const pack = medicationProfile.pack;
   const consumed = Number(pack.totalAmountInPack) - Number(pack.currentAmountInPack);
@@ -34,15 +34,15 @@ export default function MedicationListCard({
   medicationProfile,
   onSwitchToggle,
 }: MedicationListCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sharedStyles = useCardStyles();
   const profileImageUrl = useProfileImage(medicationProfile.profile.id);
 
   const [isActive, setIsActive] = useState(medicationProfile.status.toUpperCase() === "ACTIVE");
   const router = useRouter();
 
-  const dosageUnit = getDosageMeasurement(medicationProfile.schedule.measurement);
-  const startedDate = getDurationDate(medicationProfile.schedule.startDate);
+  const labelKey = getDosageMeasurementLabelKey(medicationProfile.schedule.measurement);
+  const startedDate = getDurationDate(medicationProfile.schedule.startDate, i18n.language);
 
   const canShowProgress = medicationProfile.pack !== null;
 
@@ -94,7 +94,8 @@ export default function MedicationListCard({
             <Text style={sharedStyles.cardTextLarge}>{medicationProfile.medicationName}</Text>
             <Text
               style={sharedStyles.cardTextMedium}
-            >{`${medicationProfile.schedule.dosage} ${dosageUnit}`}</Text>
+              // @ts-ignore
+            >{`${medicationProfile.schedule.dosage} ${t(`common.dosage_measuremnet.${labelKey}`)}`}</Text>
             <Text style={sharedStyles.cardTextMedium}>
               {t("medication_screen.list_card_start_at", { date: startedDate })}
             </Text>
@@ -122,7 +123,9 @@ export default function MedicationListCard({
       {canShowProgress && (
         <View style={sharedStyles.progressContainer}>
           <View style={sharedStyles.progressHeader}>
-            <Text style={sharedStyles.progressTextValue}>{getProgressText(medicationProfile)}</Text>
+            <Text style={sharedStyles.progressTextValue}>
+              {getProgressText(medicationProfile, i18n.language)}
+            </Text>
             <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>
               {getPercentage(medicationProfile)}%
             </Text>

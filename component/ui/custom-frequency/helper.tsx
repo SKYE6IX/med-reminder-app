@@ -1,4 +1,3 @@
-import { lng } from "@/i18next/i18next";
 import { Platform } from "react-native";
 import { CustomPattern, Unit } from "./types";
 
@@ -19,17 +18,16 @@ export const HEIGHT = {
   },
 };
 
-export const getOptionsValueLabel = (
+export const getOptionsValueLabelKey = (
   value: number,
-  options: { label: string; value: number }[],
+  options: { labelKey: string; value: number }[],
 ) => {
-  return options.find((option) => option.value === value)?.label;
+  return options.find((option) => option.value === value)?.labelKey;
 };
 
-export const getUnitValueLabel = (unit: Unit, value: number) => {
+export const getUnitValueLabel = (unit: Unit, value: number, lng: string) => {
   const num = Number(value);
   const isRU = lng === "ru";
-
   if (unit === "DAILY") {
     if (num === 1) {
       return isRU ? "день" : "Day";

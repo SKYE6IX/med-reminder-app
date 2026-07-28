@@ -33,7 +33,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const sharedStyles = useAddPillScreenStyles();
@@ -45,7 +45,10 @@ export default function ScheduleStepScreen() {
 
   const [durations, setDurations] = useState("");
   const [fromDate, setFromDate] = useState<Date>(getNow());
-  const displayStartDate = formatRegularDate(formState.schedule.startDate.replaceAll(".", " "));
+  const displayStartDate = formatRegularDate(
+    formState.schedule.startDate.replaceAll(".", " "),
+    i18n.language,
+  );
 
   const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
   const androidDateRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY

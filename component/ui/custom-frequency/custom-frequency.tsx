@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withDelay, withSpring } from "react-native-reanimated";
 import SelectionDot from "../selection-dot";
-import { DEFAULT_PATTERN, getOptionsValueLabel, getUnitValueLabel, HEIGHT } from "./helper";
+import { DEFAULT_PATTERN, getOptionsValueLabelKey, getUnitValueLabel, HEIGHT } from "./helper";
 import { useCustomFreqStyles } from "./shared-styles";
 import { CustomFrequencyProps, CustomState, Unit } from "./types";
 
@@ -16,7 +16,7 @@ export default function CustomFrequency({
   handleSelection,
   onCustomPatternChange,
 }: CustomFrequencyProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sharedStyles = useCustomFreqStyles();
 
   // Picker Refs
@@ -134,6 +134,11 @@ export default function CustomFrequency({
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  const hoursBetweenValueLabelKey =
+    getOptionsValueLabelKey(customState.pattern.occurrencesPerDay, HOUR_BETWEEN_OCCURENCES) ?? "";
+  const occurencePerDayValueLabelKey =
+    getOptionsValueLabelKey(customState.pattern.occurrencesPerDay, OCCURENCES_PER_DAY) ?? "";
+
   return (
     <Animated.View
       style={[
@@ -176,8 +181,8 @@ export default function CustomFrequency({
             >
               <Text style={sharedStyles.groupItemValue}>
                 {customState.pattern.unit === "HOURLY"
-                  ? getUnitValueLabel("HOURLY", customState.pattern.intervalValue)
-                  : getUnitValueLabel("DAILY", customState.pattern.intervalValue)}
+                  ? getUnitValueLabel("HOURLY", customState.pattern.intervalValue, i18n.language)
+                  : getUnitValueLabel("DAILY", customState.pattern.intervalValue, i18n.language)}
               </Text>
             </Pressable>
           </View>
@@ -197,7 +202,8 @@ export default function CustomFrequency({
               onPress={() => occurrencesPerDay.current?.focus()}
             >
               <Text style={sharedStyles.groupItemValue}>
-                {getOptionsValueLabel(customState.pattern.occurrencesPerDay, OCCURENCES_PER_DAY)}
+                {/* @ts-expect-error */}
+                {t(`common.occurences_per_day.${occurencePerDayValueLabelKey}`)}
               </Text>
             </Pressable>
           </View>
@@ -220,10 +226,8 @@ export default function CustomFrequency({
                 onPress={() => hoursBetweenOccurrences.current?.focus()}
               >
                 <Text style={sharedStyles.groupItemValue}>
-                  {getOptionsValueLabel(
-                    customState.pattern.hoursBetweenOccurrences,
-                    HOUR_BETWEEN_OCCURENCES,
-                  )}
+                  {/* @ts-expect-error */}
+                  {t(`common.hour_betweeen_occurences.${hoursBetweenValueLabelKey}`)}
                 </Text>
               </Pressable>
             </View>
@@ -296,8 +300,9 @@ export default function CustomFrequency({
       >
         {OCCURENCES_PER_DAY.map((option) => (
           <Picker.Item
-            key={option.value + option.label}
-            label={option.label}
+            key={option.value + option.labelKey}
+            // @ts-expect-error
+            label={t(`common.occurences_per_day.${option.labelKey}`)}
             value={option.value}
           />
         ))}
@@ -327,8 +332,9 @@ export default function CustomFrequency({
       >
         {HOUR_BETWEEN_OCCURENCES.map((option) => (
           <Picker.Item
-            key={option.value + option.label}
-            label={option.label}
+            key={option.value + option.labelKey}
+            // @ts-expect-error
+            label={t(`common.hour_betweeen_occurences.${option.labelKey}`)}
             value={option.value}
           />
         ))}
@@ -336,6 +342,7 @@ export default function CustomFrequency({
     </Animated.View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     height: 100,

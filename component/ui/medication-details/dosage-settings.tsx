@@ -1,7 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import PillIcon from "@/component/icons/pill-icon";
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { useTranslation } from "@/i18next/i18next";
@@ -61,7 +61,8 @@ export default function DetailsDosageSettings({
         <View style={sharedStyles.cardBody}>
           <PillIcon color={color} size={16} />
           <Text style={sharedStyles.cardTextContent}>
-            {`${medicationProfile.schedule.dosage} ${getDosageMeasurement(medicationProfile.schedule.measurement)}`}
+            {/* @ts-ignore */}
+            {`${medicationProfile.schedule.dosage} ${t(`common.dosage_measuremnet.${getDosageMeasurementLabelKey(medicationProfile.schedule.measurement)}`)}`}
           </Text>
         </View>
       </Pressable>

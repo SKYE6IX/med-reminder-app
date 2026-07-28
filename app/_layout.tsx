@@ -23,8 +23,9 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { AppState } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import "../i18next/i18next";
+import i18n, { resolveLanguage } from "../i18next/i18next";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -122,6 +123,16 @@ export default function RootLayout() {
 
   useEffect(() => {
     bootstrap();
+
+    const subscription = AppState.addEventListener("change", (appState) => {
+      if (appState === "active") {
+        const lng = resolveLanguage();
+        i18n.changeLanguage(lng);
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   useEffect(() => {

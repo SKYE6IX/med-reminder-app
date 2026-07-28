@@ -1,9 +1,6 @@
-import { lng } from "@/i18next/i18next";
 import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
 export const getTimeZone = () => DateTime.now().zoneName;
-
-const isRU = lng === "ru";
 
 export const toLocalUtcTime = (date: Date) => {
   return DateTime.fromJSDate(date)
@@ -34,7 +31,8 @@ export const getDateLocalString = (date: Date = new Date()) => {
     .toLocaleDateString("ru-RU");
 };
 
-export const formatRegularDate = (isoDate: string) => {
+export const formatRegularDate = (isoDate: string, lng: string) => {
+  const isRU = lng === "ru";
   const date = DateTime.fromFormat(isoDate, "dd MM yyyy", {
     locale: lng,
     setZone: true,
@@ -64,7 +62,8 @@ export const formatRegularDate = (isoDate: string) => {
   });
 };
 
-export const formatHomeScreenDate = (isoDate: string) => {
+export const formatHomeScreenDate = (isoDate: string, lng: string) => {
+  const isRU = lng === "ru";
   const date = DateTime.fromISO(isoDate, {
     locale: lng,
     setZone: true,
@@ -99,7 +98,7 @@ export const formatHomeScreenDate = (isoDate: string) => {
   });
 };
 
-export const getWeekDays = (offset: number) => {
+export const getWeekDays = (offset: number, lng: string) => {
   const anchorWeekStart = DateTime.now().setLocale(lng).startOf("week");
   const start = anchorWeekStart.plus({ weeks: offset });
   return Array.from({ length: 7 }, (_, i) => {
@@ -114,7 +113,8 @@ export const getWeekDays = (offset: number) => {
   });
 };
 
-export const getWeekViewDescription = (isoDate: string) => {
+export const getWeekViewDescription = (isoDate: string, lng: string) => {
+  const isRU = lng === "ru";
   const date = DateTime.fromISO(isoDate, {
     locale: "ru",
     setZone: true,

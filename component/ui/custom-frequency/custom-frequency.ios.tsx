@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import SelectionDot from "../selection-dot";
-import { DEFAULT_PATTERN, HEIGHT, getOptionsValueLabel, getUnitValueLabel } from "./helper";
+import { DEFAULT_PATTERN, HEIGHT, getOptionsValueLabelKey, getUnitValueLabel } from "./helper";
 import { useCustomFreqStyles } from "./shared-styles";
 import { CustomFrequencyProps, CustomState, Unit } from "./types";
 
@@ -16,7 +16,7 @@ export default function CustomFrequency({
   handleSelection,
   onCustomPatternChange,
 }: CustomFrequencyProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sharedStyles = useCustomFreqStyles();
 
   const [customState, setCustomState] = useState<CustomState>({
@@ -134,6 +134,11 @@ export default function CustomFrequency({
   const borderColor = useThemeColor({}, "borderColor");
   const tintColor = useThemeColor({}, "tint");
 
+  const hoursBetweenValueLabelKey =
+    getOptionsValueLabelKey(customState.pattern.occurrencesPerDay, HOUR_BETWEEN_OCCURENCES) ?? "";
+  const occurencePerDayValueLabelKey =
+    getOptionsValueLabelKey(customState.pattern.occurrencesPerDay, OCCURENCES_PER_DAY) ?? "";
+
   return (
     <Animated.View
       style={[
@@ -178,8 +183,8 @@ export default function CustomFrequency({
               >
                 <Text style={sharedStyles.groupItemValue}>
                   {customState.pattern.unit === "HOURLY"
-                    ? getUnitValueLabel("HOURLY", customState.pattern.intervalValue)
-                    : getUnitValueLabel("DAILY", customState.pattern.intervalValue)}
+                    ? getUnitValueLabel("HOURLY", customState.pattern.intervalValue, i18n.language)
+                    : getUnitValueLabel("DAILY", customState.pattern.intervalValue, i18n.language)}
                 </Text>
               </Pressable>
             </View>
@@ -248,7 +253,8 @@ export default function CustomFrequency({
                 onPress={() => handleShowPicker("occurrencesPerDay")}
               >
                 <Text style={sharedStyles.groupItemValue}>
-                  {getOptionsValueLabel(customState.pattern.occurrencesPerDay, OCCURENCES_PER_DAY)}
+                  {/* @ts-expect-error */}
+                  {t(`common.occurences_per_day.${occurencePerDayValueLabelKey}`)}
                 </Text>
               </Pressable>
             </View>
@@ -271,8 +277,9 @@ export default function CustomFrequency({
             >
               {OCCURENCES_PER_DAY.map((option) => (
                 <PickerIOS.Item
-                  key={option.value + option.label}
-                  label={option.label}
+                  key={option.value + option.labelKey}
+                  // @ts-expect-error
+                  label={t(`common.occurences_per_day.${option.labelKey}`)}
                   value={option.value}
                 />
               ))}
@@ -298,14 +305,13 @@ export default function CustomFrequency({
                   onPress={() => handleShowPicker("hoursBetweenOccurrences")}
                 >
                   <Text style={sharedStyles.groupItemValue}>
-                    {getOptionsValueLabel(
-                      customState.pattern.hoursBetweenOccurrences,
-                      HOUR_BETWEEN_OCCURENCES,
-                    )}
+                    {/* @ts-expect-error */}
+                    {t(`common.hour_betweeen_occurences.${hoursBetweenValueLabelKey}`)}
                   </Text>
                 </Pressable>
               </View>
             </View>
+
             {customState.showPicker === "hoursBetweenOccurrences" && (
               <PickerIOS
                 selectedValue={customState.pattern.hoursBetweenOccurrences}
@@ -323,8 +329,9 @@ export default function CustomFrequency({
               >
                 {HOUR_BETWEEN_OCCURENCES.map((option) => (
                   <PickerIOS.Item
-                    key={option.value + option.label}
-                    label={option.label}
+                    key={option.value + option.labelKey}
+                    // @ts-expect-error
+                    label={t(`common.hour_betweeen_occurences.${option.labelKey}`)}
                     value={option.value}
                   />
                 ))}

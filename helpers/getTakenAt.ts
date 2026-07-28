@@ -1,7 +1,6 @@
-import { lng } from "@/i18next/i18next";
 import { DateTime } from "@/utils/luxonUtil";
 
-export const getTakenAt = (isoDate: string | null) => {
+export const getTakenAt = (isoDate: string | null, lng: string) => {
   if (!isoDate) return;
   const takenAt = DateTime.fromISO(isoDate).setLocale(lng);
   const text = lng === "ru" ? "Принято в " : "Taken at ";

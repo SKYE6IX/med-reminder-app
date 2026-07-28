@@ -9,7 +9,7 @@ import { NotificationHelper } from "@/helpers/notification-helper";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { NotificationSoundMode } from "@/types/notification";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
@@ -18,19 +18,6 @@ import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type soundType = "enable" | "silent";
-
-const isRU = lng === "ru";
-const basicSoundSettings = [
-  { label: isRU ? "Звук приложения по умолчанию" : "Default app sound", value: "enable" },
-  { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
-];
-
-const proSoundSettings = [
-  { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
-  { label: "Universe Wave", value: "universfield_soft.wav" },
-  { label: "Earth Softy", value: "universfield_passive.wav" },
-  { label: "Dragon Time", value: "dragon_wavy.wav" },
-];
 
 const RINGTONE_TRACKS = [
   { key: "universfield_soft.wav", source: require("@/assets/sounds/universfield_soft.wav") },
@@ -42,7 +29,20 @@ const RINGTONE_TRACKS = [
 ];
 
 export default function Notifications() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRU = i18n.language === "ru";
+
+  const basicSoundSettings = [
+    { label: isRU ? "Звук приложения по умолчанию" : "Default app sound", value: "enable" },
+    { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
+  ];
+  const proSoundSettings = [
+    { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
+    { label: "Universe Wave", value: "universfield_soft.wav" },
+    { label: "Earth Softy", value: "universfield_passive.wav" },
+    { label: "Dragon Time", value: "dragon_wavy.wav" },
+  ];
+
   const insets = useSafeAreaInsets();
   const { openSheet } = useBottomSheet();
 

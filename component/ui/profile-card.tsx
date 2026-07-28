@@ -1,4 +1,4 @@
-import { RELATION_LIST, Relation } from "@/constants/relation";
+import { Relation, relationList } from "@/constants/relation";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
@@ -29,9 +29,10 @@ export default function ProfileCard({
   asList,
   isSelected,
 }: ProfileCardProps) {
-  const { t } = useTranslation();
-  const profileImageUrl = useProfileImage(!isSelf ? profileId : "");
+  const { t, i18n } = useTranslation();
+  const RELATION_LIST = relationList(i18n.language);
 
+  const profileImageUrl = useProfileImage(!isSelf ? profileId : "");
   const getRelationLabel = (value: string) => {
     return RELATION_LIST.find((list) => list.value === value)?.label;
   };

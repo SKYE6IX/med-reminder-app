@@ -1,4 +1,4 @@
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import React, { useState } from "react";
@@ -35,7 +35,7 @@ export default function MedicationPackPicker({
   const { t } = useTranslation();
   const isIOS = Platform.OS === "ios";
 
-  const measurement = getDosageMeasurement(measurementValue);
+  const labelKey = getDosageMeasurementLabelKey(measurementValue);
 
   const [localValue, setLocalValue] = useState({
     amountInPack,
@@ -97,7 +97,10 @@ export default function MedicationPackPicker({
           onChangeText={handleOnTextChange}
         />
         <Text style={[styles.bottomSheetText, { color }]}>
-          {t("common.reserve_setting_input_description", { measurement: measurement ?? "" })}
+          {t("common.reserve_setting_input_description", {
+            // @ts-ignore
+            measurement: t(`common.dosage_measuremnet.${labelKey}`) ?? "",
+          })}
         </Text>
       </View>
 

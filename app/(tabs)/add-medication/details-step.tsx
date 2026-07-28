@@ -138,7 +138,10 @@ export default function DetailsStepScreen() {
                 >
                   <unit.icon color={unit.value === formState.medicationUnit ? "#F7F7F7" : color} />
                 </Pressable>
-                <Text style={[styles.pillFormName, { color }]}>{unit.name}</Text>
+                <Text style={[styles.pillFormName, { color }]}>
+                  {/* @ts-expect-error */}
+                  {t(`common.medication_unit.${unit.labelKey}`)}
+                </Text>
               </View>
             ))}
             <View style={[styles.ghostWrapper, { width: UNIT_PRESSABLE_WIDTH }]} />

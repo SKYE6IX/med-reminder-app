@@ -1,5 +1,5 @@
 import { QueryKey } from "@/constants/query-keys";
-import { RELATION_LIST } from "@/constants/relation";
+import { relationList } from "@/constants/relation";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
@@ -30,7 +30,10 @@ const addRelationProfileMutation = async (data: AddProfileForm) => {
 };
 
 export default function AddProfile({ onProfileAdded }: AddProfileProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const RELATION_LIST = relationList(i18n.language);
+
   const { showFeedBack } = useFeedBackStore();
   const [formState, setFormState] = useState<AddProfileForm>({
     name: "",

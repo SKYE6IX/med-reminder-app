@@ -1,12 +1,12 @@
 import ClockIcon from "@/component/icons/clock-icon";
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { getScheduleBadge } from "@/helpers/getScheduleBadge";
 import { getScheduleTime } from "@/helpers/getScheduleTime";
 import { getTakenAt } from "@/helpers/getTakenAt";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationScheduleEventResponse } from "@/types/medication";
 import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -19,7 +19,7 @@ type ScheduleEventCardProps = {
   onActionBtnPress: (action: "TAKEN" | "MISSED") => void;
 };
 
-const showEventButtons = (scheduleAt: string, status: string) => {
+const showEventButtons = (scheduleAt: string, status: string, lng: string) => {
   if (!scheduleAt) {
     return false;
   }
@@ -37,7 +37,7 @@ export default function ScheduleEventCard({
   scheduleEvent,
   onActionBtnPress,
 }: ScheduleEventCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [nowDate, setNowDate] = useState<DateTime>(DateTime.now().setZone(getTimeZone()));
   const { status, measurement, takenAt, scheduleAt, profile } = scheduleEvent;
 
@@ -56,13 +56,13 @@ export default function ScheduleEventCard({
   const sharedStyles = useCardStyles();
   const tintColor = useThemeColor({}, "tint");
 
-  const dosageUnit = getDosageMeasurement(measurement);
-  const takenAtValue = getTakenAt(takenAt);
+  const labelKey = getDosageMeasurementLabelKey(measurement);
+  const takenAtValue = getTakenAt(takenAt, i18n.language);
   const scheduleTime = getScheduleTime(scheduleAt);
 
   const eventBadge = getScheduleBadge(scheduleAt, status, nowDate);
-  const upcomingRemainTime = getUpcomingTime(scheduleAt, nowDate);
-  const showEventBtn = showEventButtons(scheduleAt, status);
+  const upcomingRemainTime = getUpcomingTime(scheduleAt, nowDate, i18n.language);
+  const showEventBtn = showEventButtons(scheduleAt, status, i18n.language);
 
   const badgeBgColor =
     eventBadge === "taken" ? "#009E00" : eventBadge === "missed" ? "#DC0000" : tintColor;
@@ -83,7 +83,10 @@ export default function ScheduleEventCard({
         {/* Content Wrapper */}
         <View style={sharedStyles.cardContent}>
           <Text style={sharedStyles.cardTextLarge}>{scheduleEvent.medicationName}</Text>
-          <Text style={sharedStyles.cardTextMedium}>{`${scheduleEvent.dosage} ${dosageUnit}`}</Text>
+          <Text
+            style={sharedStyles.cardTextMedium}
+            // @ts-ignore
+          >{`${scheduleEvent.dosage} ${t(`common.dosage_measuremnet.${labelKey}`)}`}</Text>
 
           {takenAtValue ? (
             <Text style={sharedStyles.cardTextLarge}>{takenAtValue}</Text>

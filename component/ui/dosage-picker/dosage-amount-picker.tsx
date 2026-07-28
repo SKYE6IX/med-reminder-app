@@ -1,7 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import { DOSAGE_MEASUREMENT } from "@/constants/medication-constants";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { useAddPillStore } from "@/stores/add-pill-store";
 import { DosageMeasurement } from "@/types/medication";
 import { useState } from "react";
@@ -12,7 +12,7 @@ const UNIT_PRESSABLE_PER_ROW = 3;
 const UNIT_WRAPPER_GAP = 12;
 
 export default function DosageAmounPicker() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { openSheet, closeSheet } = useBottomSheet();
 
   const [unitWrapperWidth, setUnitWrapperWidth] = useState(0);
@@ -99,9 +99,14 @@ export default function DosageAmounPicker() {
                 ]}
                 onPress={() => handleSetDosageUnit(unit.value)}
               >
-                <unit.icon size={30} color={isSelected ? "#F7F7F7" : color} locale={lng} />
+                <unit.icon
+                  size={30}
+                  color={isSelected ? "#F7F7F7" : color}
+                  locale={i18n.language}
+                />
                 <Text style={[styles.dosageUnitLabel, { color: isSelected ? "#fff" : color }]}>
-                  {unit.label}
+                  {/* @ts-ignore */}
+                  {t(`common.dosage_measuremnet.${unit.labelKey}`)}
                 </Text>
               </Pressable>
             );

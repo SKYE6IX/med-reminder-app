@@ -6,10 +6,19 @@ import ru from "./locales/ru";
 
 export { useTranslation } from "react-i18next";
 
+const fallBackLanguage = "en";
 const supportedLngs = ["en", "ru"];
-const lngCode = getLocales()[0].languageCode ?? "en";
 
-export const lng = supportedLngs.includes(lngCode) ? lngCode : "en";
+export function resolveLanguage(): string {
+  const lngCode = getLocales()[0].languageCode;
+
+  if (lngCode && supportedLngs.includes(lngCode)) {
+    return lngCode;
+  }
+  return fallBackLanguage;
+}
+
+const lng = resolveLanguage();
 
 // eslint-disable-next-line import/no-named-as-default-member
 i18n.use(initReactI18next).init({
@@ -22,7 +31,7 @@ i18n.use(initReactI18next).init({
     },
   },
   lng,
-  fallbackLng: "en",
+  fallbackLng: fallBackLanguage,
   supportedLngs,
   interpolation: {
     escapeValue: false,

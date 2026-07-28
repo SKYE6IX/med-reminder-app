@@ -2,7 +2,7 @@ import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
 import { QueryKey } from "@/constants/query-keys";
-import { getDosageMeasurement } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
@@ -59,6 +59,8 @@ export default function StockDosageSettings({
     }
   };
 
+  const labelKey = getDosageMeasurementLabelKey(medicationProfile.schedule.measurement);
+
   const color = useThemeColor({}, "textPrimary");
   return (
     <React.Fragment>
@@ -72,8 +74,8 @@ export default function StockDosageSettings({
           <View style={sharedStyles.cardBody}>
             <LineChartIcon color={color} />
             <Text style={[sharedStyles.cardTextContent, { color }]}>
-              {medicationProfile.pack.totalAmountInPack}{" "}
-              {getDosageMeasurement(medicationProfile.schedule.measurement)}
+              {medicationProfile.pack.totalAmountInPack} {/*  @ts-ignore */}{" "}
+              {t(`common.dosage_measuremnet.${labelKey}`)}
             </Text>
           </View>
         </View>

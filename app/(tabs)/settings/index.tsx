@@ -6,6 +6,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import BellIcon from "@/component/icons/bell-icon";
 import EyeIcon from "@/component/icons/eye-icon";
+import GlobeIcon from "@/component/icons/globe-icon";
 import InfoCircle from "@/component/icons/info-circle";
 import LockIcon from "@/component/icons/lock-icon";
 import LogoutIcon from "@/component/icons/log-out-icon";
@@ -25,7 +26,10 @@ import { useFeedBackStore } from "@/stores/feedback-store";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
-import { useRef } from "react";
+import Constants from "expo-constants";
+import * as IntentLauncher from "expo-intent-launcher";
+import * as Linking from "expo-linking";
+import { useCallback, useRef } from "react";
 
 const logOutMutation = async () => {
   await api.post("auth/logout");
@@ -64,14 +68,14 @@ export default function Settings() {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так. Пожалуйста, попробуйте еще раз!",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }
@@ -89,6 +93,21 @@ export default function Settings() {
       openBannerRef.current?.openModal();
     }
   };
+
+  const openAppSettings = useCallback(async () => {
+    if (Platform.OS === "android") {
+      try {
+        const packageName = Constants.expoConfig?.android?.package;
+        await IntentLauncher.startActivityAsync(IntentLauncher.ActivityAction.APP_LOCALE_SETTINGS, {
+          data: "package:" + packageName,
+        });
+      } catch {
+        await Linking.openSettings();
+      }
+    } else {
+      await Linking.openSettings();
+    }
+  }, []);
 
   const top = isIOS ? 0 : insets.top + 20;
 
@@ -154,6 +173,13 @@ export default function Settings() {
             interaction="press"
             svgIcon={<EyeIcon color={color} />}
             onPress={() => router.navigate("/(tabs)/settings/subscription")}
+          />
+          <SettingsCard
+            title={t("settings_screen.card_language_title")}
+            description={t("settings_screen.card_language_description")}
+            interaction="press"
+            svgIcon={<GlobeIcon color={color} />}
+            onPress={openAppSettings}
           />
         </View>
 

@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset } from "@/stores/add-pill-store";
 import { buildRRule } from "@/utils/rruleUtils";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -19,7 +19,7 @@ type FrequencySettingsProps = {
   onFreqSet: ({ rrule, preset }: { rrule: string; preset: SchedulePreset | undefined }) => void;
 };
 
-const getDefaultFrequency = (): FrequencySettingsState[] => {
+const getDefaultFrequency = (lng: string): FrequencySettingsState[] => {
   const isRu = lng === "ru";
   return [
     {
@@ -49,8 +49,9 @@ const getDefaultFrequency = (): FrequencySettingsState[] => {
 };
 
 export default function FrequencySettings({ preset, onFreqSet }: FrequencySettingsProps) {
-  const DEFALUT_FREQUENCIES = getDefaultFrequency();
+  const { i18n } = useTranslation();
 
+  const DEFALUT_FREQUENCIES = getDefaultFrequency(i18n.language);
   const regularDefualts = DEFALUT_FREQUENCIES.filter((freq) => freq.preset !== "CUSTOM");
   const customDefault = DEFALUT_FREQUENCIES[DEFALUT_FREQUENCIES.length - 1];
 

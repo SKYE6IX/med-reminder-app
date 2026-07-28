@@ -6,23 +6,23 @@ import PlatformPicker from "@/component/ui/platform-picker/platform-picker";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { updateScheduleEventNotifications } from "@/helpers/update-schedule-event-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { SnoozeDuration } from "@/types/notification";
 import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-const isRU = lng === "ru";
-const snoozes = [
-  { label: isRU ? "5мин" : "5min", value: "5" },
-  { label: isRU ? "10мин" : "10min", value: "10" },
-  { label: isRU ? "15мин" : "15min", value: "15" },
-];
-
 export default function Reminders() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { openSheet } = useBottomSheet();
+  const isRU = i18n.language === "ru";
+
+  const snoozes = [
+    { label: isRU ? "5мин" : "5min", value: "5" },
+    { label: isRU ? "10мин" : "10min", value: "10" },
+    { label: isRU ? "15мин" : "15min", value: "15" },
+  ];
 
   const { reminderPreferences, notfication, setReminderPreference } = useAppSettingsStore();
   const insets = useSafeAreaInsets();

@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { lng, useTranslation } from "@/i18next/i18next";
+import { useTranslation } from "@/i18next/i18next";
 import { MedicationPackResponse } from "@/types/medication";
 import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
@@ -11,7 +11,7 @@ type RefillCardProps = {
   onRefillButtonPress: () => void;
 };
 
-const getProgressText = (pack: MedicationPackResponse) => {
+const getProgressText = (pack: MedicationPackResponse, lng: string) => {
   const consumed = Number(pack.totalQuantity) - Number(pack.currentQuantity);
   const isRU = lng === "ru";
   return `${consumed} ${isRU ? "из" : "of"} ${pack.totalQuantity} ${isRU ? "принято" : "taken"}`;
@@ -20,11 +20,11 @@ const getPercentage = (pack: MedicationPackResponse) => {
   const consumed = Number(pack.totalQuantity) - Number(pack.currentQuantity);
   return Math.round((consumed / Number(pack.totalQuantity)) * 100);
 };
-const getStartedDate = (isoString: string | null) => {
+const getStartedDate = (isoString: string | null, lng: string) => {
   if (!isoString) return;
   const date = new Date(isoString);
   const convertedString = getDateLocalString(date).replaceAll(".", " ");
-  return formatRegularDate(convertedString);
+  return formatRegularDate(convertedString, lng);
 };
 
 const isPackDepleted = (pack: MedicationPackResponse) => {
@@ -37,7 +37,7 @@ const isPackDepleted = (pack: MedicationPackResponse) => {
 };
 
 export default function MedicationPackCard({ pack, onRefillButtonPress }: RefillCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const sharedStyles = useCardStyles();
 
@@ -48,8 +48,8 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
         ? t("medication_reserve_screen.card_status_pending_label")
         : t("medication_reserve_screen.card_status_complete_label");
 
-  const startedDate = getStartedDate(pack.startedAt);
-  const endedDate = getStartedDate(pack.endedAt);
+  const startedDate = getStartedDate(pack.startedAt, i18n.language);
+  const endedDate = getStartedDate(pack.endedAt, i18n.language);
   const showRefillButton = pack.status !== "PENDING" && !pack.isRefilled;
 
   const badgeLabel =
@@ -115,7 +115,7 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
 
       <View style={sharedStyles.progressContainer}>
         <View style={sharedStyles.progressHeader}>
-          <Text style={sharedStyles.progressTextValue}>{getProgressText(pack)}</Text>
+          <Text style={sharedStyles.progressTextValue}>{getProgressText(pack, i18n.language)}</Text>
           <Text style={[sharedStyles.progressTextValue, { color: tintColor }]}>
             {getPercentage(pack)}%
           </Text>

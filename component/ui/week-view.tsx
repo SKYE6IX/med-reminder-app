@@ -29,7 +29,7 @@ const DATA = [...new Array(TOTAL_INDEX).keys()];
 const CENTER_INDEX = TOTAL_INDEX / 2;
 
 export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const CAROUSEL_WIDTH = Dimensions.get("screen").width - WINDOW_PADDING * 2;
   const now = DateTime.now();
 
@@ -63,7 +63,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
     setSelectedISODate(ISODate);
     onDateChange(ISODate);
   };
-  const description = getWeekViewDescription(selectedISODate);
+  const description = getWeekViewDescription(selectedISODate, i18n.language);
 
   // Themes
   const color = useThemeColor({}, "textPrimary");
@@ -71,7 +71,9 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   return (
     <View style={styles.container}>
       <View style={styles.headerConteainer}>
-        <Text style={[styles.title, { color }]}>{formatHomeScreenDate(selectedISODate)}</Text>
+        <Text style={[styles.title, { color }]}>
+          {formatHomeScreenDate(selectedISODate, i18n.language)}
+        </Text>
         {activeOffset !== 0 && (
           <Pressable onPress={scrollToCurrentWeek}>
             <Text style={[styles.title, { color: tintColor }]}>
@@ -93,7 +95,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
           onSnapToItem={handleOnSnapToItem}
           renderItem={({ index }) => {
             const offset = index - CENTER_INDEX;
-            const weeks = getWeekDays(offset);
+            const weeks = getWeekDays(offset, i18n.language);
             return (
               <WeekDayRow
                 weeks={weeks}
