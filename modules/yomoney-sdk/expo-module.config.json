@@ -1,9 +1,0 @@
-{
-  "platforms": ["ios", "android"],
-  "ios": {
-    "modules": ["YomoneySdkModule"]
-  },
-  "android": {
-    "modules": ["expo.modules.yomoneysdk.YomoneySdkModule"]
-  }
-}

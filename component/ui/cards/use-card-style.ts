@@ -81,12 +81,6 @@ export function useCardStyles() {
       lineHeight: 16.2,
       color,
     },
-    medicationScheduleDivider: {
-      width: 1.5,
-      height: 16,
-      backgroundColor: mutedColor,
-    },
-
     profile: {
       flexDirection: "row",
       alignItems: "center",

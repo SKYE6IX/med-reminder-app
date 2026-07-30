@@ -93,10 +93,6 @@ export default function ScheduleEventCard({
           ) : (
             <View style={sharedStyles.medicationSchedule}>
               <Text style={sharedStyles.medicationScheduleText}>{scheduleTime}</Text>
-              <View style={sharedStyles.medicationScheduleDivider} />
-              <Text style={sharedStyles.medicationScheduleText}>
-                {t("home_screen.event_card_daily")}
-              </Text>
             </View>
           )}
 

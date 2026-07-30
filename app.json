@@ -65,9 +65,6 @@
             "compileSdkVersion": 36,
             "targetSdkVersion": 35,
             "minSdkVersion": 24
-          },
-          "ios": {
-            "useFrameworks": "static"
           }
         }
       ],
@@ -117,7 +114,6 @@
       ],
       "expo-status-bar",
       "expo-asset",
-      "./app.plugin.js",
       [
         "expo-localization",
         {

@@ -6,17 +6,39 @@ import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
 import { QueryKey } from "@/constants/query-keys";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { default as YomoneySdkModule } from "@/modules/yomoney-sdk/src/YomoneySdkModule";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { SubscriptionPlanResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
-import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+// try {
+//   const customerInfo = await Purchases.getCustomerInfo();
+
+//   if (typeof customerInfo.entitlements.active["MedRemindR Premium"] !== "undefined") {
+//     // Grant user access to entitlement
+//   }
+// } catch (e) {
+//   // Error fetching customer info
+// }
+// import { Platform } from "react-native";
+// import { useEffect } from "react";
+// import Purchases, { LOG_LEVEL } from "react-native-purchases";
+
+// export default function App() {
+//   useEffect(() => {
+//     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+
+//     // Platform-specific API keys
+//     const iosApiKey = "test_yeOyusemSxJhZzbPldKeHWixMor";
+//     const androidApiKey = "test_yeOyusemSxJhZzbPldKeHWixMor";
+
+//   }, []);
+// }
 
 type Plan = "MONTHLY" | "ANNUAL";
 
@@ -87,25 +109,24 @@ export default function SubscriptionPlan() {
   const createPayment = async () => {
     const planAmount = selectedPlan === "MONTHLY" ? 299 : 3050;
     const subtitle = selectedPlan === "MONTHLY" ? "Ежемесячная подписка" : "Годовая подписка";
+    // const result = await YomoneySdkModule.startTokenize({
+    //   amount: planAmount,
+    //   currency: "RUB",
+    //   title: "Премиум план",
+    //   subtitle,
+    //   clientApplicationKey: process.env.EXPO_PUBLIC_CLIENT_KEY,
+    //   shopId: process.env.EXPO_PUBLIC_SHOP_ID,
+    // });
 
-    const result = await YomoneySdkModule.startTokenize({
-      amount: planAmount,
-      currency: "RUB",
-      title: "Премиум план",
-      subtitle,
-      clientApplicationKey: process.env.EXPO_PUBLIC_CLIENT_KEY,
-      shopId: process.env.EXPO_PUBLIC_SHOP_ID,
-    });
+    // if (!result) return;
 
-    if (!result) return;
-
-    mutate({
-      paymentToken: result.paymentToken,
-      paymentMethod: result.paymentMethod.toLocaleUpperCase(),
-      amount: String(planAmount),
-      billingCycle: selectedPlan,
-      zoneId: getTimeZone(),
-    });
+    // mutate({
+    //   paymentToken: result.paymentToken,
+    //   paymentMethod: result.paymentMethod.toLocaleUpperCase(),
+    //   amount: String(planAmount),
+    //   billingCycle: selectedPlan,
+    //   zoneId: getTimeZone(),
+    // });
   };
 
   // Themes

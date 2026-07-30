@@ -25,8 +25,9 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import i18n, { resolveLanguage } from "../i18next/i18next";
 
 SplashScreen.preventAutoHideAsync();
@@ -152,7 +153,10 @@ export default function RootLayout() {
   }
 
   useEffect(() => {
+    // Bootstrap the app
     bootstrap();
+
+    // Watch on langauge change and react to it
     const subscription = AppState.addEventListener("change", (appState) => {
       if (appState === "active") {
         const lng = resolveLanguage();
@@ -160,6 +164,15 @@ export default function RootLayout() {
         resetNotificationsOnLanguageChange(lng);
       }
     });
+
+    // Configure IAP
+    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+    if (Platform.OS === "ios") {
+      Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
+    } else if (Platform.OS === "android") {
+      Purchases.configure({ apiKey: "" });
+    }
+
     return () => {
       subscription.remove();
     };
