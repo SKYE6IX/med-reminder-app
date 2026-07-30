@@ -46,9 +46,8 @@ export default function DateTimeWrapper({
         locale={i18n.language}
         minimumDate={disabledDate && mode === "date" ? new Date(getNow()) : undefined}
       />
-      {mode !== "date" && (
-        <CustomButton label={t("common.apply")} onPress={() => applyChange(dateTime)} />
-      )}
+
+      <CustomButton label={t("common.apply")} onPress={() => applyChange(dateTime)} />
     </View>
   );
 }

@@ -45,7 +45,7 @@ export default function ScheduleStepScreen() {
   const router = useRouter();
 
   const [durations, setDurations] = useState("");
-  const [fromDate, setFromDate] = useState<Date>(getNow());
+  const [startingDate, setStartingDate] = useState<Date>(getNow());
   const displayStartDate = formatRegularDate(
     formState.schedule.startDate.replaceAll(".", " "),
     i18n.language,
@@ -74,24 +74,7 @@ export default function ScheduleStepScreen() {
     });
   };
 
-  // Time settings
-  // @platform ANDROID ONLY
-  const handleOnTimeChange = (date: Date) => {
-    if (isAndroid) {
-      const newRules = updateScheduleTimes({
-        rrule: formState.schedule.rule.recurrenceRule,
-        date,
-      });
-      setMedicatioSchedule({
-        rule: {
-          recurrenceRule: newRules,
-          preset: formState.schedule.rule.preset,
-        },
-      });
-    }
-  };
-  // @platform IOS ONLY
-  const handleApplyTimeChange = (date: Date) => {
+  const setScheduleTime = (date: Date) => {
     const newRules = updateScheduleTimes({
       rrule: formState.schedule.rule.recurrenceRule,
       date,
@@ -102,12 +85,8 @@ export default function ScheduleStepScreen() {
         preset: formState.schedule.rule.preset,
       },
     });
-    closeSheet();
   };
-
-  // Date settings
-  const handleOnDateChange = (date: Date) => {
-    setFromDate(date);
+  const setScheduleDate = (date: Date) => {
     if (durations.length >= 1) {
       const startDate = DateTime.fromJSDate(date);
       const endDate = startDate.plus({ days: Number(durations) - 1 });
@@ -121,12 +100,39 @@ export default function ScheduleStepScreen() {
     }
   };
 
+  // Time settings
+  // @platform ANDROID ONLY
+  const handleOnTimeChange = (date: Date) => {
+    if (isAndroid) {
+      setScheduleTime(date);
+    }
+  };
+  // @platform IOS ONLY
+  const handleApplyTimeChange = (date: Date) => {
+    setScheduleTime(date);
+    closeSheet();
+  };
+
+  // Date settings
+  // @platform ANDROID ONLY
+  const handleOnDateChange = (date: Date) => {
+    setStartingDate(date);
+    if (isAndroid) {
+      setScheduleDate(date);
+    }
+  };
+  // @platform IOS ONLY
+  const handleApplyDateChange = (date: Date) => {
+    setScheduleDate(date);
+    closeSheet();
+  };
+
   const handleOnDurationInputChange = (text: string) => {
     setDurations(text);
     if (text.length <= 0) {
       setMedicatioSchedule({ endDate: null });
     } else {
-      const startDate = DateTime.fromJSDate(fromDate);
+      const startDate = DateTime.fromJSDate(startingDate);
       const endDate = startDate.plus({ days: Number(text) - 1 });
       setMedicatioSchedule({
         startDate: getDateLocalString(startDate.toJSDate()),
@@ -135,6 +141,7 @@ export default function ScheduleStepScreen() {
     }
   };
 
+  // Show time picker.
   const showTimeSetting = () => {
     if (isAndroid) {
       androidTimeRef.current?.showDateTime();
@@ -152,20 +159,20 @@ export default function ScheduleStepScreen() {
       });
     }
   };
-
+  // Show date picker
   const showDateSetting = () => {
     if (isAndroid) {
       androidDateRef.current?.showDateTime();
     } else {
       openSheet({
         title: t("add_medication_screen.step3_date_label"),
-        snapPointPercent: "40%",
+        snapPointPercent: "60%",
         content: (
           <IOSDateTimeWrapper
             mode="date"
             onDateTimeChange={handleOnDateChange}
             disabledDate
-            applyChange={() => {}}
+            applyChange={handleApplyDateChange}
           />
         ),
       });
@@ -299,6 +306,7 @@ export default function ScheduleStepScreen() {
               <AndroidDateTimeWrapper
                 ref={androidDateRef}
                 onDateTimeChange={handleOnDateChange}
+                disabledDate
                 mode="date"
               />
             )}
