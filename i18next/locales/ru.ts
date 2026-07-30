@@ -245,7 +245,6 @@ const ru = {
     tab_all: "Все",
     tab_taken: "Принято",
     tab_missed: "Пропущено",
-    event_card_daily: "Ежедневно",
     event_card_banner_taken: "Принято",
     event_card_banner_missed: "Пропущено",
     event_card_btn_taken: "Принять",

@@ -170,7 +170,7 @@ export default function RootLayout() {
     if (Platform.OS === "ios") {
       Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
     } else if (Platform.OS === "android") {
-      Purchases.configure({ apiKey: "" });
+      // Purchases.configure({ apiKey: "" });
     }
 
     return () => {

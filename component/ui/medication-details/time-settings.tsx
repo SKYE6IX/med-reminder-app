@@ -6,7 +6,7 @@ import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation"
 import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
-import { updateTimeOcurrencesRule } from "@/utils/rruleUtils";
+import { updateScheduleTimes } from "@/utils/rruleUtils";
 import React, { useRef, useState } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import AndroidDateTimeWrapper, {
@@ -43,12 +43,11 @@ export default function DetailsTimeSettings({
   const color = useThemeColor({}, "textPrimary");
 
   const handleOnDateTimeChange = (date: Date) => {
-    const newRules = updateTimeOcurrencesRule({
+    const newRules = updateScheduleTimes({
       rrule: medicationProfile.schedule.recurrenceRule,
       date,
     });
     setUpdatedRule(newRules);
-
     // @platform ANDROID ONLY
     if (isAndroid && medicationProfile.schedule.recurrenceRule !== newRules) {
       mutate({ id: medicationProfile.id, data: { recurrenceRule: newRules } });
@@ -58,7 +57,7 @@ export default function DetailsTimeSettings({
   // @platform IOS ONLY
   // Function to perform an Action that will
   // update the time if it's diffrent from the current one.
-  const handleOnButtonPress = () => {
+  const handleOnButtonPress = (dateTime: Date) => {
     if (updatedRule !== medicationProfile.schedule.recurrenceRule) {
       mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
       closeSheet();
@@ -78,8 +77,7 @@ export default function DetailsTimeSettings({
           <IOSDateTimeWrapper
             mode="time"
             onDateTimeChange={(date) => handleOnDateTimeChange(date)}
-            showUpdateButton
-            onUpdateButtonPress={handleOnButtonPress}
+            applyChange={handleOnButtonPress}
           />
         ),
       });

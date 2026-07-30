@@ -6,7 +6,7 @@ import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation"
 import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset } from "@/stores/add-pill-store";
 import { MedicationProfileReponse } from "@/types/medication";
-import { formatRRuleToText, generateTimeOccurrences } from "@/utils/rruleUtils";
+import { formatRRuleToText, generateScheduleTimes } from "@/utils/rruleUtils";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import CustomButton from "../custom-button/custom-button";
@@ -71,7 +71,7 @@ const FrequencySheet = ({
   const [selectedPreset, setSelectedPreset] = useState<SchedulePreset | undefined>(undefined);
   const [updatedRule, setUpdatedRule] = useState("");
 
-  const occurences = generateTimeOccurrences({
+  const occurences = generateScheduleTimes({
     rrule: updatedRule,
   });
 

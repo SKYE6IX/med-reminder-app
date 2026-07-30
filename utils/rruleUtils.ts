@@ -4,7 +4,7 @@ import { DateTime, getTimeZone, toLocalUtcTime } from "./luxonUtil";
 
 // const isRU = lng === "ru";
 
-export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
+export const generateScheduleTimes = ({ rrule }: { rrule: string }) => {
   if (!rrule) return;
 
   const rule = RRule.fromString(rrule);
@@ -22,7 +22,7 @@ export const generateTimeOccurrences = ({ rrule }: { rrule: string }) => {
   return times;
 };
 
-export const updateTimeOcurrencesRule = ({ rrule, date }: { rrule: string; date: Date }) => {
+export const updateScheduleTimes = ({ rrule, date }: { rrule: string; date: Date }) => {
   const now = DateTime.now();
   const rule = RRule.fromString(rrule);
 

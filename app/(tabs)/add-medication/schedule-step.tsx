@@ -14,7 +14,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
 import { DateTime, formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
-import { generateTimeOccurrences, updateTimeOcurrencesRule } from "@/utils/rruleUtils";
+import { generateScheduleTimes, updateScheduleTimes } from "@/utils/rruleUtils";
 
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -34,12 +34,13 @@ const getNow = () => new Date();
 
 export default function ScheduleStepScreen() {
   const { t, i18n } = useTranslation();
+
+  const isAndroid = Platform.OS === "android";
   const insets = useSafeAreaInsets();
 
   const sharedStyles = useAddPillScreenStyles();
-  const isAndroid = Platform.OS === "android";
 
-  const { openSheet } = useBottomSheet();
+  const { openSheet, closeSheet } = useBottomSheet();
   const { formState, setMedicatioSchedule } = useAddPillStore();
   const router = useRouter();
 
@@ -53,7 +54,7 @@ export default function ScheduleStepScreen() {
   const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
   const androidDateRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
 
-  const occurences = generateTimeOccurrences({
+  const scheduleTimes = generateScheduleTimes({
     rrule: formState.schedule.rule.recurrenceRule,
   });
 
@@ -74,8 +75,24 @@ export default function ScheduleStepScreen() {
   };
 
   // Time settings
+  // @platform ANDROID ONLY
   const handleOnTimeChange = (date: Date) => {
-    const newRules = updateTimeOcurrencesRule({
+    if (isAndroid) {
+      const newRules = updateScheduleTimes({
+        rrule: formState.schedule.rule.recurrenceRule,
+        date,
+      });
+      setMedicatioSchedule({
+        rule: {
+          recurrenceRule: newRules,
+          preset: formState.schedule.rule.preset,
+        },
+      });
+    }
+  };
+  // @platform IOS ONLY
+  const handleApplyTimeChange = (date: Date) => {
+    const newRules = updateScheduleTimes({
       rrule: formState.schedule.rule.recurrenceRule,
       date,
     });
@@ -85,6 +102,7 @@ export default function ScheduleStepScreen() {
         preset: formState.schedule.rule.preset,
       },
     });
+    closeSheet();
   };
 
   // Date settings
@@ -123,12 +141,12 @@ export default function ScheduleStepScreen() {
     } else {
       openSheet({
         title: t("add_medication_screen.step3_time_sheet_title"),
-        snapPointPercent: "40%",
+        snapPointPercent: "50%",
         content: (
           <IOSDateTimeWrapper
             mode="time"
             onDateTimeChange={handleOnTimeChange}
-            showUpdateButton={false}
+            applyChange={handleApplyTimeChange}
           />
         ),
       });
@@ -146,8 +164,8 @@ export default function ScheduleStepScreen() {
           <IOSDateTimeWrapper
             mode="date"
             onDateTimeChange={handleOnDateChange}
-            showUpdateButton={false}
             disabledDate
+            applyChange={() => {}}
           />
         ),
       });
@@ -190,16 +208,26 @@ export default function ScheduleStepScreen() {
           {/* Time Settings */}
           <View style={sharedStyles.sectionContainer}>
             <Text style={sharedStyles.title}>{t("add_medication_screen.step3_time_label")}</Text>
+
             <View style={styles.timeSettingList}>
-              {occurences?.map((time, i) => (
-                <Text
-                  key={time + i}
-                  style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
-                >
-                  {time}
-                </Text>
-              ))}
+              {scheduleTimes && scheduleTimes.length <= 1 ? (
+                <Pressable onPress={showTimeSetting}>
+                  <Text style={[styles.selectedTime, { backgroundColor: bGColor, color }]}>
+                    {scheduleTimes[0]}
+                  </Text>
+                </Pressable>
+              ) : (
+                scheduleTimes?.map((time, i) => (
+                  <Text
+                    key={time + i}
+                    style={[styles.selectedTime, { backgroundColor: bGColor, color }]}
+                  >
+                    {time}
+                  </Text>
+                ))
+              )}
             </View>
+
             <CustomButton
               label={t("add_medication_screen.step3_time_choose_btn")}
               variant="outline"

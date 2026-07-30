@@ -245,7 +245,6 @@ const en = {
     tab_all: "All",
     tab_taken: "Taken",
     tab_missed: "Missed",
-    event_card_daily: "Daily",
     event_card_banner_taken: "Taken",
     event_card_banner_missed: "Missed",
     event_card_btn_taken: "Taken",

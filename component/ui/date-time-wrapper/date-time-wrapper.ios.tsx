@@ -8,8 +8,7 @@ type DateTimeWrapperProps = {
   mode: "date" | "time";
   disabledDate?: boolean;
   onDateTimeChange: (dateTime: Date) => void;
-  showUpdateButton?: boolean;
-  onUpdateButtonPress?: () => void;
+  applyChange: (dateTime: Date) => void;
 };
 
 const getNow = () => Date.now();
@@ -18,15 +17,14 @@ export default function DateTimeWrapper({
   mode,
   disabledDate = true,
   onDateTimeChange,
-  showUpdateButton,
-  onUpdateButtonPress,
+  applyChange,
 }: DateTimeWrapperProps) {
   const { t, i18n } = useTranslation();
-  const [date, setDate] = useState(new Date(getNow()));
+  const [dateTime, setDateTime] = useState(new Date(getNow()));
 
   const handleSetDateTime = (date?: Date) => {
     if (date) {
-      setDate(date);
+      setDateTime(date);
       onDateTimeChange(date);
     }
   };
@@ -41,14 +39,16 @@ export default function DateTimeWrapper({
       }}
     >
       <DateTimePicker
-        value={date}
+        value={dateTime}
         mode={mode}
         onValueChange={(event, date) => handleSetDateTime(date)}
         display={mode === "date" ? "inline" : "spinner"}
         locale={i18n.language}
         minimumDate={disabledDate && mode === "date" ? new Date(getNow()) : undefined}
       />
-      {showUpdateButton && <CustomButton label={t("common.apply")} onPress={onUpdateButtonPress} />}
+      {mode !== "date" && (
+        <CustomButton label={t("common.apply")} onPress={() => applyChange(dateTime)} />
+      )}
     </View>
   );
 }
