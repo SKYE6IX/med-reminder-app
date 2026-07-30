@@ -92,9 +92,17 @@ export default function UserDetails() {
     setUpdateUserData((prv) => ({ ...prv, gender: selectedValue }));
   };
 
-  // Callback function for onValueSelected on date picker
+  // @Platform ANDROID ONLY
   const handleOnDateChange = (date: Date) => {
+    if (isAndroid) {
+      setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+    }
+  };
+
+  // @Platform IOS ONLY
+  const handleAppyDate = (date: Date) => {
     setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+    closeSheet();
   };
 
   const handleOnTextInputChange = ({ name, value }: { name: string; value: string }) => {
@@ -111,7 +119,6 @@ export default function UserDetails() {
         status: "success",
       });
     },
-
     onError(error) {
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
@@ -135,14 +142,12 @@ export default function UserDetails() {
     // We only send updated data that isn't the same as
     // the exising one;
     const { name, email, dateOfBirth, gender } = updateUserData;
-
     const data: UpdateUserData = {
       name: name !== user?.name ? name : null,
       email: email !== user?.email ? email : null,
       dateOfBirth: dateOfBirth !== user?.dateOfBirth ? dateOfBirth : null,
       gender: gender !== user?.gender ? gender : null,
     };
-
     mutate(data);
   };
 
@@ -161,12 +166,13 @@ export default function UserDetails() {
     } else {
       openSheet({
         title: t("settings_screen.user_details_dob_label"),
-        snapPointPercent: "40%",
+        snapPointPercent: "55%",
         content: (
           <IOSDateTimeWrapper
             mode="date"
-            onDateTimeChange={handleOnDateChange}
+            onDateTimeChange={() => {}}
             disabledDate={false}
+            applyChange={handleAppyDate}
           />
         ),
       });

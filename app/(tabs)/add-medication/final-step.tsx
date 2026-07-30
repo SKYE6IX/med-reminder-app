@@ -125,7 +125,6 @@ export default function FinalStepScreen() {
   // @platform IOS ONLY
   // It control the height for the container when
   //  days reminder picker trigger it goes from HALF_EXPAND to FULL_EXPAND.
-
   const controlFullExpand = (isPicker: boolean) => {
     refillSettingHeight.value = withSpring(isPicker ? FULL_EXPAND : HALF_EXPAND);
   };

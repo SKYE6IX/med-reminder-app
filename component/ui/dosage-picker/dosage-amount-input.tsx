@@ -63,7 +63,6 @@ export default function DosageAmountInput({
           ]}
           keyboardType="decimal-pad"
           inputMode="decimal"
-          returnKeyType="done"
           maxLength={10}
           value={value}
           onChangeText={handleOnChangeText}

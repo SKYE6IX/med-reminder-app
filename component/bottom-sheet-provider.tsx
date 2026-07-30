@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerPressable: {
-    width: 55,
+    minWidth: 55,
     height: 21,
     justifyContent: "center",
   },

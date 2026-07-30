@@ -253,6 +253,37 @@ export default function ScheduleStepScreen() {
             )}
           </View>
 
+          {/* Date Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_date_label")}</Text>
+            <Pressable
+              style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
+              onPress={showDateSetting}
+            >
+              <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
+                <CalenderIcon color={tintColor} />
+              </View>
+              <View style={styles.dateSettingTextWrapper}>
+                <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>
+                  {t("add_medication_screen.step3_date_start_label")}
+                </Text>
+                <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
+              </View>
+              <View style={styles.dateSettingRightIcon}>
+                <ArrowDown />
+              </View>
+            </Pressable>
+            {/* ONLY FOR ANDROID */}
+            {isAndroid && (
+              <AndroidDateTimeWrapper
+                ref={androidDateRef}
+                onDateTimeChange={handleOnDateChange}
+                disabledDate
+                mode="date"
+              />
+            )}
+          </View>
+
           {/* Duration days settings. (Optional) */}
           <View style={sharedStyles.sectionContainer}>
             <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
@@ -278,38 +309,6 @@ export default function ScheduleStepScreen() {
                 },
               ]}
             />
-          </View>
-
-          {/* Date Settings */}
-          <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_date_label")}</Text>
-            <Pressable
-              style={[styles.dateSettingPressable, { borderColor, backgroundColor: bGColor }]}
-              onPress={showDateSetting}
-            >
-              <View style={[styles.dateSettingLeftIcon, { backgroundColor: bGTertiary }]}>
-                <CalenderIcon color={tintColor} />
-              </View>
-              <View style={styles.dateSettingTextWrapper}>
-                <Text style={[styles.dateSettingLabel, { color: colorMuted }]}>
-                  {t("add_medication_screen.step3_date_start_label")}
-                </Text>
-                <Text style={[styles.dateSettingValue, { color }]}>{displayStartDate}</Text>
-              </View>
-              <View style={styles.dateSettingRightIcon}>
-                <ArrowDown />
-              </View>
-            </Pressable>
-
-            {/* ONLY FOR ANDROID */}
-            {isAndroid && (
-              <AndroidDateTimeWrapper
-                ref={androidDateRef}
-                onDateTimeChange={handleOnDateChange}
-                disabledDate
-                mode="date"
-              />
-            )}
           </View>
 
           <CustomButton
