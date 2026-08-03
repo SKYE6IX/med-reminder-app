@@ -20,6 +20,7 @@ import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { UserResponse } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
+import { DateTime } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
@@ -39,8 +40,14 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
   return response.data;
 };
 
+const formatDob = (dob: string, lng: string) => {
+  if (!dob) return;
+  const formatDob = DateTime.fromFormat(dob, "yyyyMMdd");
+  return formatDob.setLocale(lng).toJSDate().toLocaleDateString();
+};
+
 export default function UserDetails() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isAndroid = Platform.OS === "android";
 
   const { openSheet, closeSheet } = useBottomSheet();
@@ -68,7 +75,6 @@ export default function UserDetails() {
   const canUpdate = useMemo(() => {
     const exisitngData = user;
     const { name, email, dateOfBirth, gender } = updateUserData;
-
     return (
       name !== exisitngData?.name ||
       email !== exisitngData?.email ||
@@ -76,6 +82,8 @@ export default function UserDetails() {
       gender !== exisitngData?.gender
     );
   }, [updateUserData, user]);
+
+  const dob = formatDob(updateUserData.dateOfBirth ?? "", i18n.language);
 
   // @platform IOS ONLY
   // Trigger gender picker
@@ -92,16 +100,21 @@ export default function UserDetails() {
     setUpdateUserData((prv) => ({ ...prv, gender: selectedValue }));
   };
 
+  const setDob = (date: Date) => {
+    const toISODate = DateTime.fromJSDate(date).toISODate({ format: "basic" });
+    setUpdateUserData((prv) => ({ ...prv, dateOfBirth: toISODate }));
+  };
+
   // @Platform ANDROID ONLY
   const handleOnDateChange = (date: Date) => {
     if (isAndroid) {
-      setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+      setDob(date);
     }
   };
 
   // @Platform IOS ONLY
   const handleAppyDate = (date: Date) => {
-    setUpdateUserData((prv) => ({ ...prv, dateOfBirth: date.toLocaleDateString("ru") }));
+    setDob(date);
     closeSheet();
   };
 
@@ -245,7 +258,7 @@ export default function UserDetails() {
               onPress={openDatePicker}
             >
               <Text style={[styles.bodyItemValue, { color: mutedColor }]}>
-                {updateUserData.dateOfBirth || t("settings_screen.user_details_dob_placeholder")}
+                {dob || t("settings_screen.user_details_dob_placeholder")}
               </Text>
             </Pressable>
 
