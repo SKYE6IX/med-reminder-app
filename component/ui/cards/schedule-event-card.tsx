@@ -1,8 +1,8 @@
 import ClockIcon from "@/component/icons/clock-icon";
-import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
-import { getScheduleBadge } from "@/helpers/getScheduleBadge";
-import { getScheduleTime } from "@/helpers/getScheduleTime";
-import { getTakenAt } from "@/helpers/getTakenAt";
+import { getDosageMeasurementLabelKey } from "@/helpers/get-dosage-measurement";
+import { getScheduleBadge } from "@/helpers/get-schedule-badge";
+import { getScheduleTime } from "@/helpers/get-schedule-time";
+import { getTakenAt } from "@/helpers/get-taken-at";
 import { getUpcomingTime } from "@/helpers/getUpcomingTime";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
@@ -58,7 +58,7 @@ export default function ScheduleEventCard({
 
   const labelKey = getDosageMeasurementLabelKey(measurement);
   const takenAtValue = getTakenAt(takenAt, i18n.language);
-  const scheduleTime = getScheduleTime(scheduleAt);
+  const scheduleTime = getScheduleTime(scheduleAt, i18n.language);
 
   const eventBadge = getScheduleBadge(scheduleAt, status, nowDate);
   const upcomingRemainTime = getUpcomingTime(scheduleAt, nowDate, i18n.language);

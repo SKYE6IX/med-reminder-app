@@ -6,10 +6,11 @@ export const getScheduleBadge = (
   now: DateTime,
 ): "upcoming" | "taken" | "missed" | undefined => {
   const scheduleTime = DateTime.fromISO(scheduleAt, {
-    locale: "ru",
     setZone: true,
   });
+
   const upcoming = scheduleTime.hasSame(now, "day");
+
   const isTimeReached = now >= scheduleTime;
 
   if (status === "TAKEN") {

@@ -42,6 +42,8 @@ const updateUserMutation = async (updateData: UpdateUserData) => {
 
 const formatDob = (dob: string, lng: string) => {
   if (!dob) return;
+
+  console.log(dob);
   const formatDob = DateTime.fromFormat(dob, "yyyyMMdd");
   return formatDob.setLocale(lng).toJSDate().toLocaleDateString();
 };

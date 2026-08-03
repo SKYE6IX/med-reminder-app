@@ -1,4 +1,4 @@
-import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/get-dosage-measurement";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";

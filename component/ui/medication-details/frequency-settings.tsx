@@ -68,12 +68,13 @@ const FrequencySheet = ({
 }: {
   handleUpdateRules: (updatedRule: string) => void;
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedPreset, setSelectedPreset] = useState<SchedulePreset | undefined>(undefined);
   const [updatedRule, setUpdatedRule] = useState("");
 
   const occurences = generateScheduleTimes({
     rrule: updatedRule,
+    lng: i18n.language,
   });
 
   const canUpdate = updatedRule.length > 1;

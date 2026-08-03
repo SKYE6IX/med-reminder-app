@@ -53,6 +53,7 @@ export default function ScheduleStepScreen() {
 
   const scheduleTimes = generateScheduleTimes({
     rrule: formState.schedule.rule.recurrenceRule,
+    lng: i18n.language,
   });
 
   // Frequency settings

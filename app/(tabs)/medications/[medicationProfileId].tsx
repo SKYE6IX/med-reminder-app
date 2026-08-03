@@ -9,7 +9,7 @@ import DetailsNoteSettings from "@/component/ui/medication-details/note-settings
 import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-settings";
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
 import { QueryKey } from "@/constants/query-keys";
-import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/get-dosage-measurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { useTranslation } from "@/i18next/i18next";

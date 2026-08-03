@@ -22,7 +22,7 @@ import notifee, {
   TimestampTrigger,
   TriggerType,
 } from "react-native-notify-kit";
-import { getScheduleTime } from "./getScheduleTime";
+import { getScheduleTime } from "./get-schedule-time";
 import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-manager";
 
 const DEFAULT_SETTINGS: NotificationSettings = {
@@ -104,7 +104,7 @@ export class NotificationHelper {
           i === 0
             ? i18n.t("notification.due_body", {
                 medicationName: options.medicationName,
-                scheduleAt: getScheduleTime(options.scheduleAt),
+                scheduleAt: getScheduleTime(options.scheduleAt, i18n.language),
               })
             : i18n.t("notification.snooze_body", {
                 medicationName: options.medicationName,

@@ -2,9 +2,7 @@ import { CustomPattern } from "@/component/ui/custom-frequency/types";
 import { Options, RRule } from "rrule";
 import { DateTime, getTimeZone, toLocalUtcTime } from "./luxonUtil";
 
-// const isRU = lng === "ru";
-
-export const generateScheduleTimes = ({ rrule }: { rrule: string }) => {
+export const generateScheduleTimes = ({ rrule, lng }: { rrule: string; lng: string }) => {
   if (!rrule) return;
 
   const rule = RRule.fromString(rrule);
@@ -16,7 +14,7 @@ export const generateScheduleTimes = ({ rrule }: { rrule: string }) => {
 
   const times = ruleWithMaxCount
     .all()
-    .map((time) => toLocalUtcTime(time))
+    .map((time) => toLocalUtcTime(time, lng))
     .sort();
 
   return times;

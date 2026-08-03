@@ -55,11 +55,16 @@ export default function Relations() {
 
   const { isPending, mutate } = useMutation({
     mutationFn: deleteRelationProfileMutation,
-
-    onSuccess(data, variables) {
+    async onSuccess(data, variables) {
       queryClient.setQueryData([QueryKey.profiles], (existingData: ProfileResponse[]) =>
         existingData.filter((profile) => profile.id !== variables),
       );
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationDetails] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.medicationPack] }),
+        queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] }),
+      ]);
       closeSheet();
     },
 

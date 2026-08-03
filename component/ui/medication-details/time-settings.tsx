@@ -16,9 +16,9 @@ import IOSDateTimeWrapper from "../date-time-wrapper/date-time-wrapper.ios";
 import Loader from "../loader";
 import { useSharedStyles } from "./use-shared-styles";
 
-const getStartTime = (startTime: string) => {
+const getStartTime = (startTime: string, lng: string) => {
   const date = new Date(startTime);
-  return toLocalTime(date);
+  return toLocalTime(date, lng);
 };
 
 export default function DetailsTimeSettings({
@@ -28,7 +28,7 @@ export default function DetailsTimeSettings({
   medicationProfile: MedicationProfileReponse;
   fullWidth: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sharedStyles = useSharedStyles();
   const isAndroid = Platform.OS === "android";
 
@@ -97,7 +97,7 @@ export default function DetailsTimeSettings({
         <View style={sharedStyles.cardBody}>
           <ClockIcon color={color} />
           <Text style={sharedStyles.cardTextContent}>
-            {getStartTime(medicationProfile.schedule.starTime)}
+            {getStartTime(medicationProfile.schedule.starTime, i18n.language)}
           </Text>
         </View>
       </Pressable>

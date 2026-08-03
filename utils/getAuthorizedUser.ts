@@ -3,12 +3,16 @@ import { api } from "./axiosInstance";
 import { queryClient } from "./query-client";
 
 export const getAuthorizedUser = async () => {
-  queryClient.fetchQuery({
-    queryKey: [QueryKey.users],
-    queryFn: async () => {
-      const response = await api.get("users");
-      return response.data;
-    },
-    staleTime: Infinity,
-  });
+  queryClient
+    .fetchQuery({
+      queryKey: [QueryKey.users],
+      queryFn: async () => {
+        const response = await api.get("users");
+        return response.data;
+      },
+      staleTime: Infinity,
+    })
+    .catch((error) => {
+      console.log("An error occur when try to pre-fetch user data: ", error);
+    });
 };

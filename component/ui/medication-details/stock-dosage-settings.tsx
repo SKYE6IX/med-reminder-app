@@ -2,7 +2,7 @@ import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import LineChartIcon from "@/component/icons/line-chart-icon";
 import { QueryKey } from "@/constants/query-keys";
-import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/get-dosage-measurement";
 import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";

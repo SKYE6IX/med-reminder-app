@@ -4,22 +4,22 @@ export const getTimeZone = () => DateTime.now().zoneName;
 
 export const getDefaultISODate = () => DateTime.now().toISODate({ format: "basic" });
 
-export const toLocalUtcTime = (date: Date) => {
+export const toLocalUtcTime = (date: Date, lng: string) => {
   return DateTime.fromJSDate(date)
     .toUTC()
     .setZone("local", { keepLocalTime: true })
     .toJSDate()
-    .toLocaleTimeString("ru", {
+    .toLocaleTimeString(lng, {
       formatMatcher: "best fit",
       timeStyle: "short",
     });
 };
 
-export const toLocalTime = (date: Date) => {
+export const toLocalTime = (date: Date, lng: string) => {
   return DateTime.fromJSDate(date)
     .setZone(getTimeZone(), { keepLocalTime: true })
     .toJSDate()
-    .toLocaleTimeString("ru", {
+    .toLocaleTimeString(lng, {
       formatMatcher: "best fit",
       timeStyle: "short",
     });

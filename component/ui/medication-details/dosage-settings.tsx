@@ -1,7 +1,7 @@
 import { useBottomSheet } from "@/component/bottom-sheet-provider";
 import ArrowRight from "@/component/icons/arrow-right";
 import PillIcon from "@/component/icons/pill-icon";
-import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
+import { getDosageMeasurementLabelKey } from "@/helpers/get-dosage-measurement";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { useTranslation } from "@/i18next/i18next";
