@@ -18,18 +18,29 @@ export enum DosageMeasurement {
   MILLIGRAM = "MILLIGRAM",
   GRAM = "GRAM",
 }
+
+export interface CreateMedicationProfile {
+  profileId: string;
+  medicationName: string;
+  medicationUnit: MedicationUnit;
+  medicationMeasurement: DosageMeasurement;
+  medicationNote: string | null;
+  medicationReason: string | null;
+  timeZone: string;
+  schedule: CreateSchedule;
+  medicationPack: Omit<MedicationPackCreation, "medicationProfileId"> | null;
+}
 export interface MedicationPackCreation {
   medicationProfileId: string;
   totalQuantity: string;
   reminderDays: number;
+  timeZone: string;
 }
-
-export interface ScheduleCreation {
+export interface CreateSchedule {
   dosage: string;
   recurrenceRule: string;
   startDate: string;
   endDate: string | null;
-  timeZone: string;
 }
 export interface ScheduleResponse {
   id: string;
@@ -41,17 +52,6 @@ export interface ScheduleResponse {
   endDate: string | null;
   amountTaken: string;
 }
-export interface CreateMedicationProfile {
-  profileId: string;
-  medicationName: string;
-  medicationUnit: MedicationUnit;
-  medicationMeasurement: DosageMeasurement;
-  medicationNote: string | null;
-  medicationReason: string | null;
-  schedule: ScheduleCreation;
-  medicationPack: Omit<MedicationPackCreation, "medicationProfileId"> | null;
-}
-
 export interface MedicationProfileReponse {
   id: string;
   medicationName: string;
@@ -68,7 +68,7 @@ export interface MedicationProfileReponse {
   } | null;
 }
 
-export interface MedicationScheduleEventResponse {
+export interface ScheduleEventResponse {
   id: string;
   status: string;
   medicationName: string;
@@ -80,7 +80,6 @@ export interface MedicationScheduleEventResponse {
   takenAt: string | null;
   profile: ProfileResponse;
 }
-
 export interface MedicationPackResponse {
   id: string;
   status: string;

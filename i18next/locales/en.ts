@@ -135,6 +135,10 @@ const en = {
         title: "Success!",
         text: "Added a new medication.",
       },
+      update_medication: {
+        title: "Success!",
+        text: "Your medication data has been updated.",
+      },
       user_data: {
         title: "Success!",
         text: "Successfully updated data.",

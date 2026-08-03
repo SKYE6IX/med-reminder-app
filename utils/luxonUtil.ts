@@ -2,6 +2,8 @@ import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
 export const getTimeZone = () => DateTime.now().zoneName;
 
+export const getDefaultISODate = () => DateTime.now().toISODate({ format: "basic" });
+
 export const toLocalUtcTime = (date: Date) => {
   return DateTime.fromJSDate(date)
     .toUTC()
@@ -32,8 +34,11 @@ export const getDateLocalString = (date: Date = new Date()) => {
 };
 
 export const formatRegularDate = (isoDate: string, lng: string) => {
+  if (!isoDate) return;
+
   const isRU = lng === "ru";
-  const date = DateTime.fromFormat(isoDate, "dd MM yyyy", {
+
+  const date = DateTime.fromFormat(isoDate, "yyyyMMdd", {
     locale: lng,
     setZone: true,
   });
@@ -52,10 +57,10 @@ export const formatRegularDate = (isoDate: string, lng: string) => {
   if (date.hasSame(today, "day")) {
     return todayText;
   }
+
   if (date.hasSame(tomorrow, "day")) {
     return tomorrowText;
   }
-
   return date.toLocaleString({
     ...toLocaleOptions,
     weekday: "short",
@@ -107,7 +112,7 @@ export const getWeekDays = (offset: number, lng: string) => {
       date: dt.day,
       day: dt.toLocaleString({ weekday: "short" }),
       fullDay: dt.toLocaleString({ weekday: "long" }),
-      iso: dt.toISODate(),
+      iso: dt.toISODate({ format: "basic" }),
       isToday: dt.hasSame(DateTime.now(), "day"),
     };
   });
@@ -116,11 +121,11 @@ export const getWeekDays = (offset: number, lng: string) => {
 export const getWeekViewDescription = (isoDate: string, lng: string) => {
   const isRU = lng === "ru";
   const date = DateTime.fromISO(isoDate, {
-    locale: "ru",
+    locale: lng,
     setZone: true,
   });
 
-  const today = DateTime.now().setLocale("ru");
+  const today = DateTime.now().setLocale(lng);
   const tomorrow = today.plus({ days: 1 });
   const yesterday = today.minus({ days: 1 });
 

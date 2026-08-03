@@ -88,6 +88,7 @@ export default function RootLayout() {
               return res.data;
             },
           }),
+
           logOverdueEvents(),
         ]);
 
@@ -168,7 +169,7 @@ export default function RootLayout() {
     // Configure IAP
     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
     if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
+      // Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
     } else if (Platform.OS === "android") {
       // Purchases.configure({ apiKey: "" });
     }

@@ -1,32 +1,32 @@
+import { ThemedText } from "@/component/themed-text/themed-text";
+import AppleSignIn from "@/component/ui/apple-sign-in";
+import CustomButton from "@/component/ui/custom-button/custom-button";
 import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
-import { Link } from "expo-router";
-import { useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-
-import { ThemedText } from "@/component/themed-text/themed-text";
-import CustomButton from "@/component/ui/custom-button/custom-button";
-import { useThemeColor } from "@/hooks/use-theme-color";
-import { useAuthStore } from "@/stores/use-auth-store";
-import { validateCreateAccountInputs } from "@/utils/validator";
-
-import AppleSignIn from "@/component/ui/apple-sign-in";
 import Loader from "@/component/ui/loader";
 import { NotificationHelper } from "@/helpers/notification-helper";
+import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
+import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
+import { validateCreateAccountInputs } from "@/utils/validator";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "expo-router";
+import { useRef, useState } from "react";
 import { Trans } from "react-i18next";
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 type FormState = {
   email: string;
   name: string;
   password: string;
+  timeZone: string;
 };
 
 type CreateAccountState = {
@@ -48,6 +48,7 @@ export default function CreateAccountScreen() {
       email: "",
       name: "",
       password: "",
+      timeZone: getTimeZone(),
     },
     errorsSet: new Set(),
   });

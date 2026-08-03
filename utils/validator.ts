@@ -10,6 +10,7 @@ const registerSchema = z.object({
     .string()
     .min(6)
     .regex(/^[A-Za-z0-9!@#$%^&*()_\-+=.?]+$/),
+  timeZone: z.string(),
 });
 
 const signInSchema = z.object({

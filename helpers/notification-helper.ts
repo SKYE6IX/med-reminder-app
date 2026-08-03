@@ -10,7 +10,7 @@ import { DateTime, getTimeZone } from "@/utils/luxonUtil";
 import { QueryKey } from "@/constants/query-keys";
 import i18n from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
-import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
+import { MedicationPackResponse, ScheduleEventResponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
 import notifee, {
@@ -434,7 +434,7 @@ export class NotificationHelper {
   ) {
     if (!scheduleId) return;
     try {
-      const eventResponse = await api.put<MedicationScheduleEventResponse>(
+      const eventResponse = await api.put<ScheduleEventResponse>(
         `medications/schedules/event/${scheduleId}`,
         {
           action,

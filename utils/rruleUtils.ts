@@ -72,6 +72,7 @@ export const updateScheduleTimes = ({ rrule, date }: { rrule: string; date: Date
       const doseMinutes = clampedStartMinutes + offset;
       newByHour.push(Math.floor(doseMinutes / 60));
     }
+
     newByMinute = clampedStartMinutes % 60;
   }
 
@@ -162,6 +163,7 @@ export const formatRRuleToText = (rrule: string | undefined, lng: string) => {
   if (!rrule) return;
 
   const isRU = lng === "ru";
+
   const rule = RRule.fromString(rrule);
   const options = rule.options;
   const interval = options.interval || 1;
@@ -170,9 +172,11 @@ export const formatRRuleToText = (rrule: string | undefined, lng: string) => {
     case RRule.HOURLY: {
       const hours = options.byhour || [];
       const equalInterval = calculateEqualHourInterval(hours);
+
       if (equalInterval) {
         return `${isRU ? "Каждые" : "Every"} ${equalInterval} ${pluralizeHours(equalInterval, isRU)}, ${hours.length} ${pluralizeTimes(hours.length, isRU)} ${isRU ? "в день" : "in a day"}`;
       }
+
       return isRU ? "Каждый час" : "Every hour";
     }
 
@@ -180,7 +184,7 @@ export const formatRRuleToText = (rrule: string | undefined, lng: string) => {
       const hours = options.byhour || [];
       const byminute = options.byminute;
 
-      const minute = byminute[0].toString().length < 2 ? `${byminute[0]}0` : byminute[0];
+      const minute = byminute[0].toString().length < 2 ? `0${byminute[0]}` : byminute[0];
 
       let baseText = "";
 
@@ -192,7 +196,9 @@ export const formatRRuleToText = (rrule: string | undefined, lng: string) => {
 
       if (hours.length === 1) {
         const hour = String(hours[0]).padStart(2, "0");
+
         const text = isRU ? "в" : "at";
+
         return `${baseText} ${text} ${hour}:${minute}`;
       }
 

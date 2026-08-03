@@ -15,6 +15,7 @@ import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { CreateMedicationProfile, MedicationProfileReponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -218,15 +219,14 @@ export default function FinalStepScreen() {
 
     const data: CreateMedicationProfile = {
       ...formState,
+      timeZone: getTimeZone(),
       schedule: {
         dosage: formState.schedule.dosage,
         recurrenceRule: formState.schedule.rule.recurrenceRule,
         startDate: formState.schedule.startDate,
         endDate,
-        timeZone: formState.schedule.timeZone,
       },
     };
-
     mutate(data);
   };
 

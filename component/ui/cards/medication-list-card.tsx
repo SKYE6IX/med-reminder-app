@@ -1,9 +1,9 @@
 import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
-import { getDurationDate } from "@/helpers/getDurationDate";
 import { useProfileImage } from "@/hooks/use-profile-image";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
+import { formatRegularDate } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -42,7 +42,8 @@ export default function MedicationListCard({
   const router = useRouter();
 
   const labelKey = getDosageMeasurementLabelKey(medicationProfile.schedule.measurement);
-  const startedDate = getDurationDate(medicationProfile.schedule.startDate, i18n.language);
+
+  const startedDate = formatRegularDate(medicationProfile.schedule.startDate, i18n.language);
 
   const canShowProgress = medicationProfile.pack !== null;
 

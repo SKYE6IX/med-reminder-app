@@ -1,5 +1,5 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useState } from "react";
+import { RefObject, useCallback, useImperativeHandle, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
@@ -9,33 +9,44 @@ const TAB_COUNT = 3;
 type TabsProps = {
   tabs: { label: string; value: string }[];
   onTabChange: (tab: string) => void;
+  ref?: RefObject<{ toNewTab: (tab: string, idx: number) => void } | null>;
 };
 
-export default function Tabs({ tabs, onTabChange }: TabsProps) {
+export default function Tabs({ tabs, onTabChange, ref }: TabsProps) {
   const [containerWidth, setContainerWidth] = useState(0);
-
   const [tabIndex, setTabIndex] = useState(0);
+
   const offset = useSharedValue<number>(0);
-
-  const color = useThemeColor({}, "textPrimary");
-  const tintColor = useThemeColor({}, "tint");
-  const bgSecondary = useThemeColor({}, "backgroundSecondary");
-
   const TAB_WIDTH = (containerWidth - PADDING_SPACE * 2) / TAB_COUNT;
 
-  const handlePress = (tab: string, index: number) => {
-    const newOffset = TAB_WIDTH * index;
+  const activeLabel = tabs.find((_, i) => i === tabIndex)?.label;
 
-    offset.value = withTiming(newOffset);
+  const handlePress = useCallback(
+    (tab: string, index: number) => {
+      const newOffset = TAB_WIDTH * index;
+      offset.set(() => withTiming(newOffset));
+      setTabIndex(index);
+      onTabChange(tab);
+    },
+    [TAB_WIDTH, offset, onTabChange],
+  );
 
-    setTabIndex(index);
-    onTabChange(tab);
-  };
+  useImperativeHandle(ref, () => {
+    return {
+      toNewTab(tab: string, idx: number) {
+        handlePress(tab, idx);
+      },
+    };
+  }, [handlePress]);
 
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [{ translateX: offset.value }],
   }));
-  const activeLabel = tabs.find((_, i) => i === tabIndex)?.label;
+
+  // Themes
+  const color = useThemeColor({}, "textPrimary");
+  const tintColor = useThemeColor({}, "tint");
+  const bgSecondary = useThemeColor({}, "backgroundSecondary");
 
   return (
     <View

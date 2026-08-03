@@ -1,38 +1,35 @@
+import PlusIcon from "@/component/icons/plus-icon";
+import CustomButton from "@/component/ui/custom-button/custom-button";
+import Loader from "@/component/ui/loader";
+import ScheduleEventList from "@/component/ui/schedule-event-list";
+import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
 import WeekView from "@/component/ui/week-view";
+import { QueryKey } from "@/constants/query-keys";
+import { useProfileImage } from "@/hooks/use-profile-image";
+import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useUserQuery } from "@/hooks/use-user-data";
-import { MedicationScheduleEventResponse } from "@/types/medication";
-import { getDateLocalString } from "@/utils/luxonUtil";
+import { useTranslation } from "@/i18next/i18next";
+import { useUserStore } from "@/stores/use-user-store";
+import { ScheduleEventResponse } from "@/types/medication";
+import { api } from "@/utils/axiosInstance";
+import { getDefaultISODate } from "@/utils/luxonUtil";
+import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import PlusIcon from "@/component/icons/plus-icon";
-import CustomButton from "@/component/ui/custom-button/custom-button";
-import Loader from "@/component/ui/loader";
-import ScheduleEventList from "@/component/ui/schedule-event-list";
-import SubscriptionBanner, { SubscriptionBannerRef } from "@/component/ui/subscription-banner";
-import { QueryKey } from "@/constants/query-keys";
-import { useProfileImage } from "@/hooks/use-profile-image";
-import { useSubscriptionPlanQuery } from "@/hooks/use-subscription-plan-query";
-import { useTranslation } from "@/i18next/i18next";
-import { useUserStore } from "@/stores/use-user-store";
-import { api } from "@/utils/axiosInstance";
-import { useQuery } from "@tanstack/react-query";
-
 // Fetch schedule events query
 const fetchScheduleEvents = async (params: string) => {
-  const response = await api.get<MedicationScheduleEventResponse[]>("medications/schedules/event", {
+  const response = await api.get<ScheduleEventResponse[]>("medications/schedules/event", {
     params: {
       eventDate: params,
     },
   });
   return response.data;
 };
-
-const localDateString = getDateLocalString();
 
 export default function Home() {
   const { t } = useTranslation();
@@ -41,19 +38,19 @@ export default function Home() {
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
 
-  const [selectedDate, setSelectedDate] = useState(localDateString);
+  const [selectedDate, setSelectedDate] = useState(getDefaultISODate());
   const subscriptionBannerRef = useRef<SubscriptionBannerRef>(null);
 
   const checkCustomerInfo = async () => {
     try {
-      // const offerings = await Purchases.getProducts(["medremindr_premium_monthly"]);
+      // const offerings = await Purchases.getOfferings();
       // const customerInfo = await Purchases.getCustomerInfo();
       // access latest customerInfo
       // console.log("Offering Info: ", JSON.stringify(offerings, null, 2));
       // console.log("Customer Info: ", JSON.stringify(customerInfo, null, 2));
     } catch (e) {
       // Error fetching customer info
-      console.log("An Error occur: ", e);
+      console.error("An Error occur: ", e);
     }
   };
 
@@ -65,9 +62,7 @@ export default function Home() {
         subscriptionBannerRef.current?.openModal();
       }
     }, 2000);
-
     checkCustomerInfo();
-
     return () => clearTimeout(timeout);
   }, [isPremiumPlan]);
 
@@ -79,10 +74,9 @@ export default function Home() {
 
   // Update schedule event
   const hasScheduleEvents = data && data.length >= 1 ? true : false;
-  const handleOnDateChange = (ISODate: string) => {
-    const date = new Date(ISODate);
-    const toLocalDateString = getDateLocalString(date);
-    setSelectedDate(toLocalDateString);
+
+  const handleOnDateChange = (isoDate: string) => {
+    setSelectedDate(isoDate);
   };
 
   // Themes

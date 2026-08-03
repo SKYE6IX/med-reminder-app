@@ -24,6 +24,7 @@ export default function DetailsFrequencySettings({
   const { openSheet, closeSheet } = useBottomSheet();
 
   const { isPending, mutate } = useUpdateMedicationMutation({ name: "UPDATE FREQUENCY" });
+
   const ruleToText = formatRRuleToText(medicationProfile.schedule.recurrenceRule, i18n.language);
 
   const handleUpdateRules = (updatedRule: string) => {

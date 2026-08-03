@@ -1,8 +1,8 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import {
-  DateTime,
   formatHomeScreenDate,
+  getDefaultISODate,
   getWeekDays,
   getWeekViewDescription,
 } from "@/utils/luxonUtil";
@@ -31,25 +31,24 @@ const CENTER_INDEX = TOTAL_INDEX / 2;
 export default function WeekView({ showDescription, onDateChange }: WeekViewProps) {
   const { t, i18n } = useTranslation();
   const CAROUSEL_WIDTH = Dimensions.get("screen").width - WINDOW_PADDING * 2;
-  const now = DateTime.now();
 
   const carouselRef = useRef<ICarouselInstance>(null);
-  const [selectedISODate, setSelectedISODate] = useState(now.setLocale("ru").toISODate());
+  const [selectedISODate, setSelectedISODate] = useState(getDefaultISODate());
+
   const [activeOffset, setActiveOffset] = useState(0);
 
   const handleOnSnapToItem = (index: number) => {
     if (index === CENTER_INDEX) {
-      const isoDate = now.setLocale("ru").toISODate();
+      const isoDate = getDefaultISODate();
       setSelectedISODate(isoDate);
       onDateChange(isoDate);
     }
-
     const offset = index - CENTER_INDEX;
     setActiveOffset(offset);
   };
 
   const scrollToCurrentWeek = () => {
-    const isoDate = now.setLocale("ru").toISODate();
+    const isoDate = getDefaultISODate();
     setSelectedISODate(isoDate);
     onDateChange(isoDate);
 
@@ -63,6 +62,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
     setSelectedISODate(ISODate);
     onDateChange(ISODate);
   };
+
   const description = getWeekViewDescription(selectedISODate, i18n.language);
 
   // Themes
@@ -96,6 +96,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
           renderItem={({ index }) => {
             const offset = index - CENTER_INDEX;
             const weeks = getWeekDays(offset, i18n.language);
+
             return (
               <WeekDayRow
                 weeks={weeks}
@@ -106,7 +107,6 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
           }}
         />
       </View>
-
       {showDescription && (
         <Text style={[styles.weekDescription, { color }]}>
           {t("home_screen.week_view_meds_for")}

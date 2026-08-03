@@ -10,10 +10,11 @@ import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationPackResponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { FlatList, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,6 +38,7 @@ export default function MedicationPacks() {
   const { t } = useTranslation();
   const inset = useSafeAreaInsets();
   const isIOS = Platform.OS === "ios";
+  const tabRef = useRef<{ toNewTab: (tab: string, idx: number) => void }>(null);
 
   const { openSheet, closeSheet } = useBottomSheet();
   const [activeTab, setActiveTab] = useState<TABS_VALUE>("ACTIVE");
@@ -53,6 +55,11 @@ export default function MedicationPacks() {
 
   const handleOnTabChange = (tab: TABS_VALUE) => {
     setActiveTab(tab);
+  };
+
+  const handleOnPackRefilled = () => {
+    tabRef.current?.toNewTab("PENDING", 1);
+    closeSheet();
   };
 
   const openAddMedicationPackSheet = ({
@@ -72,7 +79,7 @@ export default function MedicationPacks() {
           medicationPackId={medicationPackId}
           medicationProfileId={medicationProfileId}
           measurementValue={measurementValue}
-          closeSheet={closeSheet}
+          onPackRefilled={handleOnPackRefilled}
         />
       ),
     });
@@ -99,7 +106,11 @@ export default function MedicationPacks() {
       {!isLoading && data && data.length >= 1 && (
         <React.Fragment>
           <View style={styles.tabsWrapper}>
-            <Tabs tabs={TABS} onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)} />
+            <Tabs
+              tabs={TABS}
+              onTabChange={(tab) => handleOnTabChange(tab as TABS_VALUE)}
+              ref={tabRef}
+            />
           </View>
           <FlatList
             style={{ flex: 1 }}
@@ -145,12 +156,12 @@ const AddMedicationPackPickerSheet = ({
   medicationPackId,
   medicationProfileId,
   measurementValue,
-  closeSheet,
+  onPackRefilled,
 }: {
   medicationPackId: string;
   medicationProfileId: string;
   measurementValue: string;
-  closeSheet: () => void;
+  onPackRefilled: () => void;
 }) => {
   const { t } = useTranslation();
   const { showFeedBack } = useFeedBackStore();
@@ -160,6 +171,7 @@ const AddMedicationPackPickerSheet = ({
     medicationProfileId,
     totalQuantity: "",
     reminderDays: 0,
+    timeZone: getTimeZone(),
   });
 
   const amountInPack = medicationPack.totalQuantity ? `${medicationPack.totalQuantity}` : "";
@@ -180,15 +192,15 @@ const AddMedicationPackPickerSheet = ({
         }),
         queryClient.invalidateQueries({ queryKey: [QueryKey.medicationList] }),
       ]);
+
       showFeedBack({
         title: t("feedback.success.reserve_setup.title"),
         message: t("feedback.success.reserve_setup.text"),
         status: "success",
       });
-      closeSheet();
+      onPackRefilled();
       setMedicationPack((prv) => ({ ...prv, totalQuantity: "", reminderDays: 0 }));
     },
-
     onError() {
       showFeedBack({
         title: t("feedback.error.general.title"),

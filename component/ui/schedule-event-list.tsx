@@ -4,7 +4,7 @@ import { NotificationHelper } from "@/helpers/notification-helper";
 import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
-import { MedicationPackResponse, MedicationScheduleEventResponse } from "@/types/medication";
+import { MedicationPackResponse, ScheduleEventResponse } from "@/types/medication";
 import { NotificationData } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
@@ -24,12 +24,9 @@ interface UpdateScheduleEvent {
 }
 
 const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
-  const response = await api.put<MedicationScheduleEventResponse>(
-    `medications/schedules/event/${data.id}`,
-    {
-      action: data.action,
-    },
-  );
+  const response = await api.put<ScheduleEventResponse>(`medications/schedules/event/${data.id}`, {
+    action: data.action,
+  });
   return response.data;
 };
 
@@ -49,7 +46,7 @@ export default function ScheduleEventList({
   data,
   selectedDate,
 }: {
-  data: MedicationScheduleEventResponse[];
+  data: ScheduleEventResponse[];
   selectedDate: string;
 }) {
   const { t } = useTranslation();
@@ -89,7 +86,7 @@ export default function ScheduleEventList({
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         [QueryKey.scheduleEvents, selectedDate],
-        (existingData: MedicationScheduleEventResponse[]) =>
+        (existingData: ScheduleEventResponse[]) =>
           existingData.map((scheduleEvent) =>
             scheduleEvent.id === variables.id ? data : scheduleEvent,
           ),

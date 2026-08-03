@@ -1,7 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { MedicationPackResponse } from "@/types/medication";
-import { formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
+import { formatRegularDate } from "@/utils/luxonUtil";
 import { Image } from "expo-image";
 import { Pressable, Text, View } from "react-native";
 import { useCardStyles } from "./use-card-style";
@@ -16,15 +16,10 @@ const getProgressText = (pack: MedicationPackResponse, lng: string) => {
   const isRU = lng === "ru";
   return `${consumed} ${isRU ? "из" : "of"} ${pack.totalQuantity} ${isRU ? "принято" : "taken"}`;
 };
+
 const getPercentage = (pack: MedicationPackResponse) => {
   const consumed = Number(pack.totalQuantity) - Number(pack.currentQuantity);
   return Math.round((consumed / Number(pack.totalQuantity)) * 100);
-};
-const getStartedDate = (isoString: string | null, lng: string) => {
-  if (!isoString) return;
-  const date = new Date(isoString);
-  const convertedString = getDateLocalString(date).replaceAll(".", " ");
-  return formatRegularDate(convertedString, lng);
 };
 
 const isPackDepleted = (pack: MedicationPackResponse) => {
@@ -48,8 +43,8 @@ export default function MedicationPackCard({ pack, onRefillButtonPress }: Refill
         ? t("medication_reserve_screen.card_status_pending_label")
         : t("medication_reserve_screen.card_status_complete_label");
 
-  const startedDate = getStartedDate(pack.startedAt, i18n.language);
-  const endedDate = getStartedDate(pack.endedAt, i18n.language);
+  const startedDate = formatRegularDate(pack.startedAt ?? "", i18n.language);
+  const endedDate = formatRegularDate(pack.endedAt ?? "", i18n.language);
   const showRefillButton = pack.status !== "PENDING" && !pack.isRefilled;
 
   const badgeLabel =

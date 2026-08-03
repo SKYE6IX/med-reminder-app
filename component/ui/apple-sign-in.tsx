@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/use-auth-store";
 import { AuthResponse } from "@/types/auth-response";
 import { SocialAuthRequest } from "@/types/user";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { clearTokens, saveTokens } from "@/utils/tokenUtils";
 import { useMutation } from "@tanstack/react-query";
@@ -91,6 +92,7 @@ export default function AppleSignIn({ type }: AppleSignInProps) {
               fullName: familyName + " " + givenName,
               email: credential.email ?? "",
               jwtToken: credential.identityToken ?? "",
+              timeZone: getTimeZone(),
             };
 
             mutate(requestBody);

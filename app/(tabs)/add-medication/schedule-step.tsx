@@ -13,7 +13,7 @@ import FrequencySettings from "@/component/ui/frequency-settings";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { SchedulePreset, useAddPillStore } from "@/stores/add-pill-store";
-import { DateTime, formatRegularDate, getDateLocalString } from "@/utils/luxonUtil";
+import { DateTime, formatRegularDate } from "@/utils/luxonUtil";
 import { generateScheduleTimes, updateScheduleTimes } from "@/utils/rruleUtils";
 
 import { useRouter } from "expo-router";
@@ -39,17 +39,14 @@ export default function ScheduleStepScreen() {
   const insets = useSafeAreaInsets();
 
   const sharedStyles = useAddPillScreenStyles();
-
   const { openSheet, closeSheet } = useBottomSheet();
   const { formState, setMedicatioSchedule } = useAddPillStore();
   const router = useRouter();
 
   const [durations, setDurations] = useState("");
   const [startingDate, setStartingDate] = useState<Date>(getNow());
-  const displayStartDate = formatRegularDate(
-    formState.schedule.startDate.replaceAll(".", " "),
-    i18n.language,
-  );
+
+  const displayStartDate = formatRegularDate(formState.schedule.startDate, i18n.language);
 
   const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
   const androidDateRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
@@ -79,6 +76,7 @@ export default function ScheduleStepScreen() {
       rrule: formState.schedule.rule.recurrenceRule,
       date,
     });
+
     setMedicatioSchedule({
       rule: {
         recurrenceRule: newRules,
@@ -86,17 +84,22 @@ export default function ScheduleStepScreen() {
       },
     });
   };
+
   const setScheduleDate = (date: Date) => {
     if (durations.length >= 1) {
       const startDate = DateTime.fromJSDate(date);
       const endDate = startDate.plus({ days: Number(durations) - 1 });
+
+      const start = startDate.toISODate({ format: "basic" })!;
+      const end = endDate.toISODate({ format: "basic" })!;
       setMedicatioSchedule({
-        startDate: getDateLocalString(startDate.toJSDate()),
-        endDate: getDateLocalString(endDate.toJSDate()),
+        startDate: start,
+        endDate: end,
       });
     } else {
-      const startingDate = getDateLocalString(date);
-      setMedicatioSchedule({ startDate: startingDate });
+      const startDate = DateTime.fromJSDate(date);
+      const start = startDate.toISODate({ format: "basic" })!;
+      setMedicatioSchedule({ startDate: start });
     }
   };
 
@@ -134,9 +137,13 @@ export default function ScheduleStepScreen() {
     } else {
       const startDate = DateTime.fromJSDate(startingDate);
       const endDate = startDate.plus({ days: Number(text) - 1 });
+
+      const start = startDate.toISODate({ format: "basic" })!;
+      const end = endDate.toISODate({ format: "basic" })!;
+
       setMedicatioSchedule({
-        startDate: getDateLocalString(startDate.toJSDate()),
-        endDate: getDateLocalString(endDate.toJSDate()),
+        startDate: start,
+        endDate: end,
       });
     }
   };
@@ -159,6 +166,7 @@ export default function ScheduleStepScreen() {
       });
     }
   };
+
   // Show date picker
   const showDateSetting = () => {
     if (isAndroid) {
@@ -189,7 +197,6 @@ export default function ScheduleStepScreen() {
   const tintColor = useThemeColor({}, "tint");
 
   const top = isAndroid ? insets.top + 10 : 0;
-
   return (
     <SafeAreaView style={{ flex: 1, paddingTop: top, backgroundColor }} edges={["top"]}>
       <KeyboardAvoidingView
@@ -204,12 +211,6 @@ export default function ScheduleStepScreen() {
               onFreqSet={handleSetFrequency}
               preset={formState.schedule.rule.preset}
             />
-          </View>
-
-          {/* Dosage Settings */}
-          <View style={sharedStyles.sectionContainer}>
-            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_dosage_label")}</Text>
-            <DosageAmounPicker />
           </View>
 
           {/* Time Settings */}
@@ -234,7 +235,6 @@ export default function ScheduleStepScreen() {
                 ))
               )}
             </View>
-
             <CustomButton
               label={t("add_medication_screen.step3_time_choose_btn")}
               variant="outline"
@@ -251,6 +251,12 @@ export default function ScheduleStepScreen() {
                 mode="time"
               />
             )}
+          </View>
+
+          {/* Dosage Settings */}
+          <View style={sharedStyles.sectionContainer}>
+            <Text style={sharedStyles.title}>{t("add_medication_screen.step3_dosage_label")}</Text>
+            <DosageAmounPicker />
           </View>
 
           {/* Date Settings */}
@@ -273,6 +279,7 @@ export default function ScheduleStepScreen() {
                 <ArrowDown />
               </View>
             </Pressable>
+
             {/* ONLY FOR ANDROID */}
             {isAndroid && (
               <AndroidDateTimeWrapper

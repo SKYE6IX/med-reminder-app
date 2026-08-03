@@ -10,12 +10,12 @@ import StockDosageSettings from "@/component/ui/medication-details/stock-dosage-
 import DetailsTimeSettings from "@/component/ui/medication-details/time-settings";
 import { QueryKey } from "@/constants/query-keys";
 import { getDosageMeasurementLabelKey } from "@/helpers/getDosageMeasurement";
-import { getDurationDate } from "@/helpers/getDurationDate";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import useUpdateMedicationMutation from "@/hooks/use-update-medication-mutation";
 import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
+import { formatRegularDate } from "@/utils/luxonUtil";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -96,7 +96,7 @@ export default function MedicationDetails() {
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getDurationDate(medicationProfile.schedule.startDate, i18n.language)}
+                            {formatRegularDate(medicationProfile.schedule.startDate, i18n.language)}
                           </Text>
                         </View>
                       </View>
@@ -117,7 +117,7 @@ export default function MedicationDetails() {
                         <View style={styles.cardBody}>
                           <CalenderIcon color={color} />
                           <Text style={[styles.cardTextContent, { color }]}>
-                            {getDurationDate(
+                            {formatRegularDate(
                               medicationProfile.schedule.endDate ?? "",
                               i18n.language,
                             )}
@@ -145,7 +145,7 @@ export default function MedicationDetails() {
                       <View style={styles.cardBody}>
                         <CalenderIcon color={color} />
                         <Text style={[styles.cardTextContent, { color }]}>
-                          {getDurationDate(medicationProfile.schedule.startDate, i18n.language)}
+                          {formatRegularDate(medicationProfile.schedule.startDate, i18n.language)}
                         </Text>
                       </View>
                     </View>

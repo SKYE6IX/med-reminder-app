@@ -9,6 +9,7 @@ import { useTranslation } from "@/i18next/i18next";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackCreation, MedicationProfileReponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import React, { useMemo, useRef, useState } from "react";
@@ -112,6 +113,7 @@ const AddMedicationPackSheet = ({ medicationProfile, closeSheet }: AddMedication
     medicationProfileId: medicationProfile.id,
     totalQuantity: "",
     reminderDays: 0,
+    timeZone: getTimeZone(),
   });
 
   const reminderDays = medicationPack.reminderDays ? `${medicationPack.reminderDays}` : "";

@@ -7,7 +7,7 @@ import { useTranslation } from "@/i18next/i18next";
 import { MedicationProfileReponse } from "@/types/medication";
 import { toLocalTime } from "@/utils/luxonUtil";
 import { updateScheduleTimes } from "@/utils/rruleUtils";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import AndroidDateTimeWrapper, {
   DateTimeWrapperRef,
@@ -34,36 +34,34 @@ export default function DetailsTimeSettings({
 
   const { openSheet, closeSheet } = useBottomSheet();
 
-  const [updatedRule, setUpdatedRule] = useState("");
-
   const { mutate, isPending } = useUpdateMedicationMutation({ name: "UPDATE TIME" });
 
-  const androidTimeRef = useRef<DateTimeWrapperRef>(null); // @Platform ANDROID ONLY
+  // @Platform ANDROID ONLY
+  const androidTimeRef = useRef<DateTimeWrapperRef>(null);
 
   const color = useThemeColor({}, "textPrimary");
 
-  const handleOnDateTimeChange = (date: Date) => {
+  const updateFreqRule = (date: Date) => {
     const newRules = updateScheduleTimes({
       rrule: medicationProfile.schedule.recurrenceRule,
       date,
     });
-    setUpdatedRule(newRules);
-    // @platform ANDROID ONLY
-    if (isAndroid && medicationProfile.schedule.recurrenceRule !== newRules) {
+    if (medicationProfile.schedule.recurrenceRule !== newRules) {
       mutate({ id: medicationProfile.id, data: { recurrenceRule: newRules } });
     }
   };
 
-  // @platform IOS ONLY
-  // Function to perform an Action that will
-  // update the time if it's diffrent from the current one.
-  const handleOnButtonPress = (dateTime: Date) => {
-    if (updatedRule !== medicationProfile.schedule.recurrenceRule) {
-      mutate({ id: medicationProfile.id, data: { recurrenceRule: updatedRule } });
-      closeSheet();
-    } else {
-      closeSheet();
+  // @platform ANDROID ONLY
+  const handleOnDateTimeChange = (date: Date) => {
+    if (isAndroid) {
+      updateFreqRule(date);
     }
+  };
+
+  // @platform IOS ONLY
+  const handleApplyChange = (date: Date) => {
+    updateFreqRule(date);
+    closeSheet();
   };
 
   const openDateTime = () => {
@@ -77,7 +75,7 @@ export default function DetailsTimeSettings({
           <IOSDateTimeWrapper
             mode="time"
             onDateTimeChange={(date) => handleOnDateTimeChange(date)}
-            applyChange={handleOnButtonPress}
+            applyChange={handleApplyChange}
           />
         ),
       });

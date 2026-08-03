@@ -1,7 +1,7 @@
-import { MedicationScheduleEventResponse } from "@/types/medication";
+import { ScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
-import { DateTime } from "@/utils/luxonUtil";
+import { getDefaultISODate } from "@/utils/luxonUtil";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { saveToStorage } from "./storage-manager";
@@ -12,18 +12,15 @@ const LAST_SCHEDULED_KEY = "notifications:lastScheduledAt";
 export const scheduleNewMedicationNotifications = async (
   settings: Partial<NotificationSettings>,
 ) => {
-  const isoString = DateTime.now().toISO({ precision: "minute" });
+  const isoDate = getDefaultISODate();
 
   try {
-    const response = await api.get<MedicationScheduleEventResponse[]>(
-      "medications/schedules/upcoming",
-      {
-        params: {
-          eventDateFrom: isoString,
-          limit: MAX_PREBUILD_EVENTS,
-        },
+    const response = await api.get<ScheduleEventResponse[]>("medications/schedules/upcoming", {
+      params: {
+        eventDateFrom: isoDate,
+        limit: MAX_PREBUILD_EVENTS,
       },
-    );
+    });
 
     if (!response.data.length) return;
 
@@ -44,7 +41,6 @@ export const scheduleNewMedicationNotifications = async (
       // Because a due return 3 notification (snoonze), we use the only
       // single unique key, eventID to set them into map.
       const pendingMaps = new Map<string, TriggerNotification>();
-
       pendings.forEach((pending) => {
         const data = pending.notification?.data as unknown as NotificationData;
         pendingMaps.set(data.dosageScheduleEventId as string, pending);

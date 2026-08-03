@@ -1,10 +1,12 @@
 import { QueryKey } from "@/constants/query-keys";
 import { cancelMedicationNotifications } from "@/helpers/cancel-medication-notifications";
 import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
+import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationProfileReponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 
@@ -13,6 +15,7 @@ interface UpdateMedicationProfile {
   recurrenceRule: string;
   doseQuantity: string;
   note: string;
+  timeZone: string;
 }
 
 type UpdateMedicationProfileMutation = {
@@ -26,6 +29,7 @@ const updateMedicationProfileMutation = async ({ id, data }: UpdateMedicationPro
     recurrenceRule: data.recurrenceRule ?? null,
     doseQuantity: data.doseQuantity ?? null,
     note: data.note ?? null,
+    timeZone: getTimeZone(),
   };
 
   const response = await api.put<MedicationProfileReponse>(`medications/${id}`, updateData);
@@ -39,6 +43,7 @@ export default function useUpdateMedicationMutation({
   name: string;
   onSucceed?: () => void;
 }) {
+  const { t } = useTranslation();
   const { notfication, reminderPreferences } = useAppSettingsStore();
   const { showFeedBack } = useFeedBackStore();
 
@@ -74,8 +79,8 @@ export default function useUpdateMedicationMutation({
       await queryClient.invalidateQueries({ queryKey: [QueryKey.scheduleEvents] });
       onSucceed && onSucceed();
       showFeedBack({
-        title: "Успешно!",
-        message: "Данные о Ваших лекарствах обновлены.",
+        title: t("feedback.success.update_medication.title"),
+        message: t("feedback.success.update_medication.text"),
         status: "success",
       });
     },
@@ -83,14 +88,14 @@ export default function useUpdateMedicationMutation({
       if (axios.isAxiosError(error)) {
         if (error.code === "ERR_NETWORK") {
           showFeedBack({
-            title: "Ошибка сети!",
-            message: "Проверьте подключение к интернету.",
+            title: t("feedback.error.network.title"),
+            message: t("feedback.error.network.text"),
             status: "error",
           });
         } else {
           showFeedBack({
-            title: "Ошибка!",
-            message: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
+            title: t("feedback.error.general.title"),
+            message: t("feedback.error.general.text"),
             status: "error",
           });
         }

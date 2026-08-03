@@ -21,6 +21,7 @@ export interface SocialAuthRequest {
   authorizationCode: string;
   fullName: string;
   email: string;
+  timeZone: string;
 }
 export interface SubscriptionPlanResponse {
   id: string;
