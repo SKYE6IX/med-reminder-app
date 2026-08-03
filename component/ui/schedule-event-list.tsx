@@ -7,6 +7,7 @@ import { useFeedBackStore } from "@/stores/feedback-store";
 import { MedicationPackResponse, ScheduleEventResponse } from "@/types/medication";
 import { NotificationData } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -23,10 +24,12 @@ interface UpdateScheduleEvent {
   action: "TAKEN" | "MISSED";
 }
 
-const updateScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
+const logScheduleEventMutaion = async (data: UpdateScheduleEvent) => {
   const response = await api.put<ScheduleEventResponse>(`medications/schedules/event/${data.id}`, {
     action: data.action,
+    timeZone: getTimeZone(),
   });
+
   return response.data;
 };
 
@@ -36,6 +39,7 @@ const cancelEventNotifications = async (eventId: string) => {
     const data = appNotification.notification.data as unknown as NotificationData;
     return data.dosageScheduleEventId === eventId;
   });
+
   const notificationData = eventToCancel?.notification.data as unknown as NotificationData;
   if (notificationData) {
     await NotificationHelper.removeNotificationsWithKey(notificationData.storageKey as string);
@@ -82,7 +86,7 @@ export default function ScheduleEventList({
   };
 
   const { isPending, mutate } = useMutation({
-    mutationFn: updateScheduleEventMutaion,
+    mutationFn: logScheduleEventMutaion,
     async onSuccess(data, variables) {
       queryClient.setQueryData(
         [QueryKey.scheduleEvents, selectedDate],
