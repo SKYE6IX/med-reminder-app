@@ -71,6 +71,8 @@ export default function RootLayout() {
     try {
       // Request valid acess token
       const token = await getValidAccessToken();
+      logOverdueEvents();
+
       if (token) {
         // Prefetch Applications data
         await Promise.all([
@@ -88,8 +90,6 @@ export default function RootLayout() {
               return res.data;
             },
           }),
-
-          logOverdueEvents(),
         ]);
 
         const resolveLng = resolveLanguage();

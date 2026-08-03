@@ -3,7 +3,6 @@ import { getDefaultISODate } from "@/utils/luxonUtil";
 
 export const logOverdueEvents = async () => {
   const isoDate = getDefaultISODate();
-
   try {
     await api.put("medications/schedules/overdue", {
       eventDateUntil: isoDate,
