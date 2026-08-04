@@ -71,10 +71,9 @@ export default function RootLayout() {
     try {
       // Request valid acess token
       const token = await getValidAccessToken();
-      logOverdueEvents();
-
       if (token) {
         // Prefetch Applications data
+        logOverdueEvents();
         await Promise.all([
           queryClient.prefetchQuery({
             queryKey: [QueryKey.subscriptionPlan],
