@@ -66,7 +66,6 @@ export function useCardStyles() {
       fontFamily: "Roboto_400Regular",
       fontSize: 14,
       lineHeight: 17.2,
-      textTransform: "lowercase",
       color,
     },
 

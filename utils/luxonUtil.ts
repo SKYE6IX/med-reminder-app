@@ -47,8 +47,8 @@ export const formatRegularDate = (isoDate: string, lng: string) => {
   const tomorrow = today.plus({ days: 1 });
 
   const toLocaleOptions: DateTimeFormatOptions = {
-    month: "long",
-    day: "2-digit",
+    month: "short",
+    day: "numeric",
   };
 
   const todayText = isRU ? "Сегодня" : "Today";

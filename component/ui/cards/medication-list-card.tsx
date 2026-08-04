@@ -98,7 +98,7 @@ export default function MedicationListCard({
               // @ts-ignore
             >{`${medicationProfile.schedule.dosage} ${t(`common.dosage_measuremnet.${labelKey}`)}`}</Text>
             <Text style={sharedStyles.cardTextMedium}>
-              {t("medication_screen.list_card_start_at", { date: startedDate })}
+              {t("medication_screen.list_card_start_at", { date: startedDate ?? "" })}
             </Text>
             {!medicationProfile.profile.isSelf && (
               <View style={sharedStyles.profile}>
