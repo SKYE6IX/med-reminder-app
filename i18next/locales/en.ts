@@ -417,7 +417,37 @@ const en = {
     about_review_description: "Leave a review on the {{store}}",
     about_support_title: "Contact us",
     about_support_description: "Reach out to us via email",
+    subscription_premimum_plan_label: "Premimum plan",
+    subscription_basic_plan_label: "Basic plan",
+    subscription_manage_plan: "Manage plan",
+    subscription_upgrade_plan: "Upgrade plan",
+    subscription_cancel_plan_sheet_title: "Cancel plan?",
+    subscription_cancel_plan_sheet_heading:
+      "You will lose access to all the benefits of this plan after the end of the current period.",
+    subscription_cancel_plan_sheet_btn1: "Cancel",
+    subscription_cancel_plan_sheet_btn2: "Cancel Plan",
+    subscription_plans_title: "Premimum plan",
+    subscription_plans_sub_title: "Everything to effectively manage your medications",
+    subscription_plans_offering_heading: "What included",
+    subscription_plans_offering1_title: "Unlimited Medications",
+    subscription_plans_offering1_description:
+      "Add and track as many medications as you need without any restrictions",
+    subscription_plans_offering2_title: "Manage Family Medications",
+    subscription_plans_offering2_description:
+      "Add up to three relations and manage their medications schedule with ease",
+    subscription_plans_offering3_title: "Refill Tracker",
+    subscription_plans_offering3_description:
+      "Get notifications for when your medications are about to run out",
+    subscription_plans_offering4_title: "Personalise Notifications",
+    subscription_plans_offering4_description:
+      "Control how you want your notifications should work, prefer tone and customise snooze",
+    subscription_plans_monthly_title: "Monthly premium",
+    subscription_plans_monthly_price_label: "month",
+    subscription_plans_yearly_title: "Yearly premium",
+    subscription_plans_yearly_price_label: "year",
+    subscription_plans_yearly_discount_label: "Save",
   },
+
   notification: {
     due_title: "Medication time is due",
     due_body: "{{medicationName}} for {{scheduleAt}}. Use the quick action button.",

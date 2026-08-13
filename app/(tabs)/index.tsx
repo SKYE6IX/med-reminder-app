@@ -41,19 +41,6 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(getDefaultISODate());
   const subscriptionBannerRef = useRef<SubscriptionBannerRef>(null);
 
-  const checkCustomerInfo = async () => {
-    try {
-      // const offerings = await Purchases.getOfferings();
-      // const customerInfo = await Purchases.getCustomerInfo();
-      // access latest customerInfo
-      // console.log("Offering Info: ", JSON.stringify(offerings, null, 2));
-      // console.log("Customer Info: ", JSON.stringify(customerInfo, null, 2));
-    } catch (e) {
-      // Error fetching customer info
-      console.error("An Error occur: ", e);
-    }
-  };
-
   // Show premimum plan offer once to newly user.
   useEffect(() => {
     let timeout: NodeJS.Timeout;
@@ -62,7 +49,7 @@ export default function Home() {
         subscriptionBannerRef.current?.openModal();
       }
     }, 2000);
-    checkCustomerInfo();
+
     return () => clearTimeout(timeout);
   }, [isPremiumPlan]);
 

@@ -2,131 +2,104 @@ import CheckCircleIcon from "@/component/icons/check-circle-icon";
 import CheckIcon from "@/component/icons/check-icon";
 import StarIcon from "@/component/icons/star-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
-import Loader from "@/component/ui/loader";
 import SettingsCard from "@/component/ui/settings/settings-card";
-import { QueryKey } from "@/constants/query-keys";
+import { ENTITLEMENT_KEY } from "@/constants/susbscription-key";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useFeedBackStore } from "@/stores/feedback-store";
+import { useTranslation } from "@/i18next/i18next";
 import { SubscriptionPlanResponse } from "@/types/user";
-import { api, axios } from "@/utils/axiosInstance";
-import { queryClient } from "@/utils/query-client";
+import { api } from "@/utils/axiosInstance";
+import { getTimeZone } from "@/utils/luxonUtil";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Purchases, { PACKAGE_TYPE, PurchasesPackage } from "react-native-purchases";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-// try {
-//   const customerInfo = await Purchases.getCustomerInfo();
-
-//   if (typeof customerInfo.entitlements.active["MedRemindR Premium"] !== "undefined") {
-//     // Grant user access to entitlement
-//   }
-// } catch (e) {
-//   // Error fetching customer info
-// }
-// import { Platform } from "react-native";
-// import { useEffect } from "react";
-// import Purchases, { LOG_LEVEL } from "react-native-purchases";
-
-// export default function App() {
-//   useEffect(() => {
-//     Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-
-//     // Platform-specific API keys
-//     const iosApiKey = "test_yeOyusemSxJhZzbPldKeHWixMor";
-//     const androidApiKey = "test_yeOyusemSxJhZzbPldKeHWixMor";
-
-//   }, []);
-// }
-
-type Plan = "MONTHLY" | "ANNUAL";
-
-interface SubscriptionRequest {
-  paymentToken: string;
-  paymentMethod: string;
-  amount: string;
-  billingCycle: string;
+interface CreateSubscription {
+  originalPurchaseDate: number;
+  latestPurchaseDate: number;
+  expirationDate: number;
+  store: string;
   zoneId: string;
 }
 
-const createPaidSubscription = async (requestBody: SubscriptionRequest) => {
+const createPaidSubscription = async (requestBody: CreateSubscription) => {
   const response = await api.post<SubscriptionPlanResponse>("subscriptions", requestBody);
   return response.data;
 };
 
-export default function SubscriptionPlan() {
-  const { showFeedBack } = useFeedBackStore();
-  const [selectedPlan, setSelectedPlan] = useState<Plan>("ANNUAL");
-  const router = useRouter();
+const getPackage = (pkgs: PurchasesPackage[] | undefined, type: PACKAGE_TYPE) => {
+  return pkgs?.find((pkg) => pkg.packageType === type);
+};
 
+export default function SubscriptionPlan() {
+  const { t } = useTranslation();
   const isAndroid = Platform.OS === "android";
+
+  const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const isMontly = selectedPlan === "MONTHLY";
-  const isAnnual = selectedPlan === "ANNUAL";
+  const [pkgs, setPkgs] = useState<PurchasesPackage[]>();
+  const [selectedPkg, setSelectedPkg] = useState<PurchasesPackage>();
+  const [purchaseIsInProcess, setPurchaseIsInProcess] = useState(false);
 
-  const { isPending, mutate } = useMutation({
+  const montly = getPackage(pkgs, Purchases.PACKAGE_TYPE.MONTHLY);
+  const annualDiscount = getPackage(pkgs, Purchases.PACKAGE_TYPE.CUSTOM);
+  const annual = getPackage(pkgs, Purchases.PACKAGE_TYPE.ANNUAL);
+
+  const isMontly = montly?.identifier === selectedPkg?.identifier;
+  const isAnnual = annualDiscount?.identifier === selectedPkg?.identifier;
+
+  useEffect(() => {
+    const getPackages = async () => {
+      const offering = await Purchases.getOfferings();
+      const pkgs = offering.all["default"].availablePackages;
+      setPkgs(pkgs);
+      const defaultPackage = getPackage(pkgs, Purchases.PACKAGE_TYPE.CUSTOM);
+      setSelectedPkg(defaultPackage);
+    };
+    getPackages();
+  }, []);
+
+  const { mutate } = useMutation({
     mutationFn: createPaidSubscription,
-    onSuccess(data) {
-      if (data !== null) {
-        queryClient.setQueryData([QueryKey.subscriptionPlan], () => data);
-        showFeedBack({
-          title: "Добро пожаловать Премиум план",
-          message: "Наслаждайтесь неограниченным использованием.",
-          status: "success",
-        });
-
-        router.dismissTo("/(tabs)/settings/subscription");
-      }
-    },
-
+    onSuccess(data) {},
     onError(error) {
-      if (axios.isAxiosError(error)) {
-        if (error.code === "402") {
-          showFeedBack({
-            title: "Неудачный платеж.",
-            message: "Пожалуйста, обратитесь в свой банк.",
-            status: "error",
-          });
-        } else {
-          showFeedBack({
-            title: "Что-то пошло не так!",
-            message: "Пожалуйста, попробуйте еще раз!",
-            status: "error",
-          });
-        }
-      } else {
-        showFeedBack({
-          title: "Что-то пошло не так!",
-          message: "Пожалуйста, попробуйте еще раз!",
-          status: "error",
-        });
-      }
+      console.log("An Error occur when try to create subscription: ", error);
     },
   });
 
-  const createPayment = async () => {
-    const planAmount = selectedPlan === "MONTHLY" ? 299 : 3050;
-    const subtitle = selectedPlan === "MONTHLY" ? "Ежемесячная подписка" : "Годовая подписка";
-    // const result = await YomoneySdkModule.startTokenize({
-    //   amount: planAmount,
-    //   currency: "RUB",
-    //   title: "Премиум план",
-    //   subtitle,
-    //   clientApplicationKey: process.env.EXPO_PUBLIC_CLIENT_KEY,
-    //   shopId: process.env.EXPO_PUBLIC_SHOP_ID,
-    // });
+  const subscribe = async () => {
+    if (selectedPkg) {
+      try {
+        setPurchaseIsInProcess(true);
+        const { customerInfo } = await Purchases.purchasePackage(selectedPkg);
+        const entitlement = customerInfo.entitlements.active[ENTITLEMENT_KEY];
+        router.dismissTo("/(tabs)/settings/subscription");
 
-    // if (!result) return;
+        const {
+          originalPurchaseDateMillis,
+          latestPurchaseDateMillis,
+          expirationDateMillis,
+          store,
+        } = entitlement;
 
-    // mutate({
-    //   paymentToken: result.paymentToken,
-    //   paymentMethod: result.paymentMethod.toLocaleUpperCase(),
-    //   amount: String(planAmount),
-    //   billingCycle: selectedPlan,
-    //   zoneId: getTimeZone(),
-    // });
+        const requestBody: CreateSubscription = {
+          originalPurchaseDate: originalPurchaseDateMillis,
+          latestPurchaseDate: latestPurchaseDateMillis,
+          expirationDate: expirationDateMillis ?? 0,
+          store,
+          zoneId: getTimeZone(),
+        };
+        mutate(requestBody);
+      } catch (error) {
+        console.log("Purchase Error Occur: ", error);
+        return;
+      } finally {
+        setPurchaseIsInProcess(false);
+      }
+    }
   };
 
   // Themes
@@ -142,47 +115,51 @@ export default function SubscriptionPlan() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: bgPrimary, paddingTop: top }} edges={["top"]}>
-      <Loader visible={isPending} />
       <ScrollView contentContainerStyle={styles.contentStyle}>
         {/* HEADERS */}
         <View style={styles.headerContainer}>
           <View style={[styles.headerIcon, { backgroundColor: bgTertiary }]}>
             <StarIcon color={tintColor} />
           </View>
-          <Text style={[styles.headerTitle, { color }]}>Премиум план</Text>
+          <Text style={[styles.headerTitle, { color }]}>
+            {t("settings_screen.subscription_plans_title")}
+          </Text>
           <Text style={[styles.headerSubTitle, { color: mutedColor }]}>
-            Всё, чтобы эффективно следить за приёмом лекарств
+            {t("settings_screen.subscription_plans_sub_title")}
           </Text>
         </View>
 
         {/* INCLUDED OFFERS */}
         <View style={styles.bodyListWrapper}>
-          <Text style={[styles.bodyTitle, { color }]}>Что включено</Text>
+          <Text style={[styles.bodyTitle, { color }]}>
+            {t("settings_screen.subscription_plans_offering_heading")}
+          </Text>
+
           <View style={styles.list}>
             <SettingsCard
-              title="Неограниченное количество лекарств"
-              description="Добавляйте и отслеживайте любое количество лекарств без ограничений"
+              title={t("settings_screen.subscription_plans_offering1_title")}
+              description={t("settings_screen.subscription_plans_offering1_description")}
               svgIcon={<CheckCircleIcon />}
               interaction="none"
             />
 
             <SettingsCard
-              title="Следите за лекарствами всей семьи"
-              description="Добавьте до трёх родственников и легко управляйте их расписанием приёма лекарств"
+              title={t("settings_screen.subscription_plans_offering2_title")}
+              description={t("settings_screen.subscription_plans_offering2_description")}
               svgIcon={<CheckCircleIcon />}
               interaction="none"
             />
 
             <SettingsCard
-              title="Контроль запасов лекарств"
-              description="Уведомления о том, что лекарства заканчиваются"
+              title={t("settings_screen.subscription_plans_offering3_title")}
+              description={t("settings_screen.subscription_plans_offering3_description")}
               svgIcon={<CheckCircleIcon />}
               interaction="none"
             />
 
             <SettingsCard
-              title="Персонализировать уведомления"
-              description="Управляйте уведомлениями: настройте звук и время повтора"
+              title={t("settings_screen.subscription_plans_offering4_title")}
+              description={t("settings_screen.subscription_plans_offering4_description")}
               svgIcon={<CheckCircleIcon />}
               interaction="none"
             />
@@ -194,10 +171,12 @@ export default function SubscriptionPlan() {
           {/* MONTHLY */}
           <Pressable
             style={[styles.pricePressable, { backgroundColor: bgSecondary }]}
-            onPress={() => setSelectedPlan("MONTHLY")}
+            onPress={() => setSelectedPkg(montly)}
           >
             <View style={styles.pricePressableHead}>
-              <Text style={[styles.pricePressableTitle, { color }]}>Премиум — ежемесячно</Text>
+              <Text style={[styles.pricePressableTitle, { color }]}>
+                {t("settings_screen.subscription_plans_monthly_title")}
+              </Text>
               <View
                 style={[
                   styles.pricePressableActiveWrapper,
@@ -213,19 +192,25 @@ export default function SubscriptionPlan() {
             </View>
 
             <View style={[styles.pricePressableTextWrapper]}>
-              <Text style={[styles.pricePressableBoldText, { color }]}>299₽</Text>
+              <Text style={[styles.pricePressableBoldText, { color }]}>
+                {montly?.product.priceString}
+              </Text>
               <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>/</Text>
-              <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>месяц</Text>
+              <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>
+                {t("settings_screen.subscription_plans_monthly_price_label")}
+              </Text>
             </View>
           </Pressable>
 
           {/* ANNUAL */}
           <Pressable
             style={[styles.pricePressable, { backgroundColor: bgSecondary }]}
-            onPress={() => setSelectedPlan("ANNUAL")}
+            onPress={() => setSelectedPkg(annualDiscount)}
           >
             <View style={styles.pricePressableHead}>
-              <Text style={[styles.pricePressableTitle, { color }]}>Премиум — годовая</Text>
+              <Text style={[styles.pricePressableTitle, { color }]}>
+                {t("settings_screen.subscription_plans_yearly_title")}
+              </Text>
               <View
                 style={[
                   styles.pricePressableActiveWrapper,
@@ -241,7 +226,9 @@ export default function SubscriptionPlan() {
             </View>
 
             <View style={[styles.discountLabelWrapper, { backgroundColor: bgTertiary }]}>
-              <Text style={[styles.discountLabel, { color: tintColor }]}>Выгода 15%</Text>
+              <Text style={[styles.discountLabel, { color: tintColor }]}>
+                {t("settings_screen.subscription_plans_yearly_discount_label")} 15%
+              </Text>
             </View>
 
             <View
@@ -252,19 +239,31 @@ export default function SubscriptionPlan() {
               }}
             >
               <View style={[styles.pricePressableTextWrapper]}>
-                <Text style={[styles.pricePressableBoldText, { color }]}>3050₽</Text>
+                <Text style={[styles.pricePressableBoldText, { color }]}>
+                  {annualDiscount?.product.priceString}
+                </Text>
                 <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>/</Text>
-                <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>год</Text>
+                <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>
+                  {t("settings_screen.subscription_plans_yearly_price_label")}
+                </Text>
               </View>
 
               <View style={styles.discountValueWrapper}>
                 <View style={[styles.lineStroke, { backgroundColor: mutedColor }]} />
-                <Text style={[styles.discountValue, { color: mutedColor }]}>3588₽/год</Text>
+                <Text style={[styles.discountValue, { color: mutedColor }]}>
+                  {annual?.product.priceString}/
+                  {t("settings_screen.subscription_plans_yearly_price_label")}
+                </Text>
               </View>
             </View>
           </Pressable>
         </View>
-        <CustomButton label="Продолжить" onPress={createPayment} />
+
+        <CustomButton
+          label={t("common.continue")}
+          onPress={subscribe}
+          disabled={purchaseIsInProcess}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -347,8 +346,8 @@ const styles = StyleSheet.create({
   },
   pricePressableBoldText: {
     fontFamily: "Roboto_500Medium",
-    fontSize: 36,
-    lineHeight: 42,
+    fontSize: 28,
+    lineHeight: 36,
   },
   pricePressableThinText: {
     fontFamily: "Roboto_500Medium",

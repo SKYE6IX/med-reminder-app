@@ -166,11 +166,15 @@ export default function RootLayout() {
     });
 
     // Configure IAP
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+    Purchases.setLogLevel(LOG_LEVEL.INFO);
+    Purchases.setLogHandler((logLevel, message) => {
+      if (message.includes("Purchase was cancelled")) {
+        return;
+      }
+    });
     if (Platform.OS === "ios") {
-      // Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
+      Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
     } else if (Platform.OS === "android") {
-      // Purchases.configure({ apiKey: "" });
     }
 
     return () => {
