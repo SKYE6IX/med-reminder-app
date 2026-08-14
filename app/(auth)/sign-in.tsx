@@ -7,6 +7,7 @@ import Loader from "@/component/ui/loader";
 import { QueryKey } from "@/constants/query-keys";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
+import { syncSubscriptionWithServer } from "@/helpers/sync-subscription-with-server";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
@@ -79,6 +80,8 @@ export default function SignInScreen() {
       await saveTokens(data.accessToken, data.refreshToken);
       await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
       setIsAuthenticated(true);
+
+      syncSubscriptionWithServer();
 
       await NotificationHelper.cancelAllNotifications();
 
