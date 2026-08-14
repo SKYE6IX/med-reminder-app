@@ -24,13 +24,5 @@ export interface SocialAuthRequest {
   timeZone: string;
 }
 export interface SubscriptionPlanResponse {
-  id: string;
-  planType: "FREE" | "PRO";
-  maxMedications: number | null;
-  managedRelation: boolean;
-  refillReminders: boolean;
-  reminderPreference: boolean;
-  endAt: string | null;
-  billingCycle: string | null;
-  subscriptionStatus: "ACTIVE" | "CANCELED" | null;
+  plan: "FREE" | "PRO";
 }

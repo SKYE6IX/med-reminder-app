@@ -14,8 +14,7 @@ export default function Subscription() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const { isPremiumPlan, subscriptionStatus } = useSubscriptionPlanQuery();
-  const activePaidSubscription = subscriptionStatus && subscriptionStatus === "ACTIVE";
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const currentPlanLabel = isPremiumPlan
     ? t("settings_screen.subscription_premimum_plan_label")
@@ -24,8 +23,6 @@ export default function Subscription() {
   const pressableText = isPremiumPlan
     ? t("settings_screen.subscription_manage_plan")
     : t("settings_screen.subscription_upgrade_plan");
-
-  const hideCancelButton = isPremiumPlan && !activePaidSubscription;
 
   const handleOnPress = async () => {
     // When is premium true, user will allow to cancel their
@@ -59,17 +56,9 @@ export default function Subscription() {
             <Text style={[styles.cardLabel, { color }]}>{currentPlanLabel}</Text>
           </View>
 
-          {!hideCancelButton && (
-            <Pressable
-              style={[
-                styles.cardPressable,
-                { backgroundColor: activePaidSubscription ? "#DC0000" : "#009E00" },
-              ]}
-              onPress={handleOnPress}
-            >
-              <Text style={styles.cardPressableText}>{pressableText}</Text>
-            </Pressable>
-          )}
+          <Pressable style={styles.cardPressable} onPress={handleOnPress}>
+            <Text style={styles.cardPressableText}>{pressableText}</Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
@@ -123,6 +112,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 16,
+    backgroundColor: "#009E00",
   },
   cardPressableText: {
     fontFamily: "Roboto_500Medium",

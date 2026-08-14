@@ -214,7 +214,6 @@ export default function FinalStepScreen() {
       });
       return;
     }
-
     const endDate = formState.schedule.endDate ? formState.schedule.endDate : null;
 
     const data: CreateMedicationProfile = {

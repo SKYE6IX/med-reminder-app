@@ -28,8 +28,9 @@ export interface CreateMedicationProfile {
   medicationReason: string | null;
   timeZone: string;
   schedule: CreateSchedule;
-  medicationPack: Omit<MedicationPackCreation, "medicationProfileId"> | null;
+  medicationPack: Omit<MedicationPackCreation, "medicationProfileId" | "timeZone"> | null;
 }
+
 export interface MedicationPackCreation {
   medicationProfileId: string;
   totalQuantity: string;

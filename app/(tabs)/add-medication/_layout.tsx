@@ -12,10 +12,11 @@ export const unstable_settings = {
 const ADD_PILL_SEGMENTS = ["add-medication", "details-step", "schedule-step", "final-step"];
 
 export default function AddPillLayout() {
+  const MAX_FREE_MEDICATION = 2;
   const openBannerRef = useRef<SubscriptionBannerRef>(null);
   const segments = useSegments();
   const { count } = useMedicationProfileQuery();
-  const { maxMedications } = useSubscriptionPlanQuery();
+  const { isPremiumPlan } = useSubscriptionPlanQuery();
 
   const router = useRouter();
 
@@ -25,7 +26,11 @@ export default function AddPillLayout() {
   const isPageActive = currentScreen === ADD_PILL_SEGMENTS[0];
 
   const canCreateMedicationProfile =
-    maxMedications === null ? true : count < maxMedications ? true : false;
+    count < MAX_FREE_MEDICATION
+      ? true
+      : count >= MAX_FREE_MEDICATION && isPremiumPlan
+        ? true
+        : false;
 
   // Guard expect a boolean
   useEffect(() => {

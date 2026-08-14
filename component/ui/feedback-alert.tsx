@@ -1,7 +1,7 @@
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useFeedBackStore } from "@/stores/feedback-store";
 import { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { AppState, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -50,7 +50,19 @@ export default function FeedbackAlert() {
         useFeedBackStore.getState().hideFeedBack();
       }, 4000);
     }
-    return () => clearTimeout(timeout);
+
+    const subscription = AppState.addEventListener("change", (appState) => {
+      if (appState === "active") {
+        if (visible) {
+          useFeedBackStore.getState().hideFeedBack();
+        }
+      }
+    });
+
+    return () => {
+      clearTimeout(timeout);
+      subscription.remove();
+    };
   }, [visible]);
 
   const animatedStyle = useAnimatedStyle(() => ({

@@ -26,6 +26,7 @@ export const useFeedBackStore = create<FeebackStore>()((set) => ({
   showFeedBack({ title, message, status }) {
     set({ title, message, status, visible: true });
   },
+
   hideFeedBack() {
     set({ visible: false });
   },

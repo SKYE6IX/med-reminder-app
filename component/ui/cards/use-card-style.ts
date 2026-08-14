@@ -142,6 +142,7 @@ export function useCardStyles() {
 
     cardActionButton: {
       height: 24,
+      minWidth: 80,
       maxWidth: 120,
       paddingLeft: 10,
       paddingRight: 10,

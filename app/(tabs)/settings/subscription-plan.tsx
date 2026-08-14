@@ -3,12 +3,14 @@ import CheckIcon from "@/component/icons/check-icon";
 import StarIcon from "@/component/icons/star-icon";
 import CustomButton from "@/component/ui/custom-button/custom-button";
 import SettingsCard from "@/component/ui/settings/settings-card";
+import { QueryKey } from "@/constants/query-keys";
 import { ENTITLEMENT_KEY } from "@/constants/susbscription-key";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import { SubscriptionPlanResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { getTimeZone } from "@/utils/luxonUtil";
+import { queryClient } from "@/utils/query-client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -59,12 +61,15 @@ export default function SubscriptionPlan() {
       const defaultPackage = getPackage(pkgs, Purchases.PACKAGE_TYPE.CUSTOM);
       setSelectedPkg(defaultPackage);
     };
+
     getPackages();
   }, []);
 
   const { mutate } = useMutation({
     mutationFn: createPaidSubscription,
-    onSuccess(data) {},
+    async onSuccess(data) {
+      await queryClient.invalidateQueries({ queryKey: [QueryKey.subscriptionPlan] });
+    },
     onError(error) {
       console.log("An Error occur when try to create subscription: ", error);
     },
@@ -84,7 +89,6 @@ export default function SubscriptionPlan() {
           expirationDateMillis,
           store,
         } = entitlement;
-
         const requestBody: CreateSubscription = {
           originalPurchaseDate: originalPurchaseDateMillis,
           latestPurchaseDate: latestPurchaseDateMillis,

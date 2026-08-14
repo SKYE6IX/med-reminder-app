@@ -1,14 +1,13 @@
 import { BottomSheetProvider } from "@/component/bottom-sheet-provider";
 import FeedbackAlert from "@/component/ui/feedback-alert";
-import { QueryKey } from "@/constants/query-keys";
 import { logOverdueEvents } from "@/helpers/log-overdue-event";
 import { regenarateNotifications } from "@/helpers/regenerate-notifications";
 import { scheduleNextMedicationNotifications } from "@/helpers/schedule-next-event-notifications";
 import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
+import { syncSubscriptionWithServer } from "@/helpers/sync-subscription-with-server";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { useAuthStore } from "@/stores/use-auth-store";
-import { api } from "@/utils/axiosInstance";
 import { getAuthorizedUser } from "@/utils/getAuthorizedUser";
 import { queryClient } from "@/utils/query-client";
 import { getValidAccessToken } from "@/utils/tokenUtils";
@@ -72,24 +71,9 @@ export default function RootLayout() {
       // Request valid acess token
       const token = await getValidAccessToken();
       if (token) {
-        // Prefetch Applications data
+        // Log overdue medication
         logOverdueEvents();
-        await Promise.all([
-          queryClient.prefetchQuery({
-            queryKey: [QueryKey.subscriptionPlan],
-            queryFn: async () => {
-              const res = await api.get("subscriptions");
-              return res.data;
-            },
-          }),
-          queryClient.prefetchQuery({
-            queryKey: [QueryKey.medicationList],
-            queryFn: async () => {
-              const res = await api.get("medications");
-              return res.data;
-            },
-          }),
-        ]);
+        syncSubscriptionWithServer();
 
         const resolveLng = resolveLanguage();
         const currentAppLng = await readFromStorage<string>("lng");
@@ -133,7 +117,6 @@ export default function RootLayout() {
       console.error("An error occur in Bootstrap", error);
     } finally {
       setIsReady(true);
-
       // We always want to save the initial
       // app language, so we can make use it to trigger
       // re-creation of notifications if user change the
@@ -153,18 +136,6 @@ export default function RootLayout() {
   }
 
   useEffect(() => {
-    // Bootstrap the app
-    bootstrap();
-
-    // Watch on langauge change and react to it
-    const subscription = AppState.addEventListener("change", (appState) => {
-      if (appState === "active") {
-        const lng = resolveLanguage();
-        i18n.changeLanguage(lng);
-        resetNotificationsOnLanguageChange(lng);
-      }
-    });
-
     // Configure IAP
     Purchases.setLogLevel(LOG_LEVEL.INFO);
     Purchases.setLogHandler((logLevel, message) => {
@@ -177,6 +148,17 @@ export default function RootLayout() {
     } else if (Platform.OS === "android") {
     }
 
+    // Bootstrap the app
+    bootstrap();
+    // Watch on langauge change and react to it
+    const subscription = AppState.addEventListener("change", (appState) => {
+      if (appState === "active") {
+        const lng = resolveLanguage();
+        i18n.changeLanguage(lng);
+        resetNotificationsOnLanguageChange(lng);
+      }
+    });
+
     return () => {
       subscription.remove();
     };
@@ -188,7 +170,6 @@ export default function RootLayout() {
       SplashScreen.hide();
     }
   }, [error, isReady, loaded]);
-
   if (!isReady) {
     return null;
   }
