@@ -52,10 +52,8 @@ export default function FeedbackAlert() {
     }
 
     const subscription = AppState.addEventListener("change", (appState) => {
-      if (appState === "active") {
-        if (visible) {
-          useFeedBackStore.getState().hideFeedBack();
-        }
+      if (appState === "active" && visible) {
+        useFeedBackStore.getState().hideFeedBack();
       }
     });
 
