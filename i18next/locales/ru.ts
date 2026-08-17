@@ -461,6 +461,8 @@ const ru = {
     missed_body: "{{medicationName}} на {{scheduleAt}} не было отмечено.",
     reserve_title: "Напоминание о пополнении",
     reserve_body: "{{medicationName}} скоро закончится.",
+    quick_action_taken: "Принять",
+    quick_action_skip: "Пропустить",
   },
 } as const;
 

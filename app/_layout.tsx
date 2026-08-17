@@ -144,7 +144,7 @@ export default function RootLayout() {
       }
     });
     if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: "appl_dESNpiAeJZGAUmMdTTPqFkXfyHk" });
+      Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_IOS });
     } else if (Platform.OS === "android") {
     }
 

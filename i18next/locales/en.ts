@@ -459,6 +459,8 @@ const en = {
     missed_body: "{{medicationName}} for {{scheduleAt}} wasn't taken.",
     reserve_title: "Reserve reminder",
     reserve_body: "{{medicationName}} will soon run out",
+    quick_action_taken: "Taken",
+    quick_action_skip: "Skip",
   },
 } as const;
 

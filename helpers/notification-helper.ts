@@ -13,6 +13,7 @@ import { useAppSettingsStore } from "@/stores/app-settings-store";
 import { MedicationPackResponse, ScheduleEventResponse } from "@/types/medication";
 import { api, axios } from "@/utils/axiosInstance";
 import { queryClient } from "@/utils/query-client";
+import { t } from "i18next";
 import notifee, {
   AlarmType,
   AndroidImportance,
@@ -381,9 +382,9 @@ export class NotificationHelper {
           },
           ...(showQuickActions && {
             actions: [
-              { title: "Принять", pressAction: { id: "taken" } },
+              { title: i18n.t("notification.quick_action_taken"), pressAction: { id: "taken" } },
               {
-                title: "Пропустить",
+                title: t("notification.quick_action_skip"),
                 pressAction: {
                   id: "missed",
                 },
@@ -417,11 +418,11 @@ export class NotificationHelper {
         actions: [
           {
             id: "taken",
-            title: "Принять",
+            title: i18n.t("notification.quick_action_taken"),
           },
           {
             id: "missed",
-            title: "Пропустить",
+            title: i18n.t("notification.quick_action_skip"),
           },
         ],
       },
@@ -471,9 +472,11 @@ export class NotificationHelper {
             );
           });
           if (!activePack) return;
+
           const daysSupply = Math.round(
             Number(activePack.currentQuantity) / Number(activePack.dosageAmount),
           );
+
           if (daysSupply - 1 < activePack.reminderDays && !activePack.isRefilled) {
             const refillReminder = DateTime.now()
               .setZone(getTimeZone())
