@@ -27,7 +27,7 @@ export default function Subscription() {
   const handleOnPress = async () => {
     // When is premium true, user will allow to cancel their
     // plan
-    if (isPremiumPlan) {
+    if (isPremiumPlan && !isAndroid) {
       await Purchases.showManageSubscriptions();
     } else {
       // Else they will navigate to subscription page

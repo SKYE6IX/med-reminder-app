@@ -62,7 +62,9 @@ export default function SubscriptionPlan() {
       setSelectedPkg(defaultPackage);
     };
 
-    getPackages();
+    if (Platform.OS === "ios") {
+      getPackages();
+    }
   }, []);
 
   const { mutate } = useMutation({

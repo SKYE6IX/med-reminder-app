@@ -5,6 +5,7 @@ import FormHeader from "@/component/ui/form/form-header";
 import FormInput from "@/component/ui/form/form-input";
 import Loader from "@/component/ui/loader";
 import { QueryKey } from "@/constants/query-keys";
+import { logOverdueEvents } from "@/helpers/log-overdue-event";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
 import { syncSubscriptionWithServer } from "@/helpers/sync-subscription-with-server";
@@ -81,10 +82,10 @@ export default function SignInScreen() {
       await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
       setIsAuthenticated(true);
 
+      logOverdueEvents();
       syncSubscriptionWithServer();
 
       await NotificationHelper.cancelAllNotifications();
-
       await scheduleNewMedicationNotifications({
         ...useAppSettingsStore.getState().notfication,
         ...useAppSettingsStore.getState().reminderPreferences,

@@ -4,6 +4,7 @@ import { SubscriptionPlanResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import Purchases, { PurchasesEntitlementInfo } from "react-native-purchases";
 
 const fetchSubscriptionPlan = async () => {
@@ -21,7 +22,9 @@ export function useSubscriptionPlanQuery() {
       setEntitlement(entitlement);
     };
 
-    getEntitlement();
+    if (Platform.OS === "ios") {
+      getEntitlement();
+    }
   }, []);
 
   const { data } = useQuery({
