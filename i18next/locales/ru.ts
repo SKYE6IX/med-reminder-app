@@ -301,7 +301,7 @@ const ru = {
     step3_freq_label: "Частота",
     step3_dosage_label: "Дозировка",
     step3_dosage_amount_label: "Доза за приём",
-    step3_dosage_amount_measurement_label: "Measurement",
+    step3_dosage_amount_measurement_label: "Единица измерения",
     step3_dosage_amount_sheet_title: "Количество дозировки",
     step3_time_label: "Время приема",
     step3_time_choose_btn: "Установить время начала",
