@@ -11,6 +11,7 @@ import { SubscriptionPlanResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { getTimeZone } from "@/utils/luxonUtil";
 import { queryClient } from "@/utils/query-client";
+import { moderateScale } from "@/utils/responsive";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -57,14 +58,13 @@ export default function SubscriptionPlan() {
     const getPackages = async () => {
       const offering = await Purchases.getOfferings();
       const pkgs = offering.all["default"].availablePackages;
+
       setPkgs(pkgs);
       const defaultPackage = getPackage(pkgs, Purchases.PACKAGE_TYPE.CUSTOM);
       setSelectedPkg(defaultPackage);
     };
 
-    if (Platform.OS === "ios") {
-      getPackages();
-    }
+    getPackages();
   }, []);
 
   const { mutate } = useMutation({
@@ -198,7 +198,9 @@ export default function SubscriptionPlan() {
             </View>
 
             <View style={[styles.pricePressableTextWrapper]}>
-              <Text style={[styles.pricePressableBoldText, { color }]}>
+              <Text
+                style={[styles.pricePressableBoldText, { color, fontSize: moderateScale(28, 6) }]}
+              >
                 {montly?.product.priceString}
               </Text>
               <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>/</Text>
@@ -245,7 +247,9 @@ export default function SubscriptionPlan() {
               }}
             >
               <View style={[styles.pricePressableTextWrapper]}>
-                <Text style={[styles.pricePressableBoldText, { color }]}>
+                <Text
+                  style={[styles.pricePressableBoldText, { color, fontSize: moderateScale(28, 6) }]}
+                >
                   {annualDiscount?.product.priceString}
                 </Text>
                 <Text style={[styles.pricePressableThinText, { color: mutedColor }]}>/</Text>
@@ -256,7 +260,12 @@ export default function SubscriptionPlan() {
 
               <View style={styles.discountValueWrapper}>
                 <View style={[styles.lineStroke, { backgroundColor: mutedColor }]} />
-                <Text style={[styles.discountValue, { color: mutedColor }]}>
+                <Text
+                  style={[
+                    styles.discountValue,
+                    { color: mutedColor, fontSize: moderateScale(14, 1.5) },
+                  ]}
+                >
                   {annual?.product.priceString}/
                   {t("settings_screen.subscription_plans_yearly_price_label")}
                 </Text>
@@ -348,11 +357,10 @@ const styles = StyleSheet.create({
   pricePressableTextWrapper: {
     flexDirection: "row",
     alignItems: "baseline",
-    gap: 4,
+    gap: 1,
   },
   pricePressableBoldText: {
     fontFamily: "Roboto_500Medium",
-    fontSize: 28,
     lineHeight: 36,
   },
   pricePressableThinText: {
@@ -360,7 +368,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19.2,
   },
-
   discountLabelWrapper: {
     width: 87,
     paddingLeft: 8,
@@ -383,7 +390,6 @@ const styles = StyleSheet.create({
   },
   discountValue: {
     fontFamily: "Roboto_400Regular",
-    fontSize: 14,
     lineHeight: 16.2,
   },
   lineStroke: {

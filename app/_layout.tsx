@@ -143,9 +143,11 @@ export default function RootLayout() {
         return;
       }
     });
+
     if (Platform.OS === "ios") {
       Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_IOS });
     } else if (Platform.OS === "android") {
+      Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_ANDROID });
     }
 
     // Bootstrap the app

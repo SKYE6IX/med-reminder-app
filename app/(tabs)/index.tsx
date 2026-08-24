@@ -48,7 +48,7 @@ export default function Home() {
       if (!isPremiumPlan && useUserStore.getState().displaySubscriptioOffer) {
         subscriptionBannerRef.current?.openModal();
       }
-    }, 2000);
+    }, 4000);
 
     return () => clearTimeout(timeout);
   }, [isPremiumPlan]);

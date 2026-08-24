@@ -4,7 +4,6 @@ import { SubscriptionPlanResponse } from "@/types/user";
 import { api } from "@/utils/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
 import Purchases, { PurchasesEntitlementInfo } from "react-native-purchases";
 
 const fetchSubscriptionPlan = async () => {
@@ -22,9 +21,7 @@ export function useSubscriptionPlanQuery() {
       setEntitlement(entitlement);
     };
 
-    if (Platform.OS === "ios") {
-      getEntitlement();
-    }
+    getEntitlement();
   }, []);
 
   const { data } = useQuery({
@@ -34,6 +31,7 @@ export function useSubscriptionPlanQuery() {
 
   const isPremiumPlan = (data && data.plan === "PRO") || entitlement !== null;
   const isCancelled = entitlement !== null && entitlement.willRenew;
+
   return {
     isPremiumPlan,
     isCancelled,
