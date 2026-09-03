@@ -43,7 +43,6 @@ const CustomLightTheme = {
     background: "#F7F7F7",
   },
 };
-
 const CustomDarkTheme = {
   ...DarkTheme,
   colors: {
@@ -172,6 +171,7 @@ export default function RootLayout() {
       SplashScreen.hide();
     }
   }, [error, isReady, loaded]);
+
   if (!isReady) {
     return null;
   }
