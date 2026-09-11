@@ -2,7 +2,7 @@ import { DateTime, DateTimeFormatOptions, Duration } from "luxon";
 
 export const getTimeZone = () => DateTime.now().zoneName;
 
-export const getDefaultISODate = () => DateTime.now().toISODate({ format: "basic" });
+export const getNowISODate = () => DateTime.now().toISODate({ format: "basic" });
 
 export const toLocalUtcTime = (date: Date, lng: string) => {
   return DateTime.fromJSDate(date)

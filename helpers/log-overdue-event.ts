@@ -1,11 +1,11 @@
 import { api } from "@/utils/axiosInstance";
-import { getDefaultISODate } from "@/utils/luxonUtil";
+import { getNowISODate } from "@/utils/luxonUtil";
 
 export const logOverdueEvents = async () => {
-  const isoDate = getDefaultISODate();
+  const now = getNowISODate();
   try {
-    await api.put("medications/schedules/overdue", {
-      eventDateUntil: isoDate,
+    await api.put("medications/schedules/event/overdue", {
+      eventDateUntil: now,
     });
   } catch (error) {
     console.log("An error occur when try to log overdue events: ", error);

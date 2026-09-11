@@ -1,7 +1,7 @@
 import { ScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
-import { DateTime, getDefaultISODate } from "@/utils/luxonUtil";
+import { DateTime, getNowISODate } from "@/utils/luxonUtil";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { readFromStorage, removeFromStorage, saveToStorage } from "./storage-manager";
@@ -50,15 +50,15 @@ export const scheduleNextMedicationNotifications = async (
         ? DateTime.fromJSDate(new Date(storeDate)).toISODate({ format: "basic" })
         : null;
 
-      anchorDate = isoDate ?? getDefaultISODate();
+      anchorDate = isoDate ?? getNowISODate();
     } else {
       await removeFromStorage(LAST_SCHEDULED_KEY);
 
-      anchorDate = getDefaultISODate();
+      anchorDate = getNowISODate();
     }
 
     const upcomingEvents = await api.get<ScheduleEventResponse[]>(
-      "medications/schedules/upcoming",
+      "medications/schedules/event/upcoming",
       {
         params: {
           eventDateFrom: anchorDate,

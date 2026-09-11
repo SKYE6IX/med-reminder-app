@@ -13,7 +13,7 @@ import { useTranslation } from "@/i18next/i18next";
 import { useUserStore } from "@/stores/use-user-store";
 import { ScheduleEventResponse } from "@/types/medication";
 import { api } from "@/utils/axiosInstance";
-import { getDefaultISODate } from "@/utils/luxonUtil";
+import { getNowISODate } from "@/utils/luxonUtil";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -38,7 +38,7 @@ export default function Home() {
   const { isPremiumPlan } = useSubscriptionPlanQuery();
   const profileImageUrl = useProfileImage();
 
-  const [selectedDate, setSelectedDate] = useState(getDefaultISODate());
+  const [selectedDate, setSelectedDate] = useState(getNowISODate());
   const subscriptionBannerRef = useRef<SubscriptionBannerRef>(null);
 
   // Show premimum plan offer once to newly user.

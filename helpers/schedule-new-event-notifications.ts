@@ -1,7 +1,7 @@
 import { ScheduleEventResponse } from "@/types/medication";
 import { NotificationData, NotificationSettings } from "@/types/notification";
 import { api, axios } from "@/utils/axiosInstance";
-import { getDefaultISODate } from "@/utils/luxonUtil";
+import { getNowISODate } from "@/utils/luxonUtil";
 import notifee, { TriggerNotification } from "react-native-notify-kit";
 import { NotificationHelper } from "./notification-helper";
 import { saveToStorage } from "./storage-manager";
@@ -12,15 +12,18 @@ const LAST_SCHEDULED_KEY = "notifications:lastScheduledAt";
 export const scheduleNewMedicationNotifications = async (
   settings: Partial<NotificationSettings>,
 ) => {
-  const isoDate = getDefaultISODate();
+  const isoDate = getNowISODate();
 
   try {
-    const response = await api.get<ScheduleEventResponse[]>("medications/schedules/upcoming", {
-      params: {
-        eventDateFrom: isoDate,
-        limit: MAX_PREBUILD_EVENTS,
+    const response = await api.get<ScheduleEventResponse[]>(
+      "medications/schedules/event/upcoming",
+      {
+        params: {
+          eventDateFrom: isoDate,
+          limit: MAX_PREBUILD_EVENTS,
+        },
       },
-    });
+    );
 
     if (!response.data.length) return;
 

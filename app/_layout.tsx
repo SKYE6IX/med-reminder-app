@@ -3,6 +3,7 @@ import FeedbackAlert from "@/component/ui/feedback-alert";
 import { logOverdueEvents } from "@/helpers/log-overdue-event";
 import { regenarateNotifications } from "@/helpers/regenerate-notifications";
 import { scheduleNextMedicationNotifications } from "@/helpers/schedule-next-event-notifications";
+import { scheduleNextMedicationEvents } from "@/helpers/schedule-next-medication-events";
 import { readFromStorage, saveToStorage } from "@/helpers/storage-manager";
 import { syncSubscriptionWithServer } from "@/helpers/sync-subscription-with-server";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -72,6 +73,7 @@ export default function RootLayout() {
       if (token) {
         // Log overdue medication
         logOverdueEvents();
+        scheduleNextMedicationEvents();
         syncSubscriptionWithServer();
 
         const resolveLng = resolveLanguage();

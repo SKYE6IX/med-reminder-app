@@ -2,7 +2,7 @@ import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
 import {
   formatHomeScreenDate,
-  getDefaultISODate,
+  getNowISODate,
   getWeekDays,
   getWeekViewDescription,
 } from "@/utils/luxonUtil";
@@ -33,13 +33,13 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   const CAROUSEL_WIDTH = Dimensions.get("screen").width - WINDOW_PADDING * 2;
 
   const carouselRef = useRef<ICarouselInstance>(null);
-  const [selectedISODate, setSelectedISODate] = useState(getDefaultISODate());
+  const [selectedISODate, setSelectedISODate] = useState(getNowISODate());
 
   const [activeOffset, setActiveOffset] = useState(0);
 
   const handleOnSnapToItem = (index: number) => {
     if (index === CENTER_INDEX) {
-      const isoDate = getDefaultISODate();
+      const isoDate = getNowISODate();
       setSelectedISODate(isoDate);
       onDateChange(isoDate);
     }
@@ -48,7 +48,7 @@ export default function WeekView({ showDescription, onDateChange }: WeekViewProp
   };
 
   const scrollToCurrentWeek = () => {
-    const isoDate = getDefaultISODate();
+    const isoDate = getNowISODate();
     setSelectedISODate(isoDate);
     onDateChange(isoDate);
 

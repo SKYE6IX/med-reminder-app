@@ -1,5 +1,5 @@
 import { DosageMeasurement, MedicationUnit } from "@/types/medication";
-import { getDefaultISODate } from "@/utils/luxonUtil";
+import { getNowISODate } from "@/utils/luxonUtil";
 import { create } from "zustand";
 
 export type SchedulePreset = "ONCE_A_DAY" | "TWICE_A_DAY" | "THREE_TIMES_A_DAY" | "CUSTOM";
@@ -64,7 +64,7 @@ const DEFAULT_STATE: AddPillStore["formState"] = {
       recurrenceRule: "FREQ=DAILY;BYHOUR=8;BYMINUTE=0",
       preset: "ONCE_A_DAY",
     },
-    startDate: getDefaultISODate(),
+    startDate: getNowISODate(),
     endDate: null,
   },
   medicationPack: null,
