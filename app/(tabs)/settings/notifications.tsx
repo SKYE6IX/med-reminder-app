@@ -29,24 +29,23 @@ const RINGTONE_TRACKS = [
 ];
 
 export default function Notifications() {
+  const insets = useSafeAreaInsets();
   const { t, i18n } = useTranslation();
   const isRU = i18n.language === "ru";
+  const isAndroid = Platform.OS === "android";
 
-  const basicSoundSettings = [
+  const BASIC_SOUND_SETTINGS = [
     { label: isRU ? "Звук приложения по умолчанию" : "Default app sound", value: "enable" },
     { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
   ];
-  const proSoundSettings = [
+  const PRO_SOUND_SETTINGS = [
     { label: isRU ? "Беззвучно" : "Silent", value: "silent" },
     { label: "Universe Wave", value: "universfield_soft.wav" },
     { label: "Earth Softy", value: "universfield_passive.wav" },
     { label: "Dragon Time", value: "dragon_wavy.wav" },
   ];
 
-  const insets = useSafeAreaInsets();
-  const { openSheet } = useBottomSheet();
-
-  const isAndroid = Platform.OS === "android";
+  const { openSheet, sheetIndex } = useBottomSheet();
   const { notfication, reminderPreferences, setNotificationSetting } = useAppSettingsStore();
   const { isPremiumPlan } = useSubscriptionPlanQuery();
 
@@ -70,7 +69,7 @@ export default function Notifications() {
     }
   };
 
-  const soundListSettings = isPremiumPlan ? proSoundSettings : basicSoundSettings;
+  const soundListSettings = isPremiumPlan ? PRO_SOUND_SETTINGS : BASIC_SOUND_SETTINGS;
 
   const soundSelectedValue =
     isPremiumPlan && notfication.sound === "silent"
@@ -90,6 +89,13 @@ export default function Notifications() {
     };
     setup();
   }, []);
+
+  // Track sheetState
+  useEffect(() => {
+    if (player.playing && sheetIndex < 1) {
+      player.pause();
+    }
+  }, [player, sheetIndex]);
 
   const handleSoundChange = async (value: string) => {
     if (!isPremiumPlan) {
@@ -117,15 +123,16 @@ export default function Notifications() {
       }
 
       setNotificationSetting({ sound: "enable", alertSound: value });
-
       const newSound = RINGTONE_TRACKS.find((track) => track.key === value)!;
+
       setSelectedSounds(newSound);
+
       previewTimeoutId.current = setTimeout(() => {
         player.play();
         previewTimeoutId.current = null;
       }, 80);
 
-      // We wait atleat 5 second before we recreate
+      // We wait atleast 5 second before we recreate
       // the new sound for user notification
       commitTimeoutId.current = setTimeout(async () => {
         player.pause();

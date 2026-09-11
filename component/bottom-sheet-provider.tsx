@@ -15,6 +15,7 @@ interface OpenOptions {
 interface BottomSheetContextValue {
   openSheet: (options: OpenOptions) => void;
   closeSheet: () => void;
+  sheetIndex: number;
 }
 
 interface HandleProps {
@@ -29,18 +30,18 @@ interface HandleProps {
 const BottomSheetContext = createContext<BottomSheetContextValue>({
   openSheet: () => {},
   closeSheet: () => {},
+  sheetIndex: -1,
 });
 
 export function BottomSheetProvider({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
-
   const bottomSheetRef = useRef<BottomSheet>(null);
-
   const timeoutId = useRef<NodeJS.Timeout>(null);
 
   const [title, setTitle] = useState<string>("");
   const [snapPointPercent, setSnapPointPercent] = useState("100%");
   const [content, setContent] = useState<React.ReactNode>(null);
+  const [sheetIndex, setSheetIndex] = useState(-1);
 
   const snapPoints = useMemo(() => ["1%", snapPointPercent], [snapPointPercent]);
 
@@ -52,21 +53,24 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
     setTitle(title);
     setSnapPointPercent(snapPointPercent);
     setContent(content);
-
     timeoutId.current = setTimeout(() => bottomSheetRef.current?.expand(), 150);
   }, []);
 
   const closeSheet = useCallback(() => {
     bottomSheetRef.current?.close();
+    // Need a callback from where ever we call this function
   }, []);
 
+  // Handle on sheet changes
   const handleSheetChanges = useCallback((index: number) => {
+    setSheetIndex(index);
     if (index <= 1) {
       Keyboard.dismiss();
       bottomSheetRef.current?.close();
     }
   }, []);
 
+  // Backdrop component
   const renderBackdrop = useCallback(
     (props: any) => <BottomSheetBackdrop {...props} disappearsOnIndex={1} appearsOnIndex={2} />,
     [],
@@ -79,7 +83,7 @@ export function BottomSheetProvider({ children }: { children: React.ReactNode })
   const tint = useThemeColor({}, "tint");
 
   return (
-    <BottomSheetContext.Provider value={{ openSheet, closeSheet }}>
+    <BottomSheetContext.Provider value={{ openSheet, closeSheet, sheetIndex }}>
       {children}
       <BottomSheet
         ref={bottomSheetRef}

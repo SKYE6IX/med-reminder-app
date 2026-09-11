@@ -78,7 +78,7 @@ const ru = {
       wife: "Жена",
       husband: "Муж",
     },
-    bottom_sheet_close: "Отмена",
+    bottom_sheet_close: "Закрывать",
     local_auth_prompt_msg: "Подтвердите личность",
     local_auth_cancel_label: "Отменить",
     local_auth_fallback_label: "Используйте пароль",
