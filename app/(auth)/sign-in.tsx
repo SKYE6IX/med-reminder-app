@@ -8,6 +8,7 @@ import { QueryKey } from "@/constants/query-keys";
 import { logOverdueEvents } from "@/helpers/log-overdue-event";
 import { NotificationHelper } from "@/helpers/notification-helper";
 import { scheduleNewMedicationNotifications } from "@/helpers/schedule-new-event-notifications";
+import { scheduleNextMedicationEvents } from "@/helpers/schedule-next-medication-events";
 import { syncSubscriptionWithServer } from "@/helpers/sync-subscription-with-server";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useTranslation } from "@/i18next/i18next";
@@ -80,9 +81,9 @@ export default function SignInScreen() {
       await clearTokens();
       await saveTokens(data.accessToken, data.refreshToken);
       await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
-      setIsAuthenticated(true);
 
       logOverdueEvents();
+      scheduleNextMedicationEvents();
       syncSubscriptionWithServer();
 
       await NotificationHelper.cancelAllNotifications();
@@ -90,6 +91,8 @@ export default function SignInScreen() {
         ...useAppSettingsStore.getState().notfication,
         ...useAppSettingsStore.getState().reminderPreferences,
       });
+
+      setIsAuthenticated(true);
     },
 
     onError(error) {
