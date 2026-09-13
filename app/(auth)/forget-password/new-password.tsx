@@ -55,7 +55,7 @@ export default function NewPasswordScreen() {
         message: t("feedback.success.change_password.text"),
         status: "success",
       });
-      clearTokens();
+      await clearTokens();
       router.dismissTo("/(auth)/sign-in");
       await Promise.all([
         removeFromStorage(STORAGE_KEY_EMAIL),

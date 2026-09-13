@@ -71,11 +71,19 @@ export default function RootLayout() {
       // Request valid acess token
       const token = await getValidAccessToken();
       if (token) {
-        // Log overdue medication
-        logOverdueEvents();
-        scheduleNextMedicationEvents();
-        syncSubscriptionWithServer();
+        const [overdueResult, subscriptionResult] = await Promise.allSettled([
+          logOverdueEvents(),
+          syncSubscriptionWithServer(),
+        ]);
 
+        if (overdueResult.status === "rejected") {
+          console.log("Overdue api called failed: ", overdueResult.reason);
+        }
+        if (subscriptionResult.status === "rejected") {
+          console.log("Subscription sync api called failed: ", subscriptionResult.reason);
+        }
+
+        await scheduleNextMedicationEvents();
         const resolveLng = resolveLanguage();
         const currentAppLng = await readFromStorage<string>("lng");
         // If the currentAppLng which we store in local storage
@@ -95,7 +103,7 @@ export default function RootLayout() {
           });
         }
 
-        getAuthorizedUser();
+        await getAuthorizedUser();
         // Check if user has a set up device lock.
         const isEnrolled = await LocalAuthentication.isEnrolledAsync();
         // If user set up local device lock

@@ -82,10 +82,19 @@ export default function SignInScreen() {
       await saveTokens(data.accessToken, data.refreshToken);
       await queryClient.invalidateQueries({ queryKey: [QueryKey.users] });
 
-      logOverdueEvents();
-      scheduleNextMedicationEvents();
-      syncSubscriptionWithServer();
+      const [overdueResult, subscriptionResult] = await Promise.allSettled([
+        logOverdueEvents(),
+        syncSubscriptionWithServer(),
+      ]);
 
+      if (overdueResult.status === "rejected") {
+        console.log("Overdue api called failed: ", overdueResult.reason);
+      }
+      if (subscriptionResult.status === "rejected") {
+        console.log("Subscription sync api called failed: ", subscriptionResult.reason);
+      }
+
+      await scheduleNextMedicationEvents();
       await NotificationHelper.cancelAllNotifications();
       await scheduleNewMedicationNotifications({
         ...useAppSettingsStore.getState().notfication,
