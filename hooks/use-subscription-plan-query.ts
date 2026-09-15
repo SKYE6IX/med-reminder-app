@@ -20,7 +20,6 @@ export function useSubscriptionPlanQuery() {
       const entitlement = customerInfo.entitlements.active[ENTITLEMENT_KEY] ?? null;
       setEntitlement(entitlement);
     };
-
     getEntitlement();
   }, []);
 
@@ -29,7 +28,8 @@ export function useSubscriptionPlanQuery() {
     queryFn: fetchSubscriptionPlan,
   });
 
-  const isPremiumPlan = (data && data.plan === "PRO") || entitlement !== null;
+  const isPremiumPlan = entitlement !== null || (data && data.plan === "PRO");
+
   const isCancelled = entitlement !== null && entitlement.willRenew;
 
   return {

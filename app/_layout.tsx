@@ -75,7 +75,6 @@ export default function RootLayout() {
           logOverdueEvents(),
           syncSubscriptionWithServer(),
         ]);
-
         if (overdueResult.status === "rejected") {
           console.log("Overdue api called failed: ", overdueResult.reason);
         }

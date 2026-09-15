@@ -2,7 +2,7 @@
   "expo": {
     "name": "MedRemindR",
     "slug": "medreminder-app",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icons/ios-light.png",
     "scheme": "medreminderapp",
@@ -18,8 +18,8 @@
       },
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "Это приложение или один из его компонентов может запрашивать доступ к местоположению, чтобы улучшить ваш опыт",
-        "NSMicrophoneUsageDescription": "Это приложение использует микрофон для сеансов воспроизведения аудио."
+        "NSLocationWhenInUseUsageDescription": "This app or one of its components may request location access to enhance your experience.",
+        "NSMicrophoneUsageDescription": "This app uses a microphone for audio playback sessions."
       },
       "runtimeVersion": {
         "policy": "appVersion"
@@ -81,13 +81,13 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Приложение получит доступ к вашей фотографии, чтобы вы могли выбрать аватар."
+          "photosPermission": "The app will access your photo so that you can select an avatar."
         }
       ],
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Разрешить $(PRODUCT_NAME) использовать Face ID"
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID"
         }
       ],
       [
@@ -106,7 +106,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Разрешите $(PRODUCT_NAME) получить доступ к вашему микрофону.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone.",
           "enableBackgroundPlayback": false,
           "enableBackgroundRecording": false,
           "recordAudioAndroid": false
